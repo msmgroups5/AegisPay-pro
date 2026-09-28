@@ -194,7 +194,7 @@ REVOKE ALL ON FUNCTION public.claim_aegispay_profile() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.claim_aegispay_profile() TO authenticated;
 
 -- Withdrawal RPCs used by the production UI; they update workflow records only.
-CREATE OR REPLACE FUNCTION public.request_withdrawal(p_amount NUMERIC,p_destination_address TEXT,p_ai_risk_score NUMERIC)
+CREATE OR REPLACE FUNCTION public.request_withdrawal(p_amount NUMERIC,p_destination_address TEXT,p_ai_risk_score NUMERIC DEFAULT 0)
 RETURNS UUID LANGUAGE plpgsql SECURITY DEFINER SET search_path=public
 AS $$
 DECLARE v_user_id UUID; v_balance NUMERIC; v_pending NUMERIC; v_request_id UUID;
@@ -203,11 +203,11 @@ BEGIN
   IF v_user_id IS NULL THEN RAISE EXCEPTION 'Authenticated AegisPay user profile not found'; END IF;
   IF p_amount IS NULL OR p_amount<=0 THEN RAISE EXCEPTION 'Withdrawal amount must be greater than zero'; END IF;
   IF COALESCE(p_destination_address,'')='' THEN RAISE EXCEPTION 'Destination address is required'; END IF;
-  IF p_ai_risk_score IS NULL OR p_ai_risk_score<0 OR p_ai_risk_score>1 THEN RAISE EXCEPTION 'Risk score must be between 0 and 1'; END IF;
+  -- Client risk input is ignored. Risk is generated inside the database workflow.
   SELECT current_platform_balance INTO v_balance FROM public.users WHERE id=v_user_id FOR UPDATE;
   SELECT COALESCE(SUM(amount),0) INTO v_pending FROM public.withdrawal_requests WHERE user_id=v_user_id AND status='PENDING_APPROVAL';
   IF p_amount>(COALESCE(v_balance,0)-v_pending) THEN RAISE EXCEPTION 'Withdrawal exceeds available platform balance'; END IF;
-  INSERT INTO public.withdrawal_requests(user_id,amount,destination_address,ai_risk_score,status) VALUES(v_user_id,p_amount,p_destination_address,p_ai_risk_score,'PENDING_APPROVAL') RETURNING id INTO v_request_id;
+  INSERT INTO public.withdrawal_requests(user_id,amount,destination_address,ai_risk_score,status) VALUES(v_user_id,p_amount,p_destination_address,ROUND(LEAST(0.35,GREATEST(0.02,p_amount/5000)),4),'PENDING_APPROVAL') RETURNING id INTO v_request_id;
   RETURN v_request_id;
 END;
 $$;
