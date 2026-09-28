@@ -67,6 +67,27 @@
   var state=loadState(),session=loadSession(),page='dashboard',filters={},pageNums={};
   var supa=window.AegisSupabaseClient||null,remoteMode=!!supa;
   var root=document.getElementById('app');
+  // Native hybrid bridge hooks: location, maps, QR/barcode scan and device feedback.
+  window.AegisDevice={
+    runtime:function(){try{return window.AegisNative&&AegisNative.runtimeInfo?AegisNative.runtimeInfo():JSON.stringify(window.AegisRuntime||{})}catch(e){return '{}'}},
+    chooseLocation:function(){if(window.AegisNative&&AegisNative.chooseLocation){AegisNative.chooseLocation();return true}return false},
+    openLocation:function(q){if(window.AegisNative&&AegisNative.openLocation){AegisNative.openLocation(q||'');return true}return false},
+    scan:function(){if(window.AegisNative&&AegisNative.scan){AegisNative.scan();return true}return false},
+    message:function(m){if(window.AegisNative&&AegisNative.showMessage){AegisNative.showMessage(m||'')}else if(typeof toast==='function'){toast(m||'')} }
+  };
+  window.AegisNativeScanResult=function(value){
+    var el=document.querySelector('[data-native-scan-result]');
+    if(el){el.value=value||'';el.dispatchEvent(new Event('input',{bubbles:true}));}
+    if(typeof toast==='function')toast(value?'Scan completed':'Scan cancelled',value?'good':'');
+  };
+  window.AegisNativeLocation=function(encoded){
+    try{
+      var raw=JSON.parse(encoded);
+      var el=document.querySelector('[data-native-location]');
+      if(el)el.textContent=Number(raw.latitude).toFixed(6)+', '+Number(raw.longitude).toFixed(6);
+      if(typeof toast==='function')toast('Location: '+Number(raw.latitude).toFixed(5)+', '+Number(raw.longitude).toFixed(5),'good');
+    }catch(e){}
+  };
   function clone(x){return JSON.parse(JSON.stringify(x));}
   function isoDate(v){return v?String(v).slice(0,10):'—';}
   function remoteError(result){return result&&result.error?result.error:null;}
