@@ -15,7 +15,7 @@ android {
 
 def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
     from(project.rootDir.parentFile) {
-        include 'index.html', 'styles.css', 'app.js'
+        include 'styles.css', 'app.js'
     }
     into(layout.projectDirectory.dir('src/main/assets/aegispay'))
 }
