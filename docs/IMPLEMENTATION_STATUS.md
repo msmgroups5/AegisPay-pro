@@ -2,7 +2,7 @@
 
 ## GitHub-side completion checkpoint
 
-The repository now contains the complete demo/system-data implementation layer required by the master specification before external production integrations are connected.
+The repository contains the complete demo/system-data implementation layer required by the master specification before external production integrations are connected.
 
 ### UI / UX
 - Premium dark fintech/control-center shell
@@ -14,6 +14,7 @@ The repository now contains the complete demo/system-data implementation layer r
 - Status badges, cards, progress bars, gauge, map, heatmap, tables, modal dialogs
 - Empty-state, error-state and disabled-action behavior
 - Search and pagination on administrative tables
+- Offline shell service worker for served web deployments
 
 ### Core user modules
 - Authentication screen
@@ -64,10 +65,13 @@ The repository now contains the complete demo/system-data implementation layer r
 - API validation, security headers and demo request limit
 - PostgreSQL schema
 - pgcrypto extension in schema
+- Supabase production integration notes
+- Production environment variable template
 - .github/workflows/ci.yml
 - .github/workflows/pages.yml
 - netlify.toml
 - .gitignore
+- service-worker.js
 - scripts/validate-static.js
 - scripts/smoke-api.js
 - package.json
@@ -84,4 +88,4 @@ The GitHub Actions repository validation workflow is configured to run:
 This repository layer does not perform real financial transfers, blockchain execution, custody, banking transfers or live payment settlement. Approval actions update application status and audit records only. Displayed balances, yields, liquidity figures, rewards and risk scores are demonstration/system data and are not an independent financial audit.
 
 ### External work that remains
-Production deployment still requires separately configured hosting, database/authentication services, secrets/environment variables, external AI provider credentials (if used), domain configuration, security testing, monitoring, and any applicable compliance/legal work.
+Production deployment still requires an active and intentionally selected Supabase project, real Auth users and profile mapping, production secrets/environment variables, live data wiring, external AI provider credentials (if used), Telegram credentials/integration (if used), domain/hosting configuration, security testing, monitoring, and any applicable compliance/legal work.
