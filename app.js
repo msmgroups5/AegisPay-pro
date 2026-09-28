@@ -22,10 +22,6 @@ const DEMO={
     {name:'Ali F.',action:'Deposited',amount:'100 USDT',out:false},
     {name:'Ayesha R.',action:'Withdrawn',amount:'15 USDT',out:true}
   ],
-  nodes:[
-    {name:'Guardian Node',id:'NODE-1001',allocation:'5,000 USDT',yield:'1.24%',region:'Dubai',status:'Active'},
-    {name:'Sentinel Node',id:'NODE-1002',allocation:'7,500 USDT',yield:'0.92%',region:'London',status:'Active'}
-  ]
 };
 
 let user=JSON.parse(localStorage.getItem('aegis_user')||'null');
@@ -91,7 +87,7 @@ function tiles(){return '<div class="tile-grid"><button class="tile" onclick="na
 
 function home(){
  return top()+'<main class="content">'+levels()+referralCard()+tiles()+
- '<div class="section"><div class="section-head"><h3>Account Summary</h3><button onclick="nav(\'assets\')">View Assets</button></div><div class="stat-grid"><div class="stat"><strong>12,480</strong><small>Balance USDT</small></div><div class="stat"><strong>2</strong><small>Active Nodes</small></div><div class="stat"><strong>37</strong><small>Rewards Earned</small></div></div></div>'+
+ '<div class="section"><div class="section-head"><h3>Account Summary</h3><button onclick="nav(\'assets\')">View Assets</button></div><div class="stat-grid"><div class="stat"><strong>12,480</strong><small>Balance USDT</small></div><div class="stat"><strong>37</strong><small>Rewards Earned</small></div><div class="stat"><strong>0</strong><small>Pending Withdrawals</small></div></div></div>'+
  '</main>'+bottom()+
  '<div class="toast"></div>'
 }
@@ -111,9 +107,9 @@ function referral(){
 
 function networkView(){return '<div class="network-card"><div class="legend"><i style="background:#1675f5"></i>You (AP10023)&nbsp;&nbsp; <i style="background:#11ad76"></i>Level 1&nbsp;&nbsp; <i style="background:#7927df"></i>Level 2</div><div class="tree"><div class="tree-me">●<br><b>You</b><br>AP10023</div><div class="tree-line"></div><div class="tree-level">'+['Ahmed','Sara','Hina'].map(n=>'<div class="tree-node"><b>'+n+'</b>AP'+Math.floor(10000+Math.random()*89999)+'<br>+5 USDT</div>').join('')+'</div><div class="tree-line" style="width:78%"></div><div class="tree-level">'+['Ali','Zoya','Bilal','Ayesha'].map(n=>'<div class="tree-node l2"><b>'+n+'</b>AP'+Math.floor(10000+Math.random()*89999)+'<br>+2 USDT</div>').join('')+'</div></div><div class="network-summary"><div class="sum"><strong>AP10023</strong><small>You</small></div><div class="sum"><strong>8</strong><small>Level 1</small></div><div class="sum"><strong>14</strong><small>Level 2</small></div><div class="sum"><strong>37</strong><small>Total Earned</small></div></div></div>'}
 
-function assets(){return '<main class="content">'+pageHead('Assets','Balance, nodes and account activity')+
+function assets(){return '<main class="content">'+pageHead('Assets','Balance, deposits and account activity')+
  '<div class="asset-balance"><small>Available Balance</small><strong>12,480.00 USDT</strong><small>AegisPay platform balance</small><div class="asset-actions" style="margin-top:15px"><button class="asset-action" onclick="toast(\'Top Up request opened\')">＋ Top Up</button><button class="asset-action" onclick="toast(\'Withdrawal request opened\')">↗ Withdraw</button></div></div>'+
- '<div class="asset-card"><div class="section-head"><h3>My Active Nodes</h3><button onclick="toast(\'Node details opened\')">View All</button></div>'+DEMO.nodes.map(n=>'<div class="node-mini"><span class="nicon">◆</span><span style="flex:1;margin-left:9px"><b>'+n.name+'</b><small>'+n.id+' · '+n.region+'</small></span><span style="text-align:right"><b>'+n.yield+'</b><small>'+n.allocation+'</small></span></div>').join('')+'</div>'+
+ ''+
  '<div class="asset-card"><div class="section-head"><h3>Recent Activity</h3></div>'+DEMO.activity.map(a=>'<div class="node-mini"><span class="nicon">'+(a.out?'↑':'↓')+'</span><span style="flex:1;margin-left:9px"><b>'+a.name+' '+a.action+'</b><small>Today · AegisPay activity</small></span><b style="color:'+(a.out?'#e89508':'#079b68')+'">'+a.amount+'</b></div>').join('')+'</div></main>'+bottom()+'<div class="toast"></div>'}
 
 function profile(){return '<main class="content">'+pageHead('My Profile','Client account and preferences')+
@@ -126,10 +122,10 @@ function profile(){return '<main class="content">'+pageHead('My Profile','Client
  '<button class="menu-item" onclick="logout()"><span class="mi">↪</span><span><b>Log Out</b><small>End this device session</small></span><span class="right">›</span></button>'+
  '</div></main>'+bottom()+'<div class="toast"></div>'}
 
-let messages=[{bot:true,text:'Hello! I am AegisPay AI Bot. I can explain platform features, referrals, nodes and account screens.'}];
+let messages=[{bot:true,text:'Hello! I am AegisPay AI Bot. I can explain platform features, referrals, balance and account screens.'}];
 function ai(){return '<main class="content">'+pageHead('AI Bot','General information assistant')+
- '<div class="chat"><div class="chat-head"><div class="bot">🤖</div><div><b>AegisPay AI Bot</b><small style="display:block;color:#7c8ba6;font-size:9px">Online · informational only</small></div></div><div class="chat-scroll">'+messages.map(m=>'<div class="msg '+(m.bot?'':'user')+'">'+esc(m.text)+'</div>').join('')+'</div><div class="chat-input"><input id="chat_q" placeholder="Ask about referrals, nodes, withdrawals..."><button onclick="askAI()">↑</button></div></div></main>'+bottom()+'<div class="toast"></div>'}
-function askAI(){let q=(document.getElementById('chat_q')?.value||'').trim();if(!q)return;messages.push({bot:false,text:q});let l=q.toLowerCase(),ans=l.includes('referral')?'Your referral program shows Level 1, Level 2 and Level 3 structures. The demo rewards shown are 5 USDT for direct and 2 USDT for indirect referrals.':l.includes('withdraw')?'Withdrawal requests are shown in the Assets workflow. The current build is a platform workflow/demo and does not move real funds.':l.includes('node')?'Your Assets screen shows active nodes with allocation, region and yield information.':'I can explain the AegisPay interface and demo workflows. I do not provide individualized financial advice or execute real payments.';messages.push({bot:true,text:ans});render();setTimeout(()=>{let c=document.querySelector('.chat-scroll');if(c)c.scrollTop=c.scrollHeight},30)}
+ '<div class="chat"><div class="chat-head"><div class="bot">🤖</div><div><b>AegisPay AI Bot</b><small style="display:block;color:#7c8ba6;font-size:9px">Online · informational only</small></div></div><div class="chat-scroll">'+messages.map(m=>'<div class="msg '+(m.bot?'':'user')+'">'+esc(m.text)+'</div>').join('')+'</div><div class="chat-input"><input id="chat_q" placeholder="Ask about referrals, balance, withdrawals..."><button onclick="askAI()">↑</button></div></div></main>'+bottom()+'<div class="toast"></div>'}
+function askAI(){let q=(document.getElementById('chat_q')?.value||'').trim();if(!q)return;messages.push({bot:false,text:q});let l=q.toLowerCase(),ans=l.includes('referral')?'Your referral program shows Level 1, Level 2 and Level 3 structures. The demo rewards shown are 5 USDT for direct and 2 USDT for indirect referrals.':l.includes('withdraw')?'Withdrawal requests are shown in the Assets workflow. The current build is a platform workflow/demo and does not move real funds.':l.includes('balance')?'Your account balance is displayed in the account summary and Assets section.':'I can explain the AegisPay interface and demo workflows. I do not provide individualized financial advice or execute real payments.';messages.push({bot:true,text:ans});render();setTimeout(()=>{let c=document.querySelector('.chat-scroll');if(c)c.scrollTop=c.scrollHeight},30)}
 
 function bottom(){return '<nav class="bottom"><button class="'+(view==='home'?'active':'')+'" onclick="nav(\'home\')"><span>⌂</span>Home</button><button class="'+(view==='assets'?'active':'')+'" onclick="nav(\'assets\')"><span>◇</span>Assets</button><button class="'+(view==='profile'?'active':'')+'" onclick="nav(\'profile\')"><span>●</span>My Profile</button><button class="'+(view==='ai'?'active':'')+'" onclick="nav(\'ai\')"><span>🤖</span>AI Bot</button></nav>'}
 
