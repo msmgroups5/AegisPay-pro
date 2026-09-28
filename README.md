@@ -6,8 +6,8 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Professional login and role-aware access
 - USER, ADMIN and MASTER ADMIN roles
 - Operations Dashboard
-- Current balance, active nodes, total yield, referrals, tasks and withdrawals metrics
-- Liquidity & Reserve Dashboard with gauge, reserve/liability data, timestamp, data-source and audit status
+- Balance, active node, yield, referral, task and withdrawal metrics
+- Liquidity & Reserve Dashboard with gauge, reserves/liabilities, timestamp, data source and audit status
 - Global node map
 - Global activity heatmap
 - Global activity stream
@@ -28,7 +28,7 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Audit Logs
 - Settings
 - System Operations
-- Search and pagination for administrative tables
+- Search and pagination on administrative tables
 - Responsive desktop/tablet/mobile navigation
 - Footer and visible platform/data-only status messaging
 
@@ -36,11 +36,11 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Browser UI: index.html + styles.css + app.js
 - Demo REST API: backend/server.js
 - Demo API data: backend/data.json
-- PostgreSQL schema: database/schema.sql
+- PostgreSQL schema with pgcrypto: database/schema.sql
 - Repository validation: scripts/validate-static.js
 - API smoke tests: scripts/smoke-api.js
 - CI: .github/workflows/ci.yml
-- GitHub Pages: .github/workflows/pages.yml
+- GitHub Pages-ready packaging workflow: .github/workflows/pages.yml
 - Netlify static deployment configuration: netlify.toml
 - Repository secret/build ignores: .gitignore
 
@@ -64,6 +64,9 @@ node backend/server.js
 
 Repository checks:
 npm run check
+
+## GitHub Pages
+The repository now has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
 
 ## Production boundary
 This repository is a demonstration/system-data layer. It does not execute real payments, blockchain transfers, custody, banking transfers or live settlement. Approval actions update application status and audit records only.
