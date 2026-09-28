@@ -65,7 +65,7 @@
     'master@aegispay.demo':{pass:'demo123',id:'USR-006'}
   };
   var state=loadState(),session=loadSession(),page='dashboard',filters={},pageNums={};
-  var supa=window.AegisSupabaseClient||null,remoteMode=!!supa;
+  var supa=window.AegisSupabaseClient||null,remoteMode=!!supa&&!window.AEGIS_ANDROID_APP;
   var root=document.getElementById('app');
   // Native hybrid bridge hooks: location, maps, QR/barcode scan and device feedback.
   window.AegisDevice={
