@@ -64,3 +64,6 @@ A real production environment would require persistent database hosting, server-
 
 Build checkpoint:
 This branch is the first GitHub implementation checkpoint before external production services are connected.
+
+CI checkpoint:
+Every repository push/PR runs the syntax and static validation workflow before merge.
