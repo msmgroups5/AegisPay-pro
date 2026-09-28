@@ -24,14 +24,9 @@
       {id:'ADM-001',email:'admin@aegispay.demo',clientId:'APADMIN',name:'Operations Admin',role:'ADMIN',balance:0,status:'Active',referralCode:null},
       {id:'MAS-001',email:'master@aegispay.demo',clientId:'APMASTER',name:'Master Administrator',role:'MASTER ADMIN',balance:0,status:'Active',referralCode:null}
     ],
-    nodes: [
-      {id:'NODE-1001',userId:'USR-001',tier:'Guardian Node',allocation:5000,yield:1.24,status:'ACTIVE',region:'Dubai',country:'UAE',activationDate:'2026-09-01',expiryDate:'2027-09-01'},
-      {id:'NODE-1002',userId:'USR-001',tier:'Sentinel Node',allocation:7500,yield:.92,status:'ACTIVE',region:'London',country:'UK',activationDate:'2026-09-05',expiryDate:'2027-09-05'},
-      {id:'NODE-1003',userId:'USR-002',tier:'Guardian Node',allocation:4000,yield:1.10,status:'ACTIVE',region:'Tokyo',country:'Japan',activationDate:'2026-09-03',expiryDate:'2027-09-03'}
-    ],
     tasks: [
-      {id:'TASK-1001',userId:'USR-001',title:'Node Activity Review',description:'Review current node activity.',level:'L1',status:'In Progress',progress:70,reward:25,startDate:'2026-09-20',dueDate:'2026-09-30',relatedNodeId:'NODE-1001'},
-      {id:'TASK-1002',userId:'USR-001',title:'Referral Profile Check',description:'Review referral profile information.',level:'L1',status:'Pending',progress:0,reward:15,startDate:'2026-09-25',dueDate:'2026-10-02',relatedNodeId:null}
+      {id:'TASK-1001',userId:'USR-001',title:'Node Activity Review',description:'Review current node activity.',level:'L1',status:'In Progress',progress:70,reward:25,startDate:'2026-09-20',dueDate:'2026-09-30'},
+      {id:'TASK-1002',userId:'USR-001',title:'Referral Profile Check',description:'Review referral profile information.',level:'L1',status:'Pending',progress:0,reward:15,startDate:'2026-09-25',dueDate:'2026-10-02'}
     ],
     referrals: [
       {id:'REF-1001',userId:'USR-001',referredUserId:'USR-002',level:1,reward:5,status:'Active',createdAt:'2026-09-12'},
@@ -57,9 +52,9 @@
   function can(role, action){
     role=normRole(role);
     const matrix={
-      USER:['dashboard:read','nodes:read','tasks:read','tasks:update','referrals:read','withdrawals:create','withdrawals:read','activity:read','notifications:read','notifications:update','ai:read','profile:read'],
-      ADMIN:['dashboard:read','nodes:read','nodes:manage','tasks:read','tasks:manage','referrals:read','referrals:manage','withdrawals:read','users:read','activity:read','notifications:read','notifications:manage'],
-      'MASTER ADMIN':['dashboard:read','nodes:read','nodes:manage','tasks:read','tasks:manage','referrals:read','referrals:manage','withdrawals:read','withdrawals:approve','users:read','users:manage','activity:read','audit:read','notifications:read','notifications:manage','settings:manage','system:read','data:export','data:reset']
+      USER:['dashboard:read','tasks:read','tasks:update','referrals:read','withdrawals:create','withdrawals:read','activity:read','notifications:read','notifications:update','ai:read','profile:read'],
+      ADMIN:['dashboard:read','tasks:read','tasks:manage','referrals:read','referrals:manage','withdrawals:read','users:read','activity:read','notifications:read','notifications:manage'],
+      'MASTER ADMIN':['dashboard:read','tasks:read','tasks:manage','referrals:read','referrals:manage','withdrawals:read','withdrawals:approve','users:read','users:manage','activity:read','audit:read','notifications:read','notifications:manage','settings:manage','system:read','data:export','data:reset']
     };
     return (matrix[role]||[]).includes(action);
   }
@@ -136,13 +131,13 @@
     assert(role,resource+':read');
     if(CONFIG.mode==='DEMO'){
       const s=localState();
-      const map={users:'users',nodes:'nodes',tasks:'tasks',referrals:'referrals',withdrawals:'withdrawals',activity:'activity',notifications:'notifications'};
+      const map={users:'users',tasks:'tasks',referrals:'referrals',withdrawals:'withdrawals',activity:'activity',notifications:'notifications'};
       let rows=clone(s[map[resource]]||[]);
       if(filters&&filters.userId) rows=rows.filter(x=>x.userId===filters.userId);
       if(filters&&filters.status) rows=rows.filter(x=>x.status===filters.status);
       return rows;
     }
-    const table={users:'users',nodes:'active_nodes',tasks:'tasks',referrals:'referrals',withdrawals:'withdrawal_requests',activity:'activity_logs',notifications:'notifications'}[resource];
+    const table={users:'users',tasks:'tasks',referrals:'referrals',withdrawals:'withdrawal_requests',activity:'activity_logs',notifications:'notifications'}[resource];
     const q=filters&&filters.userId?'?user_id=eq.'+encodeURIComponent(filters.userId):'';
     return supaFetch('/rest/v1/'+table+q,{});
   }
@@ -209,13 +204,11 @@
   async function adminSummary(){
     const p=await currentProfile(); assert(p.role,'dashboard:read');
     if(p.role==='USER') return {role:p.role,scope:'USER'};
-    const [users,nodes,tasks,withdrawals,referrals]=await Promise.all([
-      getData('users'),getData('nodes'),getData('tasks'),getData('withdrawals'),getData('referrals')
+    const [users,tasks,withdrawals,referrals]=await Promise.all([
+      getData('users'),getData('tasks'),getData('withdrawals'),getData('referrals')
     ]);
     return {
       role:p.role,totalUsers:users.length,activeUsers:users.filter(x=>x.status==='Active').length,
-      activeNodes:nodes.filter(x=>String(x.status).toUpperCase()==='ACTIVE').length,
-      nodeAllocation:nodes.reduce((a,x)=>a+Number(x.allocation||x.allocated_platform_amount||0),0),
       pendingWithdrawals:withdrawals.filter(x=>x.status==='PENDING_APPROVAL').length,
       approvedWithdrawals:withdrawals.filter(x=>x.status==='APPROVED').length,
       rejectedWithdrawals:withdrawals.filter(x=>x.status==='REJECTED').length,
