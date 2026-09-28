@@ -25,8 +25,8 @@ import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
 import com.journeyapps.barcodescanner.CaptureActivity;
-import com.journeyapps.barcodescanner.IntentIntegrator;
-import com.journeyapps.barcodescanner.IntentResult;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 public class MainActivity extends AppCompatActivity {
     private static final int LOCATION_REQUEST = 701;
