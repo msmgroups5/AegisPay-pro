@@ -1,0 +1,51 @@
+name: AegisPay APK Export
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'apk-artifact/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build-and-export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build debug APK
+        run: gradle -p android :app:assembleDebug --no-daemon
+      - name: Upload APK artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-Android-Debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Export artifact metadata for retrieval
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          RUN_ID: ${{ github.run_id }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p apk-artifact
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk | awk '{print $1}' > apk-artifact/sha256.txt
+          printf '{"run_id":"%s","artifact_id":"%s","commit_sha":"%s"}\n' "$RUN_ID" "$ARTIFACT_ID" "$COMMIT_SHA" > apk-artifact/manifest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apk-artifact/manifest.json apk-artifact/sha256.txt
+          git commit -m "chore: publish APK artifact metadata" || exit 0
+          git push
