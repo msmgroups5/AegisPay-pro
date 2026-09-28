@@ -42,9 +42,12 @@ var DEMO_USERS=[
 ];
 
 var OFFERS=[
- {id:'O1',title:'Amazon Shopping Offer',subtitle:'Product browsing + shopping task',tierMin:'T1',rewardText:'Cycle task',status:'ACTIVE'},
- {id:'O2',title:'Featured Product Review',subtitle:'Open the assigned offer and complete the task',tierMin:'T2',rewardText:'Cycle task',status:'ACTIVE'},
- {id:'O3',title:'Premium Product Discovery',subtitle:'Review the premium offer shown in your shop',tierMin:'V1',rewardText:'Cycle task',status:'ACTIVE'}
+ {id:'O1',title:'Tier 1 Amazon Shopping',subtitle:'Standard product browsing + shopping task',tierMin:'T1',rewardText:'Tier 1 task',status:'ACTIVE'},
+ {id:'O2',title:'Tier 2 Featured Products',subtitle:'Review and complete the assigned featured offer',tierMin:'T2',rewardText:'Tier 2 task',status:'ACTIVE'},
+ {id:'O3',title:'Tier 3 Product Discovery',subtitle:'Complete the tier 3 product discovery task',tierMin:'T3',rewardText:'Tier 3 task',status:'ACTIVE'},
+ {id:'O4',title:'VVIP 1 Premium Shopping',subtitle:'Complete the premium offer assigned to VVIP 1',tierMin:'V1',rewardText:'VVIP 1 task',status:'ACTIVE'},
+ {id:'O5',title:'VVIP 2 Premium Review',subtitle:'Complete the premium review assigned to VVIP 2',tierMin:'V2',rewardText:'VVIP 2 task',status:'ACTIVE'},
+ {id:'O6',title:'VVIP 3 Priority Offer',subtitle:'Complete the priority shopping offer assigned to VVIP 3',tierMin:'V3',rewardText:'VVIP 3 task',status:'ACTIVE'}
 ];
 
 function now(){return Date.now();}
@@ -200,7 +203,9 @@ function awardReferralBonuses(s,newUser){
 function ensureCycleTasks(s,userId){
  var open=s.cycles.find(function(c){return c.userId===userId&&c.status==='TASKS_OPEN';});if(open)return;
  var u=userById(s,userId),tier=findTier(s,u.selectedTier);if(!tier)return;
- var offerIds=s.offers.filter(function(o){return o.status==='ACTIVE';}).slice(0,3).map(function(o){return o.id;});
+ var tierIndex=Object.fromEntries(s.tiers.map(function(t,i){return [t.id,i];}))[tier.id];
+ var offerIds=s.offers.filter(function(o){return o.status==='ACTIVE'&&o.tierMin===tier.id;}).map(function(o){return o.id;});
+ if(!offerIds.length){offerIds=s.offers.filter(function(o){return o.status==='ACTIVE';}).slice(0,1).map(function(o){return o.id;});}
  s.cycles.unshift({id:uid('CYC'),userId:userId,tierId:tier.id,cycleBase:u.balance,status:'TASKS_OPEN',taskIds:offerIds.map(function(id){return uid('TASK');}),offerIds:offerIds,completedOfferIds:[],startedAt:iso(),taskCompletedAt:null,readyAt:null,settledAt:null,profit:0});
 }
 
