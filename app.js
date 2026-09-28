@@ -4,6 +4,7 @@ var core=window.AegisCore;
 var app=document.getElementById('app');
 var view='dashboard';
 var authMode='client';
+var isAdminPortal=window.AEGIS_ADMIN_PORTAL===true;
 var authPage='login';
 var loginError='';
 var toastTimer=null;
@@ -53,26 +54,52 @@ function current(){return core.currentProfile();}
 function render(){
  try{core.settleReadyCycles();}catch(e){}
  var p=current();
- if(!p){renderAuth();return;}
- if(p.role==='MASTER ADMIN'){renderAdmin();return;}
+ if(!p){
+  renderAuth();
+  return;
+ }
+ if(isAdminPortal){
+  if(p.role!=='MASTER ADMIN'){core.authLogout();renderAuth();return;}
+  renderAdmin();
+  return;
+ }
+ if(p.role!=='USER'){
+  core.authLogout();
+  renderAuth();
+  return;
+ }
  renderClient();
 }
 function renderAuth(){
+ if(isAdminPortal){
+  app.innerHTML='<div class="auth-wrap admin-auth-wrap"><div class="auth-card admin-auth-card">'+
+   '<div class="auth-top"><div class="brand"><img src="./aegispay-logo.svg" alt="AegisPay"><b>Aegis<span>Pay</span></b></div><span class="prototype admin-badge">MASTER ADMIN</span></div>'+
+   '<div class="admin-auth-hero"><div class="logo-badge">'+icon('shield')+' Control Center</div><h1>Master Admin Access</h1><p>Private operational workspace for authorized AegisPay administration.</p></div>'+
+   '<form id="loginForm"><div class="field"><label>Master Admin Email</label><div class="field-wrap"><input id="loginEmail" type="email" required value="master@aegispay.demo" placeholder="admin@example.com"></div></div>'+
+   '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" required value="APMASTER" placeholder="••••••••"></div></div>'+
+   '<div style="min-height:18px;color:#ff9ab0;font-size:9px;margin-top:8px">'+esc(loginError)+'</div>'+
+   '<button class="primary" type="submit">Enter Control Center</button></form>'+
+   '<div class="demo-row"><div class="demo-box"><b>Authorized workspace</b>Master Admin controls are isolated from the client interface.</div></div>'+
+   '<div class="small-note">Private admin portal. This login is not presented anywhere in the client application.</div>'+
+   '</div></div><div class="toast"></div>';
+  bindClient();
+  return;
+ }
  app.innerHTML='<div class="auth-wrap"><div class="auth-card">'+
- '<div class="auth-top"><div class="brand"><img src="./aegispay-logo.svg" alt="AegisPay"><b>Aegis<span>Pay</span></b></div><span class="prototype">TESTNET DEMO</span></div>'+
+ '<div class="auth-top"><div class="brand"><img src="./aegispay-logo.svg" alt="AegisPay"><b>Aegis<span>Pay</span></b></div><span class="prototype">AEGISPAY</span></div>'+
  (authPage==='login'?loginView():signupView())+
  '</div></div><div class="toast"></div>';
+ bindClient();
 }
 function loginView(){
- return '<div class="auth-hero"><div class="logo-badge">'+icon('shield')+' Secure Access</div><h1>Welcome Back</h1><p>Sign in to your AegisPay Client or Master Admin workspace.</p></div>'+
- '<div class="mode-tabs"><button class="mode-tab '+(authMode==='client'?'active':'')+'" data-action="set-mode" data-mode="client">Client</button><button class="mode-tab '+(authMode==='master'?'active':'')+'" data-action="set-mode" data-mode="master">Master Admin</button></div>'+
- '<form id="loginForm"><div class="field"><label>Email</label><div class="field-wrap"><input id="loginEmail" type="email" required value="'+(authMode==='master'?'master@aegispay.demo':'user@aegispay.demo')+'" placeholder="you@example.com"></div></div>'+
- '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" required value="'+(authMode==='master'?'APMASTER':'AP10023')+'" placeholder="••••••••"></div></div>'+
+ return '<div class="auth-hero"><div class="logo-badge">'+icon('shield')+' Secure Access</div><h1>Welcome Back</h1><p>Sign in to your AegisPay Client account.</p></div>'+
+ '<form id="loginForm"><div class="field"><label>Email</label><div class="field-wrap"><input id="loginEmail" type="email" required value="user@aegispay.demo" placeholder="you@example.com"></div></div>'+
+ '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" required value="AP10023" placeholder="••••••••"></div></div>'+
  '<div style="min-height:18px;color:#ff9ab0;font-size:9px;margin-top:8px">'+esc(loginError)+'</div>'+
  '<button class="primary" type="submit">Sign In Securely</button></form>'+
  '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px"><button class="ghost-dark" style="flex:1" data-action="signup-page">Create Client Account</button><button class="ghost-dark" style="flex:1" data-action="forgot">Forgot Password?</button></div>'+
- '<div class="demo-row"><div class="demo-box"><b>Client Demo</b>user@aegispay.demo<br>AP10023</div><div class="demo-box"><b>Master Demo</b>master@aegispay.demo<br>APMASTER</div></div>'+
- '<div class="small-note">Prototype/Testnet mode. No live Mainnet USDT transfer, custody, or payout execution is enabled in this build.</div>';
+ '<div class="demo-row"><div class="demo-box"><b>Client Demo</b>user@aegispay.demo<br>AP10023</div></div>'+
+ '<div class="small-note">Secure AegisPay client access.</div>';
 }
 function signupView(){
  var ref=new URLSearchParams(location.search).get('ref')||'';
@@ -243,7 +270,22 @@ function bindClient(){
  var lf=document.getElementById('loginForm');if(lf)lf.addEventListener('submit',handleLogin);
  var sf=document.getElementById('signupForm');if(sf)sf.addEventListener('submit',handleSignup);
 }
-function handleLogin(e){e.preventDefault();loginError='';try{var email=document.getElementById('loginEmail').value,password=document.getElementById('loginPassword').value;var r=core.authLogin(email,password);view=r.profile.role==='MASTER ADMIN'?'admin':'dashboard';render();}catch(err){loginError=err.message;render();}}
+function handleLogin(e){
+ e.preventDefault();loginError='';
+ try{
+  var email=document.getElementById('loginEmail').value;
+  var password=document.getElementById('loginPassword').value;
+  var r=core.authLogin(email,password);
+  if(isAdminPortal){
+   if(r.profile.role!=='MASTER ADMIN')throw new Error('This portal is restricted to Master Admin accounts.');
+   view='admin';
+  }else{
+   if(r.profile.role!=='USER'){core.authLogout();throw new Error('Invalid client account credentials.');}
+   view='dashboard';
+  }
+  render();
+ }catch(err){loginError=err.message;render();}
+}
 function handleSignup(e){e.preventDefault();var err=document.getElementById('signupErr');try{core.signup({name:document.getElementById('signupName').value,email:document.getElementById('signupEmail').value,password:document.getElementById('signupPassword').value,referralCode:document.getElementById('signupRef').value});view='dashboard';render();notify('Account created');}catch(ex){if(err)err.textContent=ex.message;}}
 function aiAnswer(q){
  q=String(q||'').toLowerCase();
