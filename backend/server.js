@@ -87,9 +87,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && url.pathname === "/api/v1/ai-assistant/chat") {
       const input = await body(req);
       const q = String(input.message || "").toLowerCase();
-      let message = "I can explain current nodes, tasks, referrals, liquidity data or withdrawal status from the demonstration dataset.";
-      if (q.includes("node")) message = "Current node records are available under the Nodes view.";
-      else if (q.includes("task")) message = "Open Tasks to review pending and completed activity.";
+      let message = "I can explain tasks, referrals, liquidity data or withdrawal status from the demonstration dataset.";
+       else if (q.includes("task")) message = "Open Tasks to review pending and completed activity.";
       else if (q.includes("referral")) message = "Open Referrals to review the multi-tier relationship view.";
       else if (q.includes("liquidity")) message = "System data currently shows a 98.4% liquidity ratio; this is not an independent financial audit.";
       else if (q.includes("withdraw")) message = "Withdrawal status is approval workflow data only; no payment is executed.";
