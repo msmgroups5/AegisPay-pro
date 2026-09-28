@@ -214,6 +214,7 @@
         if(id)existing=state.users.find(function(x){return x.id===id});
         row={name:document.getElementById('af_name').value.trim(),email:document.getElementById('af_email').value.trim(),role:document.getElementById('af_role').value,referralCode:document.getElementById('af_ref').value.trim()||'—',balance:Number(document.getElementById('af_balance').value||0),status:document.getElementById('af_status').value};
         if(!row.name||!row.email){toast('Name and email are required','bad');return}
+        if(!isMaster()&&row.role==='MASTER ADMIN'){toast('Only MASTER ADMIN can assign the MASTER ADMIN role','bad');return}
         if(remoteMode){var db={name:row.name,email:row.email,role:row.role,referral_code:row.referralCode==='—'?null:row.referralCode,current_platform_balance:row.balance,status:row.status};var rr=id?await supa.from('users').update(db).eq('id',id).select().single():await supa.from('users').insert(db).select().single();if(rr.error){toast(rr.error.message,'bad');return}}
         else{if(existing)Object.assign(existing,row);else{row.id='USR-'+Date.now();row.referrer='—';row.created=new Date().toISOString().slice(0,10);row.nodeCount=0;state.users.unshift(row)}}
       }else if(key==='nodes'){
