@@ -4,7 +4,7 @@ const path = require("node:path");
 const crypto = require("node:crypto");
 
 const PORT = Number(process.env.PORT || 8080);
-const DATA_FILE = path.join(__dirname, "data.json");
+const DATA_FILE = process.env.AEGISPAY_DATA_FILE || path.join(__dirname, "data.json");
 
 function load() {
   return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
