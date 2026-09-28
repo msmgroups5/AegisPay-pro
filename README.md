@@ -73,6 +73,9 @@ npm run check
 ## Mobile web
 When served from HTTPS or localhost, the service worker caches the application shell for offline reloads. The standalone offline HTML artifact remains available for direct browser inspection.
 
+## Netlify
+The AegisPay Netlify project has been created as `aegispay-pro`. Production Supabase environment variables are configured. The current project URL is `http://aegispay-pro.netlify.app`; a deploy is still required to publish the current repository source to that URL.
+
 ## GitHub Pages
 The repository has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
 
