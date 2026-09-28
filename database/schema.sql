@@ -16,21 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
   auth_user_id UUID UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS active_nodes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  node_tier TEXT NOT NULL,
-  allocated_platform_amount NUMERIC(18,2) NOT NULL DEFAULT 0,
-  daily_yield_percentage NUMERIC(8,4) NOT NULL DEFAULT 0,
-  status TEXT NOT NULL DEFAULT 'ACTIVE',
-  region TEXT NOT NULL,
-  country TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  activation_date DATE,
-  expiry_date DATE,
-  completion_date DATE
-);
-
 CREATE TABLE IF NOT EXISTS tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -42,8 +27,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   reward NUMERIC(18,2) NOT NULL DEFAULT 0,
   start_date DATE,
   due_date DATE,
-  completion_date DATE,
-  related_node_id UUID REFERENCES active_nodes(id) ON DELETE SET NULL
+  completion_date DATE
 );
 
 CREATE TABLE IF NOT EXISTS referrals (
@@ -93,7 +77,6 @@ CREATE TABLE IF NOT EXISTS platform_settings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_nodes_user ON active_nodes(user_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_user ON tasks(user_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_user ON referrals(user_id);
 CREATE INDEX IF NOT EXISTS idx_withdraw_user ON withdrawal_requests(user_id);
@@ -134,7 +117,6 @@ END;
 $$;
 
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.active_nodes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.referrals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.withdrawal_requests ENABLE ROW LEVEL SECURITY;
@@ -148,11 +130,6 @@ DROP POLICY IF EXISTS users_self_update ON public.users;
 CREATE POLICY users_self_update ON public.users FOR UPDATE USING (auth_user_id=auth.uid()) WITH CHECK (auth_user_id=auth.uid());
 DROP POLICY IF EXISTS users_admin_all ON public.users;
 CREATE POLICY users_admin_all ON public.users FOR ALL USING (public.current_app_role() IN ('ADMIN','MASTER ADMIN')) WITH CHECK (public.current_app_role() IN ('ADMIN','MASTER ADMIN'));
-
-DROP POLICY IF EXISTS nodes_user_select ON public.active_nodes;
-CREATE POLICY nodes_user_select ON public.active_nodes FOR SELECT USING (user_id=public.current_app_user_id() OR public.current_app_role() IN ('ADMIN','MASTER ADMIN'));
-DROP POLICY IF EXISTS nodes_admin_write ON public.active_nodes;
-CREATE POLICY nodes_admin_write ON public.active_nodes FOR ALL USING (public.current_app_role() IN ('ADMIN','MASTER ADMIN')) WITH CHECK (public.current_app_role() IN ('ADMIN','MASTER ADMIN'));
 
 DROP POLICY IF EXISTS tasks_user_select ON public.tasks;
 CREATE POLICY tasks_user_select ON public.tasks FOR SELECT USING (user_id=public.current_app_user_id() OR public.current_app_role() IN ('ADMIN','MASTER ADMIN'));
