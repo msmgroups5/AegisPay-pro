@@ -37,7 +37,7 @@
   function shell(body){
     return '<div class="app-shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">A</div><b>AegisPay</b></div>' +
       nav("dashboard","Dashboard")+nav("nodes","My Nodes")+nav("tasks","Tasks")+nav("referrals","Referrals")+nav("activity","Activity")+nav("withdrawals","Withdrawals")+nav("ai","AI Assistant")+nav("profile","Profile") +
-      nav("admin","Admin Dashboard",["ADMIN","MASTER ADMIN"])+nav("users","Users",["ADMIN","MASTER ADMIN"])+nav("manage-nodes","Node Management",["ADMIN","MASTER ADMIN"])+nav("manage-tasks","Task Management",["ADMIN","MASTER ADMIN"])+nav("approvals","Approval Center",["MASTER ADMIN"]) +
+      nav("admin","Admin Dashboard",["ADMIN","MASTER ADMIN"])+nav("users","Users",["ADMIN","MASTER ADMIN"])+nav("manage-nodes","Node Management",["ADMIN","MASTER ADMIN"])+nav("manage-tasks","Task Management",["ADMIN","MASTER ADMIN"])+nav("manage-referrals","Referral Management",["ADMIN","MASTER ADMIN"])+nav("approvals","Approval Center",["MASTER ADMIN"])+nav("logs","Audit Logs",["ADMIN","MASTER ADMIN"])+nav("settings","Settings",["ADMIN","MASTER ADMIN"]) +
       '</aside><main><header class="topbar"><b>'+page+'</b><span>'+badge("SYSTEM ONLINE")+" "+badge(currentUser().role)+' <button class="btn" onclick="Aegis.logout()">Logout</button></span></header>'+body+'</main></div>';
   }
   function tablePage(title,heads,rows){
@@ -108,7 +108,9 @@
   views.users=function(){return tablePage("User Management",["ID","Name","Email","Role"],USERS.map(function(u){return "<tr><td>"+u.id+"</td><td>"+u.name+"</td><td>"+u.email+"</td><td>"+u.role+"</td></tr>";}).join(""));};
   views["manage-nodes"]=function(){return tablePage("Node Management",["ID","User","Tier","Region","Allocation"],NODES.map(function(n){return "<tr><td>"+n.id+"</td><td>"+n.user+"</td><td>"+n.tier+"</td><td>"+n.region+"</td><td>"+money(n.allocation)+"</td></tr>";}).join(""));};
   views["manage-tasks"]=function(){return tablePage("Task Management",["ID","Title","User","Status","Progress"],TASKS.map(function(t){return "<tr><td>"+t.id+"</td><td>"+t.title+"</td><td>"+t.user+"</td><td>"+t.status+"</td><td>"+t.progress+"%</td></tr>";}).join(""));};
+  views["manage-referrals"]=function(){return tablePage("Referral Management",["ID","User","Level","Reward"],REFS.map(function(r){return "<tr><td>"+r.id+"</td><td>"+r.user+"</td><td>Level "+r.level+"</td><td>"+money(r.reward)+"</td></tr>";}).join(""));};
   views.logs=function(){return tablePage("Audit Logs",["Event","Status"],WITHDRAWALS.map(function(w){return "<tr><td>"+w.id+"</td><td>"+w.status+"</td></tr>";}).join(""));};
+  views.settings=function(){return tablePage("Platform Settings",["Setting","Value"],"<tr><td>System Mode</td><td>DEMO</td></tr><tr><td>Data Source</td><td>Local system dataset</td></tr><tr><td>Real payment execution</td><td>Not connected</td></tr><tr><td>Audit</td><td>Not independent</td></tr>");};
 
   function render(){
     if(!session){
