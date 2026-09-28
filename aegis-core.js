@@ -51,19 +51,21 @@ var OFFERS=[
 ];
 
 var SHOP_CATALOG=[
- {id:'P01',title:'AeroPods Pro 2',category:'Electronics',subcategory:'Headphones',brand:'Aegis Select',art:'pods',rating:4.8,badge:'Featured'},
- {id:'P02',title:'Nova Phone 15',category:'Electronics',subcategory:'Mobile Phones',brand:'Aegis Select',art:'phone',rating:4.8,badge:'-15%'},
- {id:'P03',title:'VisionBook Air',category:'Electronics',subcategory:'Laptops',brand:'Aegis Select',art:'laptop',rating:4.8,badge:'-18%'},
- {id:'P04',title:'Pulse Watch 9',category:'Electronics',subcategory:'Smart Watches',brand:'Aegis Select',art:'watch',rating:4.7,badge:'Hot'},
- {id:'P05',title:'StreetRun Max',category:'Fashion',subcategory:'Footwear',brand:'Aegis Select',art:'shoe',rating:4.7,badge:'New'},
- {id:'P06',title:'Aero Hoodie',category:'Fashion',subcategory:'Men',brand:'Aegis Select',art:'hoodie',rating:4.8,badge:'Top Pick'},
- {id:'P07',title:'Classic Timepiece',category:'Fashion',subcategory:'Accessories',brand:'Aegis Select',art:'timepiece',rating:4.8,badge:'-20%'},
- {id:'P08',title:'Urban Tote',category:'Fashion',subcategory:'Accessories',brand:'Aegis Select',art:'bag',rating:4.7,badge:'New'},
- {id:'P09',title:'BrewMaster Coffee Set',category:'Home & Kitchen',subcategory:'Kitchen',brand:'Aegis Select',art:'coffee',rating:4.7,badge:'Featured'},
- {id:'P10',title:'Air Fryer Pro',category:'Home & Kitchen',subcategory:'Appliances',brand:'Aegis Select',art:'fryer',rating:4.6,badge:'Hot'},
- {id:'P11',title:'PureGlow Beauty Kit',category:'Beauty',subcategory:'Skin Care',brand:'Aegis Select',art:'beauty',rating:4.8,badge:'Best Seller'},
- {id:'P12',title:'SmartClean Vacuum',category:'Home & Kitchen',subcategory:'Appliances',brand:'Aegis Select',art:'vacuum',rating:4.6,badge:'-22%'}
+ {id:'P01',title:'AeroPods Pro 2',category:'Electronics',subcategory:'Headphones',brand:'Aegis Select',art:'pods',rating:4.8,badge:'Featured',image:'',marketPrice:199,stock:42},
+ {id:'P02',title:'Nova Phone 15',category:'Electronics',subcategory:'Mobile Phones',brand:'Aegis Select',art:'phone',rating:4.8,badge:'-15%',image:'',marketPrice:699,stock:18},
+ {id:'P03',title:'VisionBook Air',category:'Electronics',subcategory:'Laptops',brand:'Aegis Select',art:'laptop',rating:4.8,badge:'-18%',image:'',marketPrice:999,stock:12},
+ {id:'P04',title:'Pulse Watch 9',category:'Electronics',subcategory:'Smart Watches',brand:'Aegis Select',art:'watch',rating:4.7,badge:'Hot',image:'',marketPrice:249,stock:31},
+ {id:'P05',title:'StreetRun Max',category:'Fashion',subcategory:'Footwear',brand:'Aegis Select',art:'shoe',rating:4.7,badge:'New',image:'',marketPrice:149,stock:25},
+ {id:'P06',title:'Aero Hoodie',category:'Fashion',subcategory:'Men',brand:'Aegis Select',art:'hoodie',rating:4.8,badge:'Top Pick',image:'',marketPrice:79,stock:36},
+ {id:'P07',title:'Classic Timepiece',category:'Fashion',subcategory:'Accessories',brand:'Aegis Select',art:'timepiece',rating:4.8,badge:'-20%',image:'',marketPrice:129,stock:19},
+ {id:'P08',title:'Urban Tote',category:'Fashion',subcategory:'Accessories',brand:'Aegis Select',art:'bag',rating:4.7,badge:'New',image:'',marketPrice:59,stock:28},
+ {id:'P09',title:'BrewMaster Coffee Set',category:'Home & Kitchen',subcategory:'Kitchen',brand:'Aegis Select',art:'coffee',rating:4.7,badge:'Featured',image:'',marketPrice:69,stock:17},
+ {id:'P10',title:'Air Fryer Pro',category:'Home & Kitchen',subcategory:'Appliances',brand:'Aegis Select',art:'fryer',rating:4.6,badge:'Hot',image:'',marketPrice:119,stock:22},
+ {id:'P11',title:'PureGlow Beauty Kit',category:'Beauty',subcategory:'Skin Care',brand:'Aegis Select',art:'beauty',rating:4.8,badge:'Best Seller',image:'',marketPrice:49,stock:54},
+ {id:'P12',title:'SmartClean Vacuum',category:'Home & Kitchen',subcategory:'Appliances',brand:'Aegis Select',art:'vacuum',rating:4.6,badge:'-22%',image:'',marketPrice:179,stock:14}
 ];
+
+var LIVE_MARKET_ENDPOINT='https://dummyjson.com/products?limit=100';
 
 function now(){return Date.now();}
 function iso(){return new Date().toISOString();}
@@ -100,8 +102,9 @@ function load(){
   var raw=localStorage.getItem(KEY);
   if(!raw){var s=baseState();localStorage.setItem(KEY,JSON.stringify(s));return s;}
   var s=JSON.parse(raw);
-  s.settings=Object.assign(clone(DEFAULT_SETTINGS),s.settings||{});
+   s.settings=Object.assign(clone(DEFAULT_SETTINGS),s.settings||{});
   s.tiers=s.tiers||clone(TIERS);s.offers=s.offers||clone(OFFERS);s.catalog=s.catalog||clone(SHOP_CATALOG);
+  s.liveMarket=s.liveMarket||{provider:'Live marketplace catalog',updatedAt:null,lastStatus:'NOT_LOADED'};
   s.users=s.users||clone(DEMO_USERS);
   s.deposits=s.deposits||[];s.cycles=s.cycles||[];s.referrals=s.referrals||[];s.shopItems=s.shopItems||[];s.carts=s.carts||{};s.orders=s.orders||[];s.withdrawals=s.withdrawals||[];s.ledger=s.ledger||[];s.activity=s.activity||[];s.notifications=s.notifications||[];
   return s;
@@ -259,9 +262,22 @@ function createAssignedShopItems(s,c,u,tier){
  c.completedItemIds=[];
  c.taskProfit=0;
 }
+function syncCycleLiveProducts(s,c){
+ var changed=false,ids=c.shopItemIds||[];
+ ids.forEach(function(id,index){
+  var item=s.shopItems.find(function(x){return x.id===id;});
+  var product=s.catalog[index%s.catalog.length];
+  if(!item||!product)return;
+  item.productId=product.id;
+  ['title','category','subcategory','brand','art','rating','badge','image','marketPrice','stock'].forEach(function(k){
+   if(product[k]!==undefined&&item[k]!==product[k]){item[k]=product[k];changed=true;}
+  });
+ });
+ return changed;
+}
 function ensureCycleTasks(s,userId){
  var open=s.cycles.find(function(c){return c.userId===userId&&(c.status==='TASKS_OPEN'||c.status==='WAITING_18H');});
- if(open)return;
+ if(open){syncCycleLiveProducts(s,open);return;}
  var u=userById(s,userId),tier=findTier(s,u.selectedTier);if(!tier)return;
  var base=Math.max(0,Number(u.balance||0));if(base<=0)return;
  var offer=s.offers.find(function(o){return o.status==='ACTIVE'&&o.tierMin===tier.id;});
@@ -277,10 +293,37 @@ function currentCycle(userId){
 function currentOpenCycleFor(p,s){
  return s.cycles.find(function(c){return c.userId===p.id&&c.status==='TASKS_OPEN';})||null;
 }
+async function refreshLiveCatalog(force){
+ var s=load(),stamp=s.liveMarket&&s.liveMarket.updatedAt?new Date(s.liveMarket.updatedAt).getTime():0;
+ if(!force&&stamp&&now()-stamp<15*60*1000)return {live:s.liveMarket.lastStatus==='LIVE',count:s.catalog.length,updatedAt:s.liveMarket.updatedAt};
+ try{
+  var response=await fetch(LIVE_MARKET_ENDPOINT,{headers:{Accept:'application/json'}});
+  if(!response.ok)throw new Error('Marketplace service returned '+response.status);
+  var payload=await response.json(),products=Array.isArray(payload.products)?payload.products:[];
+  if(!products.length)throw new Error('Marketplace returned no products.');
+  s.catalog=products.slice(0,60).map(function(p,i){
+   var cat=String(p.category||'Other').replace(/-/g,' ');
+   var titleCase=function(v){return String(v||'').replace(/\b\w/g,function(x){return x.toUpperCase();});};
+   var art=cat.indexOf('laptop')>=0?'laptop':cat.indexOf('mobile')>=0||cat.indexOf('smartphone')>=0?'phone':cat.indexOf('shoes')>=0?'shoe':cat.indexOf('shirts')>=0?'hoodie':cat.indexOf('dresses')>=0?'dress':cat.indexOf('fragrances')>=0||cat.indexOf('beauty')>=0?'beauty':cat.indexOf('furniture')>=0?'bag':cat.indexOf('kitchen')>=0||cat.indexOf('groceries')>=0?'fryer':'phone';
+   return {id:'LIVE-'+p.id,title:String(p.title||'Marketplace Product'),category:titleCase(cat),subcategory:titleCase(cat),brand:String(p.brand||'Marketplace Brand'),art:art,rating:Number(p.rating||4.5),badge:Number(p.discountPercentage||0)>=15?'-'+Math.round(p.discountPercentage)+'%':(i%9===0?'Featured':'Popular'),image:String(p.thumbnail||((p.images||[])[0]||'')),marketPrice:Number(p.price||0),stock:Number(p.stock||0)};
+  });
+  s.liveMarket={provider:'Live marketplace catalog',updatedAt:iso(),lastStatus:'LIVE'};
+  s.cycles.forEach(function(c){syncCycleLiveProducts(s,c);});
+  save(s);
+  return {live:true,count:s.catalog.length,updatedAt:s.liveMarket.updatedAt};
+ }catch(e){
+  s.liveMarket=s.liveMarket||{};
+  s.liveMarket.lastStatus='ERROR';
+  s.liveMarket.lastError=String(e.message||e);
+  save(s);
+  return {live:false,count:s.catalog.length,error:String(e.message||e),updatedAt:s.liveMarket.updatedAt||null};
+}
+}
 function getShopState(){
  settleReadyCycles();
  var p=profileOrThrow(),s=load(),c=s.cycles.find(function(x){return x.userId===p.id&&(x.status==='TASKS_OPEN'||x.status==='WAITING_18H');});
- if(!c)return {cycle:null,items:[],cart:[],cartItems:[],available:[],remaining:0,total:0,profit:0,canCheckout:false};
+ if(!c)return {cycle:null,items:[],cart:[],cartItems:[],available:[],remaining:0,total:0,profit:0,canCheckout:false,liveMarket:clone(s.liveMarket||{})};
+ syncCycleLiveProducts(s,c);
  var items=s.shopItems.filter(function(x){return x.cycleId===c.id&&x.status!=='CANCELLED';});
  var cartIds=s.carts[c.id]||[];
  var cartItems=items.filter(function(x){return cartIds.indexOf(x.id)>=0;});
@@ -288,7 +331,8 @@ function getShopState(){
  var balance=Number(c.cycleBase||0);
  var remaining=Math.max(0,Math.round((balance-total)*100)/100);
  var available=items.filter(function(x){return x.status==='AVAILABLE'&&cartIds.indexOf(x.id)<0&&cents(x.amount)<=cents(remaining);});
- return {cycle:clone(c),items:clone(items),cart:clone(cartIds),cartItems:clone(cartItems),available:clone(available),remaining:remaining,total:total,profit:cartItems.reduce(function(a,x){return a+Number(x.profit||0);},0),canCheckout:c.status==='TASKS_OPEN'&&cents(remaining)===0&&cartItems.length>0};
+ save(s);
+ return {cycle:clone(c),items:clone(items),cart:clone(cartIds),cartItems:clone(cartItems),available:clone(available),remaining:remaining,total:total,profit:cartItems.reduce(function(a,x){return a+Number(x.profit||0);},0),canCheckout:c.status==='TASKS_OPEN'&&cents(remaining)===0&&cartItems.length>0,liveMarket:clone(s.liveMarket||{})};
 }
 function addToCart(itemId){
  var p=profileOrThrow();assert(p.role,'tasks:read');var s=load(),c=currentOpenCycleFor(p,s);
@@ -490,6 +534,6 @@ window.AegisCore={
  submitDeposit:submitDeposit,verifyDeposit:verifyDeposit,completeOffer:completeOffer,settleReadyCycles,createWithdrawal:createWithdrawal,finalizeWithdrawal:finalizeWithdrawal,
  markNotification:markNotification,updateSettings:updateSettings,getData:getData,getDashboard:getDashboard,adminSummary:adminSummary,manualCredit:manualCredit,manualReverse:manualReverse,
  setUserStatus:setUserStatus,exportData:exportData,resetDemo:resetDemo,getSystemState:getSystemState,telegramPayload:telegramPayload,
- currentCycle:currentCycle
+ currentCycle:currentCycle,refreshLiveCatalog:refreshLiveCatalog,getShopState:getShopState,addToCart:addToCart,removeFromCart:removeFromCart,clearCart:clearCart,smartFillCart:smartFillCart,checkoutCart:checkoutCart,rejectDeposit:rejectDeposit
 };
 })();

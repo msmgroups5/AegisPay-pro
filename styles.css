@@ -76,3 +76,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}input,s
 .admin-auth-hero{padding:20px 0 10px}
 .admin-auth-hero h1{margin:15px 0 6px;font-size:30px}
 .admin-auth-hero p{color:#8fa9d0;font-size:10px;line-height:1.55;margin:0}
+
+/* Live marketplace data */
+.market-live-row{display:flex;align-items:center;gap:7px;padding:7px 12px;background:#eef7ff;border-bottom:1px solid #dce9f7;color:#315274;font-size:7px}.market-live-row b{font-size:7px;color:#13805f}.market-live-row span:not(.live-dot){opacity:.82}.market-live-row button{margin-left:auto;border:1px solid #cbdced;background:#fff;border-radius:8px;padding:5px 8px;color:#2d5b8e;font-size:7px;font-weight:900}.live-dot{width:7px;height:7px;border-radius:50%;background:#17b882;box-shadow:0 0 0 3px rgba(23,184,130,.12)}
+.market-price{font-size:10px;font-weight:900;color:#536983;margin-top:4px}.market-price span{font-size:6px;color:#8798af;font-weight:700;text-transform:uppercase;letter-spacing:.35px}.stock-line{font-size:6px;color:#178861;font-weight:800;margin-top:4px}
+.product-art img{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;padding:10px;filter:drop-shadow(0 12px 15px rgba(19,55,104,.14))}
+.stock-detail{display:flex;justify-content:space-between;gap:8px;margin-top:11px;padding:9px 10px;border-radius:11px;background:#f6fbff;border:1px solid #dfebf6;color:#5c7390;font-size:7px}

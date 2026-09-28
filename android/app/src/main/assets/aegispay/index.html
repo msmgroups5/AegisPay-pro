@@ -1,11 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#070b14">
-<title>AegisPay — Offline Mobile UI</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061A3A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="AegisPay premium client application">
+<title>AegisPay — Secure Client & Shop</title>
 <link rel="stylesheet" href="./styles.css">
 </head>
-<body><div id="app"></div><script src="./app.js" defer></script></body>
+<body>
+<div id="app" aria-live="polite"></div>
+<script src="./aegis-core.js"></script>
+<script>
+window.AEGIS_ANDROID_APP=true;
+window.AEGIS_MODE='CLIENT';
+window.AEGIS_ADMIN_PORTAL=false;
+</script>
+<script src="./app.js"></script>
+</body>
 </html>
