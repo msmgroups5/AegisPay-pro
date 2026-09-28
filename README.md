@@ -1,69 +1,73 @@
 # AegisPay — Operatable Application Foundation
 
-This repository contains the GitHub-side implementation foundation for the AegisPay Complete A-to-Z Operatable Application Specification.
+A professional, responsive AegisPay demo/system-data application built from the Complete A-to-Z Master Application Specification.
 
-Included:
-- Authentication screen and role-aware access
-- USER / ADMIN / MASTER ADMIN navigation
-- Operations dashboard
-- Node cards and node detail view
-- Liquidity and reserve system-data visualization
-- Global node network visualization
-- Activity stream
-- Task workflow and completion
-- Referral dashboard and tree
-- AI assistant with informational responses
-- Withdrawal request workflow
-- Master Admin approval workflow
-- Withdrawal history
-- User, node, task and referral administration
-- Activity and audit records
-- Platform settings
-- Responsive/mobile layout
-- Validation and temporary disabled-action states
-- LocalStorage persistence
-- Demo REST API under backend/server.js
-- PostgreSQL-style logical schema under database/schema.sql
-- Netlify deployment configuration
-- GitHub Pages deployment workflow
-- GitHub Actions repository checks
+## Included UI
+- Professional login and role-aware access
+- USER, ADMIN and MASTER ADMIN roles
+- Operations Dashboard
+- Current balance, active nodes, total yield, referrals, tasks and withdrawals metrics
+- Liquidity & Reserve Dashboard with gauge, reserve/liability data, timestamp, data-source and audit status
+- Global node map
+- Global activity heatmap
+- Global activity stream
+- Hardware/node cards and node detail history
+- Multi-tier referral dashboard and referral tree
+- Task cards, progress, rewards and completion workflow
+- AI Strategy Assistant with suggested questions and informational disclaimer
+- Withdrawal request form, validation, risk score and history
+- Master Admin Approval Center
+- Conceptual Telegram approval payload preview
+- Notifications
+- Profile
+- Admin Dashboard
+- User Management
+- Node Management
+- Task Management
+- Referral Management
+- Audit Logs
+- Settings
+- System Operations
+- Search and pagination for administrative tables
+- Responsive desktop/tablet/mobile navigation
+- Footer and visible platform/data-only status messaging
 
-Operating boundary:
-This implementation is intentionally a demo/system-data application. It does not execute real payments, blockchain transfers, USDT transfers, custody operations, or bank transfers. Approval actions update application status and audit records only.
+## Repository layers
+- Browser UI: index.html + styles.css + app.js
+- Demo REST API: backend/server.js
+- Demo API data: backend/data.json
+- PostgreSQL schema: database/schema.sql
+- Repository validation: scripts/validate-static.js
+- API smoke tests: scripts/smoke-api.js
+- CI: .github/workflows/ci.yml
+- GitHub Pages: .github/workflows/pages.yml
+- Netlify static deployment configuration: netlify.toml
+- Repository secret/build ignores: .gitignore
 
-Displayed balances, yields, liquidity figures, referral rewards and risk scores are demonstration/system data and are not an independent financial audit.
+## Demo accounts
+USER
+user@aegispay.demo / demo123
 
-Demo credentials:
-User: user@aegispay.demo / demo123
-Admin: admin@aegispay.demo / demo123
-Master Admin: master@aegispay.demo / demo123
+ADMIN
+admin@aegispay.demo / demo123
 
-Local run:
-Open index.html directly in a browser, or serve the repository with a static HTTP server.
-Example:
-python -m http.server 8080
+MASTER ADMIN
+master@aegispay.demo / demo123
 
-Demo API:
-Run:
+## Run locally
+
+UI only:
+Open index.html directly in a browser.
+
+API demo:
 node backend/server.js
-
-Default:
-http://localhost:8080/api/v1/health
 
 Repository checks:
 npm run check
 
-GitHub Pages:
-The workflow at .github/workflows/pages.yml publishes the static app. GitHub Pages may still need to be enabled in repository settings.
+## Production boundary
+This repository is a demonstration/system-data layer. It does not execute real payments, blockchain transfers, custody, banking transfers or live settlement. Approval actions update application status and audit records only.
 
-Netlify:
-The repository includes netlify.toml as a static-site deployment configuration.
+Displayed balances, yields, liquidity figures, rewards and risk scores are demonstration/system data and are not an independent financial audit.
 
-Production backend:
-A real production environment would require persistent database hosting, server-side authentication/authorization, secret management, external service configuration, security testing, monitoring and any applicable compliance/legal work.
-
-Build checkpoint:
-This branch is the first GitHub implementation checkpoint before external production services are connected.
-
-CI checkpoint:
-Every repository push/PR runs the syntax and static validation workflow before merge.
+A production deployment still requires separately configured database/authentication infrastructure, server-side authorization, secrets/environment variables, external AI credentials if used, domain/hosting configuration, security testing, monitoring and any applicable compliance/legal work.
