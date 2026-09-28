@@ -4,6 +4,6 @@
   "version": "0.1.0",
   "description": "AegisPay operatable application foundation",
   "scripts": {
-    "check": "node --check aegis-core.js && node --check app.js && node --check backend/server.js && node scripts/validate-static.js && node scripts/smoke-api.js"
+    "check": "node --check aegis-core.js && node --check app.js && node --check backend/server.js && node scripts/test-core-auth.js && node scripts/validate-static.js && node scripts/smoke-api.js"
   }
 }
