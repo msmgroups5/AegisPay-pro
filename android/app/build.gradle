@@ -1,0 +1,21 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.aegispay.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.aegispay.app'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    tasks.register('syncAegisPayWebAssets', Copy) {
+        from(project.rootDir.parentFile) { include 'index.html', 'styles.css', 'app.js' }
+        into(layout.projectDirectory.dir('src/main/assets/aegispay'))
+    }
+
+    preBuild.dependsOn(syncAegisPayWebAssets)
+}
