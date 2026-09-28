@@ -37,15 +37,27 @@ function toast(msg){let t=document.querySelector('.toast');if(!t)return;t.textCo
 function icon(x){return x}
 function initials(n){return (n||'A').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase()}
 
-function login(){
+async function login(){
   const email=(document.getElementById('login_email')?.value||'').trim();
   const id=(document.getElementById('login_id')?.value||'').trim().toUpperCase();
-  const found=DEMO.users.find(u=>(u.email.toLowerCase()===email.toLowerCase()||u.name.toLowerCase()===email.toLowerCase())&&u.clientId===id);
   const err=document.getElementById('login_error');
-  if(!found){if(err)err.textContent='Please enter a valid Client Name / Email and Client ID.';return}
-  user={...found};localStorage.setItem('aegis_user',JSON.stringify(user));view='home';render()
+  if(!window.AegisCore){
+    if(err)err.textContent='Authentication service is unavailable.';
+    return;
+  }
+  try{
+    const session=await window.AegisCore.authLogin(email,id);
+    user=session.profile;
+    localStorage.setItem('aegis_user',JSON.stringify(user));
+    view='home';render();
+  }catch(e){
+    if(err)err.textContent=e.message||'Invalid AegisPay credentials.';
+  }
 }
-function logout(){localStorage.removeItem('aegis_user');user=null;view='home';render()}
+async function logout(){
+  try{if(window.AegisCore)await window.AegisCore.authLogout();}catch(e){}
+  localStorage.removeItem('aegis_user');user=null;view='home';render()
+}
 function nav(v){view=v;refTab='list';render();window.scrollTo({top:0,behavior:'smooth'})}
 
 function loginScreen(){
