@@ -11,11 +11,15 @@ android {
         versionCode 1
         versionName '1.0'
     }
+}
 
-    tasks.register('syncAegisPayWebAssets', Copy) {
-        from(project.rootDir.parentFile) { include 'index.html', 'styles.css', 'app.js' }
-        into(layout.projectDirectory.dir('src/main/assets/aegispay'))
+def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
+    from(project.rootDir.parentFile) {
+        include 'index.html', 'styles.css', 'app.js'
     }
+    into(layout.projectDirectory.dir('src/main/assets/aegispay'))
+}
 
-    preBuild.dependsOn(syncAegisPayWebAssets)
+tasks.named('preBuild').configure {
+    dependsOn(syncAegisPayWebAssets)
 }
