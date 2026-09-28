@@ -1,0 +1,9 @@
+{
+  "name": "aegispay-pro",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AegisPay operatable application foundation",
+  "scripts": {
+    "check": "node --check app.js && node --check backend/server.js && node scripts/validate-static.js"
+  }
+}
