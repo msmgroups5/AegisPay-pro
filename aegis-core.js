@@ -25,7 +25,7 @@
       {id:'MAS-001',email:'master@aegispay.demo',clientId:'APMASTER',name:'Master Administrator',role:'MASTER ADMIN',balance:0,status:'Active',referralCode:null}
     ],
     tasks: [
-      {id:'TASK-1001',userId:'USR-001',title:'Node Activity Review',description:'Review current node activity.',level:'L1',status:'In Progress',progress:70,reward:25,startDate:'2026-09-20',dueDate:'2026-09-30'},
+      {id:'TASK-1001',userId:'USR-001',title:'Account Activity Review',description:'Review current account activity.',level:'L1',status:'In Progress',progress:70,reward:25,startDate:'2026-09-20',dueDate:'2026-09-30'},
       {id:'TASK-1002',userId:'USR-001',title:'Referral Profile Check',description:'Review referral profile information.',level:'L1',status:'Pending',progress:0,reward:15,startDate:'2026-09-25',dueDate:'2026-10-02'}
     ],
     referrals: [
@@ -220,7 +220,7 @@
   async function exportData(){
     const p=await currentProfile(); assert(p.role,'data:export');
     if(CONFIG.mode==='DEMO') return clone(localState());
-    const resources=['users','nodes','tasks','referrals','withdrawals','activity','notifications'];
+    const resources=['users','tasks','referrals','withdrawals','activity','notifications'];
     const out={}; for(const r of resources) out[r]=await getData(r); return out;
   }
 
