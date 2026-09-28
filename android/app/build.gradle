@@ -43,7 +43,7 @@ dependencies {
 }
 
 def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
-    from(project.rootDir.parentFile) {
+    from(rootProject.projectDir.parentFile) {
         include 'index.html'
         include 'styles.css'
         include 'app.js'
