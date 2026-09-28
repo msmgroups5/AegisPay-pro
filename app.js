@@ -50,7 +50,7 @@ function nav(v){view=v;refTab='list';render();window.scrollTo({top:0,behavior:'s
 
 function loginScreen(){
  return '<div class="login-screen"><div class="login-phone">'+
- '<div class="brand"><img class="brand-logo" src="./aegispay-logo.png" alt="AegisPay"></div><div class="brand-tagline">Your Payments, Your Way</div>'+
+ '<div class="brand"><img class="brand-logo" src="./aegispay-logo.svg" alt="AegisPay"></div><div class="brand-tagline">Your Payments, Your Way</div>'+
  '<div class="login-art"><div class="live-pop p1"><b>Ali Khan</b><span>Just Withdrawn</span><strong>25 USDT</strong><small>1m ago</small></div><div class="live-pop p2"><b>Sara Malik</b><span>Just Withdrawn</span><strong>50 USDT</strong><small>3m ago</small></div><div class="live-pop p3"><b>Usman Raza</b><span>Just Withdrawn</span><strong>100 USDT</strong><small>5m ago</small></div><div class="live-pop p4"><b>Hina Fatima</b><span>Just Withdrawn</span><strong>15 USDT</strong><small>7m ago</small></div><div class="orbit"></div><div class="orbit two"></div><div class="city"><i class="building b1"></i><i class="building b2"></i><i class="building b3"></i><i class="building b4"></i><i class="building b5"></i><i class="building b6"></i><i class="building b7"></i></div></div>'+
  '<div class="login-card"><h1>Welcome Back</h1><p>Login to your account</p>'+
  '<div class="field"><span class="ico">👤</span><input id="login_email" autocomplete="username" placeholder="Client Name / Email"></div>'+
@@ -61,7 +61,7 @@ function loginScreen(){
 function toggleId(){const i=document.getElementById('login_id');if(i)i.type=i.type==='password'?'text':'password'}
 
 function top(){
- return '<header class="top"><div class="top-row"><div class="brand"><img class="brand-logo" src="./aegispay-logo.png" alt="AegisPay"></div>'+
+ return '<header class="top"><div class="top-row"><div class="brand"><img class="brand-logo" src="./aegispay-logo.svg" alt="AegisPay"></div>'+
  '<div class="top-actions"><button class="icon-btn" onclick="showNotifications()">♟<span class="dot"></span></button><button class="icon-btn" onclick="nav(\'profile\')">●</button></div></div>'+
  (view==='home'?'<div class="welcome"><div class="small">Welcome,</div><h2>'+esc(user.name)+'</h2><div class="client-id">Client ID: '+esc(user.clientId)+' <button class="copy" onclick="copyText(\''+esc(user.clientId)+'\',\'Client ID copied\')">▣</button></div></div>'+
  '<div class="ticker">'+DEMO.activity.map(a=>'<div class="ticker-item"><span class="bubble '+(a.out?'out':'')+'">'+(a.out?'↑':'↓')+'</span><div><b>'+esc(a.name)+'</b> '+esc(a.action)+'<small>'+esc(a.amount)+'</small></div></div>').join('')+'</div>':'')+
