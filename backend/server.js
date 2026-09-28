@@ -55,25 +55,6 @@ const routes = {
     service: "AegisPay",
     timestamp: new Date().toISOString()
   }),
-  "/api/v1/map/stream": (req, data) => ({
-    mode: "DEMO",
-    activities: data.activity
-  }),
-  "/api/v1/map/heatmap": () => ({
-    mode: "DEMO",
-    points: [
-      {region:"New York",x:20,y:42,intensity:0.84,nodes:1},
-      {region:"London",x:43,y:34,intensity:0.62,nodes:1},
-      {region:"Dubai",x:60,y:49,intensity:0.71,nodes:1},
-      {region:"Singapore",x:76,y:61,intensity:0.93,nodes:1},
-      {region:"Tokyo",x:84,y:38,intensity:0.78,nodes:1},
-      {region:"Sydney",x:88,y:76,intensity:0.52,nodes:1}
-    ]
-  }),
-  "/api/v1/map/user-nodes": (req, data) => ({
-    mode: "DEMO",
-    nodes: data.nodes
-  }),
   "/api/v1/liquidity/metrics": () => ({
     mode: "DEMO",
     liquidityRatio: 98.4,
