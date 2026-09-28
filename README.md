@@ -61,3 +61,6 @@ The repository includes netlify.toml as a static-site deployment configuration.
 
 Production backend:
 A real production environment would require persistent database hosting, server-side authentication/authorization, secret management, external service configuration, security testing, monitoring and any applicable compliance/legal work.
+
+Build checkpoint:
+This branch is the first GitHub implementation checkpoint before external production services are connected.
