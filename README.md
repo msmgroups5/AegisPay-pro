@@ -6,12 +6,9 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Professional login and role-aware access
 - USER, ADMIN and MASTER ADMIN roles
 - Operations Dashboard
-- Balance, active node, yield, referral, task and withdrawal metrics
+- Balance, referral, task and withdrawal metrics
 - Liquidity & Reserve Dashboard with gauge, reserves/liabilities, timestamp, data source and audit status
-- Global node map
-- Global activity heatmap
 - Global activity stream
-- Hardware/node cards and node detail history
 - Multi-tier referral dashboard and referral tree
 - Task cards, progress, rewards and completion workflow
 - AI Strategy Assistant with suggested questions and informational disclaimer
@@ -22,7 +19,6 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Profile
 - Admin Dashboard
 - User Management
-- Node Management
 - Task Management
 - Referral Management
 - Audit Logs
@@ -37,7 +33,7 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Browser UI: index.html + styles.css + app.js
 - Demo REST API: backend/server.js
 - Demo API data: backend/data.json
-- PostgreSQL schema with pgcrypto: database/schema.sql
+- PostgreSQL schema with pgcrypto: database/schema.sql (node domain removed)
 - Supabase production integration notes: supabase/README.md
 - Production environment template: .env.example
 - Production readiness checklist: docs/PRODUCTION_READINESS.md
