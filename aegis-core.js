@@ -42,12 +42,27 @@ var DEMO_USERS=[
 ];
 
 var OFFERS=[
- {id:'O1',title:'Tier 1 Amazon Shopping',subtitle:'Standard product browsing + shopping task',tierMin:'T1',rewardText:'Tier 1 task',status:'ACTIVE'},
- {id:'O2',title:'Tier 2 Featured Products',subtitle:'Review and complete the assigned featured offer',tierMin:'T2',rewardText:'Tier 2 task',status:'ACTIVE'},
- {id:'O3',title:'Tier 3 Product Discovery',subtitle:'Complete the tier 3 product discovery task',tierMin:'T3',rewardText:'Tier 3 task',status:'ACTIVE'},
- {id:'O4',title:'VVIP 1 Premium Shopping',subtitle:'Complete the premium offer assigned to VVIP 1',tierMin:'V1',rewardText:'VVIP 1 task',status:'ACTIVE'},
- {id:'O5',title:'VVIP 2 Premium Review',subtitle:'Complete the premium review assigned to VVIP 2',tierMin:'V2',rewardText:'VVIP 2 task',status:'ACTIVE'},
- {id:'O6',title:'VVIP 3 Priority Offer',subtitle:'Complete the priority shopping offer assigned to VVIP 3',tierMin:'V3',rewardText:'VVIP 3 task',status:'ACTIVE'}
+ {id:'O1',title:'Tier 1 Shopping Set',subtitle:'Assigned AegisPay Shop tasks for Tier 1',tierMin:'T1',rewardText:'Tier 1 task',status:'ACTIVE'},
+ {id:'O2',title:'Tier 2 Shopping Set',subtitle:'Assigned AegisPay Shop tasks for Tier 2',tierMin:'T2',rewardText:'Tier 2 task',status:'ACTIVE'},
+ {id:'O3',title:'Tier 3 Shopping Set',subtitle:'Assigned AegisPay Shop tasks for Tier 3',tierMin:'T3',rewardText:'Tier 3 task',status:'ACTIVE'},
+ {id:'O4',title:'VVIP 1 Premium Set',subtitle:'Assigned AegisPay Shop tasks for VVIP 1',tierMin:'V1',rewardText:'VVIP 1 task',status:'ACTIVE'},
+ {id:'O5',title:'VVIP 2 Premium Set',subtitle:'Assigned AegisPay Shop tasks for VVIP 2',tierMin:'V2',rewardText:'VVIP 2 task',status:'ACTIVE'},
+ {id:'O6',title:'VVIP 3 Priority Set',subtitle:'Assigned AegisPay Shop tasks for VVIP 3',tierMin:'V3',rewardText:'VVIP 3 task',status:'ACTIVE'}
+];
+
+var SHOP_CATALOG=[
+ {id:'P01',title:'AeroPods Pro 2',category:'Electronics',subcategory:'Headphones',brand:'Aegis Select',art:'pods',rating:4.8,badge:'Featured'},
+ {id:'P02',title:'Nova Phone 15',category:'Electronics',subcategory:'Mobile Phones',brand:'Aegis Select',art:'phone',rating:4.8,badge:'-15%'},
+ {id:'P03',title:'VisionBook Air',category:'Electronics',subcategory:'Laptops',brand:'Aegis Select',art:'laptop',rating:4.8,badge:'-18%'},
+ {id:'P04',title:'Pulse Watch 9',category:'Electronics',subcategory:'Smart Watches',brand:'Aegis Select',art:'watch',rating:4.7,badge:'Hot'},
+ {id:'P05',title:'StreetRun Max',category:'Fashion',subcategory:'Footwear',brand:'Aegis Select',art:'shoe',rating:4.7,badge:'New'},
+ {id:'P06',title:'Aero Hoodie',category:'Fashion',subcategory:'Men',brand:'Aegis Select',art:'hoodie',rating:4.8,badge:'Top Pick'},
+ {id:'P07',title:'Classic Timepiece',category:'Fashion',subcategory:'Accessories',brand:'Aegis Select',art:'timepiece',rating:4.8,badge:'-20%'},
+ {id:'P08',title:'Urban Tote',category:'Fashion',subcategory:'Accessories',brand:'Aegis Select',art:'bag',rating:4.7,badge:'New'},
+ {id:'P09',title:'BrewMaster Coffee Set',category:'Home & Kitchen',subcategory:'Kitchen',brand:'Aegis Select',art:'coffee',rating:4.7,badge:'Featured'},
+ {id:'P10',title:'Air Fryer Pro',category:'Home & Kitchen',subcategory:'Appliances',brand:'Aegis Select',art:'fryer',rating:4.6,badge:'Hot'},
+ {id:'P11',title:'PureGlow Beauty Kit',category:'Beauty',subcategory:'Skin Care',brand:'Aegis Select',art:'beauty',rating:4.8,badge:'Best Seller'},
+ {id:'P12',title:'SmartClean Vacuum',category:'Home & Kitchen',subcategory:'Appliances',brand:'Aegis Select',art:'vacuum',rating:4.6,badge:'-22%'}
 ];
 
 function now(){return Date.now();}
@@ -56,23 +71,27 @@ function clone(x){return JSON.parse(JSON.stringify(x));}
 function uid(prefix){return prefix+'-'+Math.random().toString(36).slice(2,7).toUpperCase()+'-'+Date.now().toString(36).slice(-5).toUpperCase();}
 function baseState(){
  return {
-  version:4,
+  version:5,
   settings:clone(DEFAULT_SETTINGS),
   tiers:clone(TIERS),
   offers:clone(OFFERS),
+  catalog:clone(SHOP_CATALOG),
   users:clone(DEMO_USERS),
   deposits:[],
   cycles:[],
   referrals:[],
+  shopItems:[],
+  carts:{},
+  orders:[],
   withdrawals:[],
   ledger:[],
   activity:[
-   {id:uid('EV'),type:'System',text:'AegisPay testnet demo workspace initialized',time:iso(),userId:'MAS-001'},
+   {id:uid('EV'),type:'System',text:'AegisPay operational workspace initialized',time:iso(),userId:'MAS-001'},
    {id:uid('EV'),type:'Deposit',text:'Demo Client deposit verified',time:iso(),userId:'USR-001'}
   ],
   notifications:[
-   {id:uid('NT'),userId:'USR-001',title:'Welcome to AegisPay',body:'Complete your profile and review the deposit instructions.',read:false,time:iso()},
-   {id:uid('NT'),userId:'USR-001',title:'Testnet Mode Active',body:'This prototype does not move real funds.',read:false,time:iso()}
+   {id:uid('NT'),userId:'USR-001',title:'Welcome to AegisPay',body:'Complete your profile and open Shop to complete your assigned tasks.',read:false,time:iso()},
+   {id:uid('NT'),userId:'USR-001',title:'Shop cycle ready',body:'Your selected tier controls which shopping tasks appear and the total is matched to your current balance.',read:false,time:iso()}
   ]
  };
 }
@@ -82,8 +101,9 @@ function load(){
   if(!raw){var s=baseState();localStorage.setItem(KEY,JSON.stringify(s));return s;}
   var s=JSON.parse(raw);
   s.settings=Object.assign(clone(DEFAULT_SETTINGS),s.settings||{});
-  s.tiers=s.tiers||clone(TIERS);s.offers=s.offers||clone(OFFERS);s.users=s.users||clone(DEMO_USERS);
-  s.deposits=s.deposits||[];s.cycles=s.cycles||[];s.referrals=s.referrals||[];s.withdrawals=s.withdrawals||[];s.ledger=s.ledger||[];s.activity=s.activity||[];s.notifications=s.notifications||[];
+  s.tiers=s.tiers||clone(TIERS);s.offers=s.offers||clone(OFFERS);s.catalog=s.catalog||clone(SHOP_CATALOG);
+  s.users=s.users||clone(DEMO_USERS);
+  s.deposits=s.deposits||[];s.cycles=s.cycles||[];s.referrals=s.referrals||[];s.shopItems=s.shopItems||[];s.carts=s.carts||{};s.orders=s.orders||[];s.withdrawals=s.withdrawals||[];s.ledger=s.ledger||[];s.activity=s.activity||[];s.notifications=s.notifications||[];
   return s;
  }catch(e){var fresh=baseState();localStorage.setItem(KEY,JSON.stringify(fresh));return fresh;}
 }
@@ -200,33 +220,142 @@ function awardReferralBonuses(s,newUser){
  }
 }
 
-function ensureCycleTasks(s,userId){
- var open=s.cycles.find(function(c){return c.userId===userId&&c.status==='TASKS_OPEN';});if(open)return;
- var u=userById(s,userId),tier=findTier(s,u.selectedTier);if(!tier)return;
- var tierIndex=Object.fromEntries(s.tiers.map(function(t,i){return [t.id,i];}))[tier.id];
- var offerIds=s.offers.filter(function(o){return o.status==='ACTIVE'&&o.tierMin===tier.id;}).map(function(o){return o.id;});
- if(!offerIds.length){offerIds=s.offers.filter(function(o){return o.status==='ACTIVE';}).slice(0,1).map(function(o){return o.id;});}
- s.cycles.unshift({id:uid('CYC'),userId:userId,tierId:tier.id,cycleBase:u.balance,status:'TASKS_OPEN',taskIds:offerIds.map(function(id){return uid('TASK');}),offerIds:offerIds,completedOfferIds:[],startedAt:iso(),taskCompletedAt:null,readyAt:null,settledAt:null,profit:0});
+function cents(n){return Math.round((Number(n)||0)*100);}
+function money2(c){return cents(c)/100;}
+function createAssignedShopItems(s,c,u,tier){
+ var balanceCents=cents(c.cycleBase), count=6;
+ var weights=[20,18,17,15,14,16];
+ var items=[],used=0;
+ for(var i=0;i<count;i++){
+  var amountCents=(i===count-1)?(balanceCents-used):Math.max(1,Math.floor(balanceCents*weights[i]/100));
+  used+=amountCents;
+  var product=s.catalog[i % s.catalog.length];
+  var profitCents=Math.round(amountCents*tier.rate);
+  items.push({
+   id:uid('ITM'),
+   cycleId:c.id,
+   userId:u.id,
+   productId:product.id,
+   title:product.title,
+   category:product.category,
+   subcategory:product.subcategory,
+   brand:product.brand,
+   art:product.art,
+   rating:product.rating,
+   badge:product.badge,
+   amount:money2(amountCents),
+   profit:money2(profitCents),
+   amountCents:amountCents,
+   profitCents:profitCents,
+   status:'AVAILABLE',
+   addedAt:null,
+   completedAt:null
+  });
+ }
+ s.shopItems=s.shopItems.filter(function(x){return x.cycleId!==c.id;}).concat(items);
+ c.shopItemIds=items.map(function(x){return x.id;});
+ c.offerIds=c.shopItemIds.slice();
+ c.completedOfferIds=[];
+ c.completedItemIds=[];
+ c.taskProfit=0;
 }
-
+function ensureCycleTasks(s,userId){
+ var open=s.cycles.find(function(c){return c.userId===userId&&(c.status==='TASKS_OPEN'||c.status==='WAITING_18H');});
+ if(open)return;
+ var u=userById(s,userId),tier=findTier(s,u.selectedTier);if(!tier)return;
+ var base=Math.max(0,Number(u.balance||0));if(base<=0)return;
+ var offer=s.offers.find(function(o){return o.status==='ACTIVE'&&o.tierMin===tier.id;});
+ var c={id:uid('CYC'),userId:userId,tierId:tier.id,cycleBase:base,status:'TASKS_OPEN',taskIds:[],offerIds:[],shopItemIds:[],completedOfferIds:[],completedItemIds:[],startedAt:iso(),taskCompletedAt:null,readyAt:null,settledAt:null,profit:0,taskProfit:0,offerSetId:offer?offer.id:null};
+ s.cycles.unshift(c);
+ s.carts[c.id]=[];
+ createAssignedShopItems(s,c,u,tier);
+}
 function currentCycle(userId){
  var s=load();return s.cycles.find(function(c){return c.userId===userId&&['TASKS_OPEN','WAITING_18H'].indexOf(c.status)>=0;})||null;
 }
 
-function completeOffer(offerId){
- var p=profileOrThrow();assert(p.role,'tasks:read');var s=load(),u=userById(s,p.id),c=s.cycles.find(function(x){return x.userId===u.id&&x.status==='TASKS_OPEN';});
- if(!c)throw new Error('No active shopping cycle. Complete or verify a deposit first.');
- if(c.completedOfferIds.indexOf(offerId)>=0)throw new Error('Task already completed.');
- if(c.offerIds.indexOf(offerId)<0)throw new Error('This offer is not assigned to your cycle.');
- c.completedOfferIds.push(offerId);
- if(c.completedOfferIds.length>=c.offerIds.length){
-  c.status='WAITING_18H';c.taskCompletedAt=iso();c.readyAt=new Date(now()+s.settings.cycleHours*3600000).toISOString();c.cycleBase=u.balance;
-  u.balance=0;
-  s.ledger.unshift({id:uid('LED'),type:'CYCLE_TASK_COMPLETE',userId:u.id,amount:c.cycleBase,description:'Cycle tasks completed; balance moved to settlement state',time:iso()});
-  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Cycle completed',body:'All assigned tasks are complete. Your 18-hour settlement timer has started.',read:false,time:iso()});
- }
- s.activity.unshift({id:uid('EV'),type:'Task',text:u.name+' completed '+offerId,time:iso(),userId:u.id});
+function currentOpenCycleFor(p,s){
+ return s.cycles.find(function(c){return c.userId===p.id&&c.status==='TASKS_OPEN';})||null;
+}
+function getShopState(){
+ settleReadyCycles();
+ var p=profileOrThrow(),s=load(),c=s.cycles.find(function(x){return x.userId===p.id&&(x.status==='TASKS_OPEN'||x.status==='WAITING_18H');});
+ if(!c)return {cycle:null,items:[],cart:[],cartItems:[],available:[],remaining:0,total:0,profit:0,canCheckout:false};
+ var items=s.shopItems.filter(function(x){return x.cycleId===c.id&&x.status!=='CANCELLED';});
+ var cartIds=s.carts[c.id]||[];
+ var cartItems=items.filter(function(x){return cartIds.indexOf(x.id)>=0;});
+ var total=cartItems.reduce(function(a,x){return a+cents(x.amount);},0)/100;
+ var balance=Number(c.cycleBase||0);
+ var remaining=Math.max(0,Math.round((balance-total)*100)/100);
+ var available=items.filter(function(x){return x.status==='AVAILABLE'&&cartIds.indexOf(x.id)<0&&cents(x.amount)<=cents(remaining);});
+ return {cycle:clone(c),items:clone(items),cart:clone(cartIds),cartItems:clone(cartItems),available:clone(available),remaining:remaining,total:total,profit:cartItems.reduce(function(a,x){return a+Number(x.profit||0);},0),canCheckout:c.status==='TASKS_OPEN'&&cents(remaining)===0&&cartItems.length>0};
+}
+function addToCart(itemId){
+ var p=profileOrThrow();assert(p.role,'tasks:read');var s=load(),c=currentOpenCycleFor(p,s);
+ if(!c)throw new Error('There is no open Shop cycle.');
+ var item=s.shopItems.find(function(x){return x.id===itemId&&x.cycleId===c.id;});if(!item)throw new Error('Shop item not found.');
+ if(item.status!=='AVAILABLE')throw new Error('This item is not available.');
+ s.carts[c.id]=s.carts[c.id]||[];
+ if(s.carts[c.id].indexOf(itemId)>=0)throw new Error('Item already added to cart.');
+ var total=s.carts[c.id].reduce(function(sum,id){var x=s.shopItems.find(function(y){return y.id===id;});return sum+(x?cents(x.amount):0);},0);
+ if(total+cents(item.amount)>cents(c.cycleBase))throw new Error('This item is above your remaining cycle balance.');
+ s.carts[c.id].push(itemId);item.addedAt=iso();save(s);return getShopState();
+}
+function removeFromCart(itemId){
+ var p=profileOrThrow();var s=load(),c=currentOpenCycleFor(p,s);if(!c)throw new Error('There is no open Shop cycle.');
+ s.carts[c.id]=(s.carts[c.id]||[]).filter(function(id){return id!==itemId;});
+ save(s);return getShopState();
+}
+function clearCart(){
+ var p=profileOrThrow();var s=load(),c=currentOpenCycleFor(p,s);if(!c)throw new Error('There is no open Shop cycle.');
+ s.carts[c.id]=[];save(s);return getShopState();
+}
+function smartFillCart(){
+ var p=profileOrThrow();var s=load(),c=currentOpenCycleFor(p,s);if(!c)throw new Error('There is no open Shop cycle.');
+ s.carts[c.id]=(c.shopItemIds||[]).slice();
+ s.carts[c.id].forEach(function(id){var item=s.shopItems.find(function(x){return x.id===id;});if(item)item.addedAt=iso();});
+ save(s);return getShopState();
+}
+function checkoutCart(){
+ var p=profileOrThrow(),s=load(),c=currentOpenCycleFor(p,s);if(!c)throw new Error('There is no open Shop cycle.');
+ var ids=s.carts[c.id]||[],items=ids.map(function(id){return s.shopItems.find(function(x){return x.id===id&&x.cycleId===c.id;});}).filter(Boolean);
+ var totalCents=items.reduce(function(a,x){return a+cents(x.amount);},0),baseCents=cents(c.cycleBase);
+ if(totalCents!==baseCents)throw new Error('Complete the task set until Remaining Balance is exactly $0.00.');
+ if(!items.length)throw new Error('Add your Shop tasks to the cart first.');
+ var taskProfit=items.reduce(function(a,x){return a+cents(x.profit);},0)/100;
+ items.forEach(function(x){x.status='COMPLETED';x.completedAt=iso();});
+ c.completedOfferIds=items.map(function(x){return x.id;});
+ c.completedItemIds=items.map(function(x){return x.id;});
+ c.taskProfit=taskProfit;
+ c.profit=taskProfit;
+ c.status='WAITING_18H';
+ c.taskCompletedAt=iso();
+ c.readyAt=new Date(now()+s.settings.cycleHours*3600000).toISOString();
+ p=profileOrThrow();var u=userById(s,p.id);u.balance=0;
+ s.orders.unshift({
+  id:uid('ORD'),userId:u.id,cycleId:c.id,total:c.cycleBase,profit:taskProfit,status:'COMPLETED_TASKS',createdAt:iso(),
+  items:items.map(function(x){return {itemId:x.id,title:x.title,amount:x.amount,profit:x.profit,art:x.art};})
+ });
+ s.ledger.unshift({id:uid('LED'),type:'SHOP_CHECKOUT',userId:u.id,amount:c.cycleBase,description:'AegisPay Shop task set completed; balance moved to 18-hour settlement',time:iso(),meta:{items:items.length,taskProfit:taskProfit}});
+ s.notifications.unshift({id:uid('NT'),userId:u.id,title:'All Shop tasks completed',body:'Your balance reached $0.00. The 18-hour settlement timer is now running.',read:false,time:iso()});
+ s.activity.unshift({id:uid('EV'),type:'Shop checkout',text:u.name+' completed '+items.length+' assigned Shop tasks',time:iso(),userId:u.id});
+ s.carts[c.id]=[];
  save(s);return clone(c);
+}
+function completeOffer(offerId){
+ var state=addToCart(offerId);
+ if(state.canCheckout)return checkoutCart();
+ return state.cycle;
+}
+
+function rejectDeposit(depositId,note){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),d=s.deposits.find(function(x){return x.id===depositId;});if(!d)throw new Error('Deposit not found.');
+ if(d.status!=='PENDING_VERIFICATION')throw new Error('Deposit already processed.');
+ d.status='REJECTED';d.verificationNote=note||'Deposit rejected by Master Admin';d.verifiedAt=null;
+ var u=userById(s,d.userId);if(u)s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Deposit rejected',body:d.verificationNote,read:false,time:iso()});
+ s.activity.unshift({id:uid('EV'),type:'Deposit rejected',text:'Deposit '+d.id+' rejected',time:iso(),userId:p.id});
+ save(s);return clone(d);
 }
 
 function settleReadyCycles(){
@@ -234,11 +363,247 @@ function settleReadyCycles(){
  s.cycles.forEach(function(c){
   if(c.status!=='WAITING_18H'||!c.readyAt||new Date(c.readyAt).getTime()>stamp)return;
   var u=userById(s,c.userId);var tier=findTier(s,c.tierId);if(!u||!tier)return;
-  var basis=Number(c.cycleBase||0),profit=basis*tier.rate,total=basis+profit;
+  var basis=Number(c.cycleBase||0),profit=Number(c.taskProfit||0);
+  if(!profit)profit=Math.round(basis*tier.rate*100)/100;
+  var total=Math.round((basis+profit)*100)/100;
   c.status='SETTLED';c.profit=profit;c.settledAt=iso();u.balance=total;u.profit+=profit;
-  s.ledger.unshift({id:uid('LED'),type:'CYCLE_PROFIT',userId:u.id,amount:profit,description:'18-hour cycle profit credited using configured compounded rate',time:iso(),meta:{basis:basis,rate:tier.rate,tier:tier.name}});
-  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Profit credited',body:'Your completed cycle has settled. $'+total.toFixed(2)+' is now shown in your dashboard.',read:false,time:iso()});
-  s.activity.unshift({id:uid('EV'),type:'Cycle settlement',text:u.name+' cycle settled at $'+total.toFixed(2),time:iso(),userId:u.id});
+  s.ledger.unshift({id:uid('LED'),type:'CYCLE_PROFIT',userId:u.id,amount:profit,description:'18-hour Shop task settlement credited',time:iso(),meta:{basis:basis,rate:tier.rate,tier:tier.name,taskProfit:profit}});
+  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Profit credited',body:'Your completed Shop cycle settled. (amount){
+ var p=profileOrThrow();assert(p.role,'withdrawals:create');settleReadyCycles();var s=load(),u=userById(s,p.id);
+ if(u.status!=='NORMAL')throw new Error('Withdrawals are unavailable while the account is not normal.');
+ amount=Number(amount);
+ if(!Number.isFinite(amount)||amount<s.settings.withdrawalMinimum)throw new Error('Minimum withdrawal is $50.');
+ if(!u.wallet)throw new Error('Link your withdrawal wallet first.');
+ var available=Number(u.balance||0)-Number(u.withdrawalHeld||0);if(amount>available)throw new Error('Withdrawal exceeds your available balance.');
+ var fee=amount*s.settings.withdrawalFeeRate,net=amount-fee;
+ u.withdrawalHeld=Number(u.withdrawalHeld||0)+amount;
+ var w={id:uid('WD'),userId:u.id,amount:amount,fee:fee,netAmount:net,destination:u.wallet,status:'PENDING_APPROVAL',createdAt:iso(),approvalDate:null,approvedBy:null,telegramStatus:'PREPARED'};
+ s.withdrawals.unshift(w);s.ledger.unshift({id:uid('LED'),type:'WITHDRAWAL_REQUEST',userId:u.id,amount:amount,description:'Withdrawal request with 10% demo transfer fee',time:iso(),meta:{fee:fee,net:net}});
+ s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Withdrawal submitted',body:'Request '+w.id+' is pending Master Admin approval.',read:false,time:iso()});
+ s.activity.unshift({id:uid('EV'),type:'Withdrawal request',text:u.name+' requested $'+amount.toFixed(2),time:iso(),userId:u.id});
+ save(s);return clone(w);
+}
+
+function finalizeWithdrawal(requestId,approve){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin approval is required.');
+ var s=load(),w=s.withdrawals.find(function(x){return x.id===requestId;});if(!w)throw new Error('Withdrawal request not found.');
+ if(w.status!=='PENDING_APPROVAL')throw new Error('Withdrawal is already finalized.');
+ var u=userById(s,w.userId);if(!u)throw new Error('User not found.');
+ u.withdrawalHeld=Math.max(0,Number(u.withdrawalHeld||0)-w.amount);
+ w.status=approve?'APPROVED':'REJECTED';w.approvalDate=iso();w.approvedBy=p.id;w.telegramStatus='MASTER_DECISION';
+ if(approve){
+  u.balance=Math.max(0,Number(u.balance||0)-w.amount);
+  s.ledger.unshift({id:uid('LED'),type:'WITHDRAWAL_PAYOUT_SIMULATED',userId:u.id,amount:w.netAmount,description:'Approved payout recorded; no live blockchain transfer in prototype',time:iso(),meta:{fee:w.fee,requestId:w.id}});
+  applyLiquiditySettlement(s,w);
+  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Withdrawal approved',body:'Your request '+w.id+' has been approved. Prototype payout processing is simulated.',read:false,time:iso()});
+ }else{
+  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Withdrawal rejected',body:'Your request '+w.id+' was rejected by Master Admin.',read:false,time:iso()});
+ }
+ s.activity.unshift({id:uid('EV'),type:'Master Admin decision',text:w.id+' → '+w.status,time:iso(),userId:p.id});
+ save(s);return clone(w);
+}
+
+function applyLiquiditySettlement(s,w){
+ var u=userById(s,w.userId),ownPrincipal=Math.min(Number(u.principal||0),Number(w.netAmount||0)),remaining=Math.max(0,Number(w.netAmount||0)-ownPrincipal);
+ if(remaining<=0)return;
+ var others=s.users.filter(function(x){return x.role==='USER'&&x.id!==u.id&&x.principal>0&&x.status!=='BLOCKED';});
+ if(!others.length)return;
+ var each=remaining/others.length;
+ others.forEach(function(o){
+  var adj=Math.min(Number(o.principal||0),each);
+  if(adj>0)s.ledger.unshift({id:uid('LED'),type:'LIQUIDITY_PRINCIPAL_ADJUSTMENT',userId:o.id,amount:-adj,description:'Backend liquidity settlement adjustment against approved withdrawal',time:iso(),meta:{sourceWithdrawal:w.id,displayBalanceAffected:false}});
+ });
+}
+
+function manualCredit(userId,amount,reason){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),u=userById(s,userId);amount=Number(amount);if(!u||!Number.isFinite(amount)||amount<=0)throw new Error('Valid amount required.');
+ u.balance+=amount;u.manualCredit+=amount;
+ s.ledger.unshift({id:uid('LED'),type:'MASTER_ADMIN_CREDIT',userId:u.id,amount:amount,description:reason||'Manual credit by Master Admin',time:iso(),actor:p.id});
+ s.activity.unshift({id:uid('EV'),type:'Admin credit',text:'$'+amount.toFixed(2)+' credited to '+u.name,time:iso(),userId:p.id});
+ save(s);return clone(u);
+}
+function manualReverse(userId,amount,reason){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),u=userById(s,userId);amount=Number(amount);if(!u||!Number.isFinite(amount)||amount<=0)throw new Error('Valid amount required.');
+ var allowed=Math.min(Number(u.balance||0),amount);u.balance-=allowed;u.manualCredit=Math.max(0,Number(u.manualCredit||0)-allowed);
+ s.ledger.unshift({id:uid('LED'),type:'MASTER_ADMIN_REVERSAL',userId:u.id,amount:-allowed,description:reason||'Manual reversal by Master Admin',time:iso(),actor:p.id});
+ s.activity.unshift({id:uid('EV'),type:'Admin reversal',text:'$'+allowed.toFixed(2)+' reversed from '+u.name,time:iso(),userId:p.id});
+ save(s);return clone(u);
+}
+function setUserStatus(userId,status){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),u=userById(s,userId);if(!u)throw new Error('User not found.');
+ if(['NORMAL','FROZEN','BLOCKED'].indexOf(status)<0)throw new Error('Invalid status.');
+ u.status=status;s.activity.unshift({id:uid('EV'),type:'Account status',text:u.name+' set to '+status,time:iso(),userId:p.id});save(s);return clone(u);
+}
+function markNotification(id){
+ var p=profileOrThrow();var s=load(),n=s.notifications.find(function(x){return x.id===id;});if(n&&(n.userId===p.id||p.role==='MASTER ADMIN'))n.read=true;save(s);return true;
+}
+function updateSettings(patch){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load();s.settings=Object.assign(s.settings,patch||{});s.activity.unshift({id:uid('EV'),type:'Settings',text:'Master Admin updated platform settings',time:iso(),userId:p.id});save(s);return clone(s.settings);
+}
+function getData(resource){
+ settleReadyCycles();var s=load();var p=profileOrThrow();
+ var map={users:s.users,tiers:s.tiers,offers:s.offers,catalog:s.catalog,deposits:s.deposits,cycles:s.cycles,shopItems:s.shopItems,orders:s.orders,referrals:s.referrals,withdrawals:s.withdrawals,ledger:s.ledger,activity:s.activity,notifications:s.notifications,settings:s.settings};
+ var value=map[resource];if(value===undefined)throw new Error('Unknown resource.');
+ if(resource==='users'&&p.role==='USER')return [clone(userById(s,p.id))];
+ if(['deposits','cycles','shopItems','orders','referrals','withdrawals','ledger','notifications'].indexOf(resource)>=0&&p.role==='USER')return clone(value.filter(function(x){return x.userId===p.id||x.cycleId&&s.cycles.some(function(c){return c.id===x.cycleId&&c.userId===p.id;})||resource==='referrals'&&(x.referredUserId===p.id); }));
+ if(resource==='activity'&&p.role==='USER')return clone(value.filter(function(x){return x.userId===p.id;}));
+ if(['users','deposits','cycles','shopItems','orders','referrals','withdrawals','ledger','activity','notifications','tiers','offers','catalog','settings'].indexOf(resource)>=0)return clone(value);
+ return clone(value);
+}
+function getDashboard(){
+ settleReadyCycles();var s=load(),p=profileOrThrow(),u=userById(s,p.id),tier=u.selectedTier?findTier(s,u.selectedTier):null;
+ var myCycles=s.cycles.filter(function(c){return c.userId===u.id;});
+ var activeCycle=myCycles.find(function(c){return c.status==='TASKS_OPEN'||c.status==='WAITING_18H';})||null;
+ var direct=s.users.filter(function(x){return x.referredBy===u.id;}).length;
+ var level2=s.users.filter(function(x){var parent=userById(s,x.referredBy);return parent&&parent.referredBy===u.id;}).length;
+ var pending=s.withdrawals.filter(function(w){return w.userId===u.id&&w.status==='PENDING_APPROVAL';}).reduce(function(a,w){return a+w.amount;},0);
+ return {profile:clone(u),tier:clone(tier),activeCycle:clone(activeCycle),directReferrals:direct,level2Referrals:level2,pendingWithdrawal:pending,withdrawable:Math.max(0,u.balance-(u.withdrawalHeld||0)),settings:clone(s.settings)};
+}
+function adminSummary(){
+ var s=load(),p=profileOrThrow();if(p.role==='USER')return {role:'USER'};
+ return {role:p.role,totalUsers:s.users.filter(function(u){return u.role==='USER';}).length,activeUsers:s.users.filter(function(u){return u.role==='USER'&&u.status==='NORMAL';}).length,pendingWithdrawals:s.withdrawals.filter(function(w){return w.status==='PENDING_APPROVAL';}).length,approvedWithdrawals:s.withdrawals.filter(function(w){return w.status==='APPROVED';}).length,rejectedWithdrawals:s.withdrawals.filter(function(w){return w.status==='REJECTED';}).length,totalDeposits:s.deposits.filter(function(d){return d.status==='VERIFIED';}).reduce(function(a,d){return a+d.creditedAmount;},0),ledgerEvents:s.ledger.length};
+}
+function exportData(){var p=profileOrThrow();assert(p.role,'data:export');return load();}
+function resetDemo(){var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');localStorage.setItem(KEY,JSON.stringify(baseState()));clearSession();return true;}
+function getSystemState(){return load();}
+function telegramPayload(requestId){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),w=s.withdrawals.find(function(x){return x.id===requestId;});if(!w)throw new Error('Request not found.');var u=userById(s,w.userId);
+ return {requestId:w.id,userId:u.id,user:u.name,amount:w.amount,fee:w.fee,net:w.netAmount,destination:w.destination,status:w.status,message:'AegisPay withdrawal approval request — Master Admin action required.'};
+}
+
+window.AegisCore={
+ config:{mode:'TESTNET_DEMO',network:'TRON TESTNET'},
+ tiers:TIERS,can:can,session:session,saveSession:saveSession,clearSession:clearSession,currentProfile:currentProfile,
+ authLogin:authLogin,authLogout:authLogout,signup:signup,resetPassword:resetPassword,linkWallet:linkWallet,changeWalletByMaster:changeWalletByMaster,
+ submitDeposit:submitDeposit,verifyDeposit:verifyDeposit,completeOffer:completeOffer,settleReadyCycles,createWithdrawal:createWithdrawal,finalizeWithdrawal:finalizeWithdrawal,
+ markNotification:markNotification,updateSettings:updateSettings,getData:getData,getDashboard:getDashboard,adminSummary:adminSummary,manualCredit:manualCredit,manualReverse:manualReverse,
+ setUserStatus:setUserStatus,exportData:exportData,resetDemo:resetDemo,getSystemState:getSystemState,telegramPayload:telegramPayload,
+ currentCycle:currentCycle,getShopState:getShopState,addToCart:addToCart,removeFromCart:removeFromCart,clearCart:clearCart,smartFillCart:smartFillCart,checkoutCart:checkoutCart,rejectDeposit:rejectDeposit
+};
+})();+total.toFixed(2)+' is now available for the next cycle.',read:false,time:iso()});
+  s.activity.unshift({id:uid('EV'),type:'Cycle settlement',text:u.name+' cycle settled at (amount){
+ var p=profileOrThrow();assert(p.role,'withdrawals:create');settleReadyCycles();var s=load(),u=userById(s,p.id);
+ if(u.status!=='NORMAL')throw new Error('Withdrawals are unavailable while the account is not normal.');
+ amount=Number(amount);
+ if(!Number.isFinite(amount)||amount<s.settings.withdrawalMinimum)throw new Error('Minimum withdrawal is $50.');
+ if(!u.wallet)throw new Error('Link your withdrawal wallet first.');
+ var available=Number(u.balance||0)-Number(u.withdrawalHeld||0);if(amount>available)throw new Error('Withdrawal exceeds your available balance.');
+ var fee=amount*s.settings.withdrawalFeeRate,net=amount-fee;
+ u.withdrawalHeld=Number(u.withdrawalHeld||0)+amount;
+ var w={id:uid('WD'),userId:u.id,amount:amount,fee:fee,netAmount:net,destination:u.wallet,status:'PENDING_APPROVAL',createdAt:iso(),approvalDate:null,approvedBy:null,telegramStatus:'PREPARED'};
+ s.withdrawals.unshift(w);s.ledger.unshift({id:uid('LED'),type:'WITHDRAWAL_REQUEST',userId:u.id,amount:amount,description:'Withdrawal request with 10% demo transfer fee',time:iso(),meta:{fee:fee,net:net}});
+ s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Withdrawal submitted',body:'Request '+w.id+' is pending Master Admin approval.',read:false,time:iso()});
+ s.activity.unshift({id:uid('EV'),type:'Withdrawal request',text:u.name+' requested $'+amount.toFixed(2),time:iso(),userId:u.id});
+ save(s);return clone(w);
+}
+
+function finalizeWithdrawal(requestId,approve){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin approval is required.');
+ var s=load(),w=s.withdrawals.find(function(x){return x.id===requestId;});if(!w)throw new Error('Withdrawal request not found.');
+ if(w.status!=='PENDING_APPROVAL')throw new Error('Withdrawal is already finalized.');
+ var u=userById(s,w.userId);if(!u)throw new Error('User not found.');
+ u.withdrawalHeld=Math.max(0,Number(u.withdrawalHeld||0)-w.amount);
+ w.status=approve?'APPROVED':'REJECTED';w.approvalDate=iso();w.approvedBy=p.id;w.telegramStatus='MASTER_DECISION';
+ if(approve){
+  u.balance=Math.max(0,Number(u.balance||0)-w.amount);
+  s.ledger.unshift({id:uid('LED'),type:'WITHDRAWAL_PAYOUT_SIMULATED',userId:u.id,amount:w.netAmount,description:'Approved payout recorded; no live blockchain transfer in prototype',time:iso(),meta:{fee:w.fee,requestId:w.id}});
+  applyLiquiditySettlement(s,w);
+  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Withdrawal approved',body:'Your request '+w.id+' has been approved. Prototype payout processing is simulated.',read:false,time:iso()});
+ }else{
+  s.notifications.unshift({id:uid('NT'),userId:u.id,title:'Withdrawal rejected',body:'Your request '+w.id+' was rejected by Master Admin.',read:false,time:iso()});
+ }
+ s.activity.unshift({id:uid('EV'),type:'Master Admin decision',text:w.id+' → '+w.status,time:iso(),userId:p.id});
+ save(s);return clone(w);
+}
+
+function applyLiquiditySettlement(s,w){
+ var u=userById(s,w.userId),ownPrincipal=Math.min(Number(u.principal||0),Number(w.netAmount||0)),remaining=Math.max(0,Number(w.netAmount||0)-ownPrincipal);
+ if(remaining<=0)return;
+ var others=s.users.filter(function(x){return x.role==='USER'&&x.id!==u.id&&x.principal>0&&x.status!=='BLOCKED';});
+ if(!others.length)return;
+ var each=remaining/others.length;
+ others.forEach(function(o){
+  var adj=Math.min(Number(o.principal||0),each);
+  if(adj>0)s.ledger.unshift({id:uid('LED'),type:'LIQUIDITY_PRINCIPAL_ADJUSTMENT',userId:o.id,amount:-adj,description:'Backend liquidity settlement adjustment against approved withdrawal',time:iso(),meta:{sourceWithdrawal:w.id,displayBalanceAffected:false}});
+ });
+}
+
+function manualCredit(userId,amount,reason){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),u=userById(s,userId);amount=Number(amount);if(!u||!Number.isFinite(amount)||amount<=0)throw new Error('Valid amount required.');
+ u.balance+=amount;u.manualCredit+=amount;
+ s.ledger.unshift({id:uid('LED'),type:'MASTER_ADMIN_CREDIT',userId:u.id,amount:amount,description:reason||'Manual credit by Master Admin',time:iso(),actor:p.id});
+ s.activity.unshift({id:uid('EV'),type:'Admin credit',text:'$'+amount.toFixed(2)+' credited to '+u.name,time:iso(),userId:p.id});
+ save(s);return clone(u);
+}
+function manualReverse(userId,amount,reason){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),u=userById(s,userId);amount=Number(amount);if(!u||!Number.isFinite(amount)||amount<=0)throw new Error('Valid amount required.');
+ var allowed=Math.min(Number(u.balance||0),amount);u.balance-=allowed;u.manualCredit=Math.max(0,Number(u.manualCredit||0)-allowed);
+ s.ledger.unshift({id:uid('LED'),type:'MASTER_ADMIN_REVERSAL',userId:u.id,amount:-allowed,description:reason||'Manual reversal by Master Admin',time:iso(),actor:p.id});
+ s.activity.unshift({id:uid('EV'),type:'Admin reversal',text:'$'+allowed.toFixed(2)+' reversed from '+u.name,time:iso(),userId:p.id});
+ save(s);return clone(u);
+}
+function setUserStatus(userId,status){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),u=userById(s,userId);if(!u)throw new Error('User not found.');
+ if(['NORMAL','FROZEN','BLOCKED'].indexOf(status)<0)throw new Error('Invalid status.');
+ u.status=status;s.activity.unshift({id:uid('EV'),type:'Account status',text:u.name+' set to '+status,time:iso(),userId:p.id});save(s);return clone(u);
+}
+function markNotification(id){
+ var p=profileOrThrow();var s=load(),n=s.notifications.find(function(x){return x.id===id;});if(n&&(n.userId===p.id||p.role==='MASTER ADMIN'))n.read=true;save(s);return true;
+}
+function updateSettings(patch){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load();s.settings=Object.assign(s.settings,patch||{});s.activity.unshift({id:uid('EV'),type:'Settings',text:'Master Admin updated platform settings',time:iso(),userId:p.id});save(s);return clone(s.settings);
+}
+function getData(resource){
+ settleReadyCycles();var s=load();var p=profileOrThrow();
+ var map={users:s.users,tiers:s.tiers,offers:s.offers,deposits:s.deposits,cycles:s.cycles,referrals:s.referrals,withdrawals:s.withdrawals,ledger:s.ledger,activity:s.activity,notifications:s.notifications,settings:s.settings};
+ var value=map[resource];if(value===undefined)throw new Error('Unknown resource.');
+ if(resource==='users'&&p.role==='USER')return [clone(userById(s,p.id))];
+ if(['deposits','cycles','referrals','withdrawals','ledger','notifications'].indexOf(resource)>=0&&p.role==='USER')return clone(value.filter(function(x){return x.userId===p.id||resource==='referrals'&&(x.referredUserId===p.id);}));
+ if(resource==='activity'&&p.role==='USER')return clone(value.filter(function(x){return x.userId===p.id;}));
+ if(['users','deposits','cycles','referrals','withdrawals','ledger','activity','notifications','tiers','offers','settings'].indexOf(resource)>=0)return clone(value);
+ return clone(value);
+}
+function getDashboard(){
+ settleReadyCycles();var s=load(),p=profileOrThrow(),u=userById(s,p.id),tier=u.selectedTier?findTier(s,u.selectedTier):null;
+ var myCycles=s.cycles.filter(function(c){return c.userId===u.id;});
+ var activeCycle=myCycles.find(function(c){return c.status==='TASKS_OPEN'||c.status==='WAITING_18H';})||null;
+ var direct=s.users.filter(function(x){return x.referredBy===u.id;}).length;
+ var level2=s.users.filter(function(x){var parent=userById(s,x.referredBy);return parent&&parent.referredBy===u.id;}).length;
+ var pending=s.withdrawals.filter(function(w){return w.userId===u.id&&w.status==='PENDING_APPROVAL';}).reduce(function(a,w){return a+w.amount;},0);
+ return {profile:clone(u),tier:clone(tier),activeCycle:clone(activeCycle),directReferrals:direct,level2Referrals:level2,pendingWithdrawal:pending,withdrawable:Math.max(0,u.balance-(u.withdrawalHeld||0)),settings:clone(s.settings)};
+}
+function adminSummary(){
+ var s=load(),p=profileOrThrow();if(p.role==='USER')return {role:'USER'};
+ return {role:p.role,totalUsers:s.users.filter(function(u){return u.role==='USER';}).length,activeUsers:s.users.filter(function(u){return u.role==='USER'&&u.status==='NORMAL';}).length,pendingWithdrawals:s.withdrawals.filter(function(w){return w.status==='PENDING_APPROVAL';}).length,approvedWithdrawals:s.withdrawals.filter(function(w){return w.status==='APPROVED';}).length,rejectedWithdrawals:s.withdrawals.filter(function(w){return w.status==='REJECTED';}).length,totalDeposits:s.deposits.filter(function(d){return d.status==='VERIFIED';}).reduce(function(a,d){return a+d.creditedAmount;},0),ledgerEvents:s.ledger.length};
+}
+function exportData(){var p=profileOrThrow();assert(p.role,'data:export');return load();}
+function resetDemo(){var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');localStorage.setItem(KEY,JSON.stringify(baseState()));clearSession();return true;}
+function getSystemState(){return load();}
+function telegramPayload(requestId){
+ var p=profileOrThrow();if(p.role!=='MASTER ADMIN')throw new Error('Master Admin only.');
+ var s=load(),w=s.withdrawals.find(function(x){return x.id===requestId;});if(!w)throw new Error('Request not found.');var u=userById(s,w.userId);
+ return {requestId:w.id,userId:u.id,user:u.name,amount:w.amount,fee:w.fee,net:w.netAmount,destination:w.destination,status:w.status,message:'AegisPay withdrawal approval request — Master Admin action required.'};
+}
+
+window.AegisCore={
+ config:{mode:'TESTNET_DEMO',network:'TRON TESTNET'},
+ tiers:TIERS,can:can,session:session,saveSession:saveSession,clearSession:clearSession,currentProfile:currentProfile,
+ authLogin:authLogin,authLogout:authLogout,signup:signup,resetPassword:resetPassword,linkWallet:linkWallet,changeWalletByMaster:changeWalletByMaster,
+ submitDeposit:submitDeposit,verifyDeposit:verifyDeposit,completeOffer:completeOffer,settleReadyCycles,createWithdrawal:createWithdrawal,finalizeWithdrawal:finalizeWithdrawal,
+ markNotification:markNotification,updateSettings:updateSettings,getData:getData,getDashboard:getDashboard,adminSummary:adminSummary,manualCredit:manualCredit,manualReverse:manualReverse,
+ setUserStatus:setUserStatus,exportData:exportData,resetDemo:resetDemo,getSystemState:getSystemState,telegramPayload:telegramPayload,
+ currentCycle:currentCycle
+};
+})();+total.toFixed(2),time:iso(),userId:u.id});
   changed=true;ensureCycleTasks(s,u.id);
  });
  if(changed)save(s);return changed;

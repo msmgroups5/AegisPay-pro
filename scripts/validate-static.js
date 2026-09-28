@@ -5,7 +5,7 @@ const html=fs.readFileSync("index.html","utf8");
 const js=fs.readFileSync("app.js","utf8");
 const sql=fs.readFileSync("database/schema.sql","utf8");
 if(!html.includes('id="app"')) throw new Error("App mount missing");
-for(const marker of ["Welcome Back","Deposit","Referrals","My Profile","AI Assistant","Withdraw","Notifications","MASTER ADMIN"]) if(!js.includes(marker)) throw new Error("Required UI marker missing: "+marker);
+for(const marker of ["Welcome Back","Deposit","AegisPay Shop","Proceed to Complete Tasks","Referrals","My Profile","AI Assistant","Withdraw","Notifications","MASTER ADMIN"]) if(!js.includes(marker)) throw new Error("Required UI marker missing: "+marker);
 for(const endpoint of ["/api/v1/health","/api/v1/liquidity/metrics","/api/v1/liquidity/audit","/api/v1/ai-assistant/recommendation","/api/v1/ai-assistant/chat","/api/v1/withdraw/request","/api/v1/withdraw/requests","/api/v1/admin/approve"]) if(!fs.readFileSync("backend/server.js","utf8").includes(endpoint)) throw new Error("Required API missing: "+endpoint);
 if(!sql.includes("CREATE EXTENSION IF NOT EXISTS pgcrypto")) throw new Error("pgcrypto extension missing");
 console.log("AegisPay repository validation: PASS");

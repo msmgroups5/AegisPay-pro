@@ -9,6 +9,9 @@ var loginError='';
 var toastTimer=null;
 var depositDraft={tierId:'T1',amount:30,screenshotName:'',txid:''};
 var modal=null;
+var shopCategory='All';
+var shopSearch='';
+var shopSelectedId=null;
 var aiMessages=[{who:'bot',text:'Assalam-o-Alaikum! Main Aegis AI Assistant hun. Deposit, withdrawal, referral, Shop tasks aur account help mein guide kar sakta hun.'}];
 
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -97,6 +100,8 @@ function clientPage(d){
  if(view==='dashboard')return dashboardPage(d);
  if(view==='deposit')return depositPage(d);
  if(view==='shop')return shopPage(d);
+ if(view==='shop-detail')return shopDetailPage(d);
+ if(view==='shop-cart')return shopCartPage(d);
  if(view==='referrals')return referralsPage(d);
  if(view==='withdraw')return withdrawPage(d);
  if(view==='activity')return activityPage(d);
@@ -132,12 +137,69 @@ function depositPage(d){
  '<button class="primary" style="margin-top:10px" data-action="deposit-submit">Submit for verification</button></div>'+
  (p.wallet?'<div class="section"><div class="section-head"><h3>Withdrawal wallet</h3><small>Locked</small></div><div class="wallet-card"><div class="wallet-address">'+esc(p.wallet)+'</div><div class="wallet-lock">'+icon('lock')+' Wallet linked to '+esc(p.name)+'. Client cannot change it.</div></div></div>':'');
 }
+function productArt(item,large){
+ var artMap={pods:'🎧',phone:'📱',laptop:'💻',watch:'⌚',shoe:'👟',hoodie:'🧥',timepiece:'⌚',bag:'👜',coffee:'☕',fryer:'🍳',beauty:'💄',vacuum:'🧹'};
+ return '<div class="product-art '+(large?'large':'')+' art-'+esc(item.art||'phone')+'"><span>'+esc(artMap[item.art]||'🛍️')+'</span><i></i></div>';
+}
+function productCard(item,state){
+ var inCart=state.cart.indexOf(item.id)>=0;
+ return '<button class="product-card '+(inCart?'in-cart':'')+'" data-action="shop-open" data-id="'+esc(item.id)+'">'+
+   productArt(item,false)+
+   '<div class="product-badge">'+esc(item.badge||'Featured')+'</div>'+
+   '<div class="product-card-body"><div class="stars">★★★★★ <span>('+Number(item.rating||4.8).toFixed(1)+')</span></div><h4>'+esc(item.title)+'</h4>'+
+   '<div class="product-price">'+money(item.amount)+' <span>task value</span></div><div class="product-profit">+ '+money(item.profit)+' Profit</div>'+
+   '<div class="product-action">'+(inCart?'✓ Added to cart':'Add to Cart')+'</div></div></button>';
+}
+function shopHeader(state){
+ var cartCount=state.cart.length;
+ return '<div class="shop-brandbar"><div><span class="shop-mark">A</span><strong>AegisPay Shop</strong><small>Internal shopping task center</small></div><button class="shop-cart-btn" data-action="shop-cart">'+icon('shop')+'<b>'+cartCount+'</b></button></div>';
+}
+function shopHomePage(d,state){
+ var categories=['All','Electronics','Fashion','Home & Kitchen','Beauty'];
+ var filtered=state.available.filter(function(x){
+  var catOk=shopCategory==='All'||x.category===shopCategory;
+  var q=shopSearch.trim().toLowerCase();
+  return catOk&&(!q||x.title.toLowerCase().indexOf(q)>=0||x.category.toLowerCase().indexOf(q)>=0||x.subcategory.toLowerCase().indexOf(q)>=0);
+ });
+ var featured=filtered.slice(0,4);
+ return '<div class="shop-shell">'+shopHeader(state)+
+ '<form id="shopSearchForm" class="shop-search"><input id="shopSearch" value="'+esc(shopSearch)+'" placeholder="Search products, brands, categories..."><button type="submit">'+icon('search')+'</button></form>'+
+ '<div class="shop-cats">'+categories.map(function(c){return '<button class="'+(shopCategory===c?'active':'')+'" data-action="shop-category" data-category="'+esc(c)+'">'+esc(c)+'</button>';}).join('')+'</div>'+
+ '<div class="shop-banner"><div><span class="eyebrow">AEGISPAY SHOP</span><h2>Shop & Complete Tasks</h2><p>Items are automatically matched to your current tier and cycle balance.</p><button data-action="shop-smartfill">Build My Task Set →</button></div><div class="shopping-visual">🛍️<span>+</span>📦</div></div>'+
+ '<div class="shop-balance-row"><div><small>Current cycle balance</small><strong>'+money(state.cycle?state.cycle.cycleBase:0)+'</strong></div><div><small>Cart total</small><strong>'+money(state.total)+'</strong></div><div><small>Remaining</small><strong class="'+(state.remaining===0?'good-text':'')+'">'+money(state.remaining)+'</strong></div></div>'+
+ '<div class="shop-section-head"><div><h3>Featured for Your Tier</h3><small>'+esc(d.tier?d.tier.name:'No tier')+' · '+state.available.length+' eligible items</small></div><button data-action="shop-cart" class="text-link">Cart '+state.cart.length+'</button></div>'+
+ (featured.length?'<div class="product-grid">'+featured.map(function(x){return productCard(x,state);}).join('')+'</div>':'<div class="shop-empty">No items match your current balance. Use Build My Task Set to load the exact cycle task set.</div>')+
+ '<div class="shop-category-row"><button data-action="shop-category" data-category="Electronics">Electronics</button><button data-action="shop-category" data-category="Fashion">Fashion</button><button data-action="shop-category" data-category="Home & Kitchen">Home & Kitchen</button><button data-action="shop-category" data-category="Beauty">Beauty</button></div>'+
+ '<div class="shop-rule"><span>'+icon('shield')+'</span><div><b>Zero balance is required</b><small>Checkout unlocks only when the selected task amount matches your complete cycle balance.</small></div></div>'+
+ '</div>';
+}
+function shopDetailPage(d){
+ var state=core.getShopState(),item=state.items.find(function(x){return x.id===shopSelectedId;})||state.items[0];
+ if(!item)return shopHomePage(d,state);
+ var inCart=state.cart.indexOf(item.id)>=0;
+ return '<div class="shop-shell"><div class="shop-detail-head"><button class="back-btn" data-action="go" data-view="shop">←</button><strong>Product Details</strong><button class="shop-cart-btn" data-action="shop-cart">'+icon('shop')+'<b>'+state.cart.length+'</b></button></div>'+
+ '<div class="detail-art-wrap">'+productArt(item,true)+'<span class="detail-badge">'+esc(item.badge||'Featured')+'</span></div>'+
+ '<div class="detail-content"><div class="stars">★★★★★ <span>('+Number(item.rating||4.8).toFixed(1)+')</span></div><h2>'+esc(item.title)+'</h2><p class="detail-sub">'+esc(item.brand)+' · '+esc(item.category)+' · '+esc(item.subcategory)+'</p>'+
+ '<div class="detail-price"><strong>'+money(item.amount)+'</strong><span>'+money(item.profit)+' task profit</span></div>'+
+ '<div class="detail-box"><div><span>Task value</span><b>'+money(item.amount)+'</b></div><div><span>Profit after settlement</span><b class="good-text">+ '+money(item.profit)+'</b></div><div><span>Remaining after add</span><b>'+money(Math.max(0,state.remaining-(inCart?0:item.amount)))+'</b></div></div>'+
+ '<div class="detail-note">'+icon('shield')+' This item is an AegisPay internal task presentation. It is not directly linked to Amazon checkout.</div>'+
+ '<div class="detail-actions"><button class="primary" data-action="shop-add" data-id="'+esc(item.id)+'">'+(inCart?'✓ In Cart':'Add to Cart')+'</button><button class="secondary" data-action="shop-buy" data-id="'+esc(item.id)+'">Buy Now</button></div></div></div>';
+}
+function shopCartPage(){
+ var state=core.getShopState();
+ return '<div class="shop-shell"><div class="shop-detail-head"><button class="back-btn" data-action="go" data-view="shop">←</button><strong>My Cart</strong><button class="shop-cart-btn" data-action="shop-cart">'+icon('shop')+'<b>'+state.cart.length+'</b></button></div>'+
+ '<div class="cart-progress"><div><small>Cycle balance</small><strong>'+money(state.cycle?state.cycle.cycleBase:0)+'</strong></div><div><small>Remaining</small><strong class="'+(state.remaining===0?'good-text':'')+'">'+money(state.remaining)+'</strong></div></div>'+
+ '<div class="cart-list">'+(state.cartItems.length?state.cartItems.map(function(x){return '<div class="cart-item">'+productArt(x,false)+'<div class="cart-item-main"><b>'+esc(x.title)+'</b><small>'+esc(x.category)+' · Task value</small><strong>'+money(x.amount)+'</strong><span>+ '+money(x.profit)+' profit</span></div><button class="remove-cart" data-action="shop-remove" data-id="'+esc(x.id)+'">×</button></div>';}).join(''):'<div class="shop-empty">Your cart is empty. Select the exact task items for your current balance.</div>')+'</div>'+
+ '<div class="cart-summary"><div><span>Total Task Amount</span><b>'+money(state.total)+'</b></div><div><span>Task Profit</span><b class="good-text">+ '+money(state.profit)+'</b></div><div><span>Remaining Balance</span><b class="'+(state.remaining===0?'good-text':'')+'">'+money(state.remaining)+'</b></div>'+
+ '<div class="cart-buttons"><button class="secondary" data-action="shop-clear">Clear</button><button class="secondary" data-action="shop-smartfill">Build Exact Task Set</button></div>'+
+ '<button class="primary wide" '+(state.canCheckout?'':'disabled')+' data-action="shop-checkout">'+(state.canCheckout?'Proceed to Complete Tasks →':'Add items until balance reaches $0.00')+'</button></div>'+
+ '<div class="shop-rule"><span>'+icon('shield')+'</span><div><b>Mandatory completion rule</b><small>The cycle cannot complete until every assigned task is in the cart and the remaining balance is exactly $0.00.</small></div></div></div>';
+}
 function shopPage(d){
- var c=d.activeCycle;
- var taskOffers=core.getData('offers').filter(function(o){return o.status==='ACTIVE'&&o.tierMin===((d.tier&&d.tier.id)||'');});
- return '<div class="page-head"><h2>Shop</h2><small>Tier-based shopping tasks</small></div>'+
- '<div class="section"><div class="banner"><h3>Complete your assigned tasks</h3><p>Your active tier controls the Shop task set. Complete every assigned task to move the cycle into the 18-hour settlement stage.</p></div></div>'+
- '<div class="section">'+(c?'<div class="section-head"><h3>Current cycle</h3><span class="status '+(c.status==='WAITING_18H'?'good':'warn')+'">'+esc(c.status)+'</span></div><div class="offer-grid">'+taskOffers.map(function(o){var done=c.completedOfferIds.indexOf(o.id)>=0;return '<div class="offer"><div class="offer-top"><div class="offer-brand"><div class="offer-logo">'+icon('shop')+'</div><div><h4>'+esc(o.title)+'</h4><p>'+esc(o.subtitle)+'</p></div></div><span class="reward-pill">'+esc(o.rewardText)+'</span></div><div class="offer-body">Instruction: Open the assigned offer, review the displayed item, and complete the requested shopping/task step. Keep the transaction proof available for support if needed.</div><div class="offer-bottom"><span class="task-state '+(done?'completed':'pending')+'">'+(done?'COMPLETED':'PENDING')+'</span><button class="task-button" '+(done||c.status!=='TASKS_OPEN'?'disabled':'')+' data-action="complete-task" data-id="'+o.id+'">'+(done?'Done':'Complete task')+'</button></div></div>';}).join('')+'</div>':'<div class="notice">No active cycle. Verify a deposit first to activate your Shop tasks.</div>')+'</div>';
+ var state=core.getShopState();
+ if(view==='shop-detail')return shopDetailPage(d);
+ if(view==='shop-cart')return shopCartPage();
+ return state.cycle?shopHomePage(d,state):'<div class="shop-shell">'+shopHeader(state)+'<div class="shop-empty"><b>No active Shop cycle</b><small>Verify a deposit first. Your tier will then create a matched task set.</small><button class="primary" data-action="go" data-view="deposit">Go to Deposit</button></div></div>';
 }
 function referralsPage(d){
  var p=d.profile,users=core.getData('users'),refs=users.filter(function(u){return u.referredBy===p.id||u.referredBy&&users.some(function(x){return x.id===u.referredBy&&x.referredBy===p.id;});});
@@ -176,6 +238,7 @@ function profilePage(d){
 function bindClient(){
  var shot=document.getElementById('depositScreenshot');if(shot){shot.addEventListener('change',function(){depositDraft.screenshotName=shot.files&&shot.files[0]?shot.files[0].name:'';render();});}
  var w=document.getElementById('withdrawAmount');if(w){w.addEventListener('input',function(){var a=Math.max(0,Number(w.value||0)),f=a*core.getDashboard().settings.withdrawalFeeRate,n=a-f;var g=document.getElementById('withdrawGross'),ff=document.getElementById('withdrawFee'),nn=document.getElementById('withdrawNet');if(g)g.textContent=money(a);if(ff)ff.textContent='-'+money(f);if(nn)nn.textContent=money(n);});}
+ var sfm=document.getElementById('shopSearchForm');if(sfm)sfm.addEventListener('submit',function(e){e.preventDefault();shopSearch=(document.getElementById('shopSearch')||{}).value||'';render();});
  var af=document.getElementById('aiForm');if(af)af.addEventListener('submit',function(e){e.preventDefault();var i=document.getElementById('aiInput');sendAi(i.value);});
  var lf=document.getElementById('loginForm');if(lf)lf.addEventListener('submit',handleLogin);
  var sf=document.getElementById('signupForm');if(sf)sf.addEventListener('submit',handleSignup);
@@ -184,12 +247,13 @@ function handleLogin(e){e.preventDefault();loginError='';try{var email=document.
 function handleSignup(e){e.preventDefault();var err=document.getElementById('signupErr');try{core.signup({name:document.getElementById('signupName').value,email:document.getElementById('signupEmail').value,password:document.getElementById('signupPassword').value,referralCode:document.getElementById('signupRef').value});view='dashboard';render();notify('Account created');}catch(ex){if(err)err.textContent=ex.message;}}
 function aiAnswer(q){
  q=String(q||'').toLowerCase();
- if(q.indexOf('deposit')>=0)return 'Deposit instructions: select your VIP tier, use the TRON TRC20 testnet receiving address, upload a clear screenshot with TXID visible, then submit it for verification.';
- if(q.indexOf('withdraw')>=0)return 'Withdrawal instructions: link your wallet first, request at least $50, review the 10% fee, then submit. The request goes to Master Admin approval.';
+ if(q.indexOf('deposit')>=0)return 'Deposit instructions: select your VIP tier, use the configured TRON receiving address, upload a clear transaction screenshot with TXID visible, then submit it for verification.';
+ if(q.indexOf('withdraw')>=0)return 'Withdrawal instructions: link your wallet first, request at least $50, review the fee, then submit. The request moves to Master Admin approval.';
  if(q.indexOf('referral')>=0)return 'Level 1 referral bonus is $5 and Level 2 bonus is $2. Bonus triggers after the referred client completes a verified qualifying first deposit.';
- if(q.indexOf('password')>=0)return 'Use Forgot Password from Login. After reset, a temporary security freeze is applied to protect the account.';
- if(q.indexOf('shop')>=0||q.indexOf('task')>=0)return 'Open Shop and complete every assigned task. Once all tasks are complete, your 18-hour settlement timer starts.';
- return 'I can guide you through Deposit, Shop, Withdraw, Referrals, Password Reset, Wallet linking, and account status. I do not approve withdrawals or make financial decisions.';
+ if(q.indexOf('shop')>=0||q.indexOf('task')>=0)return 'Open AegisPay Shop. Your tier and current cycle balance control the assigned items. Add task items to the cart until Remaining Balance is exactly $0.00, then Proceed to Complete Tasks. Your 18-hour settlement timer starts after checkout.';
+ if(q.indexOf('amazon')>=0)return 'AegisPay Shop uses an Amazon-style shopping interface only for task presentation. The client is not directly linked to Amazon checkout.';
+ if(q.indexOf('password')>=0)return 'Use Forgot Password from Login. After reset, the configured security freeze is applied to the account.';
+ return 'I can guide you through Deposit, Shop tasks, Withdrawals, Referrals, Password Reset, Wallet linking, and account status. I do not approve withdrawals or edit balances.';
 }
 function sendAi(q){q=String(q||'').trim();if(!q)return;aiMessages.push({who:'user',text:q});aiMessages.push({who:'bot',text:aiAnswer(q)});render();}
 function showWalletModal(){
@@ -211,7 +275,7 @@ function adminPage(tab){
 function adminUsers(s){
  var q=(document.getElementById('adminSearch')||{}).value||'';q=q.toLowerCase();
  var users=s.users.filter(function(u){return u.role==='USER'&&(!q||u.id.toLowerCase().indexOf(q)>=0||u.name.toLowerCase().indexOf(q)>=0||u.email.toLowerCase().indexOf(q)>=0);});
- return '<div class="admin-card"><h3>User Management</h3><div style="margin-top:10px"><input id="adminSearch" class="admin-input" placeholder="Search Unique ID, name or email" value="'+esc(q)+'"></div><div class="admin-list">'+users.map(function(u){return '<div class="admin-row"><div class="list-icon blue-bg">'+icon('profile')+'</div><div><b>'+esc(u.name)+' · '+esc(u.id)+'</b><small>'+esc(u.email)+' · Balance '+money(u.balance)+' · '+esc(u.status)+'</small></div><div class="right"><button class="admin-btn" data-admin-action="open-user" data-id="'+u.id+'">Manage</button></div></div>';}).join('')+'</div></div>';
+ return '<div class="admin-card"><h3>User Management</h3><div style="margin-top:10px"><input id="adminSearch" class="admin-input" placeholder="Search Unique ID, name or email" value="'+esc(q)+'"></div><div class="admin-list">'+users.map(function(u){return '<div class="admin-row"><div class="list-icon blue-bg">'+icon('profile')+'</div><div><b>'+esc(u.name)+' · '+esc(u.id)+'</b><small>'+esc(u.email)+' · Balance '+money(u.balance)+' · '+esc(u.status)+'</small><div class="admin-btns"><button class="admin-btn green" data-admin-action="credit" data-id="'+u.id+'">Credit</button><button class="admin-btn red" data-admin-action="reverse" data-id="'+u.id+'">Reverse</button><button class="admin-btn gold" data-admin-action="status" data-status="NORMAL" data-id="'+u.id+'">Restore</button><button class="admin-btn red" data-admin-action="status" data-status="FROZEN" data-id="'+u.id+'">Freeze</button><button class="admin-btn red" data-admin-action="status" data-status="BLOCKED" data-id="'+u.id+'">Block</button></div></div></div>';}).join('')+'</div></div>';
 }
 function adminWithdrawals(s){
  var ws=s.withdrawals;
@@ -250,6 +314,15 @@ document.addEventListener('click',function(e){
    else if(a==='go'){view=b.getAttribute('data-view');render();}
    else if(a==='copy'){navigator.clipboard&&navigator.clipboard.writeText(b.getAttribute('data-copy')||'');notify('Copied');}
    else if(a==='tier'){depositDraft.tierId=b.getAttribute('data-id');var t=core.tiers.find(function(x){return x.id===depositDraft.tierId;});depositDraft.amount=t?t.deposit:30;render();}
+   else if(a==='shop-category'){shopCategory=b.getAttribute('data-category')||'All';view='shop';render();}
+   else if(a==='shop-open'){shopSelectedId=b.getAttribute('data-id');view='shop-detail';render();}
+   else if(a==='shop-cart'){view='shop-cart';render();}
+   else if(a==='shop-add'){core.addToCart(b.getAttribute('data-id'));view='shop-cart';render();notify('Item added to task cart');}
+   else if(a==='shop-buy'){core.addToCart(b.getAttribute('data-id'));view='shop-cart';render();notify('Item added — review your task cart');}
+   else if(a==='shop-remove'){core.removeFromCart(b.getAttribute('data-id'));render();notify('Item removed');}
+   else if(a==='shop-clear'){core.clearCart();render();notify('Cart cleared');}
+   else if(a==='shop-smartfill'){core.smartFillCart();view='shop-cart';render();notify('Exact task set added to cart');}
+   else if(a==='shop-checkout'){core.checkoutCart();view='dashboard';render();notify('Tasks completed — 18-hour settlement started');}
    else if(a==='native-scan'){if(window.AegisNative&&window.AegisNative.scan)window.AegisNative.scan();else notify('QR scanner is available in the Android build.');}
    else if(a==='deposit-submit'){depositDraft.txid=(document.getElementById('depositTxid')||{}).value||'';var d=core.submitDeposit(depositDraft);core.verifyDeposit(d.id);render();notify('Deposit verified in testnet demo');}
    else if(a==='complete-task'){core.completeOffer(b.getAttribute('data-id'));render();notify('Task completed');}
@@ -269,6 +342,7 @@ document.addEventListener('click',function(e){
    else if(aa==='reject'){core.finalizeWithdrawal(id,false);view='admin-withdrawals';render();notify('Withdrawal rejected');}
    else if(aa==='credit'){var amt=Number(prompt('Credit amount'));if(amt>0){core.manualCredit(id,amt,prompt('Reason')||'Master Admin manual credit');render();notify('Credit applied');}}
    else if(aa==='reverse'){var am2=Number(prompt('Reverse amount'));if(am2>0){core.manualReverse(id,am2,prompt('Reason')||'Master Admin reversal');render();notify('Reversal applied');}}
+   else if(aa==='status'){core.setUserStatus(id,ad.getAttribute('data-status'));render();notify('Account status updated');}
    else if(aa==='telegram-preview'){var payload=core.telegramPayload(id);alert(JSON.stringify(payload,null,2));}
    else if(aa==='save-settings'){core.updateSettings({network:document.getElementById('settingNetwork').value,receivingAddress:document.getElementById('settingAddress').value,depositFee:Number(document.getElementById('settingDepositFee').value),withdrawalMinimum:Number(document.getElementById('settingWithdrawMin').value),withdrawalFeeRate:Number(document.getElementById('settingWithdrawFee').value),cycleHours:Number(document.getElementById('settingCycle').value),referralL1:Number(document.getElementById('settingRef1').value),referralL2:Number(document.getElementById('settingRef2').value)});render();notify('Settings saved');}
   }catch(ex){notify(ex.message||'Admin action failed');}

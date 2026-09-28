@@ -20,7 +20,7 @@ Client signup creates:
 - Referrer relationship
 - Account status
 
-Forgot Password resets the password and starts a temporary security freeze. The current prototype defaults this freeze to 24 hours.
+Forgot Password resets the password and starts a temporary security freeze. The current app defaults this freeze to 24 hours.
 
 ## 3. Withdrawal wallet
 The client links one withdrawal wallet.
@@ -49,9 +49,13 @@ A $2 deposit fee is configured. First deposit minimum is $30; repeat deposits ar
 Configured cycle rate is the initial profit divided by the tier gross deposit.
 
 ## 6. Shop / tasks
-After verified deposit and tier selection, the client gets tier-based Shop/task offers.
-The client completes the assigned tasks.
-After all tasks in the active cycle are complete, the cycle enters a waiting state and the 18-hour timer starts.
+After verified deposit and tier selection, the client receives an internal AegisPay Shop interface inspired by modern Amazon-style shopping UX. It is not directly linked to Amazon.
+- Products are filtered by the selected tier and the user's current cycle balance.
+- Each assigned product/task shows a task value and task profit.
+- The client can add items to a cart, review the remaining balance, and use an exact-task-set action.
+- The cycle checkout is locked until the cart total equals the full cycle balance and Remaining Balance is exactly $0.00.
+- Completing checkout marks the assigned tasks complete and moves the cycle to 18-hour settlement.
+- Shop orders/tasks are retained in activity and order history.
 
 ## 7. 18-hour settlement
 The completed cycle stores its cycle base.
