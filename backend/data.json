@@ -13,15 +13,23 @@
     }
   ],
   "activity": [
-    {"type":"Node heartbeat","location":"New York","text":"NODE-NY-01 health signal received","time":"2 min ago"},
-    {"type":"Task synchronization","location":"Dubai","text":"TASK-102 synchronized","time":"6 min ago"},
-    {"type":"Referral activity","location":"London","text":"Level 1 referral activity recorded","time":"11 min ago"},
-    {"type":"Withdrawal request","location":"New York","text":"WD-1042 entered approval queue","time":"19 min ago"}
-  ],
-  "nodes": [
-    {"id":"NODE-NY-01","userId":"USR-001","tier":"Guardian","region":"New York","country":"USA","allocation":12500,"yield":1.24,"status":"ACTIVE"},
-    {"id":"NODE-DXB-02","userId":"USR-001","tier":"Sentinel","region":"Dubai","country":"UAE","allocation":6200,"yield":0.92,"status":"ACTIVE"},
-    {"id":"NODE-LON-03","userId":"USR-002","tier":"Sentinel","region":"London","country":"UK","allocation":8400,"yield":0.96,"status":"ACTIVE"},
-    {"id":"NODE-SIN-04","userId":"USR-003","tier":"Vanguard","region":"Singapore","country":"Singapore","allocation":17500,"yield":1.31,"status":"ACTIVE"}
+    {
+      "type": "Task synchronization",
+      "location": "Dubai",
+      "text": "TASK-102 synchronized",
+      "time": "6 min ago"
+    },
+    {
+      "type": "Referral activity",
+      "location": "London",
+      "text": "Level 1 referral activity recorded",
+      "time": "11 min ago"
+    },
+    {
+      "type": "Withdrawal request",
+      "location": "New York",
+      "text": "WD-1042 entered approval queue",
+      "time": "19 min ago"
+    }
   ]
 }
