@@ -203,7 +203,7 @@
     copyReferral:function(){var link='https://aegispay.demo/ref/'+me().referralCode;if(navigator.clipboard)navigator.clipboard.writeText(link);toast('Referral link copied','good')},
     markAllRead:async function(){if(remoteMode){var rr=await supa.from('notifications').update({is_read:true}).eq('user_id',me().id);if(rr.error){toast(rr.error.message,'bad');return}await hydrateRemote();render();return}state.notifications.forEach(function(n){n.read=true});saveState();render()},
     tableFilter:function(key,field,value){if(!filters[key])filters[key]={};filters[key][field]=value;pageNums[key]=1;render()},
-    withdrawFilter:function(field,value){if(!filters.withdrawals)filters.withdrawals={};filters.withdrawals[field]=value;render()},
+    withdrawFilter:function(field,value){if(!filters.withdrawals)filters.withdrawals={};filters.withdrawals[field]=value;render()},    adminWithdrawalFilter:function(field,value){if(!filters.adminWithdrawals)filters.adminWithdrawals={};filters.adminWithdrawals[field]=value;render()},
     adminNew:function(key){if(!isAdmin())return;showModal(adminForm(key,null))},
     adminEdit:function(key,id){if(!isAdmin())return;showModal(adminForm(key,id))},
     adminSave:async function(key,id){
