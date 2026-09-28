@@ -1,6 +1,1 @@
-(function(){
-  'use strict';
-  window.__uniappQuillImageResize = {
-    resize: function(file){ return file; }
-  };
-})();
+(function(){'use strict';window.__uniappQuillImageResize={resize:function(file){return file}};})();
