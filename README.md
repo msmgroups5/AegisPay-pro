@@ -30,6 +30,7 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - System Operations
 - Search and pagination on administrative tables
 - Responsive desktop/tablet/mobile navigation
+- Offline service-worker shell for served web deployments
 - Footer and visible platform/data-only status messaging
 
 ## Repository layers
@@ -37,11 +38,15 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Demo REST API: backend/server.js
 - Demo API data: backend/data.json
 - PostgreSQL schema with pgcrypto: database/schema.sql
+- Supabase production integration notes: supabase/README.md
+- Production environment template: .env.example
+- Production readiness checklist: docs/PRODUCTION_READINESS.md
 - Repository validation: scripts/validate-static.js
 - API smoke tests: scripts/smoke-api.js
 - CI: .github/workflows/ci.yml
 - GitHub Pages-ready packaging workflow: .github/workflows/pages.yml
 - Netlify static deployment configuration: netlify.toml
+- Offline service worker: service-worker.js
 - Repository secret/build ignores: .gitignore
 
 ## Demo accounts
@@ -65,8 +70,11 @@ node backend/server.js
 Repository checks:
 npm run check
 
+## Mobile web
+When served from HTTPS or localhost, the service worker caches the application shell for offline reloads. The standalone offline HTML artifact remains available for direct browser inspection.
+
 ## GitHub Pages
-The repository now has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
+The repository has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
 
 ## Production boundary
 This repository is a demonstration/system-data layer. It does not execute real payments, blockchain transfers, custody, banking transfers or live settlement. Approval actions update application status and audit records only.
