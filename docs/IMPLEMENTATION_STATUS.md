@@ -20,10 +20,6 @@ The repository contains the complete demo/system-data implementation layer requi
 - Authentication screen
 - USER / ADMIN / MASTER ADMIN roles
 - Dashboard
-- My Nodes
-- Node detail modal with task/activity history
-- Global node map
-- Global heatmap
 - Activity stream
 - Tasks and completion workflow
 - Referral network/tree
@@ -37,7 +33,6 @@ The repository contains the complete demo/system-data implementation layer requi
 ### Admin / Master Admin modules
 - Admin Dashboard
 - User Management
-- Node Management
 - Task Management
 - Referral Management
 - Approval Center
