@@ -50,6 +50,7 @@ def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
         include 'supabase-client.js'
         include 'service-worker.js'
         include 'manifest.webmanifest'
+        include 'aegispay-logo.svg'
     }
     into(layout.projectDirectory.dir('src/main/assets/aegispay'))
 }
