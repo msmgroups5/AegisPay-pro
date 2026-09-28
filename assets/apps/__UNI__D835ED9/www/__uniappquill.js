@@ -1,6 +1,1 @@
-(function(){
-  'use strict';
-  window.__uniappQuill = {
-    create: function(element){ return element; }
-  };
-})();
+(function(){'use strict';window.__uniappQuill={create:function(element){return element}};})();
