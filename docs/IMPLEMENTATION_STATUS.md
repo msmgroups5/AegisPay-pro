@@ -91,15 +91,16 @@ This repository layer does not perform real financial transfers, blockchain exec
 - execute-payout now atomically claims approved withdrawals and leaves ambiguous broadcasts locked in PROCESSING for manual reconciliation.
 - Supabase Storage has no buckets or policies.
 - Netlify has a ready HTTPS deployment and no environment variables.
-- The browser application still uses localStorage demo data; the Supabase wrappers are not wired into login or business-data workflows.
+- The client-auth implementation branch connects password sign-in and recovery to Supabase Auth, then calls the approved-profile claim RPC. The client entry deliberately shows identity/profile status only; business data remains unconnected. The separate Master Admin portal still uses local demo state.
 - The live database has six recorded migrations, while the repository does not contain the full prior migration source history. Only the payout function source and profile-claim hardening migration are newly checked in here.
 - The security advisor still reports seven authenticated-callable SECURITY DEFINER functions. The performance advisor also reports unindexed foreign keys and policy-performance findings.
 - The connected integrations do not expose Supabase Auth configuration or Edge Function secret presence.
 
 ### External work that remains
 
-- Provision approved Auth identities and connect browser sign-in and profile loading.
-- Move business-data reads and writes off the browser demo store to Supabase-backed, role-checked operations.
+- Provision the six approved Auth identities, confirm invitation/password setup, and validate the client sign-in/profile flow end to end.
+- Connect Master Admin authentication to approved Supabase identities and role-checked backend operations.
+- Move client business-data reads and writes off the browser demo store to Supabase-backed, role-checked operations.
 - Create a private Storage bucket with owner-scoped policies if deposit evidence upload is required.
 - Check in source for the other three deployed Edge Functions and reconcile all prior live database migrations with repository SQL.
 - Review and resolve or document the remaining SECURITY DEFINER and performance advisor findings.
