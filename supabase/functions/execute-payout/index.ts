@@ -39,9 +39,10 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
-  let admin: ReturnType<typeof createClient> | null = null;
-  let withdrawalId: string | null = null;
-  let payoutMayHaveBeenBroadcast = false;
+let admin: ReturnType<typeof createClient> | null = null;
+let withdrawalId: string | null = null;
+let claimedWithdrawal: any = null;
+let payoutMayHaveBeenBroadcast = false;
 
   try {
     if (!SUPABASE_URL || !SERVICE_KEY) {
@@ -105,6 +106,7 @@ Deno.serve(async (req: Request) => {
     if (!withdrawal) {
       return json({ error: "Withdrawal is unavailable or has already been claimed." }, 409);
     }
+    claimedWithdrawal = withdrawal;
 
     const amountRaw = usdtUnits(withdrawal.net_amount);
     if (!withdrawal.destination_address) {
@@ -172,18 +174,32 @@ Deno.serve(async (req: Request) => {
           .update({ payout_error: "Payout outcome is unknown; keep PROCESSING until chain reconciliation. " + detail })
           .eq("id", withdrawalId)
           .eq("status", "PROCESSING");
+      } else if (claimedWithdrawal) {
+        const { data: restored, error: restoreError } = await admin.rpc("fail_unbroadcast_withdrawal", {
+          p_request_id: withdrawalId,
+          p_error: "Payout was not broadcast. " + detail,
+        });
+        if (restoreError || restored !== true) {
+          await admin.from("withdrawal_requests")
+            .update({ payout_error: "Payout was not broadcast, but the balance refund needs manual reconciliation. " + detail })
+            .eq("id", withdrawalId)
+            .eq("status", "PROCESSING");
+        }
       } else {
         await admin.from("withdrawal_requests")
-          .update({ status: "FAILED", payout_error: "Payout was not submitted. " + detail })
+          .update({ payout_error: "Payout was not submitted." })
           .eq("id", withdrawalId)
-          .eq("status", "PROCESSING");
+          .eq("status", "APPROVED");
       }
     }
     return json({
       error: payoutMayHaveBeenBroadcast
         ? "Payout outcome is unknown; keep the withdrawal locked for manual reconciliation."
+        : claimedWithdrawal
+        ? "Payout failed before broadcast. The balance was restored or flagged for manual refund reconciliation."
         : "Payout request failed before broadcast.",
+      balanceRestored: Boolean(claimedWithdrawal && !payoutMayHaveBeenBroadcast),
       detail,
-    }, payoutMayHaveBeenBroadcast ? 202 : 502);
+    }, payoutMayHaveBeenBroadcast || claimedWithdrawal ? 202 : 502);
   }
 });

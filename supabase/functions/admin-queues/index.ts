@@ -43,8 +43,8 @@ Deno.serve(async (req: Request) => {
         .select("id,user_id,document_type,status,ai_review_status,ai_confidence,review_reason,front_storage_path,back_storage_path,submitted_at")
         .in("status", ["PENDING_REVIEW","MANUAL_REVIEW"]).order("submitted_at", { ascending: true }).limit(50),
       admin.from("withdrawal_requests")
-        .select("id,user_id,amount,fee_amount,net_amount,destination_address,status,created_at")
-        .eq("status", "PENDING_APPROVAL").order("created_at", { ascending: true }).limit(50),
+        .select("id,user_id,amount,fee_amount,net_amount,destination_address,status,created_at,payout_error,payout_txid")
+        .in("status", ["PENDING_APPROVAL","APPROVED"]).order("created_at", { ascending: true }).limit(50),
     ]);
     if (depositResult.error || kycResult.error || withdrawalResult.error) {
       return json({ error: "Unable to load review queues." }, 500);
@@ -81,6 +81,7 @@ Deno.serve(async (req: Request) => {
       withdrawals: withdrawals.map((x: any) => ({
         id: x.id, amount: x.amount, feeAmount: x.fee_amount, netAmount: x.net_amount,
         destinationAddress: x.destination_address, status: x.status, submittedAt: x.created_at,
+        payoutError: x.payout_error, payoutTxid: x.payout_txid,
         user: users.get(x.user_id) || null,
       })),
       expiresInSeconds: 600,
@@ -89,4 +90,3 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Unable to load review queues." }, 500);
   }
 });
-

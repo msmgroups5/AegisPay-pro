@@ -17,6 +17,7 @@ for(const marker of ["signupForm","depositForm","kycForm","aegispay-language","s
 if(adminHtml.includes("./app.js")||adminHtml.includes("./aegis-core.js")||!adminHtml.includes("./admin-auth.js")) throw new Error("Master Admin must use protected Supabase Auth, not local demo state");
 for(const marker of ["admin-queues","admin-review","MASTER ADMIN"]) if(!adminAuth.includes(marker)) throw new Error("Master Admin workflow missing: "+marker);
 for(const marker of ["kyc_verifications","private-verification","request_withdrawal","require_deposit_evidence_review","role = 'USER'"]) if(!securitySql.includes(marker)) throw new Error("Operational security migration missing: "+marker);
+if(!fs.readFileSync("database/migrations/20260930_withdrawal_role_and_payout_recovery.sql","utf8").includes("fail_unbroadcast_withdrawal")) throw new Error("Unbroadcast payout recovery migration missing");
 if(fs.readFileSync("service-worker.js","utf8").includes("url.origin!==self.location.origin")){}else throw new Error("Service worker must not cache cross-origin/authenticated responses");
 for(const file of ["aegis-core.js","client-auth.js","master-admin.html","README.md"]) if(/aegispay\.demo|APMASTER|APADMIN|AP10023/.test(fs.readFileSync(file,"utf8"))) throw new Error("Legacy demo login identity remains in "+file);
 for(const marker of ["Welcome Back","Deposit","AegisPay Shop","Proceed to Complete Tasks","Referrals","My Profile","AI Assistant","Withdraw","Notifications","MASTER ADMIN"]) if(!js.includes(marker)) throw new Error("Required UI marker missing: "+marker);

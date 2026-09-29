@@ -9,6 +9,7 @@ The connected project already has these additive migrations applied:
 - `20260930_signup_private_evidence_and_kyc.sql`
 - `20260930_network_aware_deposit_credit.sql`
 - `20260930_rls_and_foreign_key_indexes.sql`
+- `20260930_withdrawal_role_and_payout_recovery.sql`
 
 The `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `verify-deposit`, `monitor-deposits`, and `execute-payout` Edge Functions are deployed and ACTIVE.
 

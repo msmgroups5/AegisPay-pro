@@ -12,8 +12,8 @@
 - Android has distinct Client and Master Admin application variants. The WebView supports image selection for screenshots and identity photos.
 - The service worker caches only same-origin application files, never Supabase/Auth responses.
 - The old demo login identities and displayed demo credentials have been removed from the client and admin entry points. All six unlinked live profile rows are now anonymized and marked DELETED; linked withdrawal, referral, task, notification, and audit history remains intact.
-- Three additive migrations are live: public USER signup and private KYC/evidence controls; network-aware deposit credit; and explicit authenticated read policies plus foreign-key indexes.
-- Seven Edge Functions are deployed and ACTIVE: submit-deposit, submit-kyc, admin-queues, admin-review, verify-deposit, monitor-deposits, and execute-payout. Payout approval is blocked in test mode and the admin approval flow calls the payout function only when live settings permit it.
+- Four additive migrations are live: public USER signup and private KYC/evidence controls; network-aware deposit credit; explicit authenticated read policies plus foreign-key indexes; and client-only withdrawals with safe pre-broadcast payout recovery.
+- Seven Edge Functions are deployed and ACTIVE: submit-deposit, submit-kyc, admin-queues, admin-review, verify-deposit, monitor-deposits, and execute-payout. Payout approval is blocked in test mode, approved-but-unpaid requests can be retried by Master Admin, and confirmed pre-broadcast failures restore the reserved balance.
 - The live Supabase mode is TESTNET_DEMO, real payouts are disabled, and deposit verification is pinned to the TRON test network.
 
 ## Runtime configuration still required

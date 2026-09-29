@@ -9,11 +9,12 @@ function shell(body){return '<main style="max-width:1100px;margin:24px auto;padd
 function renderLogin(){
  root.innerHTML=shell('<section style="max-width:420px;margin:40px auto"><h1>Master Admin sign in</h1><p>Use an account provisioned by the AegisPay project owner.</p><form id="adminLogin"><label>Email<input id="adminEmail" type="email" autocomplete="username" required></label><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in securely</button></form><small>Admin access is verified by Supabase Auth and the server-side role check.</small></section>');
 }
-function itemButtons(kind,id){
+function itemButtons(kind,id,status){
+ if(kind==='withdrawal'&&status==='APPROVED')return '<div style="display:flex;gap:8px;margin-top:12px"><button data-action="payout" data-id="'+esc(id)+'">Retry payout</button></div>';
  return '<div style="display:flex;gap:8px;margin-top:12px"><button data-action="review" data-kind="'+kind+'" data-id="'+esc(id)+'" data-decision="approve">Approve</button><button data-action="review" data-kind="'+kind+'" data-id="'+esc(id)+'" data-decision="reject">Reject</button></div>';
 }
-function card(title,sub,detail,kind,id,media){
- return '<article style="border:1px solid #dce5ef;border-radius:14px;padding:16px;margin:12px 0"><div style="display:flex;justify-content:space-between;gap:14px"><div><h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p>'+detail+'</div></div>'+media+itemButtons(kind,id)+'</article>';
+function card(title,sub,detail,kind,id,media,status){
+ return '<article style="border:1px solid #dce5ef;border-radius:14px;padding:16px;margin:12px 0"><div style="display:flex;justify-content:space-between;gap:14px"><div><h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p>'+detail+'</div></div>'+media+itemButtons(kind,id,status)+'</article>';
 }
 function renderQueues(){
  var q=state.queues,items=q[state.tab]||[];
@@ -29,7 +30,7 @@ function renderQueues(){
    var images='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">'+(x.frontUrl?'<a href="'+esc(x.frontUrl)+'" target="_blank" rel="noopener">Front / passport image</a>':'')+(x.backUrl?'<a href="'+esc(x.backUrl)+'" target="_blank" rel="noopener">Back image</a>':'')+'</div>';
    return card(x.documentType,who,'<p>AI: '+esc(x.aiReviewStatus)+' · Confidence: '+esc(x.confidence||'n/a')+'</p><p>Review reason: '+esc(x.reason||'No issue')+'</p>', 'kyc',x.id,images);
   }
-  return card('$'+x.amount+' request',who,'<p>Fee: $'+esc(x.feeAmount)+' · Net: $'+esc(x.netAmount)+'</p><p>Destination: <code>'+esc(x.destinationAddress)+'</code></p>', 'withdrawal',x.id,'<small>Submitted '+esc(date(x.submittedAt))+'</small>');
+  return card('$'+x.amount+' request · '+esc(x.status),who,'<p>Fee: $'+esc(x.feeAmount)+' · Net: $'+esc(x.netAmount)+'</p><p>Destination: <code>'+esc(x.destinationAddress)+'</code></p><p>'+esc(x.payoutError||'')+(x.payoutTxid?' · TXID '+esc(x.payoutTxid):'')+'</p>', 'withdrawal',x.id,'<small>Submitted '+esc(date(x.submittedAt))+'</small>',x.status);
  }).join('');
  root.innerHTML=shell('<section><h1>Operations queues</h1><p>Identity images are private and temporary review links expire after 10 minutes.</p>'+nav+(items.length?list:'<p>No items are waiting in this queue.</p>')+'<button data-action="logout">Sign out</button></section>');
 }
@@ -65,7 +66,17 @@ async function review(el){
    if(check.data&&check.data.status==='PENDING_VERIFICATION')state.error=check.data.message||'On-chain transfer is not confirmed yet.';
   }
   await loadQueues();
- }catch(err){state.error=err.message||'The review could not be completed.';}
+ }catch(err){state.error=err.message||'The review could not be completed.';await loadQueues().catch(function(){});}
+ finally{state.busy=false;render();}
+}
+async function retryPayout(el){
+ if(state.busy)return;state.busy=true;state.error='';render();
+ try{
+  var result=await service.client().functions.invoke('execute-payout',{body:{withdrawalId:el.getAttribute('data-id')}});
+  if(result.error)throw result.error;
+  if(!result.data||result.data.status!=='PAID')throw new Error((result.data&&result.data.error)||'Payout needs manual reconciliation.');
+  await loadQueues();
+ }catch(err){state.error=err.message||'The payout could not be completed.';await loadQueues().catch(function(){});}
  finally{state.busy=false;render();}
 }
 root.addEventListener('submit',function(e){if(e.target.id==='adminLogin')login(e);});
@@ -75,6 +86,7 @@ root.addEventListener('click',function(e){
  if(a==='refresh'){state.busy=true;loadQueues().catch(function(err){state.error=err.message||'Queue load failed.';}).finally(function(){state.busy=false;render();});}
  if(a==='logout'){service.signOut().finally(function(){state.profile=null;state.queues={deposits:[],kyc:[],withdrawals:[]};render();});}
  if(a==='review')review(el);
+ if(a==='payout')retryPayout(el);
 });
 async function boot(){
  render();if(!service||!service.isAvailable()){state.error='Secure sign-in is unavailable.';render();return;}
