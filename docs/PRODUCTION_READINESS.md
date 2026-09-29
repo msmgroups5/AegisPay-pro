@@ -5,7 +5,7 @@
 - Supabase Auth signup/profile creation is constrained to USER for public signup.
 - Private evidence storage and server-side deposit, KYC, and withdrawal gates are implemented as an additive migration and Supabase Edge Functions.
 - All six formerly unlinked application profiles are anonymized and marked DELETED, preserving their connected audit, withdrawal, referral, notification, and task rows.
-- The additive signup/KYC, network-aware credit, RLS/index, and withdrawal recovery migrations have been applied to the connected Supabase project.
+- The additive signup/KYC, network-aware credit, RLS/index, withdrawal recovery, and test wallet reset migrations have been applied to the connected Supabase project.
 - The deposit, KYC, admin-review, chain-verification, monitor, and payout Edge Functions have been deployed and are ACTIVE.
 - The connected database is in TESTNET_DEMO mode and cannot issue real payouts. Deposit-credit metadata records the network and token contract used for verification.
 - Deposit balance credits require an approved screenshot review and a confirmed matching TRON transfer.
