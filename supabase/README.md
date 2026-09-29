@@ -4,7 +4,7 @@ The connected Supabase project wtcspnrmsoisroavojop is active and healthy in ap-
 
 ## Verified state on 2026-09-29
 
-- Six public application tables have RLS enabled; all 14 exposed public application tables inspected have RLS enabled. FORCE ROW LEVEL SECURITY is off.
+- All 14 exposed public application tables inspected have RLS enabled. FORCE ROW LEVEL SECURITY is off.
 - Six application profiles exist, but there are zero Auth users and zero linked profiles.
 - claim_aegispay_profile now requires a verified email and either a Supabase Auth invitation or server-controlled app metadata with aegispay_approved=true before linking an unclaimed profile.
 - Four Edge Functions are active: verify-deposit, monitor-deposits, telegram-withdrawal and execute-payout. JWT verification is enabled for all except monitor-deposits, which checks the AEGIS_CRON_SECRET header in its body.
