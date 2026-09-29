@@ -15,7 +15,7 @@ jobs:
       - name: Package static site
         run: |
           mkdir -p dist
-          cp index.html styles.css app.js dist/
+          cp index.html styles.css supabase-client.js supabase-service.js client-auth.js aegispay-logo.svg service-worker.js dist/
           cp README.md dist/
           echo "Static site package prepared for GitHub Pages after Pages is enabled in repository settings." > dist/PAGES_NOTE.txt
       - name: Upload Pages-ready artifact
