@@ -58,10 +58,10 @@ function renderProfile(){
 function render(){
  if(!root)return;
  if(state.phase==='loading'){renderLoading();return;}
- if(state.mode==='password-update'){renderPasswordUpdate();return;}
- if(state.mode==='reset'){renderReset();return;}
- if(state.profile){renderProfile();return;}
- renderLogin();
+ if(state.mode==='password-update')renderPasswordUpdate();
+ else if(state.mode==='reset')renderReset();
+ else if(state.profile)renderProfile();
+ else renderLogin();
  bind();
 }
 function bind(){
