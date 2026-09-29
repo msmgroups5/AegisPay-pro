@@ -11,8 +11,10 @@ The connected project already has these additive migrations applied:
 - `20260930_rls_and_foreign_key_indexes.sql`
 - `20260930_withdrawal_role_and_payout_recovery.sql`
 - `20260930_clear_unverified_testnet_wallet.sql`
+- `20260930_signup_referral_random_fix.sql`
+- `20260930_aegispay_global_runtime_switch.sql`
 
-The `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `verify-deposit`, `monitor-deposits`, and `execute-payout` Edge Functions are deployed and ACTIVE.
+The `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `verify-deposit`, `monitor-deposits`, `execute-payout`, and `telegram-withdrawal` Edge Functions are deployed and ACTIVE. All eight honor the Master Admin global runtime switch where they perform operational work.
 
 All six original unlinked application profiles were anonymized in place, marked DELETED, and had old elevated roles reset to USER. Their linked history remains intact.
 

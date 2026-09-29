@@ -27,6 +27,9 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
     const { data: auth, error: authError } = await admin.auth.getUser(token);
     if (authError || !auth.user) return json({ error: "Invalid authentication token." }, 401);
+    const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
+    if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
+    if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
     const { data: profile } = await admin.from("users")
       .select("id,auth_user_id,role,status").eq("auth_user_id", auth.user.id).maybeSingle();
     if (!profile || !["USER","MASTER ADMIN"].includes(profile.role)) return json({ error: "AegisPay profile not found." }, 404);
@@ -121,4 +124,3 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Unable to verify deposit." }, 500);
   }
 });
-

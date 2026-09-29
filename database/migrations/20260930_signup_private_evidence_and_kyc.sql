@@ -116,7 +116,7 @@ BEGIN
   END IF;
 
   LOOP
-    v_new_referral_code := 'AG' || upper(substr(encode(gen_random_bytes(8), 'hex'), 1, 10));
+    v_new_referral_code := 'AG' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10));
     EXIT WHEN NOT EXISTS (
       SELECT 1 FROM public.users WHERE referral_code = v_new_referral_code
     );
@@ -437,4 +437,3 @@ SET value_json = value_json || jsonb_build_object(
 WHERE key = 'deposit_rules';
 
 COMMIT;
-

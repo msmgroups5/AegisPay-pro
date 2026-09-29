@@ -48,8 +48,6 @@ let payoutMayHaveBeenBroadcast = false;
     if (!SUPABASE_URL || !SERVICE_KEY) {
       return json({ error: "Payout service is not configured." }, 503);
     }
-    if (!PAYOUT_KEY) return json({ error: "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
-
     const authorization = req.headers.get("Authorization") || "";
     const token = authorization.replace(/^Bearer\s+/i, "");
     if (!token) return json({ error: "Authorization required." }, 401);
@@ -72,6 +70,10 @@ let payoutMayHaveBeenBroadcast = false;
     if (!["ACTIVE", "NORMAL"].includes(String(profile.status || "").toUpperCase())) {
       return json({ error: "Active Master Admin access is required." }, 403);
     }
+    const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
+    if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
+    if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
+    if (!PAYOUT_KEY) return json({ error: "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
 
     const { data: modeRow } = await admin.from("platform_settings")
       .select("value_json").eq("key", "system_mode").maybeSingle();
@@ -119,6 +121,13 @@ let payoutMayHaveBeenBroadcast = false;
       privateKey: PAYOUT_KEY,
     });
     const contract = await tron.contract().at(USDT);
+
+    // Recheck immediately before network broadcast. If maintenance began after
+    // the claim, the catch path restores the held balance before returning.
+    const { data: stillEnabled, error: finalRuntimeError } = await admin.rpc("app_runtime_enabled");
+    if (finalRuntimeError || stillEnabled !== true) {
+      throw new Error("AegisPay is paused by Master Admin; payout was not broadcast.");
+    }
 
     // From this point onward a transport error can mean the chain accepted the transfer.
     // Keep the row PROCESSING on any uncertain outcome so it cannot be paid a second time.
@@ -191,6 +200,12 @@ let payoutMayHaveBeenBroadcast = false;
           .eq("id", withdrawalId)
           .eq("status", "APPROVED");
       }
+    }
+    if (detail.includes("AegisPay is paused by Master Admin")) {
+      return json({
+        error: "AegisPay is paused by Master Admin.",
+        balanceRestored: Boolean(claimedWithdrawal && !payoutMayHaveBeenBroadcast),
+      }, 423);
     }
     return json({
       error: payoutMayHaveBeenBroadcast

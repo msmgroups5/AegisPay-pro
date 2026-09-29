@@ -54,6 +54,9 @@ Deno.serve(async (req: Request) => {
 
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
+    const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
+    if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
+    if (appEnabled !== true) return json({ appEnabled: false, checked: 0, results: [] });
     const { data: rulesRow } = await admin.from("platform_settings").select("value_json").eq("key", "deposit_rules").maybeSingle();
     const rules = rulesRow?.value_json || {};
     const network = String(rules.network || "").toUpperCase();
@@ -97,4 +100,3 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Deposit monitor failed." }, 500);
   }
 });
-

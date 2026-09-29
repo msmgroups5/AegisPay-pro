@@ -1,4 +1,4 @@
-const CACHE='aegispay-shell-v4';
+const CACHE='aegispay-shell-v5';
 const ASSETS=['./','./index.html','./master-admin.html','./styles.css','./supabase-client.js','./supabase-service.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
@@ -14,4 +14,3 @@ self.addEventListener('fetch',event=>{
   return response;
  }).catch(()=>caches.match('./index.html'))));
 });
-

@@ -1,9 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 110" role="img" aria-label="AegisPay">
-<defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#7137ff"/><stop offset=".48" stop-color="#1685ff"/><stop offset="1" stop-color="#19cfff"/></linearGradient></defs>
-<g transform="translate(8 6)">
-<path d="M12 86 L55 12 Q62 0 71 12 L117 86 Q122 97 111 97 L95 97 Q88 97 84 89 L65 55 L47 89 Q43 97 34 97 H18 Q3 97 12 86Z" fill="url(#g)"/>
-<path d="M56 71 Q65 56 72 63 L89 88 Q95 97 84 97 H66 Q61 97 57 90 L51 79 Q49 75 56 71Z" fill="#1388ff"/>
-</g>
-<text x="135" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="#ffffff">Aegis</text>
-<text x="325" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="url(#g)">Pay</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">AegisPay</title>
+  <defs>
+    <linearGradient id="shield" x1="8" y1="5" x2="55" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0a2850"/>
+      <stop offset="1" stop-color="#167db4"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="34" y1="17" x2="49" y2="47" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#54d5ef"/>
+      <stop offset="1" stop-color="#229ed9"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 3 56 12v17c0 15-9.8 25.8-24 32C17.8 54.8 8 44 8 29V12L32 3Z" fill="url(#shield)"/>
+  <path d="m21 40 10.2-22h2.1L44 40h-6.1l-2.2-5.1h-9.1L24.4 40H21Zm7.6-9.3h5.3l-2.6-6.3-2.7 6.3Z" fill="#fff"/>
+  <path d="m36.8 43.1 4.2 4.2 8.4-9" fill="none" stroke="url(#spark)" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
 </svg>

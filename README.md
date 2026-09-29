@@ -8,6 +8,7 @@ AegisPay client and Master Admin portals connected to Supabase Auth, private evi
 - Client deposit screenshot submission, review status, balance, KYC, and withdrawal flows
 - Private owner-scoped deposit and identity image storage
 - Separate Master Admin portal with protected review queues
+- Master Admin ON/OFF switch that pauses client access and server-side user operations
 - Separate Android Client and Master Admin app variants
 - USER, ADMIN and MASTER ADMIN roles
 - Operations Dashboard
@@ -42,6 +43,7 @@ AegisPay client and Master Admin portals connected to Supabase Auth, private evi
 - Demo API data: backend/data.json
 - PostgreSQL schema with pgcrypto: database/schema.sql (node domain removed)
 - Supabase production integration notes: supabase/README.md
+- Production readiness and runtime-switch requirements: docs/PRODUCTION_READINESS.md
 - Production environment template: .env.example
 - Production readiness checklist: docs/PRODUCTION_READINESS.md
 - Repository validation: scripts/validate-static.js
@@ -55,6 +57,10 @@ AegisPay client and Master Admin portals connected to Supabase Auth, private evi
 ## Client access
 
 Client signup creates only a USER profile. Supabase email verification must be completed before the account can sign in. Master Admin access requires a separately provisioned Supabase Auth account with a server-authorized MASTER ADMIN profile; the repository contains no shared/default administrator password.
+
+The client and Master Admin portals use a responsive Telegram-inspired blue interface with the AegisPay navy/cyan branding. Sign-in and signup show a visible loading state and explain credential or confirmation errors. If login appears to do nothing, verify that the app is online and that the account's email is confirmed.
+
+The Master Admin dashboard and separate Admin APK share one runtime switch. ON is the normal state. OFF pauses client access, image uploads, database writes, reviews, deposit verification, scheduled monitoring, Telegram withdrawal alerts, and payouts. The Master Admin sign-in and switch stay available so an authorized operator can resume the app. The switch defaults ON until a Master Admin changes it.
 
 ## Run locally
 

@@ -15,7 +15,7 @@ const fakeClient={
     signOut:async()=>{calls.push('signOut');return {error:null};},
     onAuthStateChange:(callback)=>({data:{subscription:{unsubscribe:function(){}}},callback:callback})
   },
-  rpc:async(name,args)=>{calls.push(['rpc',name,args]);return {data:name==='set_my_language'?args.p_language:name==='request_withdrawal'?'withdrawal-1':profile,error:null};}
+  rpc:async(name,args)=>{calls.push(['rpc',name,args]);return {data:name==='app_runtime_enabled'?true:name==='set_app_runtime_enabled'?{enabled:args.p_enabled}:name==='set_my_language'?args.p_language:name==='request_withdrawal'?'withdrawal-1':profile,error:null};}
 };
 const context={window:{AegisSupabaseClient:fakeClient},Promise,Error,String,Array,Object};
 vm.createContext(context);
@@ -26,6 +26,9 @@ const service=context.window.AegisSupabaseService;
   if(!service.isAvailable())throw new Error('Supabase client availability check failed');
   const session=await service.session();
   if(!session||session.access_token!=='test-session')throw new Error('Session lookup failed');
+  if(!(await service.appRuntimeEnabled()))throw new Error('Runtime status RPC did not return the enabled state');
+  const runtime=await service.setAppRuntimeEnabled(false);
+  if(runtime.enabled!==false)throw new Error('Master Admin runtime switch RPC was not called');
   const signedIn=await service.signIn(' Client@Example.com ','password123');
   if(signedIn.id!=='auth-user-1')throw new Error('Password sign-in failed');
   const credentials=calls.find(call=>Array.isArray(call)&&call[0]==='signInWithPassword')[1];
@@ -36,7 +39,7 @@ const service=context.window.AegisSupabaseService;
   if(signUpRequest.email!=='new@example.com'||signUpRequest.options.data.full_name!=='New Client'||signUpRequest.options.data.preferred_language!=='ur'||Object.hasOwn(signUpRequest.options.data,'role'))throw new Error('Signup metadata was not safely constrained');
   const account=await service.claimAegisPayProfile();
   if(account.user.id!=='auth-user-1'||account.profile.id!=='profile-1')throw new Error('Approved profile RPC result was not returned');
-  const rpc=calls.find(call=>Array.isArray(call)&&call[0]==='rpc');
+  const rpc=calls.find(call=>Array.isArray(call)&&call[0]==='rpc'&&call[1]==='claim_aegispay_profile');
   if(rpc[1]!=='claim_aegispay_profile')throw new Error('Profile claim called the wrong RPC');
   await service.sendPasswordReset(' Client@Example.com ');
   await service.updatePassword('new-password-123');
@@ -45,6 +48,6 @@ const service=context.window.AegisSupabaseService;
   if(withdrawal.error||withdrawal.data!=='withdrawal-1')throw new Error('Withdrawal RPC was not called');
   await service.signOut();
   const names=calls.filter(call=>Array.isArray(call)&&call[0]==='rpc').map(call=>call[1]);
-  if(!names.includes('set_my_language')||!names.includes('request_withdrawal'))throw new Error('Operational RPC integration is missing');
+  if(!names.includes('set_my_language')||!names.includes('request_withdrawal')||!names.includes('app_runtime_enabled')||!names.includes('set_app_runtime_enabled'))throw new Error('Operational RPC integration is missing');
   console.log('AegisPay Supabase Auth and operational service tests passed');
 })().catch(error=>{console.error(error);process.exit(1);});

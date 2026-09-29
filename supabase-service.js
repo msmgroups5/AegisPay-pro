@@ -13,6 +13,24 @@ window.AegisSupabaseService={
   return result.data&&result.data.session||null;
  },
 
+ async appRuntimeEnabled(){
+  var c=this.client();
+  if(!c)throw new Error('Supabase client unavailable');
+  var result=await c.rpc('app_runtime_enabled');
+  if(result.error)throw result.error;
+  if(typeof result.data!=='boolean')throw new Error('AegisPay runtime status is unavailable.');
+  return result.data;
+ },
+
+ async setAppRuntimeEnabled(enabled){
+  var c=this.client();
+  if(!c)throw new Error('Supabase client unavailable');
+  if(typeof enabled!=='boolean')throw new Error('Choose whether AegisPay should be ON or OFF.');
+  var result=await c.rpc('set_app_runtime_enabled',{p_enabled:enabled});
+  if(result.error)throw result.error;
+  return result.data;
+ },
+
  async signIn(email,password){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');

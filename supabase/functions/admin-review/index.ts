@@ -29,6 +29,9 @@ Deno.serve(async (req: Request) => {
     if (!actor || actor.role !== "MASTER ADMIN" || ["BLOCKED","SUSPENDED","DELETED"].includes(String(actor.status).toUpperCase())) {
       return json({ error: "Master Admin access required." }, 403);
     }
+    const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
+    if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
+    if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
 
     const body = await req.json().catch(() => null);
     const action = String(body?.action || "");
