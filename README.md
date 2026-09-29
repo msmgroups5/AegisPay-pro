@@ -51,6 +51,14 @@ A professional, responsive AegisPay demo/system-data application built from the 
 
 The client portal is invitation-only. Public signup is disabled; a user must have an approved Supabase Auth identity and a matching AegisPay profile. Legacy local demo credentials do not sign in to the client portal.
 
+## Legacy local demo accounts
+
+These credentials are only for the legacy local demo and test harness; they do not grant Supabase client access.
+
+USER: user@aegispay.demo / AP10023  
+ADMIN: admin@aegispay.demo / APADMIN  
+MASTER ADMIN: master@aegispay.demo / APMASTER
+
 ## Run locally
 
 UI only:
