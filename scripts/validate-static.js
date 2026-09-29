@@ -1,10 +1,16 @@
 const fs=require("node:fs");
-const required=["index.html","styles.css","app.js","README.md","backend/server.js","backend/data.json","database/schema.sql",".github/workflows/pages.yml",".github/workflows/ci.yml","netlify.toml","package.json","scripts/smoke-api.js"];
+const required=["index.html","styles.css","app.js","client-auth.js","supabase-client.js","supabase-service.js","README.md","backend/server.js","backend/data.json","database/schema.sql",".github/workflows/pages.yml",".github/workflows/ci.yml","netlify.toml","package.json","scripts/smoke-api.js"];
 for(const f of required) if(!fs.existsSync(f)) throw new Error("Missing required file: "+f);
 const html=fs.readFileSync("index.html","utf8");
 const js=fs.readFileSync("app.js","utf8");
+const clientAuth=fs.readFileSync("client-auth.js","utf8");
+const service=fs.readFileSync("supabase-service.js","utf8");
 const sql=fs.readFileSync("database/schema.sql","utf8");
 if(!html.includes('id="app"')) throw new Error("App mount missing");
+if(!html.includes('./client-auth.js')||!html.includes('./supabase-client.js')||!html.includes('./supabase-service.js')) throw new Error("Client Auth entry is incomplete");
+if(html.includes('./aegis-core.js')||html.includes('./app.js')) throw new Error("Client entry must not load local demo authentication or data");
+for(const marker of ["claim_aegispay_profile","signInWithPassword","resetPasswordForEmail","updateUser"]) if(!service.includes(marker)) throw new Error("Supabase Auth integration missing: "+marker);
+for(const marker of ["invited and approved","SIGNED_OUT","balances and transactions"]) if(!clientAuth.includes(marker)) throw new Error("Client Auth UI marker missing: "+marker);
 for(const marker of ["Welcome Back","Deposit","AegisPay Shop","Proceed to Complete Tasks","Referrals","My Profile","AI Assistant","Withdraw","Notifications","MASTER ADMIN"]) if(!js.includes(marker)) throw new Error("Required UI marker missing: "+marker);
 for(const endpoint of ["/api/v1/health","/api/v1/liquidity/metrics","/api/v1/liquidity/audit","/api/v1/ai-assistant/recommendation","/api/v1/ai-assistant/chat","/api/v1/withdraw/request","/api/v1/withdraw/requests","/api/v1/admin/approve"]) if(!fs.readFileSync("backend/server.js","utf8").includes(endpoint)) throw new Error("Required API missing: "+endpoint);
 if(!sql.includes("CREATE EXTENSION IF NOT EXISTS pgcrypto")) throw new Error("pgcrypto extension missing");
