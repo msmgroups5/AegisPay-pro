@@ -24,8 +24,8 @@
 - The project needs a verified TRON testnet receiving wallet and test tokens to complete an end-to-end chain test. No real deposit or payout has been sent.
 - Language auto-selection and translations currently cover English and Urdu; other locales fall back to English and need translated copy before broader language coverage.
 - Netlify deploy-preview status must be checked on the updated pull request. The prior attempt was blocked because the repository contributor was unverified in Netlify.
-- GitHub Actions must finish the updated repository checks and two Android APK builds before the APKs are ready to install.
+- GitHub Actions CI and both Android APK builds passed. The updated build is ready for installation; repeat signup because the earlier failed signup did not create an Auth identity.
 
 ## Verification
 
-Local verification passed: JavaScript syntax checks, core Auth/RBAC tests, Supabase service tests, static repository validation, API smoke tests, and manifest JSON validation. The live database migration and function deployments succeeded. GitHub Actions still needs to build the final commit's Android artifacts. No live-chain transfer or payout was used as a test.
+Local verification passed: JavaScript syntax checks, core Auth/RBAC tests, Supabase service tests, static repository validation, API smoke tests, and manifest JSON validation. The live database migrations and all eight Edge Function deployments succeeded. GitHub Actions CI passed and built both Android APKs. No Auth identity, live-chain transfer, or payout was created as a test.
