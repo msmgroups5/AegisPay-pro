@@ -82,5 +82,30 @@ The GitHub Actions repository validation workflow is configured to run:
 ### Explicit non-production boundary
 This repository layer does not perform real financial transfers, blockchain execution, custody, banking transfers or live payment settlement. Approval actions update application status and audit records only. Displayed balances, yields, liquidity figures, rewards and risk scores are demonstration/system data and are not an independent financial audit.
 
+### Live integration audit — 2026-09-29
+
+- Supabase is active and healthy. Four Edge Functions are deployed.
+- All 14 public application tables inspected have RLS enabled; FORCE ROW LEVEL SECURITY is off.
+- The six application profiles have no Auth user mappings, and auth.users is empty.
+- Profile claims now require a confirmed email plus an Auth invitation or server-controlled approval metadata.
+- execute-payout now atomically claims approved withdrawals and leaves ambiguous broadcasts locked in PROCESSING for manual reconciliation.
+- Supabase Storage has no buckets or policies.
+- Netlify has a ready HTTPS deployment and no environment variables.
+- The browser application still uses localStorage demo data; the Supabase wrappers are not wired into login or business-data workflows.
+- The live database has six recorded migrations, while the repository does not contain the full prior migration source history. Only the payout function source and profile-claim hardening migration are newly checked in here.
+- The security advisor still reports seven authenticated-callable SECURITY DEFINER functions. The performance advisor also reports unindexed foreign keys and policy-performance findings.
+- The connected integrations do not expose Supabase Auth configuration or Edge Function secret presence.
+
 ### External work that remains
-Production deployment still requires an active and intentionally selected Supabase project, real Auth users and profile mapping, production secrets/environment variables, live data wiring, external AI provider credentials (if used), Telegram credentials/integration (if used), domain/hosting configuration, security testing, monitoring, and any applicable compliance/legal work.
+
+- Provision approved Auth identities and connect browser sign-in and profile loading.
+- Move business-data reads and writes off the browser demo store to Supabase-backed, role-checked operations.
+- Create a private Storage bucket with owner-scoped policies if deposit evidence upload is required.
+- Check in source for the other three deployed Edge Functions and reconcile all prior live database migrations with repository SQL.
+- Review and resolve or document the remaining SECURITY DEFINER and performance advisor findings.
+- Verify Supabase Auth provider, email-confirmation and redirect settings, and confirm required server-side function secrets in the dashboard.
+- Finish monitoring, domain, operational incident, security, and applicable compliance work.
+
+### Production boundary
+
+The browser UI and demo REST API remain demonstration/system-data layers. The separate execute-payout Edge Function targets TRON mainnet USDT and can move real funds when configured with its payout private key. Treat it as a live money-movement path.

@@ -70,14 +70,16 @@ npm run check
 When served from HTTPS or localhost, the service worker caches the application shell for offline reloads. The standalone offline HTML artifact remains available for direct browser inspection.
 
 ## Netlify
-The AegisPay Netlify project has been created as `aegispay-pro`. Production Supabase environment variables are configured. The current project URL is `http://aegispay-pro.netlify.app`; a deploy is still required to publish the current repository source to that URL.
+The AegisPay Netlify project is aegispay-pro and currently has a ready HTTPS deployment at https://aegispay-pro.netlify.app.
+
+The latest environment audit found no Netlify environment variables configured. The Supabase URL and publishable key in supabase-client.js are public browser settings; service-role credentials and payout private keys must remain in Supabase Function secrets.
+
+The current browser UI still reads and writes demo state in localStorage. supabase-service.js is loaded, but app.js and aegis-core.js do not yet use it for login or business data.
 
 ## GitHub Pages
 The repository has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
 
 ## Production boundary
-This repository is a demonstration/system-data layer. It does not execute real payments, blockchain transfers, custody, banking transfers or live settlement. Approval actions update application status and audit records only.
+The browser UI and demo REST API remain demonstration/system-data layers. A separate active Supabase Edge Function, execute-payout, targets TRON mainnet USDT and can move real funds when its payout private key is configured. The connected service read tools do not expose whether that secret is present, and the current UI does not call this function. Treat the function as a live money-movement path.
 
-Displayed balances, yields, liquidity figures, rewards and risk scores are demonstration/system data and are not an independent financial audit.
-
-A production deployment still requires separately configured database/authentication infrastructure, server-side authorization, secrets/environment variables, external AI credentials if used, domain/hosting configuration, security testing, monitoring and any applicable compliance/legal work.
+The displayed balances, yields, liquidity figures, rewards and risk scores remain demonstration data. No banking settlement or custody service is connected.
