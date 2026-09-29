@@ -3,7 +3,8 @@
 A professional, responsive AegisPay demo/system-data application built from the Complete A-to-Z Master Application Specification.
 
 ## Included UI
-- Professional login and role-aware access
+- Invitation-only Supabase Auth and approved-profile sign-in in the client portal
+- Separate legacy Master Admin demonstration portal
 - USER, ADMIN and MASTER ADMIN roles
 - Operations Dashboard
 - Balance, referral, task and withdrawal metrics
@@ -30,7 +31,8 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Footer and visible platform/data-only status messaging
 
 ## Repository layers
-- Browser UI: index.html + styles.css + app.js
+- Client portal: index.html + styles.css + client-auth.js
+- Master Admin demonstration portal: master-admin.html + app.js + aegis-core.js
 - Demo REST API: backend/server.js
 - Demo API data: backend/data.json
 - PostgreSQL schema with pgcrypto: database/schema.sql (node domain removed)
@@ -45,15 +47,9 @@ A professional, responsive AegisPay demo/system-data application built from the 
 - Offline service worker: service-worker.js
 - Repository secret/build ignores: .gitignore
 
-## Demo accounts
-USER
-user@aegispay.demo / demo123
+## Client access
 
-ADMIN
-admin@aegispay.demo / demo123
-
-MASTER ADMIN
-master@aegispay.demo / demo123
+The client portal is invitation-only. Public signup is disabled; a user must have an approved Supabase Auth identity and a matching AegisPay profile. Legacy local demo credentials do not sign in to the client portal.
 
 ## Run locally
 
@@ -74,7 +70,7 @@ The AegisPay Netlify project is aegispay-pro and currently has a ready HTTPS dep
 
 The latest environment audit found no Netlify environment variables configured. The Supabase URL and publishable key in supabase-client.js are public browser settings; service-role credentials and payout private keys must remain in Supabase Function secrets.
 
-The current browser UI still reads and writes demo state in localStorage. supabase-service.js is loaded, but app.js and aegis-core.js do not yet use it for login or business data.
+The client entry now uses Supabase Auth and the approved-profile claim RPC. It shows the verified identity/profile only; balances and transaction controls remain unavailable until their reads and writes are connected to Supabase. The separate Master Admin demonstration portal and its core still use local demo state.
 
 ## GitHub Pages
 The repository has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
