@@ -33,13 +33,7 @@ var DEFAULT_SETTINGS={
  notes:'Prototype/Testnet only. No live custody or Mainnet payout execution.'
 };
 
-var DEMO_USERS=[
- {id:'USR-001',name:'Demo Client',email:'user@aegispay.demo',password:'AP10023',role:'USER',referralCode:'AEGIS001',referredBy:null,status:'NORMAL',wallet:'TTEST-CLIENT-001',walletOwnerName:'Demo Client',balance:75,principal:28,profit:47,manualCredit:0,firstDepositDone:true,selectedTier:'T1',registeredAt:'2026-09-28T10:00:00Z',frozenUntil:null,lastPasswordResetAt:null},
- {id:'ADM-001',name:'Operations Admin',email:'admin@aegispay.demo',password:'APADMIN',role:'ADMIN',referralCode:'ADMIN01',referredBy:null,status:'NORMAL',wallet:null,walletOwnerName:null,balance:0,principal:0,profit:0,manualCredit:0,firstDepositDone:false,selectedTier:null,registeredAt:'2026-09-28T10:00:00Z',frozenUntil:null,lastPasswordResetAt:null},
- {id:'MAS-001',name:'Master Administrator',email:'master@aegispay.demo',password:'APMASTER',role:'MASTER ADMIN',referralCode:'MASTER01',referredBy:null,status:'NORMAL',wallet:null,walletOwnerName:null,balance:0,principal:0,profit:0,manualCredit:0,firstDepositDone:false,selectedTier:null,registeredAt:'2026-09-28T10:00:00Z',frozenUntil:null,lastPasswordResetAt:null},
- {id:'USR-002',name:'Aisha Khan',email:'aisha@aegispay.demo',password:'DEMO123',role:'USER',referralCode:'AEGIS002',referredBy:'USR-001',status:'NORMAL',wallet:'TTEST-CLIENT-002',walletOwnerName:'Aisha Khan',balance:55,principal:28,profit:27,manualCredit:0,firstDepositDone:true,selectedTier:'T1',registeredAt:'2026-09-28T10:00:00Z',frozenUntil:null,lastPasswordResetAt:null},
- {id:'USR-003',name:'Usman Ali',email:'usman@aegispay.demo',password:'DEMO123',role:'USER',referralCode:'AEGIS003',referredBy:'USR-002',status:'NORMAL',wallet:'TTEST-CLIENT-003',walletOwnerName:'Usman Ali',balance:75,principal:28,profit:47,manualCredit:0,firstDepositDone:true,selectedTier:'T1',registeredAt:'2026-09-28T10:00:00Z',frozenUntil:null,lastPasswordResetAt:null}
-];
+var DEMO_USERS=[];
 
 var OFFERS=[
  {id:'O1',title:'Tier 1 Shopping Set',subtitle:'Assigned AegisPay Shop tasks for Tier 1',tierMin:'T1',rewardText:'Tier 1 task',status:'ACTIVE'},
@@ -87,14 +81,8 @@ function baseState(){
   orders:[],
   withdrawals:[],
   ledger:[],
-  activity:[
-   {id:uid('EV'),type:'System',text:'AegisPay operational workspace initialized',time:iso(),userId:'MAS-001'},
-   {id:uid('EV'),type:'Deposit',text:'Demo Client deposit verified',time:iso(),userId:'USR-001'}
-  ],
-  notifications:[
-   {id:uid('NT'),userId:'USR-001',title:'Welcome to AegisPay',body:'Complete your profile and open Shop to complete your assigned tasks.',read:false,time:iso()},
-   {id:uid('NT'),userId:'USR-001',title:'Shop cycle ready',body:'Your selected tier controls which shopping tasks appear and the total is matched to your current balance.',read:false,time:iso()}
-  ]
+  activity:[{id:uid('EV'),type:'System',text:'AegisPay operational workspace initialized',time:iso(),userId:null}],
+  notifications:[]
  };
 }
 function load(){
@@ -105,7 +93,7 @@ function load(){
    s.settings=Object.assign(clone(DEFAULT_SETTINGS),s.settings||{});
   s.tiers=s.tiers||clone(TIERS);s.offers=s.offers||clone(OFFERS);s.catalog=s.catalog||clone(SHOP_CATALOG);
   s.liveMarket=s.liveMarket||{provider:'Live marketplace catalog',updatedAt:null,lastStatus:'NOT_LOADED'};
-  s.users=s.users||clone(DEMO_USERS);
+  s.users=(s.users||clone(DEMO_USERS)).filter(function(u){return !/@aegispay\.demo$/i.test(String(u.email||''));});
   s.deposits=s.deposits||[];s.cycles=s.cycles||[];s.referrals=s.referrals||[];s.shopItems=s.shopItems||[];s.carts=s.carts||{};s.orders=s.orders||[];s.withdrawals=s.withdrawals||[];s.ledger=s.ledger||[];s.activity=s.activity||[];s.notifications=s.notifications||[];
   return s;
  }catch(e){var fresh=baseState();localStorage.setItem(KEY,JSON.stringify(fresh));return fresh;}

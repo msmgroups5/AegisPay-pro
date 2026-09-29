@@ -1,219 +1,296 @@
 (function(){
 'use strict';
-
 var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
-var authType=new URLSearchParams((window.location.hash||'').replace(/^#/, '')).get('type')||'';
-var state={phase:'loading',mode:(authType==='invite'||authType==='recovery')?'password-update':'login',profile:null,message:''};
-var busy=false;
-var profileRequest=null;
-var authSubscription=null;
-
-function esc(value){
- return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-function brand(){
- return '<div class="brand"><img src="./aegispay-logo.svg" alt="AegisPay"><b>Aegis<span>Pay</span></b></div>';
-}
-function shell(content,badge){
- return '<div class="auth-wrap"><div class="auth-card"><div class="auth-top">'+brand()+'<span class="prototype">'+esc(badge||'SECURE ACCESS')+'</span></div>'+content+'</div></div><div class="toast"></div>';
-}
-function messageBlock(){
- if(!state.message)return '';
- return '<div role="status" aria-live="polite" style="min-height:18px;color:'+(state.messageTone==='success'?'#13845b':'#c34861')+';font-size:12px;margin:12px 0">'+esc(state.message)+'</div>';
-}
-function renderLoading(){
- root.innerHTML=shell('<div class="auth-hero"><div class="logo-badge">'+(window.AegisSupabaseClient?'Secure account':'Checking secure connection')+'</div><h1>Verifying account</h1><p>Please wait while AegisPay checks your sign-in and approved profile.</p></div>','SECURE ACCESS');
-}
-function renderLogin(){
- root.innerHTML=shell('<div class="auth-hero"><div class="logo-badge">Secure Access</div><h1>Welcome Back</h1><p>Sign in to your AegisPay client account.</p></div>'+
-  '<form id="loginForm"><div class="field"><label for="loginEmail">Email</label><div class="field-wrap"><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="you@example.com"></div></div>'+
-  '<div class="field"><label for="loginPassword">Password</label><div class="field-wrap"><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Your password"></div></div>'+
-  messageBlock()+'<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+(busy?'Signing in…':'Sign In Securely')+'</button></form>'+
-  '<button class="ghost-dark" style="width:100%;margin-top:9px" type="button" data-action="reset">Forgot password?</button>'+
-  '<div class="small-note">Access is limited to invited and approved AegisPay accounts. Public account creation is disabled.</div>','AEGISPAY');
-}
-function renderReset(){
- root.innerHTML=shell('<div class="auth-hero"><div class="logo-badge">Account Recovery</div><h1>Reset your password</h1><p>Enter your account email. If it is registered, Supabase will send password reset instructions.</p></div>'+
-  '<form id="resetForm"><div class="field"><label for="resetEmail">Email</label><div class="field-wrap"><input id="resetEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div></div>'+
-  messageBlock()+'<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+(busy?'Sending…':'Send reset email')+'</button></form>'+
-  '<button class="ghost-dark" style="width:100%;margin-top:9px" type="button" data-action="login">Back to sign in</button>','ACCOUNT RECOVERY');
-}
-function renderPasswordUpdate(){
- root.innerHTML=shell('<div class="auth-hero"><div class="logo-badge">'+(authType==='invite'?'Invitation':'Account Recovery')+'</div><h1>'+(authType==='invite'?'Set your account password':'Choose a new password')+'</h1><p>'+(authType==='invite'?'Set a password to finish activating your approved AegisPay account.':'Choose a new password to finish recovering your account.')+'</p></div>'+
-  '<form id="passwordForm"><div class="field"><label for="newPassword">New password</label><div class="field-wrap"><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></div></div>'+
-  '<div class="field"><label for="confirmPassword">Confirm new password</label><div class="field-wrap"><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Repeat your new password"></div></div>'+
-  messageBlock()+'<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+(busy?'Saving…':'Save password')+'</button></form>','SECURE ACCOUNT');
-}
-function renderProfile(){
- var profile=state.profile||{};
- var status=String(profile.status||'').trim();
- root.innerHTML=shell('<div class="auth-hero"><div class="logo-badge">Verified AegisPay Profile</div><h1>Welcome, '+esc(profile.name||'AegisPay client')+'</h1><p>Your sign-in is connected to an approved AegisPay profile.</p></div>'+
-  '<div class="list"><div class="list-row"><div class="list-icon blue-bg">A</div><div><b>Email</b><small>'+esc(profile.email||'')+'</small></div></div>'+
-  '<div class="list-row"><div class="list-icon green-bg">✓</div><div><b>Account status</b><small>'+esc(status||'Verified')+'</small></div></div>'+
-  '<div class="list-row"><div class="list-icon purple-bg">U</div><div><b>Access type</b><small>Client account</small></div></div></div>'+
-  '<div class="notice" style="margin-top:16px">Secure sign-in and live profile linking are active. Dashboard balances and transactions will appear after their server-side data workflows are connected.</div>'+
-  messageBlock()+'<button class="primary" style="margin-top:14px" type="button" data-action="logout" '+(busy?'disabled':'')+'>'+(busy?'Signing out…':'Sign Out')+'</button>','LIVE PROFILE');
-}
-function render(){
- if(!root)return;
- if(state.phase==='loading'){renderLoading();return;}
- if(state.mode==='password-update')renderPasswordUpdate();
- else if(state.mode==='reset')renderReset();
- else if(state.profile)renderProfile();
- else renderLogin();
- bind();
-}
-function bind(){
- var login=document.getElementById('loginForm');
- if(login)login.addEventListener('submit',submitLogin);
- var reset=document.getElementById('resetForm');
- if(reset)reset.addEventListener('submit',submitReset);
- var password=document.getElementById('passwordForm');
- if(password)password.addEventListener('submit',submitPasswordUpdate);
- var resetButton=document.querySelector('[data-action="reset"]');
- if(resetButton)resetButton.addEventListener('click',function(){state.mode='reset';state.message='';render();});
- var loginButton=document.querySelector('[data-action="login"]');
- if(loginButton)loginButton.addEventListener('click',function(){state.mode='login';state.message='';render();});
- var logoutButton=document.querySelector('[data-action="logout"]');
- if(logoutButton)logoutButton.addEventListener('click',submitLogout);
-}
-function authError(error){
- var code=String(error&&error.code||'');
- var text=String(error&&error.message||error||'');
- if(/invalid login credentials|invalid email or password/i.test(text))return 'Email or password is incorrect, or the invitation has not been activated.';
- if(/verify your email|email.*confirm/i.test(text))return 'Verify your email using the AegisPay invitation link, then sign in again.';
- if(code==='42501'||/not been approved|no unclaimed aegispay profile|not approved for aegispay/i.test(text))return 'This account is not approved for AegisPay access. Contact the AegisPay administrator.';
- if(/rate limit/i.test(text))return 'Too many attempts were made. Wait a few minutes and try again.';
- if(/supabase client unavailable/i.test(text))return 'Secure sign-in is temporarily unavailable. Refresh the page and try again.';
- return 'AegisPay could not verify this account. Check your details or contact the AegisPay administrator.';
-}
-function isAccessDenied(error){
- var code=String(error&&error.code||'');
- var text=String(error&&error.message||error||'');
- return code==='42501'||code==='AEGIS_ACCESS_DENIED'||/not been approved|no unclaimed aegispay profile|no approved aegispay profile|not approved for aegispay|client access is not enabled|account is not active/i.test(text);
-}
-function validateProfile(profile){
- if(!profile||!profile.id)throw new Error('No approved AegisPay profile is linked to this account.');
- if(String(profile.role||'').trim().toUpperCase()!=='USER'){
-  var roleError=new Error('Client access is not enabled for this profile.');
-  roleError.code='AEGIS_ACCESS_DENIED';
-  throw roleError;
+var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error'};
+var busy=false,profileRequest=null;
+var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
+var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
+var locale=saved==='ur'?'ur':saved==='en'?'en':detected;
+var askLanguage=!saved;
+var copy={
+ en:{
+  language:'Language',detected:'We detected your device language. Choose English or Urdu.',english:'English',urdu:'Urdu',continue:'Continue',
+  loading:'Checking secure connection',checking:'Verifying account',wait:'Please wait while AegisPay checks your secure sign-in.',
+  welcome:'Welcome to AegisPay',signInText:'Sign in or create a client account.',email:'Email',password:'Password',name:'Full name',
+  signIn:'Sign in',signingIn:'Signing in…',create:'Create account',creating:'Creating account…',forgot:'Forgot password?',haveAccount:'Already have an account?',newAccount:'New to AegisPay?',
+  referral:'Referral code (optional)',passwordHint:'Use at least 8 characters.',signupSent:'Check your email to verify your account. After verification, sign in to continue.',
+  resetTitle:'Reset your password',resetText:'Enter your email and we will send recovery instructions.',sendReset:'Send recovery email',back:'Back to sign in',
+  updateTitle:'Choose a new password',confirmPassword:'Confirm password',savePassword:'Save password',
+  hi:'Hello',balance:'Available balance',principal:'Principal',profit:'Profit',kyc:'Identity verification',kycDone:'Verified',kycNeeded:'Required before a withdrawal',
+  deposits:'Deposits',deposit:'Submit deposit',tier:'Deposit tier',amount:'Amount (USDT)',txid:'TRON transaction ID',proof:'Payment screenshot (required)',submit:'Submit for verification',
+  depositHelp:'Your screenshot is privately uploaded and may be reviewed by the configured AI service. Balance is credited only after evidence review and a confirmed matching on-chain transfer.',
+  withdraw:'Withdrawals',wallet:'TRON wallet address',walletOwner:'Wallet owner name',linkWallet:'Link wallet',withdrawAmount:'Withdrawal amount (minimum $50)',requestWithdraw:'Request withdrawal',
+  kycTitle:'Complete KYC once',documentType:'Document type',cnic:'CNIC / national ID',passport:'Passport',front:'Front image / passport photo page',backImage:'Back image (CNIC only)',consent:'I agree that AegisPay and its configured AI review provider may process these images to check readability and compare the document name with my profile.',
+  submitKyc:'Submit identity images',kycHelp:'If an image is blurry or details do not match your profile, upload a clear and correct image again. Withdrawals stay locked until KYC is verified.',
+  history:'Recent activity',status:'Status',date:'Date',logout:'Sign out',refCode:'Your referral code',loadingData:'Loading your account…',save:'Save language',
+  pending:'Pending review',empty:'No records yet.',network:'Deposits are currently configured for TRON test network. Never send real funds to a test address.',
+  ok:'Request submitted.',chooseFile:'Choose an image file.',fileTooLarge:'Each image must be smaller than 10 MB.',walletLinked:'Wallet linked.',withdrawKyc:'Complete KYC before requesting a withdrawal.',
+  uploadBusy:'Uploading securely…',error:'Something went wrong. Please try again.',unavailable:'Secure sign-in is unavailable. Refresh and try again.'
+ },
+ ur:{
+  language:'Zaban',detected:'Aapke device ki zaban detect hui hai. English ya Urdu chunein.',english:'English',urdu:'Urdu',continue:'Jaari rakhein',
+  loading:'Secure connection check ho raha hai',checking:'Account verify ho raha hai',wait:'AegisPay aapka secure sign-in check kar raha hai.',
+  welcome:'AegisPay mein khush aamdeed',signInText:'Sign in karein ya client account banayein.',email:'Email',password:'Password',name:'Poora naam',
+  signIn:'Sign in',signingIn:'Sign in ho raha hai…',create:'Account banayein',creating:'Account ban raha hai…',forgot:'Password bhool gaye?',haveAccount:'Pehle se account hai?',newAccount:'AegisPay par naye hain?',
+  referral:'Referral code (optional)',passwordHint:'Kam az kam 8 characters rakhein.',signupSent:'Account verify karne ke liye apni email check karein. Verify hone ke baad sign in karein.',
+  resetTitle:'Password reset karein',resetText:'Apni email dein, hum recovery instructions bhejenge.',sendReset:'Recovery email bhejein',back:'Sign in par wapas',
+  updateTitle:'Naya password chunein',confirmPassword:'Password dobara likhein',savePassword:'Password save karein',
+  hi:'Assalam-o-alaikum',balance:'Available balance',principal:'Principal',profit:'Profit',kyc:'Shanakht ki tasdeeq',kycDone:'Verified',kycNeeded:'Withdrawal se pehle zaroori',
+  deposits:'Deposits',deposit:'Deposit submit karein',tier:'Deposit tier',amount:'Amount (USDT)',txid:'TRON transaction ID',proof:'Payment screenshot (zaroori)',submit:'Verification ke liye bhejein',
+  depositHelp:'Aapka screenshot private upload hoga aur configured AI service usay review kar sakti hai. Evidence review aur matching confirmed on-chain transfer ke baad hi balance credit hoga.',
+  withdraw:'Withdrawals',wallet:'TRON wallet address',walletOwner:'Wallet malik ka naam',linkWallet:'Wallet link karein',withdrawAmount:'Withdrawal amount (kam az kam $50)',requestWithdraw:'Withdrawal request karein',
+  kycTitle:'KYC aik martaba mukammal karein',documentType:'Document ki qisam',cnic:'CNIC / national ID',passport:'Passport',front:'Front image / passport photo page',backImage:'Back image (sirf CNIC)',consent:'Main razamand hoon ke AegisPay aur uska configured AI review provider in tasveeron ko readability aur profile name se milan ke liye process karein.',
+  submitKyc:'Identity images bhejein',kycHelp:'Agar image blur ho ya details profile se match na karein to saaf aur durust image dobara upload karein. KYC verify hone tak withdrawal band rahega.',
+  history:'Haal ki activity',status:'Status',date:'Tareekh',logout:'Sign out',refCode:'Aapka referral code',loadingData:'Account load ho raha hai…',save:'Zaban save karein',
+  pending:'Review pending',empty:'Abhi koi record nahi.',network:'Deposits abhi TRON test network par configured hain. Test address par real funds na bhejein.',
+  ok:'Request submit ho gayi.',chooseFile:'Image file select karein.',fileTooLarge:'Har image 10 MB se chhoti honi chahiye.',walletLinked:'Wallet link ho gaya.',withdrawKyc:'Withdrawal se pehle KYC mukammal karein.',
+  uploadBusy:'Secure upload ho raha hai…',error:'Masla hua. Dobara koshish karein.',unavailable:'Secure sign-in unavailable hai. Page refresh karke dobara try karein.'
  }
- var status=String(profile.status||'').trim().toUpperCase();
- if(status!=='ACTIVE'&&status!=='NORMAL'){
-  var statusError=new Error('Account is not active.');
-  statusError.code='AEGIS_ACCESS_DENIED';
-  throw statusError;
- }
+};
+function t(k){return copy[locale][k]||copy.en[k]||k;}
+function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function money(v){return '$'+Number(v||0).toLocaleString(locale==='ur'?'ur-PK':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function shell(body){
+ document.documentElement.lang=locale;document.documentElement.dir=locale==='ur'?'rtl':'ltr';
+ return '<div class="auth-wrap" style="min-height:100vh;padding:16px;background:#f3f6fb;direction:'+(locale==='ur'?'rtl':'ltr')+'"><div class="auth-card" style="width:min(100%,980px);margin:0 auto;padding:22px;border-radius:22px;background:#fff;box-shadow:0 18px 50px #15284616">'+
+ '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px"><div style="display:flex;align-items:center;gap:10px"><img src="./aegispay-logo.svg" width="36" height="36" alt=""><b style="font-size:22px">Aegis<span style="color:#259c76">Pay</span></b></div>'+
+ '<label style="display:flex;align-items:center;gap:8px;font-size:13px">'+t('language')+' <select data-action="language" style="padding:8px;border-radius:8px"><option value="en" '+(locale==='en'?'selected':'')+'>English</option><option value="ur" '+(locale==='ur'?'selected':'')+'>اردو</option></select></label></div>'+
+ (askLanguage?'<div class="notice" style="margin-bottom:15px">'+t('detected')+' <button type="button" data-action="keep-language" class="ghost-dark">'+t('continue')+'</button></div>':'')+
+ (state.message?'<div role="status" style="padding:10px 12px;margin:10px 0;border-radius:9px;background:'+(state.messageTone==='success'?'#e8f7f0':'#fff0f2')+';color:'+(state.messageTone==='success'?'#14794f':'#a63d52')+'">'+esc(state.message)+'</div>':'')+body+'</div></div>';
 }
-function refreshProfile(){
+function field(label,id,type,attrs){return '<div class="field"><label for="'+id+'">'+label+'</label><div class="field-wrap"><input id="'+id+'" name="'+id+'" type="'+type+'" '+(attrs||'')+(id==='signupReferral'?'':' required')+'></div></div>';}
+function renderAuth(){
+ if(state.phase==='loading'){root.innerHTML=shell('<h1>'+t('checking')+'</h1><p>'+t('wait')+'</p>');return;}
+ var body='';
+ if(state.mode==='signup'){
+  body='<div class="auth-hero"><h1>'+t('create')+'</h1><p>'+t('signInText')+'</p></div><form id="signupForm">'+field(t('name'),'signupName','text','autocomplete="name" maxlength="100"')+field(t('email'),'signupEmail','email','autocomplete="email"')+field(t('password'),'signupPassword','password','autocomplete="new-password" minlength="8"')+
+  '<small>'+t('passwordHint')+'</small>'+field(t('referral'),'signupReferral','text','autocomplete="off" maxlength="32"')+'<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+(busy?t('creating'):t('create'))+'</button></form><p>'+t('haveAccount')+' <button class="ghost-dark" data-action="login">'+t('signIn')+'</button></p>';
+ }else if(state.mode==='reset'){
+  body='<div class="auth-hero"><h1>'+t('resetTitle')+'</h1><p>'+t('resetText')+'</p></div><form id="resetForm">'+field(t('email'),'resetEmail','email','autocomplete="email"')+'<button class="primary" type="submit">'+t('sendReset')+'</button></form><button class="ghost-dark" data-action="login">'+t('back')+'</button>';
+ }else if(state.mode==='password-update'){
+  body='<div class="auth-hero"><h1>'+t('updateTitle')+'</h1></div><form id="passwordForm">'+field(t('password'),'newPassword','password','autocomplete="new-password" minlength="8"')+field(t('confirmPassword'),'confirmPassword','password','autocomplete="new-password" minlength="8"')+'<button class="primary" type="submit">'+t('savePassword')+'</button></form>';
+ }else{
+  body='<div class="auth-hero"><h1>'+t('welcome')+'</h1><p>'+t('signInText')+'</p></div><form id="loginForm">'+field(t('email'),'loginEmail','email','autocomplete="username"')+field(t('password'),'loginPassword','password','autocomplete="current-password"')+'<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+(busy?t('signingIn'):t('signIn'))+'</button></form><div style="display:flex;justify-content:space-between;margin-top:12px"><button class="ghost-dark" data-action="reset">'+t('forgot')+'</button><button class="ghost-dark" data-action="signup">'+t('newAccount')+'</button></div>';
+ }
+ root.innerHTML=shell(body);
+ var ref=new URLSearchParams(location.search).get('ref');var refInput=document.getElementById('signupReferral');if(refInput&&ref)refInput.value=ref.toUpperCase();
+}
+function setMessage(msg,tone){state.message=msg;state.messageTone=tone||'error';}
+function authError(e){return e&&e.message?e.message:t('error');}
+function rememberLanguage(next){
+ locale=next==='ur'?'ur':'en';askLanguage=false;
+ try{localStorage.setItem('aegispay-language',locale);}catch(e){}
+ if(state.profile&&service&&service.setPreferredLanguage)service.setPreferredLanguage(locale).catch(function(){});
+ render();
+}
+async function refreshProfile(){
  if(profileRequest)return profileRequest;
  profileRequest=(async function(){
-  state.phase='loading';state.message='';render();
   try{
-   var account=await service.claimAegisPayProfile();
-   validateProfile(account.profile);
-   state.profile={
-    id:account.profile.id,
-    name:account.profile.name||account.user.email||'AegisPay client',
-    email:account.profile.email||account.user.email||'',
-    role:account.profile.role,
-    status:account.profile.status
-   };
-   state.mode='profile';state.phase='ready';state.message='';state.messageTone='';
-   return true;
-  }catch(error){
-   state.profile=null;state.mode='login';state.phase='ready';state.message=authError(error);state.messageTone='error';
-   if(isAccessDenied(error)){
-    state.phase='loading';
-    try{await service.signOut();}catch(signOutError){}
-    state.phase='ready';
+   var result=await service.claimAegisPayProfile();
+   if(result.profile.role==='MASTER ADMIN'){location.href='./master-admin.html';return;}
+   if(result.profile.role!=='USER')throw new Error('This account does not have client access.');
+   state.profile=result.profile;
+   if(result.profile.preferred_language==='ur'||result.profile.preferred_language==='en'){
+    try{if(!localStorage.getItem('aegispay-language'))locale=result.profile.preferred_language;}catch(e){}
    }
-   return false;
-  }finally{
-   profileRequest=null;
-   render();
-  }
+   await refreshData();state.mode='dashboard';state.phase='ready';state.message='';render();
+  }catch(e){state.profile=null;state.phase='ready';state.mode='login';setMessage(authError(e));render();}
+  finally{profileRequest=null;}
  })();
  return profileRequest;
 }
-async function submitLogin(event){
- event.preventDefault();
- var email=document.getElementById('loginEmail').value;
- var password=document.getElementById('loginPassword').value;
- busy=true;state.phase='loading';state.message='';render();
+async function refreshData(){
+ var c=service.client(),p=state.profile;if(!c||!p)return;
+ var [profileRes,depositsRes,withdrawalsRes,kycRes]=await Promise.all([
+  c.from('users').select('id,name,email,role,status,current_platform_balance,principal_balance,profit_balance,manual_credit_balance,withdrawal_held,destination_address,withdrawal_wallet_owner_name,preferred_language,referral_code,first_deposit_done').eq('id',p.id).maybeSingle(),
+  c.from('deposit_submissions').select('id,tier_id,gross_amount,credited_amount,status,ai_review_status,verification_note,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
+  c.from('withdrawal_requests').select('id,amount,fee_amount,net_amount,status,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
+  c.from('kyc_verifications').select('id,document_type,status,ai_review_status,review_reason,submitted_at').eq('user_id',p.id).order('submitted_at',{ascending:false}).limit(1)
+ ]);
+ if(profileRes.error)throw profileRes.error;
+ state.profile=profileRes.data||p;
+ state.data={deposits:depositsRes.data||[],withdrawals:withdrawalsRes.data||[],kyc:(kycRes.data||[])[0]||null};
+ if(depositsRes.error)state.data.deposits=[];
+ if(withdrawalsRes.error)state.data.withdrawals=[];
+ if(kycRes.error)state.data.kyc=null;
+}
+function date(v){try{return new Date(v).toLocaleString(locale==='ur'?'ur-PK':'en-US');}catch(e){return v||'';}}
+function statusBadge(v){return '<span style="display:inline-block;padding:4px 8px;border-radius:99px;background:#edf3fa;color:#314760;font-size:12px">'+esc(String(v||'Pending').replaceAll('_',' '))+'</span>';}
+function historyTable(title,rows,kind){
+ var cells=rows.length?rows.map(function(r){
+  var amount=kind==='deposit'?r.gross_amount:r.amount;
+  var status=kind==='deposit'?(r.ai_review_status==='APPROVED'&&r.status==='PENDING_VERIFICATION'?'CHAIN CHECK':r.status):r.status;
+  return '<tr><td>'+esc(date(r.created_at))+'</td><td>'+money(amount)+'</td><td>'+statusBadge(status)+'</td></tr>';
+ }).join(''):'<tr><td colspan="3">'+t('empty')+'</td></tr>';
+ return '<section class="section" style="margin-top:18px"><h3>'+title+'</h3><div style="overflow:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th>'+t('date')+'</th><th>'+t('amount')+'</th><th>'+t('status')+'</th></tr></thead><tbody>'+cells+'</tbody></table></div></section>';
+}
+function renderDashboard(){
+ var p=state.profile||{},d=state.data||{},kyc=d.kyc;
+ var kycLabel=kyc?kyc.status:(t('kycNeeded'));
+ var kycSection=kyc&&kyc.status==='VERIFIED'
+  ?'<section class="section"><h3>'+t('kyc')+'</h3>'+statusBadge(t('kycDone'))+'</section>'
+  :(kyc&&(kyc.status==='PENDING_REVIEW'||kyc.status==='MANUAL_REVIEW')
+   ?'<section class="section" style="margin-top:18px"><h3>'+t('kycTitle')+'</h3><p>'+t('kycHelp')+'</p>'+statusBadge(kyc.status)+'<p>'+esc(kyc.review_reason||t('pending'))+'</p></section>'
+   :'<section class="section" style="margin-top:18px"><h3>'+t('kycTitle')+'</h3><p>'+t('kycHelp')+'</p><form id="kycForm">'+
+   '<div class="field"><label>'+t('documentType')+'</label><select id="kycType"><option value="CNIC">'+t('cnic')+'</option><option value="PASSPORT">'+t('passport')+'</option></select></div>'+
+   '<div class="field"><label>'+t('front')+'</label><input id="kycFront" type="file" accept="image/jpeg,image/png,image/webp" required></div>'+
+   '<div class="field" id="kycBackWrap"><label>'+t('backImage')+'</label><input id="kycBack" type="file" accept="image/jpeg,image/png,image/webp"></div>'+
+   '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 0"><input id="kycConsent" type="checkbox" required><span>'+t('consent')+'</span></label>'+
+   '<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submitKyc')+'</button></form><p>'+t('kyc')+': '+statusBadge(kycLabel)+'</p></section>');
+ var walletForm=p.destination_address
+  ?'<p>'+t('wallet')+': <code>'+esc(p.destination_address)+'</code></p>'
+  :'<div class="field"><label>'+t('wallet')+'</label><input id="walletAddress" autocomplete="off" required></div><div class="field"><label>'+t('walletOwner')+'</label><input id="walletOwner" value="'+esc(p.name||'')+'" required></div><button type="button" class="primary" data-action="link-wallet">'+t('linkWallet')+'</button>';
+ var tiers=[['T1',30],['T2',50],['T3',100],['V1',250],['V2',500],['V3',1000]];
+ var tierOptions=tiers.map(function(x){return '<option value="'+x[0]+'">'+x[0]+' — $'+x[1]+'</option>';}).join('');
+ var body='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h1>'+t('hi')+', '+esc(p.name||'')+'</h1><button class="ghost-dark" data-action="logout">'+t('logout')+'</button></div>'+
+  '<div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:15px 0"><div class="stat-card"><small>'+t('balance')+'</small><strong>'+money(p.current_platform_balance)+'</strong></div><div class="stat-card"><small>'+t('principal')+'</small><strong>'+money(p.principal_balance)+'</strong></div><div class="stat-card"><small>'+t('profit')+'</small><strong>'+money(p.profit_balance)+'</strong></div><div class="stat-card"><small>'+t('kyc')+'</small><strong style="font-size:15px">'+esc(kycLabel)+'</strong></div></div>'+
+  '<div class="notice" style="margin:14px 0">'+t('network')+'</div>'+
+  '<section class="section"><h3>'+t('deposit')+'</h3><p>'+t('depositHelp')+'</p><form id="depositForm"><div class="field"><label>'+t('tier')+'</label><select id="depositTier">'+tierOptions+'</select></div><div class="field"><label>'+t('amount')+'</label><input id="depositAmount" type="number" min="1" step="0.01" value="30" required></div><div class="field"><label>'+t('txid')+'</label><input id="depositTxid" type="text" minlength="64" maxlength="64" pattern="[A-Fa-f0-9]{64}" required></div><div class="field"><label>'+t('proof')+'</label><input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submit')+'</button></form></section>'+
+  kycSection+
+  '<section class="section" style="margin-top:18px"><h3>'+t('withdraw')+'</h3><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form></section>'+
+  '<section class="section" style="margin-top:18px"><h3>'+t('refCode')+'</h3><code>'+esc(p.referral_code||'')+'</code></section>'+
+  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal');
+ root.innerHTML=shell(body);
+ var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');
+ if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
+ var tier=document.getElementById('depositTier'),amount=document.getElementById('depositAmount');
+ if(tier&&amount)tier.addEventListener('change',function(){var opt=tier.options[tier.selectedIndex];amount.value=opt.text.match(/\$(\d+(?:\.\d+)?)/)?.[1]||30;});
+}
+function render(){
+ if(state.profile&&state.mode==='dashboard')renderDashboard();else renderAuth();
+}
+async function uploadImage(file,area){
+ if(!file)throw new Error(t('chooseFile'));
+ if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error(t('chooseFile'));
+ if(file.size>10*1024*1024)throw new Error(t('fileTooLarge'));
+ var user=await service.currentUser();if(!user)throw new Error('Authentication is required.');
+ var ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+ var path=user.id+'/'+area+'/'+(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2))+'.'+ext;
+ var result=await service.client().storage.from('private-verification').upload(path,file,{upsert:false,contentType:file.type,cacheControl:'3600'});
+ if(result.error)throw result.error;
+ return path;
+}
+function busyStart(){busy=true;state.message='';}
+function busyEnd(){busy=false;render();}
+async function handleLogin(e){
+ e.preventDefault();busyStart();
+ try{await service.signIn(document.getElementById('loginEmail').value,document.getElementById('loginPassword').value);await refreshProfile();}
+ catch(err){state.profile=null;state.mode='login';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleSignup(e){
+ e.preventDefault();var name=document.getElementById('signupName').value.trim(),email=document.getElementById('signupEmail').value.trim(),password=document.getElementById('signupPassword').value,referral=document.getElementById('signupReferral').value.trim();
+ if(name.length<2||password.length<8){setMessage(t('passwordHint'));render();return;}
+ busyStart();
  try{
-  await service.signIn(email,password);
-  await refreshProfile();
- }catch(error){
-  state.profile=null;state.mode='login';state.phase='ready';state.message=authError(error);state.messageTone='error';
- }finally{
-  busy=false;
-  if(state.phase==='loading')state.phase='ready';
-  render();
- }
+  var result=await service.signUp(email,password,name,referral,locale);
+  if(result.session){await refreshProfile();}
+  else{state.mode='login';state.phase='ready';state.messageTone='success';setMessage(t('signupSent'),'success');}
+ }catch(err){state.mode='signup';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
 }
-async function submitReset(event){
- event.preventDefault();
- var email=document.getElementById('resetEmail').value;
- busy=true;state.phase='loading';state.message='';render();
+async function handleReset(e){
+ e.preventDefault();busyStart();
+ try{await service.sendPasswordReset(document.getElementById('resetEmail').value);state.mode='login';state.phase='ready';setMessage('If this email belongs to an account, recovery instructions have been sent.','success');state.messageTone='success';}
+ catch(err){state.mode='reset';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handlePassword(e){
+ e.preventDefault();var pass=document.getElementById('newPassword').value,confirm=document.getElementById('confirmPassword').value;
+ if(pass.length<8||pass!==confirm){setMessage(pass.length<8?t('passwordHint'):'Passwords do not match.');render();return;}
+ busyStart();try{await service.updatePassword(pass);history.replaceState(null,document.title,location.pathname+location.search);await refreshProfile();}
+ catch(err){state.mode='password-update';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleDeposit(e){
+ e.preventDefault();busyStart();
  try{
-  await service.sendPasswordReset(email);
-  state.mode='reset';state.phase='ready';state.message='If this email belongs to an account, password reset instructions have been sent.';state.messageTone='success';
- }catch(error){
-  state.mode='reset';state.phase='ready';state.message=authError(error);state.messageTone='error';
- }finally{busy=false;render();}
-}
-async function submitPasswordUpdate(event){
- event.preventDefault();
- var password=document.getElementById('newPassword').value;
- var confirmation=document.getElementById('confirmPassword').value;
- if(password.length<8){state.message='Use a password with at least 8 characters.';state.messageTone='error';render();return;}
- if(password!==confirmation){state.message='The two passwords do not match.';state.messageTone='error';render();return;}
- busy=true;state.phase='loading';state.message='';render();
- try{
-  await service.updatePassword(password);
-  try{window.history.replaceState(null,document.title,window.location.pathname+window.location.search);}catch(historyError){}
-  await refreshProfile();
- }catch(error){
-  state.mode='password-update';state.phase='ready';state.message=authError(error);state.messageTone='error';
- }finally{busy=false;if(state.phase==='loading')state.phase='ready';render();}
-}
-async function submitLogout(){
- busy=true;state.phase='loading';state.message='';render();
- try{await service.signOut();state.profile=null;state.mode='login';}
- catch(error){state.message=authError(error);state.messageTone='error';}
- finally{busy=false;state.phase='ready';render();}
-}
-function boot(){
- render();
- if(!service||!service.isAvailable()){
-  state.phase='ready';state.message='Secure sign-in is unavailable. Refresh the page and try again.';state.messageTone='error';render();return;
- }
- authSubscription=service.onAuthStateChange(function(event,session){
-  if(event==='SIGNED_OUT'){
-   state.profile=null;
-   if(state.phase!=='loading'){state.mode='login';state.message='';state.phase='ready';}
-   render();
-  }else if(event==='PASSWORD_RECOVERY'){
-   state.profile=null;state.mode='password-update';state.phase='ready';state.message='';render();
-  }else if(event==='SIGNED_IN'&&session&&!state.profile&&state.mode!=='password-update'){
-   window.setTimeout(function(){refreshProfile();},0);
+  var file=document.getElementById('depositProof').files[0];
+  var path=await uploadImage(file,'deposits');
+  var result=await service.client().functions.invoke('submit-deposit',{body:{tierId:document.getElementById('depositTier').value,amount:Number(document.getElementById('depositAmount').value),txid:document.getElementById('depositTxid').value.trim(),screenshotPath:path}});
+  if(result.error)throw result.error;
+  if(result.data&&result.data.aiReviewStatus==='APPROVED'){
+   var verified=await service.client().functions.invoke('verify-deposit',{body:{depositId:result.data.depositId}});
+   if(verified.error)throw verified.error;
+   setMessage(verified.data&&verified.data.status==='VERIFIED'?'Deposit confirmed and balance credited.':(verified.data&&verified.data.message)||t('pending'),'success');
+  }else{
+   setMessage((result.data&&result.data.message)||t('pending'),'success');
   }
- });
- if(authType==='invite'||authType==='recovery'){
-  service.session().then(function(session){
-   if(session){state.mode='password-update';state.message='';}
-   else{state.mode='login';state.message='This invitation or recovery link is invalid or expired. Request a new link.';state.messageTone='error';}
-   state.phase='ready';render();
-  }).catch(function(error){state.mode='login';state.phase='ready';state.message=authError(error);state.messageTone='error';render();});
-  return;
+  state.messageTone='success';await refreshData();
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleKyc(e){
+ e.preventDefault();if(!document.getElementById('kycConsent').checked){setMessage(t('consent'));render();return;}
+ busyStart();
+ try{
+  var doc=document.getElementById('kycType').value;
+  var front=await uploadImage(document.getElementById('kycFront').files[0],'kyc');
+  var backFile=document.getElementById('kycBack').files[0];
+  var back=doc==='CNIC'?await uploadImage(backFile,'kyc'):'';
+  var result=await service.client().functions.invoke('submit-kyc',{body:{documentType:doc,frontPath:front,backPath:back,processingConsent:true}});
+  if(result.error)throw result.error;
+  setMessage(result.data&&result.data.message||t('pending'),'success');state.messageTone='success';await refreshData();
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleWithdraw(e){
+ e.preventDefault();busyStart();
+ try{
+  var p=state.profile,c=service.client();
+  if(!p.destination_address){
+   var address=document.getElementById('walletAddress').value.trim(),owner=document.getElementById('walletOwner').value.trim();
+   var linked=await c.rpc('link_withdrawal_wallet',{p_address:address,p_owner_name:owner});
+   if(linked.error)throw linked.error;
+   await refreshData();p=state.profile;
+  }
+  if(!state.data.kyc||state.data.kyc.status!=='VERIFIED')throw new Error(t('withdrawKyc'));
+  var result=await service.requestWithdrawal(Number(document.getElementById('withdrawAmount').value));
+  if(result.error)throw result.error;
+  setMessage(t('ok'),'success');await refreshData();
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function action(e){
+ var el=e.target.closest('[data-action]');if(!el)return;
+ var a=el.getAttribute('data-action');
+ if(a==='language')return;
+ if(a==='keep-language'){askLanguage=false;try{localStorage.setItem('aegispay-language',locale);}catch(e){}render();return;}
+ if(a==='login'){state.mode='login';state.message='';render();}
+ else if(a==='signup'){state.mode='signup';state.message='';render();}
+ else if(a==='reset'){state.mode='reset';state.message='';render();}
+ else if(a==='logout'){await service.signOut();state.profile=null;state.mode='login';state.phase='ready';render();}
+ else if(a==='link-wallet'){
+  try{busyStart();var r=await service.client().rpc('link_withdrawal_wallet',{p_address:document.getElementById('walletAddress').value.trim(),p_owner_name:document.getElementById('walletOwner').value.trim()});if(r.error)throw r.error;setMessage(t('walletLinked'),'success');state.messageTone='success';await refreshData();}
+  catch(err){setMessage(authError(err));}finally{busy=false;render();}
  }
- service.session().then(function(session){
-  if(session){refreshProfile();}
-  else{state.phase='ready';render();}
- }).catch(function(error){state.phase='ready';state.message=authError(error);state.messageTone='error';render();});
+}
+root.addEventListener('submit',function(e){
+ if(e.target.id==='loginForm')handleLogin(e);
+ else if(e.target.id==='signupForm')handleSignup(e);
+ else if(e.target.id==='resetForm')handleReset(e);
+ else if(e.target.id==='passwordForm')handlePassword(e);
+ else if(e.target.id==='depositForm')handleDeposit(e);
+ else if(e.target.id==='kycForm')handleKyc(e);
+ else if(e.target.id==='withdrawForm')handleWithdraw(e);
+});
+root.addEventListener('click',action);root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
+
+async function boot(){
+ render();
+ if(!service||!service.isAvailable()){state.phase='ready';setMessage(t('unavailable'));render();return;}
+ service.onAuthStateChange(function(event,session){
+  if(event==='SIGNED_OUT'){state.profile=null;state.mode='login';state.phase='ready';render();}
+  if(event==='PASSWORD_RECOVERY'){state.profile=null;state.mode='password-update';state.phase='ready';render();}
+  if(event==='SIGNED_IN'&&session&&!state.profile&&state.mode!=='password-update')setTimeout(refreshProfile,0);
+ });
+ try{
+  var session=await service.session();
+  if(session)await refreshProfile();else{state.phase='ready';render();}
+ }catch(err){state.phase='ready';setMessage(authError(err));render();}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+

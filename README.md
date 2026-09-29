@@ -1,10 +1,14 @@
 # AegisPay — Operatable Application Foundation
 
-A professional, responsive AegisPay demo/system-data application built from the Complete A-to-Z Master Application Specification.
+AegisPay client and Master Admin portals connected to Supabase Auth, private evidence storage, and role-checked financial workflows.
 
 ## Included UI
-- Invitation-only Supabase Auth and approved-profile sign-in in the client portal
-- Separate legacy Master Admin demonstration portal
+- Supabase Auth client signup, email verification, sign-in, password recovery, and profile claim
+- Device-language detection and an English / Urdu choice
+- Client deposit screenshot submission, review status, balance, KYC, and withdrawal flows
+- Private owner-scoped deposit and identity image storage
+- Separate Master Admin portal with protected review queues
+- Separate Android Client and Master Admin app variants
 - USER, ADMIN and MASTER ADMIN roles
 - Operations Dashboard
 - Balance, referral, task and withdrawal metrics
@@ -32,7 +36,8 @@ A professional, responsive AegisPay demo/system-data application built from the 
 
 ## Repository layers
 - Client portal: index.html + styles.css + client-auth.js
-- Master Admin demonstration portal: master-admin.html + app.js + aegis-core.js
+- Master Admin portal: master-admin.html + admin-auth.js
+- Legacy prototype components: app.js + aegis-core.js (not loaded by either live portal)
 - Demo REST API: backend/server.js
 - Demo API data: backend/data.json
 - PostgreSQL schema with pgcrypto: database/schema.sql (node domain removed)
@@ -49,15 +54,7 @@ A professional, responsive AegisPay demo/system-data application built from the 
 
 ## Client access
 
-The client portal is invitation-only. Public signup is disabled; a user must have an approved Supabase Auth identity and a matching AegisPay profile. Legacy local demo credentials do not sign in to the client portal.
-
-## Legacy local demo accounts
-
-These credentials are only for the legacy local demo and test harness; they do not grant Supabase client access.
-
-USER: user@aegispay.demo / AP10023  
-ADMIN: admin@aegispay.demo / APADMIN  
-MASTER ADMIN: master@aegispay.demo / APMASTER
+Client signup creates only a USER profile. Supabase email verification must be completed before the account can sign in. Master Admin access requires a separately provisioned Supabase Auth account with a server-authorized MASTER ADMIN profile; the repository contains no shared/default administrator password.
 
 ## Run locally
 
@@ -78,12 +75,10 @@ The AegisPay Netlify project is aegispay-pro and currently has a ready HTTPS dep
 
 The latest environment audit found no Netlify environment variables configured. The Supabase URL and publishable key in supabase-client.js are public browser settings; service-role credentials and payout private keys must remain in Supabase Function secrets.
 
-The client entry now uses Supabase Auth and the approved-profile claim RPC. It shows the verified identity/profile only; balances and transaction controls remain unavailable until their reads and writes are connected to Supabase. The separate Master Admin demonstration portal and its core still use local demo state.
+The client portal reads balances and histories from Supabase. Deposits require a private screenshot, AI evidence precheck, and confirmed TRON transfer before credit. Withdrawals require verified KYC. Identity review uses an OpenAI-compatible vision endpoint configured only with server-side Supabase Function secrets; until those are set, submitted cases remain in manual review and balances are not credited automatically.
 
 ## GitHub Pages
 The repository has a manual Pages-ready packaging workflow. The current GitHub connection can run CI and commit code, but the Pages site itself still requires repository Pages enablement with the necessary owner/admin-level repository access.
 
 ## Production boundary
-The browser UI and demo REST API remain demonstration/system-data layers. A separate active Supabase Edge Function, execute-payout, targets TRON mainnet USDT and can move real funds when its payout private key is configured. The connected service read tools do not expose whether that secret is present, and the current UI does not call this function. Treat the function as a live money-movement path.
-
-The displayed balances, yields, liquidity figures, rewards and risk scores remain demonstration data. No banking settlement or custody service is connected.
+The old REST demo remains separate from the connected Supabase application. The payout Edge Function is guarded by explicit MAINNET mode and payout settings and still requires a privately configured key. Deposit verification supports TRON testnet and mainnet configuration; the current project remains in test mode and needs a real test receiving address before a deposit can be credited.

@@ -70,8 +70,8 @@ function renderAuth(){
   app.innerHTML='<div class="auth-wrap admin-auth-wrap"><div class="auth-card admin-auth-card">'+
    '<div class="auth-top"><div class="brand"><img src="./aegispay-logo.svg" alt="AegisPay"><b>Aegis<span>Pay</span></b></div><span class="prototype admin-badge">MASTER ADMIN</span></div>'+
    '<div class="auth-hero admin-auth-hero"><div class="logo-badge">'+icon('shield')+' Control Center</div><h1>Master Admin Access</h1><p>Private operational workspace for authorized AegisPay administration.</p></div>'+
-   '<form id="loginForm"><div class="field"><label>Master Admin Email</label><div class="field-wrap"><input id="loginEmail" type="email" required value="master@aegispay.demo" placeholder="admin@example.com"></div></div>'+
-   '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" required value="APMASTER" placeholder="••••••••"></div></div>'+
+   '<form id="loginForm"><div class="field"><label>Master Admin Email</label><div class="field-wrap"><input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@example.com"></div></div>'+
+   '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></div></div>'+
    '<div style="min-height:18px;color:#ff9ab0;font-size:9px;margin-top:8px">'+esc(loginError)+'</div>'+
    '<button class="primary" type="submit">Enter Control Center</button></form>'+
    '<div class="demo-row"><div class="demo-box"><b>Authorized workspace</b>Master Admin controls are isolated from the client interface.</div></div>'+
@@ -92,12 +92,11 @@ function bindAuth(){
 }
 function loginView(){
  return '<div class="auth-hero"><div class="logo-badge">'+icon('shield')+' Secure Access</div><h1>Welcome Back</h1><p>Sign in to your AegisPay Client account.</p></div>'+
- '<form id="loginForm"><div class="field"><label>Email</label><div class="field-wrap"><input id="loginEmail" type="email" required value="user@aegispay.demo" placeholder="you@example.com"></div></div>'+
- '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" required value="AP10023" placeholder="••••••••"></div></div>'+
+ '<form id="loginForm"><div class="field"><label>Email</label><div class="field-wrap"><input id="loginEmail" type="email" autocomplete="username" required placeholder="you@example.com"></div></div>'+
+ '<div class="field"><label>Password</label><div class="field-wrap"><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></div></div>'+
  '<div style="min-height:18px;color:#ff9ab0;font-size:9px;margin-top:8px">'+esc(loginError)+'</div>'+
  '<button class="primary" type="submit">Sign In Securely</button></form>'+
  '<div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px"><button class="ghost-dark" style="flex:1" data-action="signup-page">Create Client Account</button><button class="ghost-dark" style="flex:1" data-action="forgot">Forgot Password?</button></div>'+
- '<div class="demo-row"><div class="demo-box"><b>Client Demo</b>user@aegispay.demo<br>AP10023</div></div>'+
  '<div class="small-note">Secure AegisPay client access.</div>';
 }
 function signupView(){
@@ -408,3 +407,4 @@ window.addEventListener('load',function(){
 });
 setInterval(function(){if(current()&&(view==='dashboard'||view==='shop'))render();},1000);
 })();
+

@@ -1,29 +1,38 @@
-# Supabase production layer
+# Supabase operational configuration
 
-The connected Supabase project wtcspnrmsoisroavojop is active and healthy in ap-northeast-1.
+Project: wtcspnrmsoisroavojop
 
-## Verified state on 2026-09-29
+## Migrations and Edge Functions
 
-- All 14 exposed public application tables inspected have RLS enabled. FORCE ROW LEVEL SECURITY is off.
-- Six application profiles exist, but there are zero Auth users and zero linked profiles.
-- claim_aegispay_profile now requires a verified email and either a Supabase Auth invitation or server-controlled app metadata with aegispay_approved=true before linking an unclaimed profile.
-- Four Edge Functions are active: verify-deposit, monitor-deposits, telegram-withdrawal and execute-payout. JWT verification is enabled for all except monitor-deposits, which checks the AEGIS_CRON_SECRET header in its body.
-- execute-payout now atomically claims an approved withdrawal before sending. An uncertain chain result stays PROCESSING for manual reconciliation.
-- No Storage buckets or Storage policies are configured.
-- The repository app still uses its localStorage demo store. The Supabase client/service wrappers are loaded but are not yet connected to the app login or business-data workflows.
-- The Netlify project has no environment variables configured. The browser Supabase URL and publishable key are public client settings, not server secrets.
+The connected project already has these additive migrations applied:
 
-## Important live boundary
+- `20260930_signup_private_evidence_and_kyc.sql`
+- `20260930_network_aware_deposit_credit.sql`
+- `20260930_rls_and_foreign_key_indexes.sql`
 
-execute-payout submits a TRON mainnet USDT transfer when its payout private key is configured. Secret values and their presence are not exposed through the current connected read tools. Do not treat this path as a demo or assume it is inactive.
+The `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `verify-deposit`, `monitor-deposits`, and `execute-payout` Edge Functions are deployed and ACTIVE.
 
-## Remaining work
+All six original unlinked application profiles were anonymized in place, marked DELETED, and had old elevated roles reset to USER. Their linked history remains intact.
 
-1. Provision approved Auth identities through Supabase invitation or server-controlled app metadata, then connect browser sign-in and profile loading.
-2. Replace the demo localStorage business store with Supabase reads and authorized RPC/Edge Function writes before presenting the app as live.
-3. Define a private Storage bucket and owner-scoped policies before storing deposit evidence.
-4. Check in the source for the other three deployed Edge Functions and reconcile the repository's consolidated schema with the six live migrations.
-5. Review the remaining authenticated SECURITY DEFINER advisor findings and the performance advisor findings before production use.
-6. Verify required Supabase runtime secrets through the Supabase dashboard; the connected audit interface does not reveal their presence or values.
+## Secrets
 
-Keep all service-role keys, bot tokens and payout keys server-side. Never place them in browser configuration or Netlify client variables.
+Keep secrets in Supabase Edge Function configuration:
+
+- `TRONGRID_API_KEY` (required for mainnet; optional for public testnet calls)
+- `AEGIS_CRON_SECRET` (required for monitor-deposits)
+- `AI_REVIEW_ENDPOINT`
+- `AI_REVIEW_API_KEY`
+- `AI_REVIEW_MODEL`
+- `TRON_PAYOUT_PRIVATE_KEY` (only for deliberately enabled mainnet payouts)
+
+Supabase supplies project URL and server API credentials to Edge Functions. Never place a service-role/secret key in the client app. The AI settings must point to an HTTPS OpenAI-compatible vision endpoint. The app stores review statuses and short issue codes; it does not persist extracted ID numbers. When AI settings are missing or uncertain, submissions remain in manual review.
+
+## Required project settings
+
+- Verify Supabase Auth email-confirmation and redirect settings, and configure email delivery.
+- Verify or replace `deposit_rules.receiving_address` with a wallet controlled for TRON testnet use, then fund it with test tokens.
+- Keep `system_mode` set to `TESTNET_DEMO` and `real_payouts` false while testing.
+- Create a new Supabase Auth identity for the first Master Admin, then set its profile role through a project-owner-controlled operation. No Master Admin Auth identity currently exists.
+- Recheck Supabase security/performance advisors after application traffic. Authenticated SECURITY DEFINER RPC warnings remain for functions that enforce caller identity or Master Admin role checks; unused-index notices are expected before application traffic.
+
+Only English and Urdu translations are currently available; the browser language is detected for those two locales and other languages fall back to English.

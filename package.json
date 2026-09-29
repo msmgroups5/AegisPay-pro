@@ -4,6 +4,6 @@
   "version": "0.1.0",
   "description": "AegisPay operatable application foundation",
   "scripts": {
-    "check": "node --check aegis-core.js && node --check app.js && node --check supabase-client.js && node --check supabase-service.js && node --check client-auth.js && node --check backend/server.js && node scripts/test-core-auth.js && node scripts/test-supabase-service.js && node scripts/validate-static.js && node scripts/smoke-api.js"
+    "check": "node --check aegis-core.js && node --check app.js && node --check supabase-client.js && node --check supabase-service.js && node --check client-auth.js && node --check admin-auth.js && node --check backend/server.js && node scripts/test-core-auth.js && node scripts/test-supabase-service.js && node scripts/validate-static.js && node scripts/smoke-api.js"
   }
 }

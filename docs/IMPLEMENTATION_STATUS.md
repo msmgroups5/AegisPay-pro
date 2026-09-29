@@ -1,112 +1,31 @@
-# AegisPay GitHub Implementation Status
+# AegisPay implementation status
 
-## GitHub-side completion checkpoint
+## Implemented on the working branch
 
-The repository contains the complete demo/system-data implementation layer required by the master specification before external production integrations are connected.
+- Client signup and sign-in use Supabase Auth. New public signups are restricted to the USER role and create their profile through the Auth trigger.
+- English/Urdu selection uses the browser's preferred language when supported, then asks the user to confirm or change it. Country or language detection is not an authoritative locale service.
+- Deposit proof and CNIC/passport images upload to a private owner-scoped Storage bucket.
+- Deposit workflow requires screenshot review plus a confirmed matching TRON transfer before any balance credit.
+- KYC supports a CNIC front/back pair or passport photo page. A verified KYC record is reusable; rejected images can be submitted again.
+- The withdrawal RPC blocks requests until KYC is verified. Client direct writes to balances, review statuses, deposits, and withdrawals are removed.
+- A separate Master Admin web portal can review KYC, deposits, and withdrawals.
+- Android has distinct Client and Master Admin application variants. The WebView supports image selection for screenshots and identity photos.
+- The service worker caches only same-origin application files, never Supabase/Auth responses.
+- The old demo login identities and displayed demo credentials have been removed from the client and admin entry points. All six unlinked live profile rows are now anonymized and marked DELETED; linked withdrawal, referral, task, notification, and audit history remains intact.
+- Three additive migrations are live: public USER signup and private KYC/evidence controls; network-aware deposit credit; and explicit authenticated read policies plus foreign-key indexes.
+- Seven Edge Functions are deployed and ACTIVE: submit-deposit, submit-kyc, admin-queues, admin-review, verify-deposit, monitor-deposits, and execute-payout. Payout approval is blocked in test mode and the admin approval flow calls the payout function only when live settings permit it.
+- The live Supabase mode is TESTNET_DEMO, real payouts are disabled, and deposit verification is pinned to the TRON test network.
 
-### UI / UX
-- Premium dark fintech/control-center shell
-- Responsive desktop/tablet/mobile layout
-- Collapsible mobile sidebar
-- Mobile bottom navigation
-- Persistent top status bar
-- Footer and visible platform/data-only messaging
-- Status badges, cards, progress bars, gauge, map, heatmap, tables, modal dialogs
-- Empty-state, error-state and disabled-action behavior
-- Search and pagination on administrative tables
-- Offline shell service worker for served web deployments
+## Runtime configuration still required
 
-### Core user modules
-- Authentication screen
-- USER / ADMIN / MASTER ADMIN roles
-- Dashboard
-- Activity stream
-- Tasks and completion workflow
-- Referral network/tree
-- Referral link copy
-- AI Assistant and suggested questions
-- Withdrawals and request validation
-- Withdrawal history
-- Notifications
-- Profile
+- Supabase Auth email confirmation, allowed redirect URLs, and outbound email delivery must be verified in project settings.
+- A new Supabase Auth Master Admin identity must be created and its profile role set by the project owner. The old seed Master Admin row was anonymized with the other five; no shared password is embedded or generated.
+- AI_REVIEW_ENDPOINT, AI_REVIEW_API_KEY, and AI_REVIEW_MODEL must be configured as Supabase Edge Function secrets. Until then, deposits and KYC remain pending/manual review; balances are never credited by AI alone.
+- The project needs a verified TRON testnet receiving wallet and test tokens to complete an end-to-end chain test. No real deposit or payout has been sent.
+- Language auto-selection and translations currently cover English and Urdu; other locales fall back to English and need translated copy before broader language coverage.
+- Netlify deploy-preview status must be checked on the updated pull request. The prior attempt was blocked because the repository contributor was unverified in Netlify.
+- GitHub Actions must finish the updated repository checks and two Android APK builds before the APKs are ready to install.
 
-### Admin / Master Admin modules
-- Admin Dashboard
-- User Management
-- Task Management
-- Referral Management
-- Approval Center
-- Audit Logs
-- Settings
-- System Operations
-- Master Admin-only approval and system controls
-- Role-aware navigation and protected admin sections
+## Verification
 
-### Workflow coverage
-- Withdrawal request creation
-- Demo risk scoring
-- PENDING_APPROVAL queue
-- Master Admin APPROVED / REJECTED decision
-- Duplicate finalization blocked at API layer
-- Approval timestamp and approver tracking
-- Conceptual Telegram notification payload preview
-- Audit/activity records
-- Notification generation
-- Demo JSON export/reset controls
-
-### Backend / repository assets
-- backend/server.js demo REST API
-- Required /api/v1/* endpoints from the specification
-- API validation, security headers and demo request limit
-- PostgreSQL schema
-- pgcrypto extension in schema
-- Supabase production integration notes
-- Production environment variable template
-- .github/workflows/ci.yml
-- .github/workflows/pages.yml
-- netlify.toml
-- .gitignore
-- service-worker.js
-- scripts/validate-static.js
-- scripts/smoke-api.js
-- package.json
-- README
-
-### Verification
-The GitHub Actions repository validation workflow is configured to run:
-1. JavaScript syntax checks
-2. API server syntax check
-3. Static repository checks
-4. API smoke tests covering health, liquidity, withdrawal creation, administrator listing and Master Admin approval
-
-### Explicit non-production boundary
-This repository layer does not perform real financial transfers, blockchain execution, custody, banking transfers or live payment settlement. Approval actions update application status and audit records only. Displayed balances, yields, liquidity figures, rewards and risk scores are demonstration/system data and are not an independent financial audit.
-
-### Live integration audit — 2026-09-29
-
-- Supabase is active and healthy. Four Edge Functions are deployed.
-- All 14 public application tables inspected have RLS enabled; FORCE ROW LEVEL SECURITY is off.
-- The six application profiles have no Auth user mappings, and auth.users is empty.
-- Profile claims now require a confirmed email plus an Auth invitation or server-controlled approval metadata.
-- execute-payout now atomically claims approved withdrawals and leaves ambiguous broadcasts locked in PROCESSING for manual reconciliation.
-- Supabase Storage has no buckets or policies.
-- Netlify has a ready HTTPS deployment and no environment variables.
-- The client-auth implementation branch connects password sign-in and recovery to Supabase Auth, then calls the approved-profile claim RPC. The client entry deliberately shows identity/profile status only; business data remains unconnected. The separate Master Admin portal still uses local demo state.
-- The live database has six recorded migrations, while the repository does not contain the full prior migration source history. Only the payout function source and profile-claim hardening migration are newly checked in here.
-- The security advisor still reports seven authenticated-callable SECURITY DEFINER functions. The performance advisor also reports unindexed foreign keys and policy-performance findings.
-- The connected integrations do not expose Supabase Auth configuration or Edge Function secret presence.
-
-### External work that remains
-
-- Provision the six approved Auth identities, confirm invitation/password setup, and validate the client sign-in/profile flow end to end.
-- Connect Master Admin authentication to approved Supabase identities and role-checked backend operations.
-- Move client business-data reads and writes off the browser demo store to Supabase-backed, role-checked operations.
-- Create a private Storage bucket with owner-scoped policies if deposit evidence upload is required.
-- Check in source for the other three deployed Edge Functions and reconcile all prior live database migrations with repository SQL.
-- Review and resolve or document the remaining SECURITY DEFINER and performance advisor findings.
-- Verify Supabase Auth provider, email-confirmation and redirect settings, and confirm required server-side function secrets in the dashboard.
-- Finish monitoring, domain, operational incident, security, and applicable compliance work.
-
-### Production boundary
-
-The browser UI and demo REST API remain demonstration/system-data layers. The separate execute-payout Edge Function targets TRON mainnet USDT and can move real funds when configured with its payout private key. Treat it as a live money-movement path.
+Local verification passed: JavaScript syntax checks, core Auth/RBAC tests, Supabase service tests, static repository validation, API smoke tests, and manifest JSON validation. The live database migration and function deployments succeeded. GitHub Actions still needs to build the final commit's Android artifacts. No live-chain transfer or payout was used as a test.

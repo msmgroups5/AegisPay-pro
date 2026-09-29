@@ -3,6 +3,7 @@ plugins { id 'com.android.application' }
 android {
     namespace 'com.aegispay.app'
     compileSdk 35
+    flavorDimensions += 'portal'
 
     defaultConfig {
         applicationId 'com.aegispay.app'
@@ -10,6 +11,21 @@ android {
         targetSdk 35
         versionCode 20
         versionName '2.0.0'
+    }
+
+    productFlavors {
+        client {
+            dimension 'portal'
+            applicationIdSuffix '.client'
+            resValue 'string', 'app_name', 'AegisPay'
+            resValue 'string', 'entry_html', 'index.html'
+        }
+        admin {
+            dimension 'portal'
+            applicationIdSuffix '.admin'
+            resValue 'string', 'app_name', 'AegisPay Admin'
+            resValue 'string', 'entry_html', 'master-admin.html'
+        }
     }
 
     buildTypes {
@@ -45,13 +61,15 @@ dependencies {
 def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
     from(rootProject.projectDir.parentFile) {
         include 'index.html'
+        include 'master-admin.html'
         include 'styles.css'
-        include 'app.js'
+        include 'client-auth.js'
+        include 'admin-auth.js'
         include 'supabase-client.js'
+        include 'supabase-service.js'
         include 'service-worker.js'
         include 'manifest.webmanifest'
         include 'aegispay-logo.svg'
-        include 'aegis-core.js'
     }
     into(layout.projectDirectory.dir('src/main/assets/aegispay'))
 }

@@ -72,6 +72,16 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Active Master Admin access is required." }, 403);
     }
 
+    const { data: modeRow } = await admin.from("platform_settings")
+      .select("value_json").eq("key", "system_mode").maybeSingle();
+    const systemMode = modeRow?.value_json || {};
+    const { data: networkRow } = await admin.from("platform_settings")
+      .select("value_json").eq("key", "deposit_rules").maybeSingle();
+    const network = String(networkRow?.value_json?.network || "").toUpperCase();
+    if (systemMode.mode !== "MAINNET" || systemMode.real_payouts !== true || network !== "TRON MAINNET") {
+      return json({ error: "Live payouts are disabled while AegisPay is in test mode." }, 403);
+    }
+
     const body = await req.json().catch(() => null);
     withdrawalId = typeof body?.withdrawalId === "string" ? body.withdrawalId : null;
     if (!withdrawalId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(withdrawalId)) {

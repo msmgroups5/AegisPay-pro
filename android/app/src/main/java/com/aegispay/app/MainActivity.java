@@ -12,12 +12,14 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -31,16 +33,29 @@ import com.google.zxing.integration.android.IntentResult;
 public class MainActivity extends AppCompatActivity {
     private static final int LOCATION_REQUEST = 701;
     private WebView webView;
+    private ValueCallback<Uri[]> pendingFileSelection;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (pendingFileSelection == null) return;
+                    Uri[] selected = result.getResultCode() == RESULT_OK
+                            ? WebChromeClient.FileChooserParams.parseResult(result.getResultCode(), result.getData())
+                            : null;
+                    pendingFileSelection.onReceiveValue(selected);
+                    pendingFileSelection = null;
+                }
+        );
         setContentView(R.layout.activity_main);
 
         webView = findViewById(R.id.webview);
         configureWebView(webView);
         webView.addJavascriptInterface(new AegisBridge(), "AegisNative");
-        webView.loadUrl("https://appassets.androidplatform.net/assets/aegispay/index.html");
+        webView.loadUrl("https://appassets.androidplatform.net/assets/aegispay/" + getString(R.string.entry_html));
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -68,7 +83,25 @@ public class MainActivity extends AppCompatActivity {
                 return assetLoader.shouldInterceptRequest(Uri.parse(url));
             }
         });
-        view.setWebChromeClient(new WebChromeClient());
+        view.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (pendingFileSelection != null) pendingFileSelection.onReceiveValue(null);
+                pendingFileSelection = callback;
+                Intent picker = params.createIntent();
+                picker.setType("image/*");
+                picker.addCategory(Intent.CATEGORY_OPENABLE);
+                picker.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/jpeg", "image/png", "image/webp"});
+                try {
+                    imagePickerLauncher.launch(Intent.createChooser(picker, "Choose image"));
+                    return true;
+                } catch (Exception ignored) {
+                    pendingFileSelection = null;
+                    callback.onReceiveValue(null);
+                    return false;
+                }
+            }
+        });
     }
 
     private void callJs(String expression) {
