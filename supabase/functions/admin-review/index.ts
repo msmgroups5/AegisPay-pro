@@ -91,20 +91,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "withdrawal") {
-      if (decision === "approve") {
-        const [{ data: modeRow }, { data: networkRow }] = await Promise.all([
-          admin.from("platform_settings").select("value_json").eq("key", "system_mode").maybeSingle(),
-          admin.from("platform_settings").select("value_json").eq("key", "deposit_rules").maybeSingle(),
-        ]);
-        const mode = modeRow?.value_json || {};
-        const network = String(networkRow?.value_json?.network || "").toUpperCase();
-        if (mode.mode !== "MAINNET" || mode.real_payouts !== true || network !== "TRON MAINNET") {
-          return json({ error: "Withdrawal approval is disabled while AegisPay is in test mode." }, 403);
-        }
-        if (!Deno.env.get("TRON_PAYOUT_PRIVATE_KEY")) {
-          return json({ error: "Withdrawal payout is not configured. No balance or request status was changed." }, 503);
-        }
-      }
       const scoped = createClient(SUPABASE_URL, SERVICE_KEY, {
         auth: { persistSession: false, autoRefreshToken: false },
         global: { headers: { Authorization: "Bearer " + token } },
@@ -114,7 +100,12 @@ Deno.serve(async (req: Request) => {
         p_approve: decision === "approve",
       });
       if (error) return json({ error: error.message || "Withdrawal review failed." }, 400);
-      return json({ status: decision === "approve" ? "APPROVED" : "REJECTED", result: data });
+      return json({
+        status: data?.status || (decision === "approve" ? "PENDING_APPROVAL" : "REJECTED"),
+        panelDecision: data?.panel_decision || (decision === "approve" ? "APPROVED" : "REJECTED"),
+        telegramDecision: data?.telegram_decision || "PENDING",
+        requiresTelegramApproval: data?.status === "PENDING_APPROVAL" && decision === "approve",
+      });
     }
 
     return json({ error: "Unsupported review type." }, 400);
@@ -122,3 +113,4 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Review action could not be completed." }, 500);
   }
 });
+

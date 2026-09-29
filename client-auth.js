@@ -25,7 +25,7 @@ var copy={
   submitKyc:'Submit identity images',kycHelp:'If an image is blurry or details do not match your profile, upload a clear and correct image again. Withdrawals stay locked until KYC is verified.',
   history:'Recent activity',status:'Status',date:'Date',logout:'Sign out',refCode:'Your referral code',loadingData:'Loading your account…',save:'Save language',
   pending:'Pending review',empty:'No records yet.',network:'Deposits are currently configured for TRON test network. Never send real funds to a test address.',
-  ok:'Request submitted.',chooseFile:'Choose an image file.',fileTooLarge:'Each image must be smaller than 10 MB.',walletLinked:'Wallet linked.',withdrawKyc:'Complete KYC before requesting a withdrawal.',
+  ok:'Request submitted.',withdrawTelegramPending:'Withdrawal submitted. Telegram could not be reached, so an administrator must resend the approval request.',chooseFile:'Choose an image file.',fileTooLarge:'Each image must be smaller than 10 MB.',walletLinked:'Wallet linked.',withdrawKyc:'Complete KYC before requesting a withdrawal.',
   uploadBusy:'Uploading securely…',error:'Something went wrong. Please try again.',unavailable:'Secure sign-in is unavailable. Refresh and try again.'
  },
  ur:{
@@ -44,7 +44,7 @@ var copy={
   submitKyc:'Identity images bhejein',kycHelp:'Agar image blur ho ya details profile se match na karein to saaf aur durust image dobara upload karein. KYC verify hone tak withdrawal band rahega.',
   history:'Haal ki activity',status:'Status',date:'Tareekh',logout:'Sign out',refCode:'Aapka referral code',loadingData:'Account load ho raha hai…',save:'Zaban save karein',
   pending:'Review pending',empty:'Abhi koi record nahi.',network:'Deposits abhi TRON test network par configured hain. Test address par real funds na bhejein.',
-  ok:'Request submit ho gayi.',chooseFile:'Image file select karein.',fileTooLarge:'Har image 10 MB se chhoti honi chahiye.',walletLinked:'Wallet link ho gaya.',withdrawKyc:'Withdrawal se pehle KYC mukammal karein.',
+  ok:'Request submit ho gayi.',withdrawTelegramPending:'Withdrawal submit ho gayi. Telegram se rabta nahi ho saka, is liye Admin ko approval dobara bhejni hogi.',chooseFile:'Image file select karein.',fileTooLarge:'Har image 10 MB se chhoti honi chahiye.',walletLinked:'Wallet link ho gaya.',withdrawKyc:'Withdrawal se pehle KYC mukammal karein.',
   uploadBusy:'Secure upload ho raha hai…',error:'Masla hua. Dobara koshish karein.',unavailable:'Secure sign-in unavailable hai. Page refresh karke dobara try karein.'
  }
 };
@@ -268,7 +268,8 @@ async function handleWithdraw(e){
   if(!state.data.kyc||state.data.kyc.status!=='VERIFIED')throw new Error(t('withdrawKyc'));
   var result=await service.requestWithdrawal(Number(document.getElementById('withdrawAmount').value));
   if(result.error)throw result.error;
-  setMessage(t('ok'),'success');await refreshData();
+  var telegram=await c.functions.invoke('telegram-withdrawal',{body:{action:'notify',withdrawalId:result.data}});
+  setMessage(telegram.error?t('withdrawTelegramPending'):t('ok'),'success');state.messageTone='success';await refreshData();
  }catch(err){setMessage(authError(err));}
  finally{busy=false;render();}
 }
@@ -313,17 +314,17 @@ async function boot(){
  if(!runtimeTimer)runtimeTimer=setInterval(checkRuntime,10000);
 }
 async function checkRuntime(){
- if(!service||!service.isAvailable()||runtimeRequest)return runtimeRequest;
+ if(!service||!service.isAvailable()||runtimeRequest||busy)return runtimeRequest;
  runtimeRequest=(async function(){
-  var was=state.appEnabled,wasUnverified=state.runtimeUnverified;
+  var was=state.appEnabled,wasUnverified=state.runtimeUnverified,wasPaused=state.phase==='paused';
   try{
    var enabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;state.appEnabled=enabled;
-   if(!enabled){state.profile=null;state.phase='paused';state.mode='login';state.message='';render();return;}
-  if(was===false||state.phase==='loading'||wasUnverified){state.phase='ready';var session=await service.session();if(session)await refreshProfile();else{state.profile=null;state.mode='login';render();}}
-   else render();
-  }catch(err){state.appEnabled=false;state.runtimeUnverified=true;state.profile=null;state.phase='paused';setMessage(t('runtimeUnknown'));render();}
+   if(!enabled){var changed=was!==false||!wasPaused||wasUnverified;state.profile=null;state.phase='paused';state.mode='login';state.message='';if(changed)render();return;}
+   if(was===false||wasPaused||wasUnverified){state.phase='ready';state.message='';var session=await service.session();if(session)await refreshProfile();else{state.profile=null;state.mode='login';render();}}
+  }catch(err){var changed=!state.runtimeUnverified||state.phase!=='paused';state.appEnabled=false;state.runtimeUnverified=true;state.profile=null;state.phase='paused';if(changed){setMessage(t('runtimeUnknown'));render();}}
  })();
  try{return await runtimeRequest;}finally{runtimeRequest=null;}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+

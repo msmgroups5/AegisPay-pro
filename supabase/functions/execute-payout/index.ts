@@ -4,9 +4,11 @@ import { TronWeb } from "npm:tronweb@6.0.4";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-const PAYOUT_KEY = Deno.env.get("TRON_PAYOUT_PRIVATE_KEY");
+const MAINNET_PAYOUT_KEY = Deno.env.get("TRON_PAYOUT_PRIVATE_KEY");
+const TESTNET_PAYOUT_KEY = Deno.env.get("TRON_TESTNET_PAYOUT_PRIVATE_KEY");
 const TRONGRID_KEY = Deno.env.get("TRONGRID_API_KEY");
-const USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+const MAINNET_USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+const SHASTA_USDT = "TG3XXyExBkPp9nzdajDZsozEu4BkaSJozs";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -73,7 +75,6 @@ let payoutMayHaveBeenBroadcast = false;
     const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
     if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
     if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
-    if (!PAYOUT_KEY) return json({ error: "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
 
     const { data: modeRow } = await admin.from("platform_settings")
       .select("value_json").eq("key", "system_mode").maybeSingle();
@@ -81,9 +82,16 @@ let payoutMayHaveBeenBroadcast = false;
     const { data: networkRow } = await admin.from("platform_settings")
       .select("value_json").eq("key", "deposit_rules").maybeSingle();
     const network = String(networkRow?.value_json?.network || "").toUpperCase();
-    if (systemMode.mode !== "MAINNET" || systemMode.real_payouts !== true || network !== "TRON MAINNET") {
-      return json({ error: "Live payouts are disabled while AegisPay is in test mode." }, 403);
-    }
+    const testnet = systemMode.mode === "TESTNET_DEMO" && systemMode.testnet_payouts === true && network === "TRON TESTNET";
+    const mainnet = systemMode.mode === "MAINNET" && systemMode.real_payouts === true && network === "TRON MAINNET";
+    if (!testnet && !mainnet) return json({ error: "The selected TRON network is not enabled for payouts." }, 403);
+    const payoutKey = testnet ? TESTNET_PAYOUT_KEY : MAINNET_PAYOUT_KEY;
+    if (!payoutKey) return json({ error: testnet ? "TRON_TESTNET_PAYOUT_PRIVATE_KEY is not configured." : "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
+    const tokenContract = String(networkRow?.value_json?.token_contract || "");
+    if (testnet && tokenContract !== SHASTA_USDT) return json({ error: "The testnet USDT contract does not match the supported Shasta token." }, 403);
+    if (mainnet && tokenContract && tokenContract !== MAINNET_USDT) return json({ error: "The configured token is not the supported TRON mainnet USDT contract." }, 403);
+    const chain = testnet ? "https://api.shasta.trongrid.io" : "https://api.trongrid.io";
+    const usdtContract = testnet ? SHASTA_USDT : MAINNET_USDT;
 
     const body = await req.json().catch(() => null);
     withdrawalId = typeof body?.withdrawalId === "string" ? body.withdrawalId : null;
@@ -101,7 +109,10 @@ let payoutMayHaveBeenBroadcast = false;
       })
       .eq("id", withdrawalId)
       .eq("status", "APPROVED")
-      .select("id,user_id,net_amount,destination_address")
+      .eq("panel_decision", "APPROVED")
+      .eq("telegram_decision", "APPROVED")
+      .is("payout_txid", null)
+      .select("id,user_id,net_amount,destination_address,panel_decision,telegram_decision")
       .maybeSingle();
 
     if (claimError) return json({ error: "Unable to lock the approved withdrawal." }, 500);
@@ -110,17 +121,25 @@ let payoutMayHaveBeenBroadcast = false;
     }
     claimedWithdrawal = withdrawal;
 
+    if (testnet) {
+      const { data: currentMode, error: currentModeError } = await admin.from("platform_settings")
+        .select("value_json").eq("key", "system_mode").maybeSingle();
+      if (currentModeError || currentMode?.value_json?.mode !== "TESTNET_DEMO" || currentMode?.value_json?.testnet_payouts !== true) {
+        throw new Error("Testnet payouts were disabled before the transfer could be broadcast.");
+      }
+    }
+
     const amountRaw = usdtUnits(withdrawal.net_amount);
     if (!withdrawal.destination_address) {
       throw new Error("Withdrawal destination address is missing.");
     }
 
     const tron = new TronWeb({
-      fullHost: "https://api.trongrid.io",
+      fullHost: chain,
       headers: TRONGRID_KEY ? { "TRON-PRO-API-KEY": TRONGRID_KEY } : undefined,
-      privateKey: PAYOUT_KEY,
+      privateKey: payoutKey,
     });
-    const contract = await tron.contract().at(USDT);
+    const contract = await tron.contract().at(usdtContract);
 
     // Recheck immediately before network broadcast. If maintenance began after
     // the claim, the catch path restores the held balance before returning.
@@ -218,3 +237,4 @@ let payoutMayHaveBeenBroadcast = false;
     }, payoutMayHaveBeenBroadcast || claimedWithdrawal ? 202 : 502);
   }
 });
+

@@ -34,6 +34,10 @@ Deno.serve(async (req: Request) => {
     if (!actor || actor.role !== "MASTER ADMIN" || ["BLOCKED","SUSPENDED","DELETED"].includes(String(actor.status).toUpperCase())) {
       return json({ error: "Master Admin access required." }, 403);
     }
+    const { data: stats, error: statsError } = await admin.rpc("aegispay_admin_dashboard_totals", {
+      p_admin_auth_user_id: auth.user.id,
+    });
+    if (statsError) return json({ error: "Unable to load confirmed platform totals." }, 500);
     const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
     if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
     if (appEnabled !== true) return json({
@@ -41,6 +45,7 @@ Deno.serve(async (req: Request) => {
       deposits: [],
       kyc: [],
       withdrawals: [],
+      stats,
     });
 
     const [depositResult, kycResult, withdrawalResult] = await Promise.all([
@@ -51,7 +56,7 @@ Deno.serve(async (req: Request) => {
         .select("id,user_id,document_type,status,ai_review_status,ai_confidence,review_reason,front_storage_path,back_storage_path,submitted_at")
         .in("status", ["PENDING_REVIEW","MANUAL_REVIEW"]).order("submitted_at", { ascending: true }).limit(50),
       admin.from("withdrawal_requests")
-        .select("id,user_id,amount,fee_amount,net_amount,destination_address,status,created_at,payout_error,payout_txid")
+        .select("id,user_id,amount,fee_amount,net_amount,destination_address,status,created_at,payout_error,payout_txid,panel_decision,panel_decided_at,telegram_decision,telegram_decided_at,telegram_status,telegram_message_id")
         .in("status", ["PENDING_APPROVAL","APPROVED"]).order("created_at", { ascending: true }).limit(50),
     ]);
     if (depositResult.error || kycResult.error || withdrawalResult.error) {
@@ -90,11 +95,16 @@ Deno.serve(async (req: Request) => {
         id: x.id, amount: x.amount, feeAmount: x.fee_amount, netAmount: x.net_amount,
         destinationAddress: x.destination_address, status: x.status, submittedAt: x.created_at,
         payoutError: x.payout_error, payoutTxid: x.payout_txid,
+        panelDecision: x.panel_decision, panelDecidedAt: x.panel_decided_at,
+        telegramDecision: x.telegram_decision, telegramDecidedAt: x.telegram_decided_at,
+        telegramStatus: x.telegram_status, telegramMessageId: x.telegram_message_id,
         user: users.get(x.user_id) || null,
       })),
+      stats,
       expiresInSeconds: 600,
     });
   } catch {
     return json({ error: "Unable to load review queues." }, 500);
   }
 });
+
