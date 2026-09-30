@@ -114,4 +114,4 @@ jobs:
 
       - name: Deploy production website
         if: env.NETLIFY_AUTH_TOKEN != ''
-        run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay main $GITHUB_SHA"
+        run: npx -y netlify-cli deploy --dir=site --prod --no-wait --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay main $GITHUB_SHA"
