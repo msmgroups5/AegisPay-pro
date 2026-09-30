@@ -2,8 +2,12 @@
 'use strict';
 
 var WEB_AUTH_CALLBACK='https://aegispay-pro.netlify.app/auth/callback';
-var MOBILE_AUTH_CALLBACK='com.aegispay.app://auth/callback';
-function authRedirectUri(){return window.AEGIS_ANDROID_APP ? MOBILE_AUTH_CALLBACK : WEB_AUTH_CALLBACK;}
+var MOBILE_CLIENT_AUTH_CALLBACK='com.aegispay.app.client://auth/callback';
+var MOBILE_ADMIN_AUTH_CALLBACK='com.aegispay.app.admin://auth/callback';
+function authRedirectUri(){
+  if(!window.AEGIS_ANDROID_APP)return WEB_AUTH_CALLBACK;
+  return window.AEGIS_ADMIN_PORTAL ? MOBILE_ADMIN_AUTH_CALLBACK : MOBILE_CLIENT_AUTH_CALLBACK;
+}
 
 window.AegisSupabaseService={
  client:function(){return window.AegisSupabaseClient;},
