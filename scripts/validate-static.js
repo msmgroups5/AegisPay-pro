@@ -40,6 +40,8 @@ for(const file of ["client-auth.js","admin-auth.js","master-admin.html","README.
 for(const marker of ["signupForm","depositForm","kycForm","submit-deposit","submit-kyc","aegispay-language","complete-task","shopSection","referralsSection","notificationsSection","aiSection"]) if(!clientJs.includes(marker)) throw new Error("Client workflow marker missing: "+marker);
 for(const marker of ["admin-queues","admin-review","MASTER ADMIN","setAppRuntimeEnabled","confirmedDepositsUsdt","completedWithdrawalsCount","telegram-check","telegram-resend","user-status","balance-adjust","toggle-offer","offerForm","settingsForm"]) if(!adminJs.includes(marker)) throw new Error("Admin workflow marker missing: "+marker);
 for(const marker of ["exchangeCodeForSession","setSession","AegisAuthRedirect"]) if(!redirectJs.includes(marker)) throw new Error("Auth callback handler missing: "+marker);
+const updater=fs.readFileSync("app-update.js","utf8");
+for(const marker of ["app-version.json","startApkUpdate","clientApkUrl","adminApkUrl"]) if(!updater.includes(marker)) throw new Error("Automatic updater marker missing: "+marker);
 const ai=fs.readFileSync("supabase/functions/ai-support/index.ts","utf8");
 for(const marker of ["AI_REVIEW_ENDPOINT","AI_REVIEW_API_KEY","AI_REVIEW_MODEL","Never approve, reject, initiate, or recommend a financial transaction"]) if(!ai.includes(marker)) throw new Error("Secure AI support guard missing: "+marker);
 for(const endpoint of ["/api/v1/health","/api/v1/liquidity/metrics","/api/v1/liquidity/audit","/api/v1/ai-assistant/recommendation","/api/v1/ai-assistant/chat","/api/v1/withdraw/request","/api/v1/withdraw/requests","/api/v1/admin/approve"]) if(!fs.readFileSync("backend/server.js","utf8").includes(endpoint)) throw new Error("Required API missing: "+endpoint);
@@ -50,5 +52,8 @@ if(!authManifest.includes('android:scheme="@string/auth_scheme"')) throw new Err
 for(const marker of ["auth_scheme","com.aegispay.app.client","com.aegispay.app.admin","assembleClientDebug","assembleAdminDebug"]) if(!(authGradle.includes(marker)||fs.readFileSync(".github/workflows/android-apk.yml","utf8").includes(marker))) throw new Error("Android portal flavor configuration missing: "+marker);
 const redirectService=fs.readFileSync("supabase-service.js","utf8");
 for(const marker of ["https://aegispay-pro.netlify.app/app/auth/callback","com.aegispay.app.client://auth/callback","emailRedirectTo","redirectTo"]) if(!redirectService.includes(marker)) throw new Error("Production auth redirect configuration missing: "+marker);
+const website=fs.readFileSync("site/index.html","utf8");
+for(const marker of ["SINCE 2023","downloads/aegispay-client.apk","/app/","Remote-first updates"]) if(!website.includes(marker)) throw new Error("Premium website marker missing: "+marker);
+if(!fs.existsSync("netlify.toml")) throw new Error("Netlify configuration missing");
 console.log("AegisPay repository validation: PASS");
 
