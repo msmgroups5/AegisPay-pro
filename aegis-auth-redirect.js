@@ -43,7 +43,7 @@ async function handle(rawUrl){
 
   if(isWebProtocol()){
     try{
-      window.history.replaceState({},document.title,'/');
+      window.history.replaceState({},document.title,'/app/');
     }catch(e){}
   }
 
@@ -59,7 +59,7 @@ async function handle(rawUrl){
 function shouldHandleCurrentPage(){
   if(!isWebProtocol())return false;
   var url=parseUrl(window.location.href);
-  if(url.pathname==='/auth/callback')return true;
+  if(url.pathname==='/auth/callback'||url.pathname==='/app/auth/callback')return true;
   return url.searchParams.has('code')||
     url.searchParams.has('access_token')||
     url.hash.indexOf('access_token=')>=0;
