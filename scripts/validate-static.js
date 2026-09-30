@@ -1,5 +1,5 @@
 const fs=require("node:fs");
-const required=["index.html","styles.css","app.js","README.md","backend/server.js","backend/data.json","database/schema.sql",".github/workflows/pages.yml",".github/workflows/ci.yml","netlify.toml","package.json","scripts/smoke-api.js"];
+const required=["index.html","styles.css","app.js","aegis-auth-redirect.js","_redirects","README.md","backend/server.js","backend/data.json","database/schema.sql",".github/workflows/pages.yml",".github/workflows/ci.yml","netlify.toml","package.json","scripts/smoke-api.js"];
 for(const f of required) if(!fs.existsSync(f)) throw new Error("Missing required file: "+f);
 const html=fs.readFileSync("index.html","utf8");
 const js=fs.readFileSync("app.js","utf8");
