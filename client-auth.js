@@ -344,7 +344,21 @@ async function action(e){
  }
 }
 root.addEventListener('submit',function(e){
- if(e.target.id==='aiForm'){e.preventDefault();var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply');if(aiReply)aiReply.textContent=aiAnswer(aiInput&&aiInput.value);if(aiInput)aiInput.value='';return;}
+ if(e.target.id==='aiForm'){
+  e.preventDefault();
+  var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
+  if(!question)return;
+  if(aiReply)aiReply.textContent='Thinking…';
+  try{
+    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
+    if(aiResult.error)throw aiResult.error;
+    if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
+  }catch(err){
+    if(aiReply)aiReply.textContent=aiAnswer(question);
+  }
+  if(aiInput)aiInput.value='';
+  return;
+ }
  if(e.target.id==='loginForm')handleLogin(e);
  else if(e.target.id==='signupForm')handleSignup(e);
  else if(e.target.id==='resetForm')handleReset(e);
