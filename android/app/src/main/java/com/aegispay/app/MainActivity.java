@@ -3,12 +3,19 @@ package com.aegispay.app;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -27,6 +34,10 @@ import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
 import com.journeyapps.barcodescanner.CaptureActivity;
+
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.util.Locale;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -36,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
     private ValueCallback<Uri[]> pendingFileSelection;
     private String pendingAuthRedirect;
     private boolean webReady;
+    private boolean localFallbackLoaded;
+    private long activeUpdateDownloadId = -1L;
+    private String activeUpdateSha256 = "";
+    private Uri pendingInstallUri;
+    private BroadcastReceiver updateDownloadReceiver;
+    private static final int UNKNOWN_SOURCE_REQUEST = 9842;
+    private static final String REMOTE_APP_BASE = "https://aegispay-pro.netlify.app/app/";
+    private static final String UPDATE_HOST = "aegispay-pro.netlify.app";
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
@@ -57,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webview);
         configureWebView(webView);
         webView.addJavascriptInterface(new AegisBridge(), "AegisNative");
-        webView.loadUrl("https://appassets.androidplatform.net/assets/aegispay/" + getString(R.string.entry_html));
+        loadPortal();
         handleIncomingIntent(getIntent());
     }
 
@@ -84,6 +103,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public android.webkit.WebResourceResponse shouldInterceptRequest(WebView v, String url) {
                 return assetLoader.shouldInterceptRequest(Uri.parse(url));
+            }
+
+            @Override
+            public void onReceivedError(WebView v, int errorCode, String description, String failingUrl) {
+                if (!localFallbackLoaded && failingUrl != null && failingUrl.startsWith(REMOTE_APP_BASE)) {
+                    loadLocalPortal();
+                }
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView v, android.webkit.WebResourceRequest request, android.webkit.WebResourceResponse errorResponse) {
+                if (request != null && request.isForMainFrame() && !localFallbackLoaded && request.getUrl().toString().startsWith(REMOTE_APP_BASE)) {
+                    loadLocalPortal();
+                }
             }
 
             @Override
