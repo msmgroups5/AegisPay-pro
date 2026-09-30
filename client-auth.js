@@ -343,7 +343,7 @@ async function action(e){
   catch(err){setMessage(authError(err));}finally{busy=false;render();}
  }
 }
-root.addEventListener('submit',function(e){
+root.addEventListener('submit',async function(e){
  if(e.target.id==='aiForm'){
   e.preventDefault();
   var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
