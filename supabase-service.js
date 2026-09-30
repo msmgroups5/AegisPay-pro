@@ -14,6 +14,13 @@ window.AegisSupabaseService={
  isAvailable:function(){return !!(this.client()&&this.client().auth);},
  authRedirectUri:authRedirectUri,
 
+ async currentUser(){
+  var c=this.client();
+  if(!c)throw new Error('Supabase client unavailable');
+  var result=await c.auth.getUser();
+  if(result.error)throw result.error;
+  return result.data&&result.data.user||null;
+ },
  async session(){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
