@@ -18,7 +18,7 @@ CREATE POLICY vip_tiers_master_all ON public.vip_tiers FOR ALL USING (public.cur
 -- Server-side cycle creation is attached to verified deposits.
 CREATE OR REPLACE FUNCTION public.create_cycle_for_verified_deposit()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
-DECLARE u public.users; t public.vip_tiers; c public.cycle_runs; o RECORD;
+DECLARE u public.users; t public.vip_tiers; c public.cycle_runs; offer_row RECORD;
   offer_count integer:=0; offer_index integer:=0; task_value numeric(18,2); task_reward numeric(18,2);
   remaining_value numeric(18,2); remaining_reward numeric(18,2); cycle_base numeric(18,2);
 BEGIN
@@ -31,17 +31,17 @@ BEGIN
  cycle_base:=ROUND(GREATEST(0,COALESCE(NEW.gross_amount,0)-COALESCE(NEW.deposit_fee,0)),2);
  SELECT COUNT(*) INTO offer_count FROM public.shop_offers o
    JOIN public.vip_tiers vt ON vt.id=o.tier_min_id
-   WHERE o.status='ACTIVE' AND vt.enabled=true AND vt.display_order<=t.display_order;
+   WHERE so.status='ACTIVE' AND vt.enabled=true AND vt.display_order<=t.display_order;
 
  INSERT INTO public.cycle_runs(user_id,tier_id,cycle_base,status,profit_amount,source_deposit_id)
  VALUES(u.id,t.id,cycle_base,'TASKS_OPEN',ROUND(COALESCE(t.initial_profit,0),2),NEW.id) RETURNING * INTO c;
 
  remaining_value:=cycle_base; remaining_reward:=ROUND(COALESCE(t.initial_profit,0),2);
  IF offer_count>0 THEN
-  FOR o IN SELECT o.id,o.title,o.subtitle,o.task_level,o.instructions,vt.display_order
-    FROM public.shop_offers o JOIN public.vip_tiers vt ON vt.id=o.tier_min_id
-    WHERE o.status='ACTIVE' AND vt.enabled=true AND vt.display_order<=t.display_order
-    ORDER BY vt.display_order,o.created_at,o.id
+  FOR offer_row IN SELECT so.id,so.title,so.subtitle,so.task_level,so.instructions,vt.display_order
+    FROM public.shop_offers so JOIN public.vip_tiers vt ON vt.id=so.tier_min_id
+    WHERE so.status='ACTIVE' AND vt.enabled=true AND vt.display_order<=t.display_order
+    ORDER BY vt.display_order,so.created_at,so.id
   LOOP
    offer_index:=offer_index+1;
    IF offer_index=offer_count THEN
@@ -53,7 +53,7 @@ BEGIN
    END IF;
    INSERT INTO public.tasks(user_id,cycle_id,title,description,task_level,status,progress,reward,start_date,due_date,offer_id,task_value)
    VALUES(u.id,c.id,o.title,COALESCE(o.subtitle,o.instructions,'Complete the assigned Shop task.'),
-     COALESCE(o.task_level,'CLIENT'),'Pending',0,task_reward,CURRENT_DATE,CURRENT_DATE+1,o.id::text,task_value);
+     COALESCE(offer_row.task_level,'CLIENT'),'Pending',0,task_reward,CURRENT_DATE,CURRENT_DATE+1,offer_row.id::text,task_value);
   END LOOP;
  END IF;
 
