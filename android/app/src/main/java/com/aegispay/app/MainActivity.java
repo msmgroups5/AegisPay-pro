@@ -31,6 +31,8 @@ import com.google.zxing.integration.android.IntentResult;
 public class MainActivity extends AppCompatActivity {
     private static final int LOCATION_REQUEST = 701;
     private WebView webView;
+    private String pendingAuthRedirect;
+    private boolean webReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         configureWebView(webView);
         webView.addJavascriptInterface(new AegisBridge(), "AegisNative");
         webView.loadUrl("https://appassets.androidplatform.net/assets/aegispay/index.html");
+        handleIncomingIntent(getIntent());
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -67,8 +70,39 @@ public class MainActivity extends AppCompatActivity {
             public android.webkit.WebResourceResponse shouldInterceptRequest(WebView v, String url) {
                 return assetLoader.shouldInterceptRequest(Uri.parse(url));
             }
+
+            @Override
+            public void onPageFinished(WebView v, String url) {
+                super.onPageFinished(v, url);
+                webReady = true;
+                dispatchPendingAuthRedirect();
+            }
         });
         view.setWebChromeClient(new WebChromeClient());
+    }
+
+    private void handleIncomingIntent(Intent intent) {
+        if (intent == null) return;
+        Uri data = intent.getData();
+        if (data == null) return;
+        if (!"com.aegispay.app".equalsIgnoreCase(data.getScheme())) return;
+        pendingAuthRedirect = data.toString();
+        dispatchPendingAuthRedirect();
+    }
+
+    private void dispatchPendingAuthRedirect() {
+        if (!webReady || webView == null || pendingAuthRedirect == null) return;
+        String redirect = pendingAuthRedirect;
+        pendingAuthRedirect = null;
+        String quoted = JSONObjectEscape.quote(redirect);
+        callJs("(window.AegisAuthRedirect && window.AegisAuthRedirect.handle) ? window.AegisAuthRedirect.handle(" + quoted + ").catch(function(e){ try { if (window.AegisNative) window.AegisNative.showMessage(e.message || 'Authentication callback failed'); } catch (_) {} }) : null");
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIncomingIntent(intent);
     }
 
     private void callJs(String expression) {
