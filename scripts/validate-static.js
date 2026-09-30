@@ -47,7 +47,8 @@ for(const marker of ["AI_REVIEW_ENDPOINT","AI_REVIEW_API_KEY","AI_REVIEW_MODEL",
 for(const endpoint of ["/api/v1/health","/api/v1/liquidity/metrics","/api/v1/liquidity/audit","/api/v1/ai-assistant/recommendation","/api/v1/ai-assistant/chat","/api/v1/withdraw/request","/api/v1/withdraw/requests","/api/v1/admin/approve"]) if(!fs.readFileSync("backend/server.js","utf8").includes(endpoint)) throw new Error("Required API missing: "+endpoint);
 if(!sql.includes("CREATE EXTENSION IF NOT EXISTS pgcrypto")) throw new Error("pgcrypto extension missing");
 const nativeMain=fs.readFileSync("android/app/src/main/java/com/aegispay/app/MainActivity.java","utf8");
-for(const marker of ["REMOTE_APP_BASE","startApkDownload","REQUEST_INSTALL_PACKAGES","setDestinationInExternalFilesDir","appVersionCode","appVersionName"]) if(!nativeMain.includes(marker)) throw new Error("Native update/remote shell marker missing: "+marker);
+for(const marker of ["REMOTE_APP_BASE","startApkDownload","setDestinationInExternalFilesDir","appVersionCode","appVersionName"]) if(!nativeMain.includes(marker)) throw new Error("Native update/remote shell marker missing: "+marker);
+if(!authManifest.includes("android.permission.REQUEST_INSTALL_PACKAGES")) throw new Error("APK update permission missing");
 const authManifest=fs.readFileSync("android/app/src/main/AndroidManifest.xml","utf8");
 const authGradle=fs.readFileSync("android/app/build.gradle","utf8");
 if(!authManifest.includes('android:scheme="@string/auth_scheme"')) throw new Error("Android auth scheme binding missing");
