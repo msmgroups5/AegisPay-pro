@@ -46,6 +46,8 @@ const ai=fs.readFileSync("supabase/functions/ai-support/index.ts","utf8");
 for(const marker of ["AI_REVIEW_ENDPOINT","AI_REVIEW_API_KEY","AI_REVIEW_MODEL","Never approve, reject, initiate, or recommend a financial transaction"]) if(!ai.includes(marker)) throw new Error("Secure AI support guard missing: "+marker);
 for(const endpoint of ["/api/v1/health","/api/v1/liquidity/metrics","/api/v1/liquidity/audit","/api/v1/ai-assistant/recommendation","/api/v1/ai-assistant/chat","/api/v1/withdraw/request","/api/v1/withdraw/requests","/api/v1/admin/approve"]) if(!fs.readFileSync("backend/server.js","utf8").includes(endpoint)) throw new Error("Required API missing: "+endpoint);
 if(!sql.includes("CREATE EXTENSION IF NOT EXISTS pgcrypto")) throw new Error("pgcrypto extension missing");
+const nativeMain=fs.readFileSync("android/app/src/main/java/com/aegispay/app/MainActivity.java","utf8");
+for(const marker of ["REMOTE_APP_BASE","startApkDownload","REQUEST_INSTALL_PACKAGES","setDestinationInExternalFilesDir","appVersionCode","appVersionName"]) if(!nativeMain.includes(marker)) throw new Error("Native update/remote shell marker missing: "+marker);
 const authManifest=fs.readFileSync("android/app/src/main/AndroidManifest.xml","utf8");
 const authGradle=fs.readFileSync("android/app/build.gradle","utf8");
 if(!authManifest.includes('android:scheme="@string/auth_scheme"')) throw new Error("Android auth scheme binding missing");
@@ -53,6 +55,7 @@ for(const marker of ["auth_scheme","com.aegispay.app.client","com.aegispay.app.a
 const redirectService=fs.readFileSync("supabase-service.js","utf8");
 for(const marker of ["https://aegispay-pro.netlify.app/app/auth/callback","com.aegispay.app.client://auth/callback","emailRedirectTo","redirectTo"]) if(!redirectService.includes(marker)) throw new Error("Production auth redirect configuration missing: "+marker);
 const website=fs.readFileSync("site/index.html","utf8");
+if(website.includes("downloads/aegispay-admin.apk")) throw new Error("Master Admin APK must not be exposed on public website");
 for(const marker of ["SINCE 2023","downloads/aegispay-client.apk","/app/","Remote-first updates"]) if(!website.includes(marker)) throw new Error("Premium website marker missing: "+marker);
 if(!fs.existsSync("netlify.toml")) throw new Error("Netlify configuration missing");
 console.log("AegisPay repository validation: PASS");
