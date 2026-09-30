@@ -1,5 +1,11 @@
 plugins { id 'com.android.application' }
 
+def releaseKeystorePath = System.getenv('AEGIS_RELEASE_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('AEGIS_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = System.getenv('AEGIS_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('AEGIS_RELEASE_KEY_PASSWORD')
+def hasReleaseSigning = [releaseKeystorePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it }
+
 android {
     namespace 'com.aegispay.app'
     compileSdk 35
@@ -30,9 +36,23 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(releaseKeystorePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
