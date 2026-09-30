@@ -88,7 +88,7 @@ jobs:
           if-no-files-found: error
 
       - name: Deploy production website
-        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' }}
+        if: env.NETLIFY_AUTH_TOKEN != ''
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: npx -y netlify-cli deploy --dir=site --prod --site-id="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay main $GITHUB_SHA"
