@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 var root=document.getElementById('app'),service=window.AegisSupabaseService;
-var state={profile:null,queues:{deposits:[],kyc:[],withdrawals:[],stats:{}},users:[],offers:[],tiers:[],tasks:[],settings:{},error:'',tab:'overview',busy:false,enabled:true,telegram:null};
+var state={profile:null,queues:{deposits:[],kyc:[],withdrawals:[],stats:{}},users:[],offers:[],tiers:[],tasks:[],referrals:[],audit:[],settings:{},error:'',tab:'overview',busy:false,enabled:true,telegram:null};
 var pollTimer=null;
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function date(v){try{return new Date(v).toLocaleString();}catch(e){return v||'';}}
@@ -100,6 +100,18 @@ function renderShop(){
  '<h2 style="margin-top:22px">Assigned tasks</h2>'+(tasks||'<div class="tg-empty">No tasks assigned yet.</div>')+
  '<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
 }
+function renderReferrals(){
+ var rows=state.referrals.map(function(x){
+  return '<article style="padding:13px;margin-top:8px;border:1px solid #e5edf3;border-radius:13px;background:#fff"><strong>Level '+esc(x.referral_level||'—')+'</strong><p style="margin:5px 0">Referrer: <code>'+esc(x.user_id)+'</code> · Referred: <code>'+esc(x.referred_user_id)+'</code></p><small>Platform reward: '+Number(x.platform_reward||0).toFixed(2)+' USDT · '+esc(date(x.created_at))+'</small></article>';
+ }).join('');
+ root.innerHTML=shell('<section class="tg-admin-content">'+adminNav()+'<div class="tg-admin-heading"><div><span class="tg-kicker">REFERRAL MANAGEMENT</span><h1>Referral activity</h1><p>View Level 1 / Level 2 referral relationships and recorded platform rewards.</p></div><button class="tg-button-soft" data-action="refresh">Refresh</button></div>'+(rows||'<div class="tg-empty">No referral records found.</div>')+'<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
+}
+function renderAudit(){
+ var rows=state.audit.map(function(x){
+  return '<article style="padding:13px;margin-top:8px;border:1px solid #e5edf3;border-radius:13px;background:#fff"><div style="display:flex;justify-content:space-between;gap:10px"><strong>'+esc(x.event_type||'AUDIT EVENT')+'</strong><small>'+esc(date(x.created_at))+'</small></div><p style="margin:5px 0">'+esc(x.description||'')+'</p><small>Actor: <code>'+esc(x.actor_user_id||'system')+'</code> · Target: <code>'+esc(x.target_user_id||'—')+'</code> · Ref: <code>'+esc(x.reference_id||'—')+'</code></small></article>';
+ }).join('');
+ root.innerHTML=shell('<section class="tg-admin-content">'+adminNav()+'<div class="tg-admin-heading"><div><span class="tg-kicker">AUDIT LOG</span><h1>Security & operations history</h1><p>Recent administrative and workflow audit events from Supabase.</p></div><button class="tg-button-soft" data-action="refresh">Refresh</button></div>'+(rows||'<div class="tg-empty">No audit events found.</div>')+'<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
+}
 function renderSettings(){
  var s=state.settings||{},dr=s.deposit_rules||{},cr=s.cycle_rules||{},rr=s.referral_rules||{},sm=s.system_mode||{};
  root.innerHTML=shell('<section class="tg-admin-content">'+adminNav()+'<div class="tg-admin-heading"><div><span class="tg-kicker">PLATFORM SETTINGS</span><h1>Rules & runtime</h1><p>These changes affect future client workflows.</p></div></div>'+
@@ -108,20 +120,24 @@ function renderSettings(){
 }
 async function loadOperations(){
  var c=service.client();
- var [users,offers,tiers,tasks,settings]=await Promise.all([
+ var [users,offers,tiers,tasks,settings,referrals,audit]=await Promise.all([
    c.from('users').select('id,name,email,role,status,current_platform_balance,principal_balance,profit_balance,destination_address,created_at').order('created_at',{ascending:false}).limit(200),
    c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,reward_text,status,instructions,created_at,updated_at').order('created_at',{ascending:false}),
    c.from('vip_tiers').select('id,name,deposit_amount,initial_profit,enabled,display_order,color_key').order('display_order'),
    c.from('tasks').select('id,user_id,cycle_id,title,status,progress,reward,task_value,offer_id,start_date,due_date,completion_date').order('start_date',{ascending:false}).limit(200),
-   c.from('platform_settings').select('key,value_json')
+   c.from('platform_settings').select('key,value_json'),
+   c.from('referrals').select('id,user_id,referred_user_id,referral_level,platform_reward,created_at').order('created_at',{ascending:false}).limit(300),
+   c.from('audit_events').select('id,actor_user_id,target_user_id,event_type,description,reference_id,created_at').order('created_at',{ascending:false}).limit(300)
  ]);
- state.users=users.data||[];state.offers=offers.data||[];state.tiers=tiers.data||[];state.tasks=tasks.data||[];
+ state.users=users.data||[];state.offers=offers.data||[];state.tiers=tiers.data||[];state.tasks=tasks.data||[];state.referrals=referrals.data||[];state.audit=audit.data||[];
  state.settings={};(settings.data||[]).forEach(function(x){state.settings[x.key]=x.value_json||{};});
  if(users.error)throw users.error;
  if(offers.error)throw offers.error;
  if(tiers.error)throw tiers.error;
  if(tasks.error)throw tasks.error;
  if(settings.error)throw settings.error;
+ if(referrals.error)throw referrals.error;
+ if(audit.error)throw audit.error;
 }
 async function changeUserStatus(el){
  var id=el.getAttribute('data-id'),status=el.getAttribute('data-status');
@@ -167,7 +183,7 @@ async function saveSettings(e){
  }catch(err){state.error=err.message||'Settings save failed.';}finally{state.busy=false;render();}
 }
 
-function render(){if(!state.profile)return renderLogin();if(state.tab==='overview')return renderOverview();if(state.tab==='users')return renderUsers();if(state.tab==='shop')return renderShop();if(state.tab==='settings')return renderSettings();if(state.tab==='deposits'||state.tab==='kyc'||state.tab==='withdrawals')return renderQueues();if(state.tab==='telegram'){state.tab='withdrawals';return renderQueues();}return renderOverview();}
+function render(){if(!state.profile)return renderLogin();if(state.tab==='overview')return renderOverview();if(state.tab==='users')return renderUsers();if(state.tab==='shop')return renderShop();if(state.tab==='settings')return renderSettings();if(state.tab==='referrals')return renderReferrals();if(state.tab==='audit')return renderAudit();if(state.tab==='deposits'||state.tab==='kyc'||state.tab==='withdrawals')return renderQueues();if(state.tab==='telegram'){state.tab='withdrawals';return renderQueues();}return renderOverview();}
 async function login(e){
  e.preventDefault();var email=document.getElementById('adminEmail').value,password=document.getElementById('adminPassword').value;
  state.busy=true;state.error='';render();
