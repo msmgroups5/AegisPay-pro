@@ -6,7 +6,7 @@ var pollTimer=null;
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function date(v){try{return new Date(v).toLocaleString();}catch(e){return v||'';}}
 function shell(body){
- return '<main class="tg-admin-page"><section class="tg-admin-card"><header class="tg-admin-topbar"><div class="tg-admin-brand"><img src="./aegispay-logo.svg" width="42" height="42" alt=""><span><b>AegisPay <em>Master Admin</em></b><small>PROTECTED OPERATIONS</small></span></div>'+(state.profile?'<span class="tg-admin-session">Secure session active</span>':'')+'</header>'+
+ return '<main class="tg-admin-page"><section class="tg-admin-card"><header class="tg-admin-topbar"><div class="tg-admin-brand"><img src="./aegispay-logo.svg" width="42" height="42" alt=""><span><b>AegisPay <em>Master Admin</em></b><small>SINCE 2023 — 2026 · PROTECTED OPERATIONS</small></span></div>'+(state.profile?'<span class="tg-admin-session">Secure session active</span>':'')+'</header>'+
  (state.error?'<div class="tg-admin-content"><div role="alert">'+esc(state.error)+'</div></div>':'')+body+'<footer class="tg-footer">AegisPay · Master Admin</footer></section></main>';
 }
 function renderLogin(){
