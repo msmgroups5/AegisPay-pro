@@ -11,6 +11,11 @@ permissions:
 jobs:
   build-and-export:
     runs-on: ubuntu-latest
+    env:
+      AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
+      AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
+      AEGIS_RELEASE_KEY_ALIAS: ${{ secrets.AEGIS_RELEASE_KEY_ALIAS }}
+      AEGIS_RELEASE_KEY_PASSWORD: ${{ secrets.AEGIS_RELEASE_KEY_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,8 +28,18 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Configure release signing
+        if: env.AEGIS_RELEASE_KEYSTORE_B64 != '' && env.AEGIS_RELEASE_STORE_PASSWORD != '' && env.AEGIS_RELEASE_KEY_ALIAS != '' && env.AEGIS_RELEASE_KEY_PASSWORD != ''
+        run: |
+          echo "$AEGIS_RELEASE_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/aegispay-release.jks"
+          echo "AEGIS_RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/aegispay-release.jks" >> "$GITHUB_ENV"
       - name: Build client and Master Admin APKs
-        run: gradle -p android :app:assembleClientDebug :app:assembleAdminDebug --no-daemon
+        run: |
+          if [ -n "${AEGIS_RELEASE_KEYSTORE_PATH:-}" ]; then
+            gradle -p android :app:assembleClientRelease :app:assembleAdminRelease --no-daemon
+          else
+            gradle -p android :app:assembleClientDebug :app:assembleAdminDebug --no-daemon
+          fi
       - name: Upload installable APKs
         uses: actions/upload-artifact@v4
         with:
@@ -32,5 +47,7 @@ jobs:
           path: |
             android/app/build/outputs/apk/client/debug/app-client-debug.apk
             android/app/build/outputs/apk/admin/debug/app-admin-debug.apk
+            android/app/build/outputs/apk/client/release/app-client-release.apk
+            android/app/build/outputs/apk/admin/release/app-admin-release.apk
           if-no-files-found: error
 
