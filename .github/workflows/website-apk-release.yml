@@ -29,8 +29,21 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Configure release signing
+        if: env.AEGIS_RELEASE_KEYSTORE_B64 != '' && env.AEGIS_RELEASE_STORE_PASSWORD != '' && env.AEGIS_RELEASE_KEY_ALIAS != '' && env.AEGIS_RELEASE_KEY_PASSWORD != ''
+        run: |
+          echo "$AEGIS_RELEASE_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/aegispay-release.jks"
+          echo "AEGIS_RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/aegispay-release.jks" >> "$GITHUB_ENV"
+
       - name: Build Client and Master Admin APKs
-        run: gradle -p android :app:assembleClientDebug :app:assembleAdminDebug --no-daemon
+        run: |
+          if [ -n "${AEGIS_RELEASE_KEYSTORE_PATH:-}" ]; then
+            gradle -p android :app:assembleClientRelease :app:assembleAdminRelease --no-daemon
+            echo "AEGIS_BUILD_TYPE=release" >> "$GITHUB_ENV"
+          else
+            gradle -p android :app:assembleClientDebug :app:assembleAdminDebug --no-daemon
+            echo "AEGIS_BUILD_TYPE=debug" >> "$GITHUB_ENV"
+          fi
 
       - name: Assemble website package
         shell: bash
@@ -53,7 +66,7 @@ jobs:
           {
             "versionCode": ${VERSION_CODE},
             "versionName": "${VERSION_NAME}",
-            "releaseChannel": "stable",
+            "releaseChannel": "${AEGIS_BUILD_TYPE}",
             "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
             "adminApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-admin.apk",
