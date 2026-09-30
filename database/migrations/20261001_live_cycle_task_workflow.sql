@@ -97,3 +97,17 @@ END $$;
 
 REVOKE ALL ON FUNCTION public.complete_task(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.complete_task(uuid) TO authenticated;
+
+-- Expose only the runtime flag to the anonymous/authenticated client and keep all other platform settings private.
+DROP POLICY IF EXISTS settings_runtime_read ON public.platform_settings;
+CREATE POLICY settings_runtime_read ON public.platform_settings
+  FOR SELECT TO anon,authenticated
+  USING (key='app_runtime');
+INSERT INTO public.platform_settings(key,value_json,updated_at)
+VALUES('app_runtime','{"enabled":true}'::jsonb,now())
+ON CONFLICT(key) DO UPDATE SET value_json=EXCLUDED.value_json,updated_at=now();
+CREATE OR REPLACE FUNCTION public.app_runtime_enabled()
+RETURNS boolean LANGUAGE sql STABLE SECURITY INVOKER SET search_path=public AS $$
+  SELECT COALESCE((SELECT (value_json ->> 'enabled')::BOOLEAN FROM public.platform_settings WHERE key='app_runtime'),TRUE);
+$$;
+GRANT EXECUTE ON FUNCTION public.app_runtime_enabled() TO anon,authenticated;
