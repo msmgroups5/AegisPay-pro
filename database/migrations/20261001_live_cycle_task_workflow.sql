@@ -7,13 +7,11 @@ CREATE INDEX IF NOT EXISTS tasks_cycle_idx ON public.tasks(cycle_id,start_date D
 DROP POLICY IF EXISTS tasks_user_update ON public.tasks;
 DROP POLICY IF EXISTS tasks_master_update ON public.tasks;
 DROP POLICY IF EXISTS tasks_master_all ON public.tasks;
-CREATE POLICY tasks_master_all ON public.tasks FOR ALL USING (public.current_app_role()='MASTER ADMIN') WITH CHECK (public.current_app_role()='MASTER ADMIN');
-
-DROP POLICY IF EXISTS shop_offers_master_all ON public.shop_offers;
-CREATE POLICY shop_offers_master_all ON public.shop_offers FOR ALL USING (public.current_app_role()='MASTER ADMIN') WITH CHECK (public.current_app_role()='MASTER ADMIN');
+CREATE POLICY shop_offers_master_insert ON public.shop_offers FOR INSERT WITH CHECK (public.current_app_role()='MASTER ADMIN');
+CREATE POLICY shop_offers_master_update ON public.shop_offers FOR UPDATE USING (public.current_app_role()='MASTER ADMIN') WITH CHECK (public.current_app_role()='MASTER ADMIN');
+CREATE POLICY shop_offers_master_delete ON public.shop_offers FOR DELETE USING (public.current_app_role()='MASTER ADMIN');
 
 DROP POLICY IF EXISTS vip_tiers_master_all ON public.vip_tiers;
-CREATE POLICY vip_tiers_master_all ON public.vip_tiers FOR ALL USING (public.current_app_role()='MASTER ADMIN') WITH CHECK (public.current_app_role()='MASTER ADMIN');
 
 -- Server-side cycle creation is attached to verified deposits.
 CREATE OR REPLACE FUNCTION public.create_cycle_for_verified_deposit()
@@ -71,6 +69,7 @@ DROP TRIGGER IF EXISTS trg_create_cycle_for_verified_deposit ON public.deposit_s
 CREATE TRIGGER trg_create_cycle_for_verified_deposit
 AFTER UPDATE OF status ON public.deposit_submissions
 FOR EACH ROW EXECUTE FUNCTION public.create_cycle_for_verified_deposit();
+REVOKE ALL ON FUNCTION public.create_cycle_for_verified_deposit() FROM PUBLIC, anon, authenticated;
 
 CREATE OR REPLACE FUNCTION public.complete_task(p_task_id uuid)
 RETURNS public.cycle_runs LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
