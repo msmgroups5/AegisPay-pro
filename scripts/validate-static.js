@@ -55,6 +55,8 @@ if(!authManifest.includes('android:scheme="@string/auth_scheme"')) throw new Err
 for(const marker of ["auth_scheme","com.aegispay.app.client","com.aegispay.app.admin","assembleClientDebug","assembleAdminDebug"]) if(!(authGradle.includes(marker)||fs.readFileSync(".github/workflows/android-apk.yml","utf8").includes(marker))) throw new Error("Android portal flavor configuration missing: "+marker);
 const redirectService=fs.readFileSync("supabase-service.js","utf8");
 for(const marker of ["https://aegispay-pro.netlify.app/app/auth/callback","com.aegispay.app.client://auth/callback","emailRedirectTo","redirectTo"]) if(!redirectService.includes(marker)) throw new Error("Production auth redirect configuration missing: "+marker);
+const settingsRls=fs.readFileSync("database/migrations/20261001_consolidate_platform_settings_rls.sql","utf8");
+for(const marker of ["settings_runtime_read_anon","settings_authenticated_read","settings_master_write"]) if(!settingsRls.includes(marker)) throw new Error("Platform settings RLS hardening missing: "+marker);
 const website=fs.readFileSync("site/index.html","utf8");
 if(website.includes("downloads/aegispay-admin.apk")) throw new Error("Master Admin APK must not be exposed on public website");
 for(const marker of ["SINCE 2023","downloads/aegispay-client.apk","/app/","Remote-first updates"]) if(!website.includes(marker)) throw new Error("Premium website marker missing: "+marker);
