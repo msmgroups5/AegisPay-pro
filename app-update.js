@@ -46,14 +46,19 @@ function check(){
      var sha=isAdmin()?m.adminSha256:m.clientSha256;
      if(!url)return;
      var name=String(m.versionName||('v'+remote));
-     setBanner('<div style="display:flex;gap:10px;align-items:center"><div style="flex:1"><div style="font-size:11px;opacity:.8">AegisPay update available</div><div style="font-size:16px;margin-top:2px">'+name+'</div><div style="font-size:10px;opacity:.8;margin-top:2px">Current '+currentName()+' → latest '+name+'</div></div><button id="aegisUpdateBtn" style="border:0;border-radius:12px;padding:10px 13px;background:#fff;color:#165ec5;font-weight:900">Update</button></div>');
-     var btn=document.getElementById('aegisUpdateBtn');
-     if(btn)btn.onclick=function(){
-       if(downloaded)return;
-       downloaded=true;btn.disabled=true;btn.textContent='Downloading…';
-       try{window.AegisNative.startApkUpdate(new URL(url,location.origin).href,name,String(sha||''));}
-       catch(e){downloaded=false;btn.disabled=false;btn.textContent='Update';}
-     };
+     setBanner('<div style="display:flex;gap:10px;align-items:center"><div style="flex:1"><div style="font-size:11px;opacity:.8">AegisPay update available</div><div style="font-size:16px;margin-top:2px">'+name+'</div><div style="font-size:10px;opacity:.8;margin-top:2px">Current '+currentName()+' → latest '+name+'</div></div><div id="aegisUpdateState" style="font-size:11px;font-weight:900">Starting…</div></div>');
+     if(!downloaded){
+       downloaded=true;
+       var state=document.getElementById('aegisUpdateState');
+       if(state)state.textContent='Downloading…';
+       try{
+         window.AegisNative.startApkUpdate(new URL(url,location.origin).href,name,String(sha||''));
+         if(state)setTimeout(function(){state.textContent='Download in progress';},1200);
+       }catch(e){
+         downloaded=false;
+         if(state)state.textContent='Tap app restart to retry';
+       }
+     }
    })
    .catch(function(){})
    .finally(function(){checking=false;});
