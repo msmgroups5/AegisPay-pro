@@ -4,9 +4,11 @@ import { TronWeb } from "npm:tronweb@6.0.4";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-const PAYOUT_KEY = Deno.env.get("TRON_PAYOUT_PRIVATE_KEY");
+const MAINNET_PAYOUT_KEY = Deno.env.get("TRON_PAYOUT_PRIVATE_KEY");
+const TESTNET_PAYOUT_KEY = Deno.env.get("TRON_TESTNET_PAYOUT_PRIVATE_KEY");
 const TRONGRID_KEY = Deno.env.get("TRONGRID_API_KEY");
-const USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+const MAINNET_USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+const SHASTA_USDT = "TG3XXyExBkPp9nzdajDZsozEu4BkaSJozs";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -39,16 +41,15 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
-  let admin: ReturnType<typeof createClient> | null = null;
-  let withdrawalId: string | null = null;
-  let payoutMayHaveBeenBroadcast = false;
+let admin: ReturnType<typeof createClient> | null = null;
+let withdrawalId: string | null = null;
+let claimedWithdrawal: any = null;
+let payoutMayHaveBeenBroadcast = false;
 
   try {
     if (!SUPABASE_URL || !SERVICE_KEY) {
       return json({ error: "Payout service is not configured." }, 503);
     }
-    if (!PAYOUT_KEY) return json({ error: "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
-
     const authorization = req.headers.get("Authorization") || "";
     const token = authorization.replace(/^Bearer\s+/i, "");
     if (!token) return json({ error: "Authorization required." }, 401);
@@ -71,6 +72,26 @@ Deno.serve(async (req: Request) => {
     if (!["ACTIVE", "NORMAL"].includes(String(profile.status || "").toUpperCase())) {
       return json({ error: "Active Master Admin access is required." }, 403);
     }
+    const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
+    if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
+    if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
+
+    const { data: modeRow } = await admin.from("platform_settings")
+      .select("value_json").eq("key", "system_mode").maybeSingle();
+    const systemMode = modeRow?.value_json || {};
+    const { data: networkRow } = await admin.from("platform_settings")
+      .select("value_json").eq("key", "deposit_rules").maybeSingle();
+    const network = String(networkRow?.value_json?.network || "").toUpperCase();
+    const testnet = systemMode.mode === "TESTNET_DEMO" && systemMode.testnet_payouts === true && network === "TRON TESTNET";
+    const mainnet = systemMode.mode === "MAINNET" && systemMode.real_payouts === true && network === "TRON MAINNET";
+    if (!testnet && !mainnet) return json({ error: "The selected TRON network is not enabled for payouts." }, 403);
+    const payoutKey = testnet ? TESTNET_PAYOUT_KEY : MAINNET_PAYOUT_KEY;
+    if (!payoutKey) return json({ error: testnet ? "TRON_TESTNET_PAYOUT_PRIVATE_KEY is not configured." : "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
+    const tokenContract = String(networkRow?.value_json?.token_contract || "");
+    if (testnet && tokenContract !== SHASTA_USDT) return json({ error: "The testnet USDT contract does not match the supported Shasta token." }, 403);
+    if (mainnet && tokenContract && tokenContract !== MAINNET_USDT) return json({ error: "The configured token is not the supported TRON mainnet USDT contract." }, 403);
+    const chain = testnet ? "https://api.shasta.trongrid.io" : "https://api.trongrid.io";
+    const usdtContract = testnet ? SHASTA_USDT : MAINNET_USDT;
 
     const body = await req.json().catch(() => null);
     withdrawalId = typeof body?.withdrawalId === "string" ? body.withdrawalId : null;
@@ -88,12 +109,24 @@ Deno.serve(async (req: Request) => {
       })
       .eq("id", withdrawalId)
       .eq("status", "APPROVED")
-      .select("id,user_id,net_amount,destination_address")
+      .eq("panel_decision", "APPROVED")
+      .eq("telegram_decision", "APPROVED")
+      .is("payout_txid", null)
+      .select("id,user_id,net_amount,destination_address,panel_decision,telegram_decision")
       .maybeSingle();
 
     if (claimError) return json({ error: "Unable to lock the approved withdrawal." }, 500);
     if (!withdrawal) {
       return json({ error: "Withdrawal is unavailable or has already been claimed." }, 409);
+    }
+    claimedWithdrawal = withdrawal;
+
+    if (testnet) {
+      const { data: currentMode, error: currentModeError } = await admin.from("platform_settings")
+        .select("value_json").eq("key", "system_mode").maybeSingle();
+      if (currentModeError || currentMode?.value_json?.mode !== "TESTNET_DEMO" || currentMode?.value_json?.testnet_payouts !== true) {
+        throw new Error("Testnet payouts were disabled before the transfer could be broadcast.");
+      }
     }
 
     const amountRaw = usdtUnits(withdrawal.net_amount);
@@ -102,11 +135,18 @@ Deno.serve(async (req: Request) => {
     }
 
     const tron = new TronWeb({
-      fullHost: "https://api.trongrid.io",
+      fullHost: chain,
       headers: TRONGRID_KEY ? { "TRON-PRO-API-KEY": TRONGRID_KEY } : undefined,
-      privateKey: PAYOUT_KEY,
+      privateKey: payoutKey,
     });
-    const contract = await tron.contract().at(USDT);
+    const contract = await tron.contract().at(usdtContract);
+
+    // Recheck immediately before network broadcast. If maintenance began after
+    // the claim, the catch path restores the held balance before returning.
+    const { data: stillEnabled, error: finalRuntimeError } = await admin.rpc("app_runtime_enabled");
+    if (finalRuntimeError || stillEnabled !== true) {
+      throw new Error("AegisPay is paused by Master Admin; payout was not broadcast.");
+    }
 
     // From this point onward a transport error can mean the chain accepted the transfer.
     // Keep the row PROCESSING on any uncertain outcome so it cannot be paid a second time.
@@ -162,18 +202,39 @@ Deno.serve(async (req: Request) => {
           .update({ payout_error: "Payout outcome is unknown; keep PROCESSING until chain reconciliation. " + detail })
           .eq("id", withdrawalId)
           .eq("status", "PROCESSING");
+      } else if (claimedWithdrawal) {
+        const { data: restored, error: restoreError } = await admin.rpc("fail_unbroadcast_withdrawal", {
+          p_request_id: withdrawalId,
+          p_error: "Payout was not broadcast. " + detail,
+        });
+        if (restoreError || restored !== true) {
+          await admin.from("withdrawal_requests")
+            .update({ payout_error: "Payout was not broadcast, but the balance refund needs manual reconciliation. " + detail })
+            .eq("id", withdrawalId)
+            .eq("status", "PROCESSING");
+        }
       } else {
         await admin.from("withdrawal_requests")
-          .update({ status: "FAILED", payout_error: "Payout was not submitted. " + detail })
+          .update({ payout_error: "Payout was not submitted." })
           .eq("id", withdrawalId)
-          .eq("status", "PROCESSING");
+          .eq("status", "APPROVED");
       }
+    }
+    if (detail.includes("AegisPay is paused by Master Admin")) {
+      return json({
+        error: "AegisPay is paused by Master Admin.",
+        balanceRestored: Boolean(claimedWithdrawal && !payoutMayHaveBeenBroadcast),
+      }, 423);
     }
     return json({
       error: payoutMayHaveBeenBroadcast
         ? "Payout outcome is unknown; keep the withdrawal locked for manual reconciliation."
+        : claimedWithdrawal
+        ? "Payout failed before broadcast. The balance was restored or flagged for manual refund reconciliation."
         : "Payout request failed before broadcast.",
+      balanceRestored: Boolean(claimedWithdrawal && !payoutMayHaveBeenBroadcast),
       detail,
-    }, payoutMayHaveBeenBroadcast ? 202 : 502);
+    }, payoutMayHaveBeenBroadcast || claimedWithdrawal ? 202 : 502);
   }
 });
+
