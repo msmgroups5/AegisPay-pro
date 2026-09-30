@@ -29,8 +29,8 @@ BEGIN
  IF EXISTS(SELECT 1 FROM public.cycle_runs WHERE source_deposit_id=NEW.id) THEN RETURN NEW; END IF;
 
  cycle_base:=ROUND(GREATEST(0,COALESCE(NEW.gross_amount,0)-COALESCE(NEW.deposit_fee,0)),2);
- SELECT COUNT(*) INTO offer_count FROM public.shop_offers o
-   JOIN public.vip_tiers vt ON vt.id=o.tier_min_id
+ SELECT COUNT(*) INTO offer_count FROM public.shop_offers so
+   JOIN public.vip_tiers vt ON vt.id=so.tier_min_id
    WHERE so.status='ACTIVE' AND vt.enabled=true AND vt.display_order<=t.display_order;
 
  INSERT INTO public.cycle_runs(user_id,tier_id,cycle_base,status,profit_amount,source_deposit_id)
@@ -52,7 +52,7 @@ BEGIN
      remaining_reward:=ROUND(remaining_reward-task_reward,2);
    END IF;
    INSERT INTO public.tasks(user_id,cycle_id,title,description,task_level,status,progress,reward,start_date,due_date,offer_id,task_value)
-   VALUES(u.id,c.id,o.title,COALESCE(o.subtitle,o.instructions,'Complete the assigned Shop task.'),
+   VALUES(u.id,c.id,offer_row.title,COALESCE(offer_row.subtitle,offer_row.instructions,'Complete the assigned Shop task.'),
      COALESCE(offer_row.task_level,'CLIENT'),'Pending',0,task_reward,CURRENT_DATE,CURRENT_DATE+1,offer_row.id::text,task_value);
   END LOOP;
  END IF;
