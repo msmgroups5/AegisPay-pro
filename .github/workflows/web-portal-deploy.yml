@@ -1,0 +1,56 @@
+name: AegisPay Web Portal Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-web:
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assemble web portal
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf site/app
+          mkdir -p site/app
+          cp index.html master-admin.html styles.css client-auth.js admin-auth.js \
+             supabase-client.js supabase-service.js aegis-auth-redirect.js \
+             app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
+          cat > site/app-version.json <<'EOF'
+          {
+            "versionCode": 21,
+            "versionName": "2.1.0-web",
+            "releaseChannel": "web",
+            "releasedAt": "2026-10-01T00:00:00Z",
+            "notes": [
+              "Remote-first client portal",
+              "Web portal deployment"
+            ]
+          }
+          EOF
+          test -s site/index.html
+          test -s site/app/index.html
+          test -s site/app/master-admin.html
+          test -s site/app-version.json
+
+      - name: Deploy to Netlify
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        run: npx -y netlify-cli deploy --dir=site --prod --site-id="${NETLIFY_SITE_ID}" --auth="${NETLIFY_AUTH_TOKEN}" --message="AegisPay web portal ${GITHUB_SHA}"
+
+      - name: Upload web portal artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-Web-Portal
+          path: site/
+          if-no-files-found: error
