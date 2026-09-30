@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         request.setMimeType("application/vnd.android.package-archive");
         request.setAllowedOverMetered(true);
         request.setAllowedOverRoaming(false);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+        request.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, fileName);
 
         registerUpdateReceiver();
         activeUpdateSha256 = expectedSha256 == null ? "" : expectedSha256.trim().toLowerCase(Locale.US);
