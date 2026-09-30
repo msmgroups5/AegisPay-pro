@@ -13,7 +13,7 @@
 - The service worker caches only same-origin application files, never Supabase/Auth responses.
 - Fixed the 10-second runtime poll so a healthy unchanged status no longer replaces the client DOM or clears an in-progress sign-in/sign-up form. The poll only redraws on a real runtime transition or first status error.
 - The old demo login identities and displayed demo credentials have been removed from the client and admin entry points. All six unlinked live profile rows are now anonymized and marked DELETED; linked withdrawal, referral, task, notification, and audit history remains intact.
-- Fourteen migrations are applied. The newest migration adds atomic two-party withdrawal approval (Master Admin panel plus allowlisted Telegram user), secure dashboard aggregates, and an explicit testnet-only payout flag. A withdrawal stays reserved until both approvals; a rejection releases the reservation. Only `PAID` records count as completed payouts.
+- Fifteen migrations are applied. The dual-approval migration adds atomic two-party withdrawal approval (Master Admin panel plus allowlisted Telegram user), secure dashboard aggregates, and an explicit testnet-only payout flag. A withdrawal stays reserved until both approvals; a rejection releases the reservation. A transaction ID blocks Telegram changes until payout reconciliation. Only `PAID` records count as completed payouts.
 - All eight Edge Functions are ACTIVE. `admin-queues`, `admin-review`, `execute-payout`, and `telegram-withdrawal` are on the new versions; the Telegram webhook has platform JWT checks disabled only for its callback route, which instead validates a token-derived Telegram webhook secret, configured chat, stored message ID, allowlisted numeric approver ID, and runtime switch. Other Telegram actions still require a valid Supabase JWT and role.
 - The live Supabase mode is `TESTNET_DEMO`, mainnet payouts remain disabled, and Shasta testnet payouts require a separate `TRON_TESTNET_PAYOUT_PRIVATE_KEY`. Withdrawals cannot pay without both recorded approvals and no existing transaction ID. The receive address remains blank until the owner supplies a controlled test wallet.
 - The Master Admin queue now reports confirmed gross USDT deposits, credited USDT, `PAID` withdrawal count, and net USDT paid. The dashboard also offers a Telegram connection check and retry for unsent review messages.
@@ -31,5 +31,5 @@
 
 ## Verification
 
-Local verification passed: JavaScript syntax checks, the client runtime-poll regression test, core Auth/RBAC tests, Supabase service tests, static repository validation, and API smoke tests. The live migration and all four updated Edge Function deployments succeeded. No Admin identity, Telegram callback, live-chain transfer, or payout was created as a test.
+Local verification passed: JavaScript syntax checks, the client runtime-poll regression test, core Auth/RBAC tests, Supabase service tests, static repository validation, and API smoke tests. The live migrations and all four updated Edge Function deployments succeeded. No Admin identity, Telegram callback, live-chain transfer, or payout was created as a test.
 

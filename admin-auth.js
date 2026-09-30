@@ -34,15 +34,17 @@ function actionButtons(kind,id,status,item){
 function card(title,sub,detail,kind,id,media,status,item){
  return '<article class="tg-review-card"><div><h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p>'+detail+'</div>'+media+actionButtons(kind,id,status,item||{})+'</article>';
 }
+function statCards(){
+ var totals=state.queues.stats||{};
+ function usdt(v){return Number(v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+ return '<div class="tg-admin-stats"><article><small>Confirmed deposits</small><strong>'+usdt(totals.confirmedDepositsUsdt)+' USDT</strong></article><article><small>Credited to client balances</small><strong>'+usdt(totals.creditedDepositsUsdt)+' USDT</strong></article><article><small>Completed withdrawals</small><strong>'+Number(totals.completedWithdrawalsCount||0)+'</strong></article><article><small>USDT paid out</small><strong>'+usdt(totals.completedWithdrawalsUsdt)+' USDT</strong></article></div>';
+}
 function renderPaused(){
- root.innerHTML=shell('<section class="tg-admin-content">'+powerPanel()+'<div class="tg-paused-admin"><span class="tg-kicker">MAINTENANCE MODE</span><h2>Client activity is paused</h2><p>Sign-in, deposits, identity uploads, withdrawals, and other user actions are frozen at the backend. Switch the app ON here to resume normal use.</p></div><button class="tg-button-soft" data-action="logout">Sign out</button></section>');
+ root.innerHTML=shell('<section class="tg-admin-content">'+powerPanel()+statCards()+'<div class="tg-paused-admin"><span class="tg-kicker">MAINTENANCE MODE</span><h2>Client activity is paused</h2><p>Sign-in, deposits, identity uploads, withdrawals, and other user actions are frozen at the backend. Switch the app ON here to resume normal use.</p></div><button class="tg-button-soft" data-action="logout">Sign out</button></section>');
 }
 function renderQueues(){
  if(!state.enabled){renderPaused();return;}
  var q=state.queues,items=q[state.tab]||[];
- var totals=q.stats||{};
- function usdt(v){return Number(v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
- var stats='<div class="tg-admin-stats"><article><small>Confirmed deposits</small><strong>'+usdt(totals.confirmedDepositsUsdt)+' USDT</strong></article><article><small>Credited to client balances</small><strong>'+usdt(totals.creditedDepositsUsdt)+' USDT</strong></article><article><small>Completed withdrawals</small><strong>'+Number(totals.completedWithdrawalsCount||0)+'</strong></article><article><small>USDT paid out</small><strong>'+usdt(totals.completedWithdrawalsUsdt)+' USDT</strong></article></div>';
  var tabs=[['deposits','Deposits',q.deposits.length],['kyc','KYC',q.kyc.length],['withdrawals','Withdrawals',q.withdrawals.length]];
  var nav='<nav class="tg-admin-nav">'+tabs.map(function(x){return '<button data-action="tab" data-tab="'+x[0]+'" aria-pressed="'+String(state.tab===x[0])+'">'+x[1]+' <span>'+x[2]+'</span></button>';}).join('')+'</nav>';
  var list=items.map(function(x){
@@ -59,7 +61,7 @@ function renderQueues(){
  }).join('');
  var telegramButton='<button class="tg-button-soft" data-action="telegram-check" '+(state.busy?'disabled':'')+'>Check Telegram</button>';
  var telegramStatus=state.telegram?'<p class="tg-telegram-status">'+(state.telegram.configured?'Telegram connected: @'+esc(state.telegram.botUsername||'bot')+' · '+esc(state.telegram.chatTitle||'review chat'):'Telegram setup incomplete. Check the Supabase bot, chat, and approver configuration.')+'</p>':'';
- root.innerHTML=shell('<section class="tg-admin-content"><div class="tg-admin-heading"><div><span class="tg-kicker">OPERATIONS CONTROL</span><h1>Review queues</h1><p>Private evidence links expire after 10 minutes.</p></div><div>'+telegramButton+' <button class="tg-button-soft" data-action="refresh" '+(state.busy?'disabled':'')+'>Refresh</button></div></div>'+powerPanel()+stats+telegramStatus+nav+(items.length?list:'<div class="tg-empty">No items waiting in this queue.</div>')+'<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
+ root.innerHTML=shell('<section class="tg-admin-content"><div class="tg-admin-heading"><div><span class="tg-kicker">OPERATIONS CONTROL</span><h1>Review queues</h1><p>Private evidence links expire after 10 minutes.</p></div><div>'+telegramButton+' <button class="tg-button-soft" data-action="refresh" '+(state.busy?'disabled':'')+'>Refresh</button></div></div>'+powerPanel()+statCards()+telegramStatus+nav+(items.length?list:'<div class="tg-empty">No items waiting in this queue.</div>')+'<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
 }
 function render(){if(state.profile)renderQueues();else renderLogin();}
 async function login(e){
@@ -73,8 +75,8 @@ async function login(e){
  }catch(err){await service.signOut().catch(function(){});state.profile=null;state.error=err.message||'Sign-in failed.';}
  finally{state.busy=false;render();}
 }
-async function loadQueues(){
- if(!state.enabled){state.queues={deposits:[],kyc:[],withdrawals:[]};return;}
+async function loadQueues(force){
+ if(!state.enabled&&!force){state.queues={deposits:[],kyc:[],withdrawals:[],stats:state.queues.stats||{}};return;}
  var response=await service.client().functions.invoke('admin-queues',{body:{}});
  if(response.error)throw response.error;
  var data=response.data||{};
@@ -84,7 +86,7 @@ async function loadQueues(){
 async function syncRuntime(){
  var was=state.enabled;
  state.enabled=await service.appRuntimeEnabled();
- if(!state.enabled){state.queues={deposits:[],kyc:[],withdrawals:[]};render();return;}
+ if(!state.enabled){await loadQueues(true).catch(function(){state.queues={deposits:[],kyc:[],withdrawals:[],stats:state.queues.stats||{}};});render();return;}
  if(was!==state.enabled||state.profile)await loadQueues();
  render();
 }
@@ -93,7 +95,7 @@ async function toggleRuntime(){
  var next=!state.enabled;
  if(!next&&window.confirm&&!window.confirm('Pause all client access and operations now?'))return;
  state.busy=true;state.error='';render();
- try{await service.setAppRuntimeEnabled(next);state.enabled=next;state.queues={deposits:[],kyc:[],withdrawals:[]};if(next)await loadQueues();}
+ try{await service.setAppRuntimeEnabled(next);state.enabled=next;state.queues={deposits:[],kyc:[],withdrawals:[],stats:state.queues.stats||{}};if(next)await loadQueues();}
  catch(err){state.error=err.message||'App status update failed.';await service.appRuntimeEnabled().then(function(v){state.enabled=v;}).catch(function(){});}
  finally{state.busy=false;render();}
 }
