@@ -1,0 +1,94 @@
+name: AegisPay Website + Direct APK Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build Client and Master Admin APKs
+        run: gradle -p android :app:assembleClientDebug :app:assembleAdminDebug --no-daemon
+
+      - name: Assemble website package
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf site/app site/downloads
+          mkdir -p site/app site/downloads
+
+          cp index.html master-admin.html styles.css client-auth.js admin-auth.js              supabase-client.js supabase-service.js aegis-auth-redirect.js              app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
+
+          cp android/app/build/outputs/apk/client/debug/app-client-debug.apk              site/downloads/aegispay-client.apk
+          cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk              site/downloads/aegispay-admin.apk
+
+          VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
+          VERSION_NAME="$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)"
+          CLIENT_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
+          ADMIN_SHA="$(sha256sum site/downloads/aegispay-admin.apk | awk '{print $1}')"
+
+          cat > site/app-version.json <<EOF
+          {
+            "versionCode": ${VERSION_CODE},
+            "versionName": "${VERSION_NAME}",
+            "releaseChannel": "stable",
+            "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
+            "adminApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-admin.apk",
+            "clientSha256": "${CLIENT_SHA}",
+            "adminSha256": "${ADMIN_SHA}",
+            "notes": [
+              "Remote-first client portal",
+              "Automatic update detection",
+              "Shop, Tasks, Referrals, Notifications and secure AI Help",
+              "Master Admin operations, referrals and audit views"
+            ]
+          }
+          EOF
+
+          cp site/app-version.json app-version.json
+
+      - name: Verify direct-download package
+        run: |
+          test -s site/index.html
+          test -s site/app/index.html
+          test -s site/app/master-admin.html
+          test -s site/app-version.json
+          test -s site/downloads/aegispay-client.apk
+          test -s site/downloads/aegispay-admin.apk
+          test "$(wc -c < site/downloads/aegispay-client.apk)" -gt 100000
+          test "$(wc -c < site/downloads/aegispay-admin.apk)" -gt 100000
+
+      - name: Upload website + APK package
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-Website-and-Direct-APK-Package
+          path: site/
+          if-no-files-found: error
+
+      - name: Deploy production website
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: npx -y netlify-cli deploy --dir=site --prod --site-id="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay main $GITHUB_SHA"
