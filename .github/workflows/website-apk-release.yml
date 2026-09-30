@@ -14,6 +14,10 @@ jobs:
     env:
       NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
+      AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
+      AEGIS_RELEASE_KEY_ALIAS: ${{ secrets.AEGIS_RELEASE_KEY_ALIAS }}
+      AEGIS_RELEASE_KEY_PASSWORD: ${{ secrets.AEGIS_RELEASE_KEY_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,17 +55,21 @@ jobs:
           set -euo pipefail
           rm -rf site/app site/downloads
           mkdir -p site/app site/downloads
-
-          cp index.html master-admin.html styles.css client-auth.js admin-auth.js              supabase-client.js supabase-service.js aegis-auth-redirect.js              app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
-
-          cp android/app/build/outputs/apk/client/debug/app-client-debug.apk              site/downloads/aegispay-client.apk
-          cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk              site/downloads/aegispay-admin.apk
-
+          cp index.html master-admin.html styles.css client-auth.js admin-auth.js \
+             supabase-client.js supabase-service.js aegis-auth-redirect.js \
+             app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
+          cp aegispay-logo.svg site/aegispay-logo.svg
+          if [ "$AEGIS_BUILD_TYPE" = "release" ]; then
+            cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
+            cp android/app/build/outputs/apk/admin/release/app-admin-release.apk site/downloads/aegispay-admin.apk
+          else
+            cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
+            cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk site/downloads/aegispay-admin.apk
+          fi
           VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
           VERSION_NAME="$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)"
           CLIENT_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
           ADMIN_SHA="$(sha256sum site/downloads/aegispay-admin.apk | awk '{print $1}')"
-
           cat > site/app-version.json <<EOF
           {
             "versionCode": ${VERSION_CODE},
@@ -80,7 +88,6 @@ jobs:
             ]
           }
           EOF
-
           cp site/app-version.json app-version.json
 
       - name: Verify direct-download package
