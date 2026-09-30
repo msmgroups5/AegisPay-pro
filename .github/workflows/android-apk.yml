@@ -44,8 +44,13 @@ jobs:
           fi
       - name: Verify APKs exist
         run: |
-          test -s android/app/build/outputs/apk/client/debug/app-client-debug.apk
-          test -s android/app/build/outputs/apk/admin/debug/app-admin-debug.apk
+          if [ -n "${AEGIS_RELEASE_KEYSTORE_PATH:-}" ]; then
+            test -s android/app/build/outputs/apk/client/release/app-client-release.apk
+            test -s android/app/build/outputs/apk/admin/release/app-admin-release.apk
+          else
+            test -s android/app/build/outputs/apk/client/debug/app-client-debug.apk
+            test -s android/app/build/outputs/apk/admin/debug/app-admin-debug.apk
+          fi
       - name: Upload installable APKs
         uses: actions/upload-artifact@v4
         with:
