@@ -1,0 +1,3 @@
+/app /app/ 301
+/app/auth/callback /app/index.html 200
+/auth/callback /app/index.html 200
