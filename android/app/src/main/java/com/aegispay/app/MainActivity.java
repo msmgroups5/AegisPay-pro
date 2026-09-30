@@ -147,6 +147,145 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    private void loadPortal() {
+        localFallbackLoaded = false;
+        webReady = false;
+        webView.loadUrl(REMOTE_APP_BASE + getString(R.string.entry_html));
+    }
+
+    private void loadLocalPortal() {
+        if (webView == null || localFallbackLoaded) return;
+        localFallbackLoaded = true;
+        webReady = false;
+        webView.loadUrl("https://appassets.androidplatform.net/assets/aegispay/" + getString(R.string.entry_html));
+    }
+
+    private String sha256(Uri uri) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) throw new IllegalStateException("Unable to read downloaded update.");
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) digest.update(buffer, 0, read);
+        }
+        StringBuilder result = new StringBuilder(64);
+        for (byte value : digest.digest()) result.append(String.format(Locale.US, "%02x", value));
+        return result.toString();
+    }
+
+    private void startApkDownload(String url, String versionName, String expectedSha256) {
+        if (url == null || !url.startsWith("https://") || !UPDATE_HOST.equals(Uri.parse(url).getHost())) {
+            Toast.makeText(this, "Invalid AegisPay update source.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (activeUpdateDownloadId != -1L) {
+            Toast.makeText(this, "Update download is already running.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        String flavor = getString(R.string.entry_html).contains("master-admin") ? "admin" : "client";
+        String safeVersion = String.valueOf(versionName == null ? "latest" : versionName).replaceAll("[^A-Za-z0-9._-]", "_");
+        String fileName = "aegispay-" + flavor + "-" + safeVersion + ".apk";
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle("AegisPay " + safeVersion);
+        request.setDescription("Downloading secure application update");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setMimeType("application/vnd.android.package-archive");
+        request.setAllowedOverMetered(true);
+        request.setAllowedOverRoaming(false);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+        registerUpdateReceiver();
+        activeUpdateSha256 = expectedSha256 == null ? "" : expectedSha256.trim().toLowerCase(Locale.US);
+        activeUpdateDownloadId = manager.enqueue(request);
+        Toast.makeText(this, "AegisPay update download started.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void registerUpdateReceiver() {
+        if (updateDownloadReceiver != null) return;
+        updateDownloadReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L);
+                if (id == activeUpdateDownloadId) handleUpdateDownloaded(id);
+            }
+        };
+        ContextCompat.registerReceiver(
+                this,
+                updateDownloadReceiver,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+        );
+    }
+
+    private void handleUpdateDownloaded(long id) {
+        DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        DownloadManager.Query query = new DownloadManager.Query().setFilterById(id);
+        android.database.Cursor cursor = manager.query(query);
+        boolean success = false;
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                success = status == DownloadManager.STATUS_SUCCESSFUL;
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        Uri apkUri = success ? manager.getUriForDownloadedFile(id) : null;
+        activeUpdateDownloadId = -1L;
+
+        if (updateDownloadReceiver != null) {
+            try { unregisterReceiver(updateDownloadReceiver); } catch (Exception ignored) { }
+            updateDownloadReceiver = null;
+        }
+
+        if (!success || apkUri == null) {
+            Toast.makeText(this, "AegisPay update download failed.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            if (!activeUpdateSha256.isEmpty() && !activeUpdateSha256.equalsIgnoreCase(sha256(apkUri))) {
+                Toast.makeText(this, "Update verification failed. The APK was not installed.", Toast.LENGTH_LONG).show();
+                return;
+            }
+        } catch (Exception error) {
+            Toast.makeText(this, "Update verification could not be completed.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        pendingInstallUri = apkUri;
+        installDownloadedApk();
+    }
+
+    private void installDownloadedApk() {
+        if (pendingInstallUri == null) return;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                !getPackageManager().canRequestPackageInstalls()) {
+            Intent settingsIntent = new Intent(
+                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:" + getPackageName())
+            );
+            startActivityForResult(settingsIntent, UNKNOWN_SOURCE_REQUEST);
+            Toast.makeText(this, "Allow AegisPay to install updates, then return here.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+        installIntent.setDataAndType(pendingInstallUri, "application/vnd.android.package-archive");
+        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            startActivity(installIntent);
+        } catch (Exception error) {
+            Toast.makeText(this, "Android could not open the update installer.", Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void handleIncomingIntent(Intent intent) {
         if (intent == null) return;
         Uri data = intent.getData();
@@ -243,6 +382,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == UNKNOWN_SOURCE_REQUEST) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || getPackageManager().canRequestPackageInstalls()) {
+                installDownloadedApk();
+            } else {
+                Toast.makeText(this, "Update installation was not authorized.", Toast.LENGTH_LONG).show();
+            }
+        }
+
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() != null) {
@@ -270,6 +417,27 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public void scan() {
             runOnUiThread(MainActivity.this::startScan);
+        }
+
+        @JavascriptInterface
+        public int appVersionCode() {
+            try {
+                PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return info.versionCode;
+            } catch (Exception ignored) { return 0; }
+        }
+
+        @JavascriptInterface
+        public String appVersionName() {
+            try {
+                PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return info.versionName == null ? "" : info.versionName;
+            } catch (Exception ignored) { return ""; }
+        }
+
+        @JavascriptInterface
+        public void startApkUpdate(String url, String versionName, String sha256) {
+            runOnUiThread(() -> startApkDownload(url, versionName, sha256));
         }
 
         @JavascriptInterface
