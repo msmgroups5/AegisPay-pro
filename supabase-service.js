@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-var WEB_AUTH_CALLBACK='https://aegispay-pro.netlify.app/auth/callback';
+var WEB_AUTH_CALLBACK='https://aegispay-pro.netlify.app/app/auth/callback';
 var MOBILE_CLIENT_AUTH_CALLBACK='com.aegispay.app.client://auth/callback';
 var MOBILE_ADMIN_AUTH_CALLBACK='com.aegispay.app.admin://auth/callback';
 function authRedirectUri(){
