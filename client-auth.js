@@ -111,7 +111,7 @@ async function refreshProfile(){
 }
 async function refreshData(){
  var c=service.client(),p=state.profile;if(!c||!p)return;
- var [profileRes,depositsRes,withdrawalsRes,kycRes]=await Promise.all([
+ var [profileRes,depositsRes,withdrawalsRes,kycRes,tasksRes,cycleRes,refsRes,notificationsRes,offersRes]=await Promise.all([
   c.from('users').select('id,name,email,role,status,current_platform_balance,principal_balance,profit_balance,manual_credit_balance,withdrawal_held,destination_address,withdrawal_wallet_owner_name,preferred_language,referral_code,first_deposit_done').eq('id',p.id).maybeSingle(),
   c.from('deposit_submissions').select('id,tier_id,gross_amount,credited_amount,status,ai_review_status,verification_note,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
   c.from('withdrawal_requests').select('id,amount,fee_amount,net_amount,status,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
@@ -134,7 +134,49 @@ function historyTable(title,rows,kind){
  }).join(''):'<tr><td colspan="3">'+t('empty')+'</td></tr>';
  return '<section class="section" style="margin-top:18px"><h3>'+title+'</h3><div style="overflow:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th>'+t('date')+'</th><th>'+t('amount')+'</th><th>'+t('status')+'</th></tr></thead><tbody>'+cells+'</tbody></table></div></section>';
 }
-function renderDashboard(){
+
+function cycleCountdown(readyAt){
+ var ms=new Date(readyAt||0).getTime()-Date.now();
+ if(!readyAt||!Number.isFinite(ms))return '—';
+ if(ms<=0)return 'Ready for settlement';
+ var total=Math.floor(ms/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;
+ return h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
+}
+function shopSection(d){
+ var cycle=d.cycle,tasks=d.tasks||[],offers=d.offers||[];
+ if(!cycle)return '<section class="section" style="margin-top:18px"><h3>'+t('shopTitle')+'</h3><p>'+t('shopEmpty')+'</p></section>';
+ var current=tasks.filter(function(x){return x.cycle_id===cycle.id;});
+ var done=current.filter(function(x){return x.status==='Completed';}).length;
+ var remaining=current.filter(function(x){return x.status!=='Completed';}).reduce(function(a,x){return a+Number(x.task_value||0);},0);
+ var offerRows=offers.map(function(o){return '<article style="padding:11px;margin-top:7px;border:1px solid #e6eef3;border-radius:12px;background:#fff"><strong>'+esc(o.title)+'</strong><p style="margin:4px 0">'+esc(o.subtitle||o.instructions||'Assigned Shop task')+'</p><small>Tier '+esc(o.tier_min_id||'Any')+' · '+esc(o.reward_text||'Cycle task')+'</small></article>';}).join('');
+ var taskRows=current.map(function(x){var complete=x.status==='Completed';return '<article style="padding:13px;margin-top:9px;border:1px solid #e2edf4;border-radius:14px;background:#fbfdff"><div style="display:flex;justify-content:space-between;gap:12px"><div><strong>'+esc(x.title)+'</strong><p style="margin:5px 0">'+esc(x.description||'Complete the assigned Shop step.')+'</p><small>Task value '+money(x.task_value)+' · Reward '+money(x.reward)+'</small></div><div style="text-align:right;min-width:105px"><small>'+esc(x.status)+'</small><div style="margin-top:4px;font-weight:800;color:#1c789e">'+Number(x.progress||0)+'%</div>'+(complete?'':'<button class="primary" style="margin-top:7px;min-height:38px;padding:0 10px" data-action="complete-task" data-id="'+esc(x.id)+'">'+t('completeTask')+'</button>')+'</div></div></article>';}).join('');
+ return '<section class="section" style="margin-top:18px" id="shop"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h3>'+t('shopTitle')+'</h3><p style="margin:4px 0">'+t('shopReady')+'</p></div><strong>'+done+'/'+current.length+'</strong></div><div style="margin-top:10px;padding:12px;border-radius:13px;background:#f3fbff;border:1px solid #d8edf6"><div style="display:flex;justify-content:space-between"><span>'+t('cycleOpen')+'</span><strong>'+money(cycle.cycle_base)+'</strong></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span>'+t('remaining')+'</span><strong>'+money(remaining)+'</strong></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span>Status</span><strong>'+esc(cycle.status)+'</strong></div>'+(cycle.status==='WAITING_18H'?'<div id="cycleCountdown" data-ready="'+esc(cycle.ready_at||'')+'" style="margin-top:7px;color:#19769c;font-weight:800">'+cycleCountdown(cycle.ready_at)+'</div>':'')+'</div><div style="margin-top:14px"><strong>'+t('shopTitle')+' Offers</strong>'+(offerRows||'<p>'+t('empty')+'</p>')+'</div>'+taskRows+'</section>';
+}
+function referralsSection(d){
+ var refs=d.referrals||[],l1=refs.filter(function(x){return x.referral_level===1;}).length,l2=refs.filter(function(x){return x.referral_level===2;}).length,reward=refs.reduce(function(a,x){return a+Number(x.platform_reward||0);},0);
+ var link=location.origin+location.pathname+'?ref='+encodeURIComponent(d.profile&&d.profile.referral_code||'');
+ return '<section class="section" style="margin-top:18px"><h3>'+t('referralsTitle')+'</h3><div class="stats-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><div class="stat-card"><small>'+t('level1')+'</small><strong>'+l1+'</strong></div><div class="stat-card"><small>'+t('level2')+'</small><strong>'+l2+'</strong></div><div class="stat-card"><small>'+t('referralBonus')+'</small><strong>'+money(reward)+'</strong></div></div><div style="margin-top:10px;padding:10px;border-radius:12px;background:#f7fbfd;border:1px solid #e4edf3;overflow-wrap:anywhere"><small>'+esc(link)+'</small><button class="ghost-dark" style="margin-left:8px" data-action="copy-ref">'+t('save')+'</button></div></section>';
+}
+function notificationsSection(d){
+ var ns=d.notifications||[];
+ return '<section class="section" style="margin-top:18px"><h3>'+t('notificationsTitle')+'</h3>'+(ns.length?ns.map(function(n){return '<article style="padding:10px 0;border-bottom:1px solid #edf2f6"><div style="display:flex;justify-content:space-between;gap:8px"><strong>'+esc(n.title)+'</strong><small>'+esc(date(n.created_at))+'</small></div><p style="margin:4px 0">'+esc(n.body)+'</p></article>';}).join(''):'<p>'+t('empty')+'</p>')+'</section>';
+}
+function aiAnswer(q){
+ q=String(q||'').toLowerCase();
+ if(q.indexOf('deposit')>=0)return 'Select your tier, send the configured TRON amount, then submit the screenshot and TXID. Balance is credited only after evidence review and a confirmed matching transfer.';
+ if(q.indexOf('shop')>=0||q.indexOf('task')>=0)return 'A verified deposit creates your Shop cycle. Complete every assigned task. When all tasks are complete, the 18-hour settlement timer starts.';
+ if(q.indexOf('withdraw')>=0)return 'KYC must be verified and a withdrawal wallet linked. Withdrawal requests require Master Admin approval plus the configured Telegram approval.';
+ if(q.indexOf('referral')>=0)return 'Qualifying verified first deposits create the configured referral rewards for the eligible levels.';
+ if(q.indexOf('kyc')>=0)return 'Upload clear CNIC or Passport images. Withdrawals remain locked until KYC verification is complete.';
+ return 'I can help with Deposit, Shop, Tasks, Withdrawal, KYC and Referrals.';
+}
+function aiSection(){
+ return '<section class="section" style="margin-top:18px"><h3>'+t('aiTitle')+'</h3><p>'+t('aiHint')+'</p><div id="aiReply" style="padding:10px;border-radius:12px;background:#f6fbfe;color:#45667b;font-size:13px">'+aiAnswer('')+'</div><form id="aiForm" style="display:flex;gap:8px;margin-top:10px"><input id="aiInput" type="text" placeholder="'+t('aiHint')+'" style="flex:1"><button class="primary" type="submit">Ask</button></form></section>';
+}
+function updateCycleCountdown(){
+ var el=document.getElementById('cycleCountdown');if(el)el.textContent=cycleCountdown(el.getAttribute('data-ready')||'');
+}
+\nfunction renderDashboard(){
  var p=state.profile||{},d=state.data||{},kyc=d.kyc;
  var kycLabel=kyc?kyc.status:(t('kycNeeded'));
  var kycSection=kyc&&kyc.status==='VERIFIED'
@@ -159,7 +201,7 @@ function renderDashboard(){
   kycSection+
   '<section class="section" style="margin-top:18px"><h3>'+t('withdraw')+'</h3><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form></section>'+
   '<section class="section" style="margin-top:18px"><h3>'+t('refCode')+'</h3><code>'+esc(p.referral_code||'')+'</code></section>'+
-  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal');
+  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal')+shopSection(d)+referralsSection(d)+notificationsSection(d)+aiSection();
  root.innerHTML=shell(body,'dashboard');
  var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');
  if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
@@ -278,6 +320,18 @@ async function action(e){
  var a=el.getAttribute('data-action');
  if(a==='language')return;
  if(a==='retry-runtime'){checkRuntime();return;}
+  if(a==='complete-task'){
+   if(busy)return;busyStart();render();
+   try{var taskResult=await service.client().rpc('complete_task',{p_task_id:el.getAttribute('data-id')});if(taskResult.error)throw taskResult.error;setMessage(t('taskCompleted'),'success');await refreshData();state.messageTone='success';}
+   catch(err){setMessage(authError(err));}
+   finally{busy=false;render();} return;
+  }
+  if(a==='copy-ref'){
+   var refCode=state.profile&&state.profile.referral_code||'';
+   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
+   else{setMessage(t('error'));render();}
+   return;
+  }
  if(a==='keep-language'){askLanguage=false;try{localStorage.setItem('aegispay-language',locale);}catch(e){}render();return;}
  if(a==='login'){state.mode='login';state.message='';render();}
  else if(a==='signup'){state.mode='signup';state.message='';render();}
@@ -289,6 +343,7 @@ async function action(e){
  }
 }
 root.addEventListener('submit',function(e){
+ if(e.target.id==='aiForm'){e.preventDefault();var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply');if(aiReply)aiReply.textContent=aiAnswer(aiInput&&aiInput.value);if(aiInput)aiInput.value='';return;}
  if(e.target.id==='loginForm')handleLogin(e);
  else if(e.target.id==='signupForm')handleSignup(e);
  else if(e.target.id==='resetForm')handleReset(e);
@@ -311,7 +366,8 @@ async function boot(){
   if(!state.appEnabled){state.phase='paused';render();}
   else{var session=await service.session();if(session)await refreshProfile();else{state.phase='ready';render();}}
  }catch(err){state.appEnabled=false;state.runtimeUnverified=true;state.phase='paused';setMessage(t('runtimeUnknown'));render();}
- if(!runtimeTimer)runtimeTimer=setInterval(checkRuntime,10000);
+ if(!runtimeTimer)runtimeTimer=setInterval(function(){checkRuntime();updateCycleCountdown();},10000);
+ updateCycleCountdown();
 }
 async function checkRuntime(){
  if(!service||!service.isAvailable()||runtimeRequest||busy)return runtimeRequest;
