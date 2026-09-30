@@ -176,7 +176,8 @@ function aiSection(){
 function updateCycleCountdown(){
  var el=document.getElementById('cycleCountdown');if(el)el.textContent=cycleCountdown(el.getAttribute('data-ready')||'');
 }
-\nfunction renderDashboard(){
+
+function renderDashboard(){
  var p=state.profile||{},d=state.data||{},kyc=d.kyc;
  var kycLabel=kyc?kyc.status:(t('kycNeeded'));
  var kycSection=kyc&&kyc.status==='VERIFIED'
