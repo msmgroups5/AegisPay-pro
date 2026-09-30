@@ -74,7 +74,7 @@ function renderQueues(){
 function renderOverview(){
  var q=state.queues.stats||{};
  root.innerHTML=shell('<section class="tg-admin-content">'+adminNav()+powerPanel()+statCards()+
-  '<div class="tg-admin-stats"><article><small>Total client accounts</small><strong>'+state.users.length+'</strong></article><article><small>Active Shop offers</small><strong>'+state.offers.filter(function(x){return x.status==='ACTIVE';}).length+'</strong></article><article><small>Assigned tasks</small><strong>'+state.tasks.length+'</strong></article><article><small>Pending notifications</small><strong>'+state.tasks.filter(function(x){return x.status==='Pending';}).length+'</strong></article></div>'+
+  '<div class="tg-admin-stats"><article><small>Total client accounts</small><strong>'+state.users.length+'</strong></article><article><small>Active Shop offers</small><strong>'+state.offers.filter(function(x){return x.status==='ACTIVE';}).length+'</strong></article><article><small>Assigned tasks</small><strong>'+state.tasks.length+'</strong></article><article><small>Pending tasks</small><strong>'+state.tasks.filter(function(x){return x.status==='Pending';}).length+'</strong></article></div>'+
   '<div class="tg-paused-admin"><span class="tg-kicker">MASTER ADMIN CONTROL</span><h2>Full operational control</h2><p>Use Users for account controls and balance adjustments, Shop & Tasks for offer/task operations, and Settings for platform rules.</p></div><button class="tg-button-soft" data-action="logout">Sign out</button></section>');
 }
 function renderUsers(){
