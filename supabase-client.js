@@ -7,7 +7,7 @@ window.AegisSupabaseConfig={
 function init(){
   try{
     if(window.supabase&&typeof window.supabase.createClient==='function'){
-      window.AegisSupabaseClient=window.supabase.createClient(window.AegisSupabaseConfig.url,window.AegisSupabaseConfig.publishableKey);
+      window.AegisSupabaseClient=window.supabase.createClient(window.AegisSupabaseConfig.url,window.AegisSupabaseConfig.publishableKey,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}});
     }
   }catch(e){window.AegisSupabaseClient=null;}
 }
