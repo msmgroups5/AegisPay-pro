@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         if (intent == null) return;
         Uri data = intent.getData();
         if (data == null) return;
-        if (!"com.aegispay.app".equalsIgnoreCase(data.getScheme())) return;
+        if (!getString(R.string.auth_scheme).equalsIgnoreCase(data.getScheme())) return;
         pendingAuthRedirect = data.toString();
         dispatchPendingAuthRedirect();
     }
