@@ -1,5 +1,5 @@
 name: AegisPay Web Portal Deploy
-# Production deploy trigger
+# Production web portal deployment
 
 on:
   push:
@@ -23,32 +23,56 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build test Client and Master Admin APKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle -p android :app:assembleClientDebug :app:assembleAdminDebug --no-daemon
+
       - name: Assemble web portal
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf site/app
-          mkdir -p site/app
+          rm -rf site/app site/downloads
+          mkdir -p site/app site/downloads
           cp client.html site/app/index.html
           cp styles.css client-auth.js supabase-client.js supabase-service.js \
              aegis-auth-redirect.js app-update.js service-worker.js \
              manifest.webmanifest aegispay-logo.svg site/
+          cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
+          cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk site/downloads/aegispay-admin.apk
           cat > site/app-version.json <<'EOF'
           {
             "versionCode": 21,
-            "versionName": "2.1.0-web",
-            "releaseChannel": "web",
+            "versionName": "2.1.0-web-test",
+            "releaseChannel": "test",
             "releasedAt": "2026-10-01T00:00:00Z",
+            "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
+            "adminApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-admin.apk",
             "notes": [
-              "Remote-first client portal",
-              "Web portal deployment"
+              "Stable client portal routing",
+              "Remote-first web portal deployment",
+              "Test APK package for verification"
             ]
           }
           EOF
           test -s site/index.html
+          test -s site/client.html
           test -s site/app/index.html
           test -s site/app-version.json
-
+          test -s site/downloads/aegispay-client.apk
+          test -s site/downloads/aegispay-admin.apk
 
       - name: Upload web portal artifact
         uses: actions/upload-artifact@v4
@@ -56,3 +80,16 @@ jobs:
           name: AegisPay-Web-Portal
           path: site/
           if-no-files-found: error
+
+      - name: Deploy production website to Netlify
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
+
+      - name: Verify deployment configuration
+        shell: bash
+        run: |
+          if [ -n "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "NETLIFY_AUTH_TOKEN configured; deployment step was enabled."
+          else
+            echo "NETLIFY_AUTH_TOKEN is not configured; artifact was built but Netlify deployment was skipped."
+          fi
