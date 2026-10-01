@@ -29,7 +29,7 @@ jobs:
           set -euo pipefail
           rm -rf site/app
           mkdir -p site/app
-          cp client.html site/client.html
+          cp client.html site/app/index.html
           cp styles.css client-auth.js supabase-client.js supabase-service.js \
              aegis-auth-redirect.js app-update.js service-worker.js \
              manifest.webmanifest aegispay-logo.svg site/
@@ -46,7 +46,7 @@ jobs:
           }
           EOF
           test -s site/index.html
-          test -s site/client.html
+          test -s site/app/index.html
           test -s site/app-version.json
 
 
