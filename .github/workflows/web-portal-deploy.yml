@@ -25,9 +25,10 @@ jobs:
           set -euo pipefail
           rm -rf site/app
           mkdir -p site/app
-          cp index.html master-admin.html styles.css client-auth.js admin-auth.js \
-             supabase-client.js supabase-service.js aegis-auth-redirect.js \
-             app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
+          cp index.html site/client.html
+          cp styles.css client-auth.js supabase-client.js supabase-service.js \
+             aegis-auth-redirect.js app-update.js service-worker.js \
+             manifest.webmanifest aegispay-logo.svg site/
           cat > site/app-version.json <<'EOF'
           {
             "versionCode": 21,
@@ -41,8 +42,7 @@ jobs:
           }
           EOF
           test -s site/index.html
-          test -s site/app/index.html
-          test -s site/app/master-admin.html
+          test -s site/client.html
           test -s site/app-version.json
 
       - name: Deploy to Netlify
