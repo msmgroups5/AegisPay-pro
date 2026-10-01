@@ -77,7 +77,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA" --no-wait
+          npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
           echo "Netlify upload accepted; waiting for the public assets to update."
           for i in {1..20}; do
             body="$(curl -fsSL "https://aegispay-client1.netlify.app/supabase-service.js?v=$GITHUB_SHA" || true)"
