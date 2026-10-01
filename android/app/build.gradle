@@ -83,6 +83,7 @@ dependencies {
 def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
     from(rootProject.projectDir.parentFile) {
         include 'index.html'
+        include 'client.html'
         include 'master-admin.html'
         include 'styles.css'
         include 'client-auth.js'
