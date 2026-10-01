@@ -54,7 +54,7 @@ window.AegisSupabaseService={
   var cfg=window.AegisSupabaseConfig||{};
   if(cfg.url&&cfg.publishableKey){
     try{
-      var endpoint=cfg.url.replace(/\\/$/,'')+'/rest/v1/platform_settings?select=value_json&key=eq.app_runtime';
+      var endpoint=cfg.url.replace(/\/$/,'')+'/rest/v1/platform_settings?select=value_json&key=eq.app_runtime';
       var response=await fetch(endpoint,{headers:{apikey:cfg.publishableKey,Authorization:'Bearer '+cfg.publishableKey},cache:'no-store'});
       if(response.ok){
         var rows=await response.json();
