@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private Uri pendingInstallUri;
     private BroadcastReceiver updateDownloadReceiver;
     private static final int UNKNOWN_SOURCE_REQUEST = 9842;
-    private static final String REMOTE_APP_BASE = "https://aegispay-pro.netlify.app/";
-    private static final String UPDATE_HOST = "aegispay-pro.netlify.app";
+    private static final String REMOTE_APP_BASE = "https://aegispay-client1.netlify.app/";
+    private static final String UPDATE_HOST = "aegispay-client1.netlify.app";
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
