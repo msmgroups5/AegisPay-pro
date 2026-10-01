@@ -1,9 +1,11 @@
 name: AegisPay APK Export
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: aegispay-apk-export
+  cancel-in-progress: true
 
 permissions:
   contents: read
