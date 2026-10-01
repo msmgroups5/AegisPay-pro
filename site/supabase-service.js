@@ -45,10 +45,25 @@ window.AegisSupabaseService={
 
   // Keep the RPC as a fallback for environments where the table policy is
   // temporarily unavailable.
-  var result=await c.rpc('app_runtime_enabled');
-  if(result.error)throw result.error;
-  if(typeof result.data!=='boolean')throw new Error('AegisPay runtime status is unavailable.');
-  return result.data;
+  try{
+    var result=await c.rpc('app_runtime_enabled');
+    if(!result.error && typeof result.data==='boolean')return result.data;
+  }catch(e){}
+
+  // Final fallback: query the public REST endpoint directly.
+  var cfg=window.AegisSupabaseConfig||{};
+  if(cfg.url&&cfg.publishableKey){
+    try{
+      var endpoint=cfg.url.replace(/\\/$/,'')+'/rest/v1/platform_settings?select=value_json&key=eq.app_runtime';
+      var response=await fetch(endpoint,{headers:{apikey:cfg.publishableKey,Authorization:'Bearer '+cfg.publishableKey},cache:'no-store'});
+      if(response.ok){
+        var rows=await response.json();
+        var value=rows&&rows[0]&&rows[0].value_json&&rows[0].value_json.enabled;
+        if(typeof value==='boolean')return value;
+      }
+    }catch(e){}
+  }
+  throw new Error('AegisPay runtime status is unavailable.');
  },
 
  async setAppRuntimeEnabled(enabled){
