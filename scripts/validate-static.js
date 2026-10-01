@@ -62,7 +62,7 @@ if(website.includes("downloads/aegispay-admin.apk")) throw new Error("Master Adm
 for(const marker of ["SINCE 2023","downloads/aegispay-client.apk","Remote-first updates"]) if(!website.includes(marker)) throw new Error("Premium website marker missing: "+marker);
 if(!website.includes("client.html") && !website.includes("/app/")) throw new Error("Premium website client entry marker missing");
 const siteRedirects=fs.readFileSync("site/_redirects","utf8");
-for(const marker of ["/app/ /client.html 200","/app /client.html 200","/app/* /client.html 200"]) if(!siteRedirects.includes(marker)) throw new Error("Netlify client route missing: "+marker);
+for(const marker of ["/app/auth/callback /app/index.html 200","/auth/callback /app/index.html 200","/client /app/ 301","/client.html /app/ 301"]) if(!siteRedirects.includes(marker)) throw new Error("Netlify client route missing: "+marker);
 if(!fs.existsSync("site/app/index.html")) throw new Error("Published site/app/index.html missing");
 if(!fs.readFileSync("site/index.html","utf8").includes('href="/app/"')) throw new Error("Public site must link to /app/");
 if(!fs.readFileSync("android/app/build.gradle","utf8").includes("include 'client.html'")) throw new Error("Android client fallback does not bundle client.html");
