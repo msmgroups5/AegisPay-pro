@@ -81,6 +81,13 @@ jobs:
           path: site/
           if-no-files-found: error
 
+      - name: Verify Netlify authentication
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx -y netlify-cli status --auth="$NETLIFY_AUTH_TOKEN" --json
+
       - name: Deploy production website to Netlify
         if: env.NETLIFY_AUTH_TOKEN != ''
         run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
