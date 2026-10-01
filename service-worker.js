@@ -1,5 +1,5 @@
-const CACHE='aegispay-shell-v7-live';
-const ASSETS=['./','./index.html','./master-admin.html','./styles.css','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
+const CACHE='aegispay-shell-v8-app-reset';
+const ASSETS=['./','./index.html','./app/','./app/index.html','./master-admin.html','./styles.css','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS).catch(()=>{})));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',event=>{
@@ -11,7 +11,7 @@ self.addEventListener('fetch',event=>{
   event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
     if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
     return response;
-  }).catch(()=>caches.match(event.request).then(cached=>cached||caches.match('./index.html'))));
+  }).catch(()=>caches.match(event.request).then(cached=>cached||caches.match(url.pathname.startsWith('/app/')?'./app/index.html':'./index.html'))));
   return;
  }
  event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{
