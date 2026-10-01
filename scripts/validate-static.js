@@ -63,7 +63,8 @@ for(const marker of ["SINCE 2023","downloads/aegispay-client.apk","Remote-first 
 if(!website.includes("client.html") && !website.includes("/app/")) throw new Error("Premium website client entry marker missing");
 const siteRedirects=fs.readFileSync("site/_redirects","utf8");
 for(const marker of ["/app/ /client.html 200","/app /client.html 200","/app/* /client.html 200"]) if(!siteRedirects.includes(marker)) throw new Error("Netlify client route missing: "+marker);
-if(!fs.existsSync("site/client.html")) throw new Error("Published client.html missing");
+if(!fs.existsSync("site/app/index.html")) throw new Error("Published site/app/index.html missing");
+if(!fs.readFileSync("site/index.html","utf8").includes('href="/app/"')) throw new Error("Public site must link to /app/");
 if(!fs.readFileSync("android/app/build.gradle","utf8").includes("include 'client.html'")) throw new Error("Android client fallback does not bundle client.html");
 if(!fs.existsSync("netlify.toml")) throw new Error("Netlify configuration missing");
 console.log("AegisPay repository validation: PASS");
