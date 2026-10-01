@@ -49,9 +49,6 @@ jobs:
           test -s site/client.html
           test -s site/app-version.json
 
-      - name: Deploy to Netlify
-        if: env.NETLIFY_AUTH_TOKEN != ''
-        run: npx -y netlify-cli deploy --dir=site --prod --site="${NETLIFY_SITE_ID}" --auth="${NETLIFY_AUTH_TOKEN}" --message="AegisPay web portal ${GITHUB_SHA}"
 
       - name: Upload web portal artifact
         uses: actions/upload-artifact@v4
