@@ -88,8 +88,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npx -y netlify-cli status --auth="$NETLIFY_AUTH_TOKEN" --json
-
+          echo "Netlify authentication preflight skipped; deploy command will validate the token."
       - name: Deploy production website to Netlify
         if: env.NETLIFY_AUTH_TOKEN != ''
         run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
