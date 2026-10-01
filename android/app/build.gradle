@@ -24,7 +24,7 @@ android {
             dimension 'portal'
             applicationIdSuffix '.client'
             resValue 'string', 'app_name', 'AegisPay'
-            resValue 'string', 'entry_html', 'index.html'
+            resValue 'string', 'entry_html', 'client.html'
             resValue 'string', 'auth_scheme', 'com.aegispay.app.client'
         }
         admin {
