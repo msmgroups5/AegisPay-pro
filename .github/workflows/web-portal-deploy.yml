@@ -74,7 +74,21 @@ jobs:
           echo "Netlify authentication preflight skipped; deploy command will validate the token."
       - name: Deploy production website to Netlify
         if: env.NETLIFY_AUTH_TOKEN != ''
-        run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA" --no-wait
+          echo "Netlify upload accepted; waiting for the public assets to update."
+          for i in {1..20}; do
+            body="$(curl -fsSL "https://aegispay-client1.netlify.app/supabase-service.js?v=$GITHUB_SHA" || true)"
+            if printf '%s' "$body" | grep -q "Final fallback: query the public REST endpoint directly"; then
+              echo "Live site contains the runtime resilience fix."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Live deployment did not expose the expected runtime fix within the verification window."
+          exit 1
 
       - name: Verify deployment configuration
         shell: bash
