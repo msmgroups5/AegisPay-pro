@@ -31,6 +31,20 @@ window.AegisSupabaseService={
  async appRuntimeEnabled(){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
+
+  // Read the public runtime flag directly so the client is not blocked
+  // by PostgREST RPC/schema-cache issues during startup.
+  var setting=await c.from('platform_settings')
+    .select('value_json')
+    .eq('key','app_runtime')
+    .maybeSingle();
+  if(!setting.error && setting.data && setting.data.value_json &&
+     typeof setting.data.value_json.enabled==='boolean'){
+    return setting.data.value_json.enabled;
+  }
+
+  // Keep the RPC as a fallback for environments where the table policy is
+  // temporarily unavailable.
   var result=await c.rpc('app_runtime_enabled');
   if(result.error)throw result.error;
   if(typeof result.data!=='boolean')throw new Error('AegisPay runtime status is unavailable.');
