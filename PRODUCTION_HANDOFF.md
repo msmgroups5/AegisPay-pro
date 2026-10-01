@@ -4,7 +4,7 @@
 
 - Repository: `msmgroups5/AegisPay-pro`
 - Supabase project: `wtcspnrmsoisroavojop`
-- Netlify site: `aegispay-pro`
+- Netlify site: `aegispay-client1`
 - Production version baseline: Android versionCode 21 / versionName 2.1.0
 - Client entry: `/app/`
 - Public website: `/`
@@ -33,11 +33,11 @@
 
 Set the production Site URL to:
 
-`https://aegispay-pro.netlify.app`
+`https://aegispay-client1.netlify.app`
 
 Add these exact Redirect URLs:
 
-`https://aegispay-pro.netlify.app/app/auth/callback`
+`https://aegispay-client1.netlify.app/app/auth/callback`
 
 `com.aegispay.app.client://auth/callback`
 
