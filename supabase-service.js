@@ -5,7 +5,10 @@ var WEB_AUTH_CALLBACK='https://aegispay-pro.netlify.app/app/auth/callback';
 var MOBILE_CLIENT_AUTH_CALLBACK='com.aegispay.app.client://auth/callback';
 var MOBILE_ADMIN_AUTH_CALLBACK='com.aegispay.app.admin://auth/callback';
 function authRedirectUri(){
-  if(!window.AEGIS_ANDROID_APP)return WEB_AUTH_CALLBACK;
+  if(!window.AEGIS_ANDROID_APP){
+    try{return new URL('/app/auth/callback',window.location.origin).href;}
+    catch(e){return WEB_AUTH_CALLBACK;}
+  }
   return window.AEGIS_ADMIN_PORTAL ? MOBILE_ADMIN_AUTH_CALLBACK : MOBILE_CLIENT_AUTH_CALLBACK;
 }
 
