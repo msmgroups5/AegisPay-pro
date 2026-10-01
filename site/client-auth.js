@@ -125,7 +125,7 @@ async function refreshData(){
  if(kycRes.error)state.data.kyc=null;
 }
 function date(v){try{return new Date(v).toLocaleString(locale==='ur'?'ur-PK':'en-US');}catch(e){return v||'';}}
-function statusBadge(v){return '<span style="display:inline-block;padding:4px 8px;border-radius:99px;background:#edf3fa;color:#314760;font-size:12px">'+esc(String(v||'Pending').replaceAll('_',' '))+'</span>';}
+function statusBadge(v){return '<span style="display:inline-block;padding:4px 8px;border-radius:99px;background:#edf3fa;color:#314760;font-size:12px">'+esc(String(v||'Pending').split('_').join(' '))+'</span>';}
 function historyTable(title,rows,kind){
  var cells=rows.length?rows.map(function(r){
   var amount=kind==='deposit'?r.gross_amount:r.amount;
