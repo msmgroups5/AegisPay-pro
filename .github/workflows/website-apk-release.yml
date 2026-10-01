@@ -14,7 +14,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
+      NETLIFY_SITE_ID: 8cfe4e27-2e3c-4940-bd54-5926a201ee12
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
@@ -83,8 +83,8 @@ jobs:
             "versionName": "${VERSION_NAME}",
             "releaseChannel": "stable",
             "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
-            "adminApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-admin.apk",
+            "clientApkUrl": "https://aegispay-client1.netlify.app/downloads/aegispay-client.apk",
+            "adminApkUrl": "https://aegispay-client1.netlify.app/downloads/aegispay-admin.apk",
             "clientSha256": "${CLIENT_SHA}",
             "adminSha256": "${ADMIN_SHA}",
             "notes": [
@@ -101,6 +101,8 @@ jobs:
         run: |
           test -s site/index.html
           test -s site/client.html
+          test -s site/master-admin.html
+          test -s site/admin-auth.js
           test -s site/app-version.json
           test -s site/downloads/aegispay-client.apk
           test -s site/downloads/aegispay-admin.apk
