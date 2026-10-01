@@ -4,3 +4,5 @@
 /app/ /client.html 200
 /client /client.html 200
 /client/ /client.html 200
+/admin /master-admin.html 200
+/admin/ /master-admin.html 200
