@@ -1,0 +1,16 @@
+{
+  "versionCode": 21,
+  "versionName": "2.1.0",
+  "releaseChannel": "stable",
+  "releasedAt": "2026-10-01T00:00:00Z",
+  "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
+  "adminApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-admin.apk",
+  "clientSha256": "",
+  "adminSha256": "",
+  "notes": [
+    "Live remote web interface",
+    "Automatic update detection",
+    "Shop, Tasks, Referrals, Notifications and secure AI Help",
+    "Master Admin operations and audit views"
+  ]
+}
