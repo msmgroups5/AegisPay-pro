@@ -115,7 +115,12 @@ async function refreshData(){
   c.from('users').select('id,name,email,role,status,current_platform_balance,principal_balance,profit_balance,manual_credit_balance,withdrawal_held,destination_address,withdrawal_wallet_owner_name,preferred_language,referral_code,first_deposit_done').eq('id',p.id).maybeSingle(),
   c.from('deposit_submissions').select('id,tier_id,gross_amount,credited_amount,status,ai_review_status,verification_note,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
   c.from('withdrawal_requests').select('id,amount,fee_amount,net_amount,status,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
-  c.from('kyc_verifications').select('id,document_type,status,ai_review_status,review_reason,submitted_at').eq('user_id',p.id).order('submitted_at',{ascending:false}).limit(1)
+  c.from('kyc_verifications').select('id,document_type,status,ai_review_status,review_reason,submitted_at').eq('user_id',p.id).order('submitted_at',{ascending:false}).limit(1),
+  c.from('tasks').select('id,user_id,cycle_id,title,description,status,progress,reward,task_value,offer_id,start_date,due_date,completion_date').eq('user_id',p.id).order('start_date',{ascending:false}).limit(100),
+  c.from('cycle_runs').select('id,user_id,tier_id,cycle_base,status,task_completed_at,ready_at,settled_at,profit_amount,created_at,source_deposit_id').eq('user_id',p.id).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+  c.from('referrals').select('id,user_id,referred_user_id,referral_level,platform_reward,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100),
+  c.from('notifications').select('id,user_id,notification_type,title,body,is_read,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(50),
+  c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,reward_text,status,instructions,created_at,updated_at').eq('status','ACTIVE').order('created_at',{ascending:false})
  ]);
  if(profileRes.error)throw profileRes.error;
  state.profile=profileRes.data||p;
