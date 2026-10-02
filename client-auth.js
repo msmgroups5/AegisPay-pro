@@ -153,16 +153,13 @@ function cycleCountdown(readyAt){
  var total=Math.floor(ms/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;
  return h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
 }
-function shopSection(d){
- var cycle=d.cycle,tasks=d.tasks||[],offers=d.offers||[];
- var offerRows=offers.map(function(o){return '<article style="padding:12px;margin-top:8px;border:1px solid #e6eef3;border-radius:12px;background:#fff"><strong>'+esc(o.title)+'</strong><p style="margin:4px 0">'+esc(o.subtitle||o.instructions||'Assigned Shop task')+'</p><small>Tier '+esc(o.tier_min_id||'Any')+' · '+esc(o.reward_text||'Cycle task')+'</small></article>';}).join('');
- if(!cycle)return '<section class="section" style="margin-top:18px" id="shop"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h3>'+t('shopTitle')+'</h3><p style="margin:4px 0">'+t('shopEmpty')+'</p></div></div><div style="margin-top:14px"><strong>'+t('shopTitle')+' Offers</strong>'+(offerRows||'<p>'+t('empty')+'</p>')+'</div></section>';
- var current=tasks.filter(function(x){return x.cycle_id===cycle.id;});
- var done=current.filter(function(x){return x.status==='Completed';}).length;
- var remaining=current.filter(function(x){return x.status!=='Completed';}).reduce(function(a,x){return a+Number(x.task_value||0);},0);
- var taskRows=current.map(function(x){var complete=x.status==='Completed';return '<article style="padding:13px;margin-top:9px;border:1px solid #e2edf4;border-radius:14px;background:#fbfdff"><div style="display:flex;justify-content:space-between;gap:12px"><div><strong>'+esc(x.title)+'</strong><p style="margin:5px 0">'+esc(x.description||'Complete the assigned Shop step.')+'</p><small>Task value '+money(x.task_value)+' · Reward '+money(x.reward)+'</small></div><div style="text-align:right;min-width:105px"><small>'+esc(x.status)+'</small><div style="margin-top:4px;font-weight:800;color:#1c789e">'+Number(x.progress||0)+'%</div>'+(complete?'':'<button class="primary" style="margin-top:7px;min-height:38px;padding:0 10px" data-action="complete-task" data-id="'+esc(x.id)+'">'+t('completeTask')+'</button>')+'</div></div></article>';}).join('');
- return '<section class="section" style="margin-top:18px" id="shop"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h3>'+t('shopTitle')+'</h3><p style="margin:4px 0">'+t('shopReady')+'</p></div><strong>'+done+'/'+current.length+'</strong></div><div style="margin-top:10px;padding:12px;border-radius:13px;background:#f3fbff;border:1px solid #d8edf6"><div style="display:flex;justify-content:space-between"><span>'+t('cycleOpen')+'</span><strong>'+money(cycle.cycle_base)+'</strong></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span>'+t('remaining')+'</span><strong>'+money(remaining)+'</strong></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span>Status</span><strong>'+esc(cycle.status)+'</strong></div>'+(cycle.status==='WAITING_18H'?'<div id="cycleCountdown" data-ready="'+esc(cycle.ready_at||'')+'" style="margin-top:7px;color:#19769c;font-weight:800">'+cycleCountdown(cycle.ready_at)+'</div>':'')+'</div><div style="margin-top:14px"><strong>'+t('shopTitle')+' Offers</strong>'+(offerRows||'<p>'+t('empty')+'</p>')+'</div>'+taskRows+'</section>';
-}
+function shopCartKey(){return 'aegispay-premium-cart:'+((state.profile&&state.profile.id)||'guest');}
+function loadShopCart(){try{var v=JSON.parse(localStorage.getItem(shopCartKey())||'[]');return Array.isArray(v)?v:[]}catch(e){return [];}}
+function saveShopCart(v){try{localStorage.setItem(shopCartKey(),JSON.stringify(v));}catch(e){}}
+function currentShopTasks(d){return d&&d.cycle?(d.tasks||[]).filter(function(x){return x.cycle_id===d.cycle.id;}):[];}
+function shopTaskForProduct(d,id){var idx=-1;for(var i=0;i<PREMIUM_SHOP.length;i++){if(PREMIUM_SHOP[i].id===id){idx=i;break;}}var tasks=currentShopTasks(d);return idx>=0?tasks[idx]||null:null;}
+function shopProductList(){var q=shopSearch.trim().toLowerCase(),cat=shopCategory.toLowerCase();return PREMIUM_SHOP.filter(function(p){return (cat==='all'||p.category.toLowerCase()===cat)&&(!q||p.title.toLowerCase().indexOf(q)>=0||p.brand.toLowerCase().indexOf(q)>=0||p.category.toLowerCase().indexOf(q)>=0||p.subcategory.toLowerCase().indexOf(q)>=0);});}
+
 function referralsSection(d){
  var refs=d.referrals||[],l1=refs.filter(function(x){return x.referral_level===1;}).length,l2=refs.filter(function(x){return x.referral_level===2;}).length,reward=refs.reduce(function(a,x){return a+Number(x.platform_reward||0);},0);
  var link=location.origin+location.pathname+'?ref='+encodeURIComponent(state.profile&&state.profile.referral_code||'');
