@@ -71,12 +71,12 @@ const siteAdminHtml=fs.readFileSync("site/master-admin.html","utf8");
 if(siteClientHtml!==html) throw new Error("site/client.html must stay identical to canonical client.html");
 if(siteAppHtml!==html) throw new Error("site/app/index.html must stay identical to canonical client.html");
 if(siteAdminHtml!==adminHtml) throw new Error("site/master-admin.html must stay identical to canonical master-admin.html");
+const deployWorkflow=fs.readFileSync(".github/workflows/web-portal-deploy.yml","utf8");
 for(const match of html.matchAll(/(?:src|href)="(\.\/[^"]+)"/g)){
   const target=match[1].replace(/^\.\//,"");
   if(target==='index.html') continue;
   if(!deployWorkflow.includes(target)) throw new Error("Web build does not copy required /app asset: "+target);
 }
-const deployWorkflow=fs.readFileSync(".github/workflows/web-portal-deploy.yml","utf8");
 for(const marker of ["cp client.html site/client.html","cp client.html site/app/index.html","cp master-admin.html site/master-admin.html","cp admin-auth.js site/admin-auth.js"]) if(!deployWorkflow.includes(marker)) throw new Error("Web deployment source-of-truth copy missing: "+marker);
 if(!fs.readFileSync("site/index.html","utf8").includes('href="/app/"')) throw new Error("Public site must link to /app/");
 if(!fs.readFileSync("android/app/build.gradle","utf8").includes("include 'client.html'")) throw new Error("Android client fallback does not bundle client.html");
