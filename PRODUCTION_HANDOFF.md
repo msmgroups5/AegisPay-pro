@@ -33,11 +33,11 @@
 
 Set the production Site URL to:
 
-`https://aegispay-client1.netlify.app`
+`https://aegispay-client.netlify.app`
 
 Add these exact Redirect URLs:
 
-`https://aegispay-client1.netlify.app/app/auth/callback`
+`https://aegispay-client.netlify.app/app/auth/callback`
 
 `com.aegispay.app.client://auth/callback`
 
