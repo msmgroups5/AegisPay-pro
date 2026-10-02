@@ -91,13 +91,15 @@ window.AegisSupabaseService={
  async signUp(email,password,name,referralCode,preferredLanguage){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
-  var result=await c.auth.signUp({
-   email:String(email||'').trim().toLowerCase(),
-   password:String(password||''),
-   options:{data:{full_name:String(name||'').trim(),referral_code:String(referralCode||'').trim().toUpperCase(),preferred_language:preferredLanguage==='ur'?'ur':'en'},emailRedirectTo:authRedirectUri()}
-  });
+  var result=await c.functions.invoke('public-signup',{body:{
+    email:String(email||'').trim().toLowerCase(),
+    password:String(password||''),
+    name:String(name||'').trim(),
+    referralCode:String(referralCode||'').trim().toUpperCase(),
+    preferredLanguage:preferredLanguage==='ur'?'ur':'en'
+  }});
   if(result.error)throw result.error;
-  if(!result.data||!result.data.user)throw new Error('Supabase Auth did not create an account.');
+  if(!result.data||!result.data.user)throw new Error('AegisPay signup service did not create an account.');
   return result.data;
  },
 
