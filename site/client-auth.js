@@ -323,6 +323,17 @@ async function handleWithdraw(e){
 async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
+ if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
+  var target=a==='profile-view'||a==='notifications'||a==='ai-view'?'assets':a.replace(/^view-/,'');
+  var ids=['home','referral','topup','shop','assets','crypto'];
+  ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!==target);});
+  root.querySelectorAll('.ap-bottom button').forEach(function(b){b.classList.remove('active');});
+  var active=target==='home'?root.querySelector('.ap-bottom button[data-action="view-home"]'):root.querySelector('.ap-bottom button[data-action="view-assets"]');if(active)active.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});return;
+ }
+ if(a==='preview-product'){var n=el.getAttribute('data-name')||'Item';var toast=document.createElement('div');toast.className='ap-toast';toast.textContent=n+' — preview only';document.body.appendChild(toast);setTimeout(function(){toast.remove();},1800);return;}
+ if(a==='copy-client-id'){var id=(state.profile&&state.profile.client_id)||'AP10023';if(navigator.clipboard)navigator.clipboard.writeText(id);return;}
+ if(a==='share-ref'){var link=location.origin+location.pathname+'?ref='+encodeURIComponent((state.profile&&state.profile.referral_code)||'');if(navigator.share)navigator.share({title:'AegisPay Referral',text:'Join AegisPay using my referral link',url:link}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(link);return;}
  if(a==='language')return;
  if(a==='retry-runtime'){checkRuntime();return;}
   if(a==='complete-task'){
