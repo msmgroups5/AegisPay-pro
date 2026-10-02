@@ -438,3 +438,9 @@ html,body{margin:0!important;padding:0!important;background:#06080c!important;co
  .home-shop-banner{height:98px!important;min-height:98px!important}
  .banner-cart-visual{transform:scale(.68) translate(6px,1px)!important}
 }
+
+/* HOME HEADER MICRO-DETAILS — 2026-10-03 */
+.round-bell{position:relative!important}
+.head-badge{position:absolute!important;right:-2px!important;top:-2px!important;min-width:14px!important;height:14px!important;padding:0 3px!important;box-sizing:border-box!important;border-radius:999px!important;background:#ff2638!important;color:#fff!important;border:2px solid #07080b!important;font-size:7px!important;font-weight:900!important;line-height:10px!important;display:grid!important;place-items:center!important}
+.copy-id-btn{display:inline-grid!important;place-items:center!important;width:18px!important;height:18px!important;margin-left:2px!important;padding:0!important;border:0!important;background:transparent!important;color:#fff!important;font-size:12px!important;line-height:1!important;vertical-align:middle!important;opacity:.92!important}
+.copy-id-btn:active{transform:scale(.9)!important}
