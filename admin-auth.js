@@ -197,7 +197,7 @@ async function login(e){
 }
 async function loadQueues(force){
  if(!state.enabled&&!force){state.queues={deposits:[],kyc:[],withdrawals:[],stats:state.queues.stats||{}};return;}
- var response=await service.client().functions.invoke('admin-queues',{body:{}});
+ var response=await service.invokeFunction('admin-queues',{body:{}});
  if(response.error)throw response.error;
  var data=response.data||{};
  if(typeof data.appEnabled==='boolean')state.enabled=data.appEnabled;
@@ -222,15 +222,15 @@ async function toggleRuntime(){
 async function review(el){
  if(state.busy||!state.enabled)return;state.busy=true;state.error='';render();
  try{
-  var result=await service.client().functions.invoke('admin-review',{body:{action:el.getAttribute('data-kind'),id:el.getAttribute('data-id'),decision:el.getAttribute('data-decision')}});
+  var result=await service.invokeFunction('admin-review',{body:{action:el.getAttribute('data-kind'),id:el.getAttribute('data-id'),decision:el.getAttribute('data-decision')}});
   if(result.error)throw result.error;
   if(el.getAttribute('data-kind')==='withdrawal'&&el.getAttribute('data-decision')==='approve'&&result.data&&result.data.status==='APPROVED'){
-   var payout=await service.client().functions.invoke('execute-payout',{body:{withdrawalId:el.getAttribute('data-id')}});
+   var payout=await service.invokeFunction('execute-payout',{body:{withdrawalId:el.getAttribute('data-id')}});
    if(payout.error)throw new Error('Both approvals are saved. Testnet payout needs configuration or review: '+(payout.error.message||'payout service failed'));
    if(!payout.data||payout.data.status!=='PAID')throw new Error((payout.data&&payout.data.error)||'Payout needs manual reconciliation.');
   }
   if(el.getAttribute('data-kind')==='deposit'&&el.getAttribute('data-decision')==='approve'){
-   var check=await service.client().functions.invoke('verify-deposit',{body:{depositId:el.getAttribute('data-id')}});
+   var check=await service.invokeFunction('verify-deposit',{body:{depositId:el.getAttribute('data-id')}});
    if(check.error)throw check.error;
    if(check.data&&check.data.status==='PENDING_VERIFICATION')state.error=check.data.message||'On-chain transfer is not confirmed yet.';
   }
@@ -241,7 +241,7 @@ async function review(el){
 async function retryPayout(el){
  if(state.busy||!state.enabled)return;state.busy=true;state.error='';render();
  try{
-  var result=await service.client().functions.invoke('execute-payout',{body:{withdrawalId:el.getAttribute('data-id')}});
+  var result=await service.invokeFunction('execute-payout',{body:{withdrawalId:el.getAttribute('data-id')}});
   if(result.error)throw result.error;
   if(!result.data||result.data.status!=='PAID')throw new Error((result.data&&result.data.error)||'Payout needs manual reconciliation.');
   await loadQueues();
@@ -250,13 +250,13 @@ async function retryPayout(el){
 }
 async function checkTelegram(){
  if(state.busy||!state.enabled)return;state.busy=true;state.error='';render();
- try{var result=await service.client().functions.invoke('telegram-withdrawal',{body:{action:'diagnostics'}});if(result.error)throw result.error;state.telegram=result.data||{};if(!state.telegram.configured)state.error='Telegram token, chat ID, and approver IDs must be configured as Supabase secrets.';}
+ try{var result=await service.invokeFunction('telegram-withdrawal',{body:{action:'diagnostics'}});if(result.error)throw result.error;state.telegram=result.data||{};if(!state.telegram.configured)state.error='Telegram token, chat ID, and approver IDs must be configured as Supabase secrets.';}
  catch(err){state.telegram={configured:false};state.error=err.message||'Telegram connection check failed.';}
  finally{state.busy=false;render();}
 }
 async function resendTelegram(el){
  if(state.busy||!state.enabled)return;state.busy=true;state.error='';render();
- try{var result=await service.client().functions.invoke('telegram-withdrawal',{body:{action:'resend',withdrawalId:el.getAttribute('data-id')}});if(result.error)throw result.error;await loadQueues();}
+ try{var result=await service.invokeFunction('telegram-withdrawal',{body:{action:'resend',withdrawalId:el.getAttribute('data-id')}});if(result.error)throw result.error;await loadQueues();}
  catch(err){state.error=err.message||'Telegram approval could not be sent.';await loadQueues().catch(function(){});}
  finally{state.busy=false;render();}
 }
