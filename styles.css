@@ -158,3 +158,82 @@ html,body{margin:0!important;padding:0!important;background:#06080c!important;co
 .crypto-circle{width:58px;height:58px;border-radius:18px;background:#fff0de;color:#e38c08;display:grid;place-items:center;font-size:30px;margin:auto}.crypto-panel{text-align:center}.crypto-panel label{text-align:left}
 .amazon-detail{margin-top:10px;background:#fff;border:1px solid #e0e4e8;border-radius:16px;overflow:hidden}.amazon-detail-media{display:grid;grid-template-columns:58px 1fr;gap:8px;padding:10px}.detail-thumbs{display:grid;gap:7px}.detail-thumbs button{width:54px;height:54px;border:1px solid #dfe3e7;background:#fff;border-radius:8px;overflow:hidden}.detail-thumbs button.selected{border:2px solid #e52231}.detail-thumbs img{width:100%;height:100%;object-fit:cover}.detail-main-image{height:310px;border-radius:9px;background:#f2f3f4;overflow:hidden}.detail-main-image img{width:100%;height:100%;object-fit:contain}.amazon-detail-info{padding:0 14px 14px}.amazon-detail-info h1{font-size:20px;line-height:1.15;margin:4px 0 6px}.amazon-detail-rating{font-size:10px;color:#f1a600}.amazon-detail-rating span{color:#e7a100}.amazon-detail-rating b{color:#1264b0}.amazon-detail-price{font-size:25px;font-weight:900;margin-top:9px}.amazon-detail-price del{font-size:10px;color:#7c848d;font-weight:400}.amazon-detail-price em{font-style:normal;background:#e52332;color:#fff;font-size:8px;padding:5px 7px;border-radius:5px;margin-left:5px}.amazon-detail-info>p{font-size:9px;line-height:1.6;color:#616b75}.detail-choice{display:flex;align-items:center;gap:7px;margin-top:11px;font-size:9px}.choice-dot{width:29px;height:29px;border-radius:50%;background:#f2c5ca;border:2px solid #fff;box-shadow:0 0 0 1px #d7dce1}.choice-dot.active{background:#15191e}.choice-pill{height:34px;border:1px solid #dce1e6;background:#fff;border-radius:7px;padding:0 12px;font-size:8px}.choice-pill.active{border:2px solid #e52130}.detail-quantity{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:9px}.detail-quantity button{width:30px;height:30px;border:1px solid #dfe3e8;background:#fff;border-radius:6px}.detail-quantity i{font-style:normal;color:#0b9d64;margin-left:auto;font-size:8px}.amazon-cart-big,.amazon-buy{width:100%;height:46px;border:0;border-radius:8px;margin-top:12px;font-size:10px;font-weight:900}.amazon-cart-big{background:#ffb20f;color:#171a1e}.amazon-buy{background:#f4511e;color:#fff;margin-top:7px}.detail-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:13px}.detail-benefits span{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:16px}.detail-benefits b{font-size:7px;margin-top:4px}.detail-benefits small{font-size:6px;color:#777f88;margin-top:2px}
 @media(max-width:360px){.amazon-categories{grid-template-columns:repeat(4,1fr)}.amazon-product-image{height:132px}.exact-header{height:64px}.exact-brand img{width:112px}}
+
+
+/* FINAL APPROVED CLIENT UI — reference parity pass 2026-10-03 */
+.exact-app{background:#f7f7f8!important;color:#11151b!important}
+.exact-header{height:76px!important;padding:12px 16px!important;background:#07090d!important}
+.exact-brand img{width:132px!important;height:46px!important;object-fit:contain!important;object-position:left center!important}
+.round-head{width:44px!important;height:44px!important;border-radius:14px!important;background:#11151a!important;border:1px solid #2b3037!important}
+.exact-hero{min-height:146px!important;margin:11px 13px 9px!important;padding:20px 18px!important;border-radius:24px!important;background:linear-gradient(135deg,#3a070b 0%,#9e1722 56%,#ef2736 100%)!important;box-shadow:0 15px 32px rgba(133,14,25,.20)!important}
+.exact-hero h1{color:#fff!important;font-size:27px!important;font-weight:850!important}
+.exact-hero small{color:#fff!important;opacity:.9!important}
+.exact-hero p{color:#ffe8e9!important}
+.hero-building{right:12px!important;bottom:0!important;width:190px!important;height:120px!important;font-size:0!important;opacity:.32!important;transform:none!important;background:
+ linear-gradient(to top,rgba(255,255,255,.32) 0 54%,transparent 54%) 18px 44px/38px 76px no-repeat,
+ linear-gradient(to top,rgba(255,255,255,.26) 0 70%,transparent 70%) 58px 28px/44px 92px no-repeat,
+ linear-gradient(to top,rgba(255,255,255,.34) 0 48%,transparent 48%) 104px 52px/36px 68px no-repeat,
+ linear-gradient(to top,rgba(255,255,255,.20) 0 78%,transparent 78%) 140px 18px/30px 102px no-repeat;
+ border-radius:2px;clip-path:polygon(0 100%,0 38%,20% 38%,20% 20%,43% 20%,43% 48%,61% 48%,61% 12%,77% 12%,77% 45%,100% 45%,100% 100%)}
+.exact-levels{margin:0 13px!important;height:86px!important;border-radius:19px!important}
+.exact-levels>div{height:86px!important}
+.exact-levels b{font-size:21px!important;color:#ef2735!important}
+.exact-levels strong{font-size:12px!important}
+.exact-levels span{font-size:17px!important}
+.exact-view{padding:11px 13px 0!important}
+.home-grid{gap:9px!important}
+.home-tile{height:106px!important;border-radius:18px!important;padding:13px!important;box-shadow:0 8px 20px rgba(0,0,0,.055)!important}
+.home-tile>span{width:43px!important;height:43px!important;border-radius:13px!important}
+.home-tile b{font-size:13px!important}
+.home-tile small{font-size:8px!important}
+.home-ref{height:82px!important;border-radius:19px!important;margin-top:10px!important}
+.home-ref>span{width:50px!important;height:50px!important;border-radius:15px!important}
+.home-ref b{font-size:17px!important}
+.home-shop-banner{min-height:118px!important;border-radius:20px!important;margin-top:11px!important;padding:17px!important;background:linear-gradient(135deg,#39070b,#b51625 58%,#ef2737)!important;box-shadow:0 12px 26px rgba(165,20,35,.16)!important}
+.home-shop-banner span{font-size:39px!important}
+.home-shop-banner b{font-size:18px!important}
+.exact-bottom{height:70px!important;width:min(410px,calc(100% - 16px))!important}
+.exact-bottom.shop-nav{grid-template-columns:repeat(4,1fr)!important}
+.exact-bottom button.active{color:#e3202e!important;background:#fff0f1!important}
+.amazon-top{height:60px!important;background:#080a0d!important}
+.amazon-hero{min-height:164px!important;margin:10px 0!important;padding:17px!important;border-radius:17px!important;background:linear-gradient(135deg,#37070b 0%,#9d1721 55%,#ef2938 100%)!important;box-shadow:0 13px 28px rgba(133,14,25,.16)!important}
+.amazon-word{font-size:31px!important;color:#fff!important}
+.amazon-hero h1{font-size:25px!important;color:#fff!important}
+.amazon-hero p{font-size:10px!important;color:#ffe7e8!important}
+.amazon-boxes{right:14px!important;bottom:22px!important;color:#ffc04a!important;opacity:.95!important}
+.amazon-search{height:48px!important;border-radius:11px!important}
+.amazon-search input{font-size:11px!important}
+.amazon-delivery{height:41px!important;background:#172d42!important;border-radius:9px!important}
+.amazon-categories{gap:7px!important;margin-top:10px!important}
+.amazon-categories button{min-height:68px!important;border-radius:12px!important;background:#fff!important;box-shadow:0 4px 10px rgba(0,0,0,.035)!important}
+.amazon-categories button.active{background:#fff0d8!important;border-color:#ffb21b!important}
+.amazon-section-head{margin:15px 0 8px!important}
+.amazon-section-head h2{font-size:19px!important}
+.amazon-products{gap:9px!important}
+.amazon-product{border-radius:14px!important}
+.amazon-product-image{height:168px!important}
+.amazon-product-body h4{font-size:11px!important}
+.amazon-price{font-size:18px!important}
+.amazon-add{height:36px!important;font-size:9px!important}
+.amazon-detail{border-radius:17px!important}
+.detail-main-image{height:325px!important}
+.amazon-detail-info h1{font-size:21px!important}
+.amazon-detail-price{font-size:27px!important}
+.white-panel{border-radius:18px!important;padding:14px!important}
+.pay-method{min-height:66px!important;border-radius:12px!important}
+.red-button{height:49px!important;border-radius:11px!important;background:linear-gradient(135deg,#f01f31,#b30e1d)!important}
+.ref-banner{min-height:166px!important;border-radius:19px!important;background:linear-gradient(135deg,#5b080f,#f02131)!important}
+.ref-rewards>div{min-height:126px!important;border-radius:16px!important}
+.account-total{min-height:112px!important;border-radius:19px!important;background:linear-gradient(135deg,#4b080f,#ed1e2d)!important}
+.account-total strong{font-size:28px!important}
+.account-stats>div{min-height:108px!important;border-radius:15px!important}
+.account-actions button{height:74px!important;border-radius:13px!important}
+.account-info{border-radius:17px!important}
+@media(max-width:640px){
+ .exact-header{height:76px!important}
+ .exact-hero{margin:11px 12px 9px!important}
+ .exact-levels{margin:0 12px!important}
+ .exact-view{padding-left:12px!important;padding-right:12px!important}
+ .amazon-product-image{height:158px!important}
+ .amazon-hero{min-height:166px!important}
+}
