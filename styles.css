@@ -444,3 +444,48 @@ html,body{margin:0!important;padding:0!important;background:#06080c!important;co
 .head-badge{position:absolute!important;right:-2px!important;top:-2px!important;min-width:14px!important;height:14px!important;padding:0 3px!important;box-sizing:border-box!important;border-radius:999px!important;background:#ff2638!important;color:#fff!important;border:2px solid #07080b!important;font-size:7px!important;font-weight:900!important;line-height:10px!important;display:grid!important;place-items:center!important}
 .copy-id-btn{display:inline-grid!important;place-items:center!important;width:18px!important;height:18px!important;margin-left:2px!important;padding:0!important;border:0!important;background:transparent!important;color:#fff!important;font-size:12px!important;line-height:1!important;vertical-align:middle!important;opacity:.92!important}
 .copy-id-btn:active{transform:scale(.9)!important}
+
+
+/* AEGISPAY — 100% PROMPT MATCH ICON/CONTROL PASS — 2026-10-03 */
+.amazon-categories button .ui-svg,
+.pay-method .ui-svg,
+.ref-banner-icon .ui-svg,
+.ref-rewards .ui-svg,
+.ref-share .ui-svg,
+.ref-link button .ui-svg,
+.account-action-icon .ui-svg,
+.account-stats .ui-svg,
+.detail-benefits .ui-svg{
+  width:24px!important;height:24px!important;display:block!important;
+  fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;
+}
+.amazon-categories button .ui-svg{width:27px!important;height:27px!important;margin:0 auto 5px!important;color:#17202b!important}
+.amazon-categories button.active .ui-svg{color:#e51e2b!important}
+.pay-method>i{width:42px!important;height:42px!important;border-radius:12px!important;display:grid!important;place-items:center!important;font-style:normal!important;background:#fff0f2!important;color:#e51e2b!important;flex:0 0 42px!important}
+.pay-method>i .ui-svg{width:24px!important;height:24px!important}
+.ref-banner{position:relative!important;overflow:hidden!important}
+.ref-banner-icon{position:absolute!important;right:18px!important;top:20px!important;width:58px!important;height:58px!important;border-radius:18px!important;background:rgba(255,255,255,.14)!important;display:grid!important;place-items:center!important;color:#fff!important}
+.ref-banner-icon .ui-svg{width:34px!important;height:34px!important}
+.ref-rewards>div>b{width:38px!important;height:38px!important;border-radius:50%!important;display:grid!important;place-items:center!important;background:#ffe8eb!important;color:#e51e2b!important;font-size:0!important}
+.ref-rewards>div>b .ui-svg{width:21px!important;height:21px!important}
+.ref-level-pill{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:max-content!important;margin-top:4px!important;padding:3px 7px!important;border-radius:999px!important;background:#fff0f2!important;color:#d7192a!important;font-size:7px!important;font-weight:900!important;font-style:normal!important;letter-spacing:.3px!important}
+.ref-share button{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important}
+.ref-share button .ui-svg{width:17px!important;height:17px!important}
+.ref-link>div:first-of-type button .ui-svg{width:17px!important;height:17px!important}
+.account-actions{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important;align-items:start!important}
+.account-actions button{height:auto!important;min-height:82px!important;border:0!important;background:transparent!important;border-radius:0!important;padding:4px 2px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;color:#20242a!important;font-weight:800!important}
+.account-action-icon{width:54px!important;height:54px!important;border-radius:50%!important;background:#fff!important;box-shadow:0 5px 13px rgba(0,0,0,.07)!important;display:grid!important;place-items:center!important;color:#e51e2b!important;border:1px solid #f0e2e4!important}
+.account-action-icon .ui-svg{width:25px!important;height:25px!important}
+.account-actions button small{font-size:8px!important;line-height:1.15!important;color:#343940!important}
+.account-stats>div>span .ui-svg{width:23px!important;height:23px!important}
+.detail-benefits{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:7px!important}
+.detail-benefits>span{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:3px!important}
+.detail-benefits>span .ui-svg{width:23px!important;height:23px!important;color:#e51e2b!important}
+.detail-benefits>span b{font-size:8px!important}
+.detail-benefits>span small{font-size:7px!important;color:#777d85!important}
+@media(max-width:380px){
+ .account-action-icon{width:49px!important;height:49px!important}
+ .account-actions button{min-height:76px!important}
+ .ref-banner-icon{right:12px!important;top:16px!important}
+}
