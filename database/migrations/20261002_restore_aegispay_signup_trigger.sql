@@ -41,16 +41,16 @@ BEGIN
   END IF;
 
   v_name := left(trim(COALESCE(
-    NEW.raw_user_metadata ->> 'full_name',
-    NEW.raw_user_metadata ->> 'name',
+    NEW.raw_user_meta_data ->> 'full_name',
+    NEW.raw_user_meta_data ->> 'name',
     split_part(NEW.email, '@', 1)
   )), 100);
   IF length(v_name) < 2 THEN RAISE EXCEPTION 'Please provide a valid display name'; END IF;
 
-  v_language := lower(COALESCE(NEW.raw_user_metadata ->> 'preferred_language', 'en'));
+  v_language := lower(COALESCE(NEW.raw_user_meta_data ->> 'preferred_language', 'en'));
   IF v_language NOT IN ('en','ur') THEN v_language := 'en'; END IF;
 
-  v_referral_code := upper(trim(COALESCE(NEW.raw_user_metadata ->> 'referral_code', '')));
+  v_referral_code := upper(trim(COALESCE(NEW.raw_user_meta_data ->> 'referral_code', '')));
   IF v_referral_code <> '' THEN
     SELECT id INTO v_referrer_id
     FROM public.users
