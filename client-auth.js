@@ -406,4 +406,266 @@ async function checkRuntime(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+function shopSection(d){
+ var cart=loadShopCart(),filtered=shopProductList(),tasks=currentShopTasks(d),hasCycle=!!(d&&d.cycle),assignedCount=Math.min(tasks.length,PREMIUM_SHOP.length);
+ var chips=SHOP_CATEGORIES.map(function(cat){return '<button type="button" class="aegis-shop-chip '+(shopCategory===cat?'active':'')+'" data-action="shop-category" data-category="'+esc(cat)+'">'+esc(cat)+'</button>';}).join('');
+ var products=filtered.map(function(p){
+  var inCart=cart.indexOf(p.id)>=0,task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';
+  return '<article class="aegis-product"><div class="aegis-product-media"><span class="fallback">'+esc(p.emoji)+'</span><img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" onerror="this.classList.add(\'broken\')" loading="lazy"><span class="aegis-product-badge">'+esc(p.badge)+'</span>'+(pending?'<span class="aegis-task-badge">TASK</span>':'')+'</div><div class="aegis-product-body"><div class="aegis-product-brand">'+esc(p.brand)+'</div><div class="aegis-product-title">'+esc(p.title)+'</div><div class="aegis-stars">★★★★★ <span>'+Number(p.rating||4.5).toFixed(1)+'</span></div><div class="aegis-product-price"><strong>$'+Number(p.marketPrice).toFixed(2)+'</strong><small>display</small></div><div class="aegis-task-value '+(pending?'':'browse')+'">'+(pending?'Task '+money(task.task_value)+' assigned':'Browse only · no task')+'</div><button type="button" class="aegis-product-action '+(inCart?'added':(pending?'task':''))+'" data-action="shop-add" data-id="'+esc(p.id)+'">'+(inCart?'✓ Added to Cart':(pending?'Add to Cart':'Preview Item'))+'</button></div></article>';
+ }).join('');
+ var cartProducts=cart.map(function(id){for(var i=0;i<PREMIUM_SHOP.length;i++){if(PREMIUM_SHOP[i].id===id)return PREMIUM_SHOP[i];}return null;}).filter(Boolean);
+ var cartRows=cartProducts.map(function(p){
+  var task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';
+  return '<div class="aegis-cart-item"><img class="aegis-cart-thumb" src="'+esc(p.image)+'" alt="" onerror="this.style.display=\'none\'"><div class="aegis-cart-copy"><b>'+esc(p.title)+'</b><small>'+esc(p.category)+' · $'+Number(p.marketPrice).toFixed(2)+' display</small><strong>'+(task?'Task: '+esc(task.title):'Preview item only')+'</strong></div><div class="aegis-cart-actions"><button type="button" class="remove" data-action="shop-remove" data-id="'+esc(p.id)+'">Remove</button>'+(pending?'<button type="button" class="buy" data-action="shop-buy" data-id="'+esc(p.id)+'">Buy</button>':'')+'</div></div>';
+ }).join('');
+ var total=cartProducts.reduce(function(a,p){return a+Number(p.marketPrice||0);},0);
+ return '<section class="section aegis-shop" style="margin-top:18px" id="shop"><div class="aegis-shop-head"><div class="aegis-shop-brand"><span class="aegis-shop-logo">A</span><div><h3>'+t('shopTitle')+'</h3><small>Marketplace-style task center · '+PREMIUM_SHOP.length+' products</small></div></div><button type="button" class="aegis-shop-cart-top" data-action="shop-cart-focus" aria-label="Open cart">🛒<span class="aegis-shop-cart-count">'+cart.length+'</span></button></div><div class="aegis-shop-hero"><span class="kicker">AegisPay Marketplace</span><h4>Browse • Add to Cart • Buy • Complete</h4><p>Familiar shopping-style browsing from $2 to $999. Market prices are display-only; only items carrying the TASK badge are linked to assigned AegisPay tasks.</p><div class="aegis-shop-hero-meta"><span>'+PREMIUM_SHOP.length+' products</span><span>'+assignedCount+' assigned tasks</span><span>'+(hasCycle?'Cycle active':'Activate after verified deposit')+'</span></div></div><div class="aegis-shop-controls"><form id="shopSearchForm" class="aegis-shop-search"><input id="shopSearchInput" value="'+esc(shopSearch)+'" placeholder="Search products, brands or categories"><button type="submit" aria-label="Search">⌕</button></form><div class="aegis-shop-chips">'+chips+'</div></div>'+(products?'<div class="aegis-shop-grid">'+products+'</div>':'<div class="aegis-shop-empty"><b>No matching products</b>Try another search or category.</div>')+'<div class="aegis-cart" id="shop-cart"><div class="aegis-cart-head"><div><h4>Shopping Cart</h4><small>'+cart.length+' item'+(cart.length===1?'':'s')+' · simulated display</small></div><button type="button" class="aegis-shop-chip" data-action="shop-clear">Clear</button></div><div class="aegis-cart-list">'+(cartRows||'<div class="aegis-cart-empty">Your cart is empty. Add a TASK item to continue.</div>')+'</div><div class="aegis-cart-footer"><div><span>Cart display total</span><strong>$'+total.toFixed(2)+'</strong></div><div><span>Task rule</span><strong style="font-size:11px">'+(hasCycle?'Buy mapped tasks to complete them':'Verify deposit to activate tasks')+'</strong></div></div></div><div class="aegis-shop-notice"><div>🛡️</div><div><strong>TESTNET / DEMO SAFEGUARD</strong>This is an AegisPay task interface, not a real marketplace checkout. “Buy” completes the mapped assigned task through the existing secure backend function; no real product order is submitted.</div></div></section>';
+}
+
+function referralsSection(d){
+ var refs=d.referrals||[],l1=refs.filter(function(x){return x.referral_level===1;}).length,l2=refs.filter(function(x){return x.referral_level===2;}).length,reward=refs.reduce(function(a,x){return a+Number(x.platform_reward||0);},0);
+ var link=location.origin+location.pathname+'?ref='+encodeURIComponent(state.profile&&state.profile.referral_code||'');
+ return '<section class="section" style="margin-top:18px"><h3>'+t('referralsTitle')+'</h3><div class="stats-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><div class="stat-card"><small>'+t('level1')+'</small><strong>'+l1+'</strong></div><div class="stat-card"><small>'+t('level2')+'</small><strong>'+l2+'</strong></div><div class="stat-card"><small>'+t('referralBonus')+'</small><strong>'+money(reward)+'</strong></div></div><div style="margin-top:10px;padding:10px;border-radius:12px;background:#f7fbfd;border:1px solid #e4edf3;overflow-wrap:anywhere"><small>'+esc(link)+'</small><button class="ghost-dark" style="margin-left:8px" data-action="copy-ref">'+t('save')+'</button></div></section>';
+}
+function notificationsSection(d){
+ var ns=d.notifications||[];
+ return '<section class="section" style="margin-top:18px"><h3>'+t('notificationsTitle')+'</h3>'+(ns.length?ns.map(function(n){return '<article style="padding:10px 0;border-bottom:1px solid #edf2f6"><div style="display:flex;justify-content:space-between;gap:8px"><strong>'+esc(n.title)+'</strong><small>'+esc(date(n.created_at))+'</small></div><p style="margin:4px 0">'+esc(n.body)+'</p></article>';}).join(''):'<p>'+t('empty')+'</p>')+'</section>';
+}
+function aiAnswer(q){
+ q=String(q||'').toLowerCase();
+ if(q.indexOf('deposit')>=0)return 'Select your tier, send the configured TRON amount, then submit the screenshot and TXID. Balance is credited only after evidence review and a confirmed matching transfer.';
+ if(q.indexOf('shop')>=0||q.indexOf('task')>=0)return 'A verified deposit creates your Shop cycle. Complete every assigned task. When all tasks are complete, the 18-hour settlement timer starts.';
+ if(q.indexOf('withdraw')>=0)return 'KYC must be verified and a withdrawal wallet linked. Withdrawal requests require Master Admin approval plus the configured Telegram approval.';
+ if(q.indexOf('referral')>=0)return 'Qualifying verified first deposits create the configured referral rewards for the eligible levels.';
+ if(q.indexOf('kyc')>=0)return 'Upload clear CNIC or Passport images. Withdrawals remain locked until KYC verification is complete.';
+ return 'I can help with Deposit, Shop, Tasks, Withdrawal, KYC and Referrals.';
+}
+function aiSection(){
+ return '<section class="section" style="margin-top:18px"><h3>'+t('aiTitle')+'</h3><p>'+t('aiHint')+'</p><div id="aiReply" style="padding:10px;border-radius:12px;background:#f6fbfe;color:#45667b;font-size:13px">'+aiAnswer('')+'</div><form id="aiForm" style="display:flex;gap:8px;margin-top:10px"><input id="aiInput" type="text" placeholder="'+t('aiHint')+'" style="flex:1"><button class="primary" type="submit">Ask</button></form></section>';
+}
+function updateCycleCountdown(){
+ var el=document.getElementById('cycleCountdown');if(el)el.textContent=cycleCountdown(el.getAttribute('data-ready')||'');
+}
+
+function renderDashboard(){
+ var p=state.profile||{},d=state.data||{},kyc=d.kyc;
+ var kycLabel=kyc?kyc.status:(t('kycNeeded'));
+ var kycSection=kyc&&kyc.status==='VERIFIED'
+  ?'<section class="section"><h3>'+t('kyc')+'</h3>'+statusBadge(t('kycDone'))+'</section>'
+  :(kyc&&(kyc.status==='PENDING_REVIEW'||kyc.status==='MANUAL_REVIEW')
+   ?'<section class="section" style="margin-top:18px"><h3>'+t('kycTitle')+'</h3><p>'+t('kycHelp')+'</p>'+statusBadge(kyc.status)+'<p>'+esc(kyc.review_reason||t('pending'))+'</p></section>'
+   :'<section class="section" style="margin-top:18px"><h3>'+t('kycTitle')+'</h3><p>'+t('kycHelp')+'</p><form id="kycForm">'+
+   '<div class="field"><label>'+t('documentType')+'</label><select id="kycType"><option value="CNIC">'+t('cnic')+'</option><option value="PASSPORT">'+t('passport')+'</option></select></div>'+
+   '<div class="field"><label>'+t('front')+'</label><input id="kycFront" type="file" accept="image/jpeg,image/png,image/webp" required></div>'+
+   '<div class="field" id="kycBackWrap"><label>'+t('backImage')+'</label><input id="kycBack" type="file" accept="image/jpeg,image/png,image/webp"></div>'+
+   '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 0"><input id="kycConsent" type="checkbox" required><span>'+t('consent')+'</span></label>'+
+   '<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submitKyc')+'</button></form><p>'+t('kyc')+': '+statusBadge(kycLabel)+'</p></section>');
+ var walletForm=p.destination_address
+  ?'<p>'+t('wallet')+': <code>'+esc(p.destination_address)+'</code></p>'
+  :'<div class="field"><label>'+t('wallet')+'</label><input id="walletAddress" autocomplete="off" required></div><div class="field"><label>'+t('walletOwner')+'</label><input id="walletOwner" value="'+esc(p.name||'')+'" required></div><button type="button" class="primary" data-action="link-wallet">'+t('linkWallet')+'</button>';
+ var tiers=[['T1',30],['T2',50],['T3',100],['V1',250],['V2',500],['V3',1000]];
+ var tierOptions=tiers.map(function(x){return '<option value="'+x[0]+'">'+x[0]+' — $'+x[1]+'</option>';}).join('');
+ var body='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h1>'+t('hi')+', '+esc(p.name||'')+'</h1><button class="ghost-dark" data-action="logout">'+t('logout')+'</button></div>'+
+  '<div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:15px 0"><div class="stat-card"><small>'+t('balance')+'</small><strong>'+money(p.current_platform_balance)+'</strong></div><div class="stat-card"><small>'+t('principal')+'</small><strong>'+money(p.principal_balance)+'</strong></div><div class="stat-card"><small>'+t('profit')+'</small><strong>'+money(p.profit_balance)+'</strong></div><div class="stat-card"><small>'+t('kyc')+'</small><strong style="font-size:15px">'+esc(kycLabel)+'</strong></div></div>'+
+  '<div class="notice" style="margin:14px 0">'+t('network')+'</div>'+
+  '<section class="section"><h3>'+t('deposit')+'</h3><p>'+t('depositHelp')+'</p><form id="depositForm"><div class="field"><label>'+t('tier')+'</label><select id="depositTier">'+tierOptions+'</select></div><div class="field"><label>'+t('amount')+'</label><input id="depositAmount" type="number" min="1" step="0.01" value="30" required></div><div class="field"><label>'+t('txid')+'</label><input id="depositTxid" type="text" minlength="64" maxlength="64" pattern="[A-Fa-f0-9]{64}" required></div><div class="field"><label>'+t('proof')+'</label><input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submit')+'</button></form></section>'+
+  kycSection+
+  '<section class="section" style="margin-top:18px"><h3>'+t('withdraw')+'</h3><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form></section>'+
+  '<section class="section" style="margin-top:18px"><h3>'+t('refCode')+'</h3><code>'+esc(p.referral_code||'')+'</code></section>'+
+  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal')+shopSection(d)+referralsSection(d)+notificationsSection(d)+aiSection();
+ root.innerHTML=shell(body,'dashboard');
+ var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');
+ if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
+ var tier=document.getElementById('depositTier'),amount=document.getElementById('depositAmount');
+ if(tier&&amount)tier.addEventListener('change',function(){var opt=tier.options[tier.selectedIndex];amount.value=opt.text.match(/\$(\d+(?:\.\d+)?)/)?.[1]||30;});
+}
+function render(){
+ if(state.appEnabled===false){
+  root.innerHTML=shell('<section class="tg-paused"><span class="tg-paused-icon">⏻</span><span class="tg-kicker">SERVICE STATUS</span><h1>'+t('pausedTitle')+'</h1><p>'+t(state.runtimeUnverified?'runtimeUnknown':'pausedInfo')+'</p><button type="button" class="tg-button tg-button-primary" data-action="retry-runtime">'+t('retryRuntime')+'</button></section>','auth');
+ }else if(state.profile&&state.mode==='dashboard')renderDashboard();else renderAuth();
+}
+async function uploadImage(file,area){
+ if(!file)throw new Error(t('chooseFile'));
+ if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error(t('chooseFile'));
+ if(file.size>10*1024*1024)throw new Error(t('fileTooLarge'));
+ var user=await service.currentUser();if(!user)throw new Error('Authentication is required.');
+ var ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+ var path=user.id+'/'+area+'/'+(crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2))+'.'+ext;
+ var result=await service.client().storage.from('private-verification').upload(path,file,{upsert:false,contentType:file.type,cacheControl:'3600'});
+ if(result.error)throw result.error;
+ return path;
+}
+function busyStart(){
+ busy=true;state.message='';
+ root.querySelectorAll('form button[type="submit"]').forEach(function(button){button.disabled=true;});
+ root.querySelectorAll('form').forEach(function(form){form.setAttribute('aria-busy','true');});
+ if(!root.querySelector('.tg-inline-progress')){
+  var progress=document.createElement('div');progress.className='tg-inline-progress';progress.setAttribute('role','status');
+  progress.innerHTML='<span class="tg-spinner" aria-hidden="true"></span><span>Processing securely…</span>';
+  var card=root.querySelector('.tg-card');if(card)card.insertBefore(progress,card.querySelector('.tg-footer'));
+ }
+}
+function busyEnd(){busy=false;render();}
+async function handleLogin(e){
+ e.preventDefault();var email=document.getElementById('loginEmail').value,password=document.getElementById('loginPassword').value;busyStart();render();
+ try{if(!await service.appRuntimeEnabled())throw new Error(t('pausedInfo'));await service.signIn(email,password);await refreshProfile();}
+ catch(err){state.profile=null;state.mode='login';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleSignup(e){
+ e.preventDefault();var name=document.getElementById('signupName').value.trim(),email=document.getElementById('signupEmail').value.trim(),password=document.getElementById('signupPassword').value,referral=document.getElementById('signupReferral').value.trim();
+ if(name.length<2||password.length<8){setMessage(t('passwordHint'));render();return;}
+ busyStart();render();
+ try{
+  var result=await service.signUp(email,password,name,referral,locale);
+  if(result.session){await refreshProfile();}
+  else{state.mode='login';state.phase='ready';state.messageTone='success';setMessage(t('signupSent'),'success');}
+ }catch(err){state.mode='signup';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleReset(e){
+ e.preventDefault();busyStart();
+ try{await service.sendPasswordReset(document.getElementById('resetEmail').value);state.mode='login';state.phase='ready';setMessage('If this email belongs to an account, recovery instructions have been sent.','success');state.messageTone='success';}
+ catch(err){state.mode='reset';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handlePassword(e){
+ e.preventDefault();var pass=document.getElementById('newPassword').value,confirm=document.getElementById('confirmPassword').value;
+ if(pass.length<8||pass!==confirm){setMessage(pass.length<8?t('passwordHint'):'Passwords do not match.');render();return;}
+ busyStart();try{await service.updatePassword(pass);history.replaceState(null,document.title,location.pathname+location.search);await refreshProfile();}
+ catch(err){state.mode='password-update';state.phase='ready';setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleDeposit(e){
+ e.preventDefault();busyStart();
+ try{
+  var file=document.getElementById('depositProof').files[0];
+  var path=await uploadImage(file,'deposits');
+  var result=await service.client().functions.invoke('submit-deposit',{body:{tierId:document.getElementById('depositTier').value,amount:Number(document.getElementById('depositAmount').value),txid:document.getElementById('depositTxid').value.trim(),screenshotPath:path}});
+  if(result.error)throw result.error;
+  if(result.data&&result.data.aiReviewStatus==='APPROVED'){
+   var verified=await service.client().functions.invoke('verify-deposit',{body:{depositId:result.data.depositId}});
+   if(verified.error)throw verified.error;
+   setMessage(verified.data&&verified.data.status==='VERIFIED'?'Deposit confirmed and balance credited.':(verified.data&&verified.data.message)||t('pending'),'success');
+  }else{
+   setMessage((result.data&&result.data.message)||t('pending'),'success');
+  }
+  state.messageTone='success';await refreshData();
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleKyc(e){
+ e.preventDefault();if(!document.getElementById('kycConsent').checked){setMessage(t('consent'));render();return;}
+ busyStart();
+ try{
+  var doc=document.getElementById('kycType').value;
+  var front=await uploadImage(document.getElementById('kycFront').files[0],'kyc');
+  var backFile=document.getElementById('kycBack').files[0];
+  var back=doc==='CNIC'?await uploadImage(backFile,'kyc'):'';
+  var result=await service.client().functions.invoke('submit-kyc',{body:{documentType:doc,frontPath:front,backPath:back,processingConsent:true}});
+  if(result.error)throw result.error;
+  setMessage(result.data&&result.data.message||t('pending'),'success');state.messageTone='success';await refreshData();
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function handleWithdraw(e){
+ e.preventDefault();busyStart();
+ try{
+  var p=state.profile,c=service.client();
+  if(!p.destination_address){
+   var address=document.getElementById('walletAddress').value.trim(),owner=document.getElementById('walletOwner').value.trim();
+   var linked=await c.rpc('link_withdrawal_wallet',{p_address:address,p_owner_name:owner});
+   if(linked.error)throw linked.error;
+   await refreshData();p=state.profile;
+  }
+  if(!state.data.kyc||state.data.kyc.status!=='VERIFIED')throw new Error(t('withdrawKyc'));
+  var result=await service.requestWithdrawal(Number(document.getElementById('withdrawAmount').value));
+  if(result.error)throw result.error;
+  var telegram=await c.functions.invoke('telegram-withdrawal',{body:{action:'notify',withdrawalId:result.data}});
+  setMessage(telegram.error?t('withdrawTelegramPending'):t('ok'),'success');state.messageTone='success';await refreshData();
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+async function action(e){
+ var el=e.target.closest('[data-action]');if(!el)return;
+ var a=el.getAttribute('data-action');
+ if(a==='language')return;
+ if(a==='retry-runtime'){checkRuntime();return;}
+  if(a==='complete-task'){
+   if(busy)return;busyStart();render();
+   try{var taskResult=await service.client().rpc('complete_task',{p_task_id:el.getAttribute('data-id')});if(taskResult.error)throw taskResult.error;setMessage(t('taskCompleted'),'success');await refreshData();state.messageTone='success';}
+   catch(err){setMessage(authError(err));}
+   finally{busy=false;render();} return;
+  }
+  if(a==='copy-ref'){
+   var refCode=state.profile&&state.profile.referral_code||'';
+   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
+   else{setMessage(t('error'));render();}
+   return;
+  }
+ if(a==='keep-language'){askLanguage=false;try{localStorage.setItem('aegispay-language',locale);}catch(e){}render();return;}
+ if(a==='login'){state.mode='login';state.message='';render();}
+ else if(a==='signup'){state.mode='signup';state.message='';render();}
+ else if(a==='reset'){state.mode='reset';state.message='';render();}
+ else if(a==='logout'){await service.signOut();state.profile=null;state.mode='login';state.phase='ready';render();}
+ else if(a==='link-wallet'){
+  try{busyStart();var r=await service.client().rpc('link_withdrawal_wallet',{p_address:document.getElementById('walletAddress').value.trim(),p_owner_name:document.getElementById('walletOwner').value.trim()});if(r.error)throw r.error;setMessage(t('walletLinked'),'success');state.messageTone='success';await refreshData();}
+  catch(err){setMessage(authError(err));}finally{busy=false;render();}
+ }
+}
+root.addEventListener('submit',async function(e){
+ if(e.target.id==='aiForm'){
+  e.preventDefault();
+  var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
+  if(!question)return;
+  if(aiReply)aiReply.textContent='Thinking…';
+  try{
+    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
+    if(aiResult.error)throw aiResult.error;
+    if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
+  }catch(err){
+    if(aiReply)aiReply.textContent=aiAnswer(question);
+  }
+  if(aiInput)aiInput.value='';
+  return;
+ }
+ if(e.target.id==='loginForm')handleLogin(e);
+ else if(e.target.id==='signupForm')handleSignup(e);
+ else if(e.target.id==='resetForm')handleReset(e);
+ else if(e.target.id==='passwordForm')handlePassword(e);
+ else if(e.target.id==='depositForm')handleDeposit(e);
+ else if(e.target.id==='kycForm')handleKyc(e);
+ else if(e.target.id==='withdrawForm')handleWithdraw(e);
+});
+root.addEventListener('click',action);root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
+
+async function boot(){
+ render();
+ if(!service||!service.isAvailable()){state.phase='ready';setMessage(t('unavailable'));render();return;}
+ service.onAuthStateChange(function(event,session){
+  if(event==='SIGNED_OUT'){state.profile=null;state.mode='login';state.phase='ready';render();}
+  if(event==='PASSWORD_RECOVERY'){state.profile=null;state.mode='password-update';state.phase='ready';render();}
+ });
+ try{
+  state.appEnabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;
+  if(!state.appEnabled){state.phase='paused';render();}
+  else{var session=await service.session();if(session)await refreshProfile();else{state.phase='ready';render();}}
+ }catch(err){state.appEnabled=false;state.runtimeUnverified=true;state.phase='paused';setMessage(t('runtimeUnknown'));render();}
+ if(!runtimeTimer)runtimeTimer=setInterval(function(){checkRuntime();updateCycleCountdown();},10000);
+ updateCycleCountdown();
+}
+async function checkRuntime(){
+ if(!service||!service.isAvailable()||runtimeRequest||busy)return runtimeRequest;
+ runtimeRequest=(async function(){
+  var was=state.appEnabled,wasUnverified=state.runtimeUnverified,wasPaused=state.phase==='paused';
+  try{
+   var enabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;state.appEnabled=enabled;
+   if(!enabled){var changed=was!==false||!wasPaused||wasUnverified;state.profile=null;state.phase='paused';state.mode='login';state.message='';if(changed)render();return;}
+   if(was===false||wasPaused||wasUnverified){state.phase='ready';state.message='';var session=await service.session();if(session)await refreshProfile();else{state.profile=null;state.mode='login';render();}}
+  }catch(err){var changed=!state.runtimeUnverified||state.phase!=='paused';state.appEnabled=false;state.runtimeUnverified=true;state.profile=null;state.phase='paused';if(changed){setMessage(t('runtimeUnknown'));render();}}
+ })();
+ try{return await runtimeRequest;}finally{runtimeRequest=null;}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
 
