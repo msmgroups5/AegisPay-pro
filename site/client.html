@@ -8,24 +8,26 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="AegisPay premium client application">
 <title>AegisPay — Secure Client & Shop</title>
-<link rel="icon" href="/aegispay-logo.svg" type="image/svg+xml">
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="./aegispay-logo.svg" type="image/svg+xml">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./premium.css">
 </head>
 <body>
 <div id="app" aria-live="polite"></div>
 <script>window.AEGIS_ANDROID_APP=!!window.AegisNative;window.AEGIS_ADMIN_PORTAL=false;</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/supabase-client.js?v=20261002-runtime-fix"></script>
-<script src="/supabase-service.js?v=20261002-runtime-fix"></script>
-<script src="/aegis-auth-redirect.js?v=20261002-runtime-fix"></script>
-<script src="/app-update.js?v=20261002-runtime-fix"></script>
-<script src="/client-auth.js?v=20261002-runtime-fix"></script>
+<script src="./supabase-client.js?v=20261002-runtime-fix"></script>
+<script src="./supabase-service.js?v=20261002-runtime-fix"></script>
+<script src="./aegis-auth-redirect.js?v=20261002-runtime-fix"></script>
+<script src="./app-update.js?v=20261002-runtime-fix"></script>
+<script src="./shop-catalog.js"></script>
+<script src="./client-auth.js?v=20261002-runtime-fix"></script>
 <script>
 (function(){
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('/service-worker.js?v=20261002-runtime-fix').catch(function(){});
+      navigator.serviceWorker.register('./service-worker.js?v=20261002-runtime-fix').catch(function(){});
     });
   }
 })();
