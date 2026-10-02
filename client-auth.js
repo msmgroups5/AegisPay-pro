@@ -4,7 +4,6 @@ var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
 var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
 var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null;
-var PREMIUM_SHOP=window.AegisShopCatalog||[];var SHOP_CATEGORIES=['All','Electronics','Fashion','Home & Kitchen','Beauty','Sports','Gaming','Office','Books','Outdoor'];var shopSearch='',shopCategory='All';
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
 var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
 var locale=saved==='ur'?'ur':saved==='en'?'en':detected;
@@ -56,7 +55,7 @@ function shell(body,page){
  document.documentElement.lang=locale;document.documentElement.dir=locale==='ur'?'rtl':'ltr';
  var wide=page==='dashboard';
  return '<main class="tg-page '+(wide?'tg-page-dashboard':'')+'"><section class="tg-card '+(wide?'tg-card-dashboard':'tg-card-auth')+'">'+
- '<header class="tg-topbar"><div class="tg-brand"><img src="./aegispay-logo.svg" width="42" height="42" alt=""><span><b>Aegis<span>Pay</span></b><small>SINCE 2023 — 2026 · SECURE CLIENT PORTAL</small></span></div>'+ 
+ '<header class="tg-topbar"><div class="tg-brand"><img src="/aegispay-logo.svg" width="42" height="42" alt=""><span><b>Aegis<span>Pay</span></b><small>SINCE 2023 — 2026 · SECURE CLIENT PORTAL</small></span></div>'+ 
  '<label class="tg-language">'+t('language')+'<select data-action="language"><option value="en" '+(locale==='en'?'selected':'')+'>English</option><option value="ur" '+(locale==='ur'?'selected':'')+'>Urdu</option></select></label></header>'+ 
  (askLanguage&&!wide?'<div class="tg-language-hint">'+t('detected')+' <button type="button" data-action="keep-language" class="tg-button tg-button-soft">'+t('continue')+'</button></div>':'')+
  (state.message?'<div role="status" aria-live="polite" class="tg-alert '+(state.messageTone==='success'?'is-success':'is-error')+'">'+esc(state.message)+'</div>':'')+body+
@@ -98,7 +97,7 @@ async function refreshProfile(){
  profileRequest=(async function(){
   try{
    var result=await service.claimAegisPayProfile();
-   if(result.profile.role==='MASTER ADMIN'){location.href='/admin/';return;}
+   if(result.profile.role==='MASTER ADMIN'){location.href='./master-admin.html';return;}
    if(result.profile.role!=='USER')throw new Error('This account does not have client access.');
    state.profile=result.profile;
    if(result.profile.preferred_language==='ur'||result.profile.preferred_language==='en'){
@@ -116,20 +115,14 @@ async function refreshData(){
   c.from('users').select('id,name,email,role,status,current_platform_balance,principal_balance,profit_balance,manual_credit_balance,withdrawal_held,destination_address,withdrawal_wallet_owner_name,preferred_language,referral_code,first_deposit_done').eq('id',p.id).maybeSingle(),
   c.from('deposit_submissions').select('id,tier_id,gross_amount,credited_amount,status,ai_review_status,verification_note,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
   c.from('withdrawal_requests').select('id,amount,fee_amount,net_amount,status,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10),
-  c.from('kyc_verifications').select('id,document_type,status,ai_review_status,review_reason,submitted_at').eq('user_id',p.id).order('submitted_at',{ascending:false}).limit(1),
-  c.from('tasks').select('id,user_id,cycle_id,title,description,status,progress,reward,task_value,offer_id,start_date,due_date,completion_date').eq('user_id',p.id).order('start_date',{ascending:false}).limit(100),
-  c.from('cycle_runs').select('id,user_id,tier_id,cycle_base,status,task_completed_at,ready_at,settled_at,profit_amount,created_at,source_deposit_id').eq('user_id',p.id).order('created_at',{ascending:false}).limit(1).maybeSingle(),
-  c.from('referrals').select('id,user_id,referred_user_id,referral_level,platform_reward,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100),
-  c.from('notifications').select('id,user_id,notification_type,title,body,is_read,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(50),
-  c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,product_id,reward_text,status,instructions,created_at,updated_at').eq('status','ACTIVE').order('created_at',{ascending:false})
+  c.from('kyc_verifications').select('id,document_type,status,ai_review_status,review_reason,submitted_at').eq('user_id',p.id).order('submitted_at',{ascending:false}).limit(1)
  ]);
  if(profileRes.error)throw profileRes.error;
  state.profile=profileRes.data||p;
- state.data={deposits:depositsRes.data||[],withdrawals:withdrawalsRes.data||[],kyc:(kycRes.data||[])[0]||null,tasks:tasksRes.data||[],cycle:(cycleRes.data||[])[0]||null,referrals:refsRes.data||[],notifications:notificationsRes.data||[],offers:offersRes.data||[]};
+ state.data={deposits:depositsRes.data||[],withdrawals:withdrawalsRes.data||[],kyc:(kycRes.data||[])[0]||null};
  if(depositsRes.error)state.data.deposits=[];
  if(withdrawalsRes.error)state.data.withdrawals=[];
  if(kycRes.error)state.data.kyc=null;
- if(tasksRes.error)state.data.tasks=[];if(cycleRes.error)state.data.cycle=null;if(refsRes.error)state.data.referrals=[];if(notificationsRes.error)state.data.notifications=[];if(offersRes.error)state.data.offers=[];
 }
 function date(v){try{return new Date(v).toLocaleString(locale==='ur'?'ur-PK':'en-US');}catch(e){return v||'';}}
 function statusBadge(v){return '<span style="display:inline-block;padding:4px 8px;border-radius:99px;background:#edf3fa;color:#314760;font-size:12px">'+esc(String(v||'Pending').split('_').join(' '))+'</span>';}
@@ -149,49 +142,16 @@ function cycleCountdown(readyAt){
  var total=Math.floor(ms/1000),h=Math.floor(total/3600),m=Math.floor((total%3600)/60),s=total%60;
  return h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
 }
-function shopCartKey(){return 'aegispay-premium-cart:'+((state.profile&&state.profile.id)||'guest');}
-function loadShopCart(){try{var v=JSON.parse(localStorage.getItem(shopCartKey())||'[]');return Array.isArray(v)?v:[]}catch(e){return [];}}
-function saveShopCart(v){try{localStorage.setItem(shopCartKey(),JSON.stringify(v));}catch(e){}}
-function currentShopTasks(d){return d&&d.cycle?(d.tasks||[]).filter(function(x){return x.cycle_id===d.cycle.id;}):[];}
-function shopTaskForProduct(d,id){
-  var tasks=currentShopTasks(d),offers=(d&&d.offers)||[];
-  for(var i=0;i<tasks.length;i++){
-   var task=tasks[i],offer=offers.find(function(x){return String(x.id)===String(task.offer_id);});
-   if(offer&&String(offer.product_id||'')===String(id))return task;
-  }
-  return null;
-}
-function shopProductList(){var q=shopSearch.trim().toLowerCase(),cat=shopCategory.toLowerCase();return PREMIUM_SHOP.filter(function(p){return (cat==='all'||p.category.toLowerCase()===cat)&&(!q||p.title.toLowerCase().indexOf(q)>=0||p.brand.toLowerCase().indexOf(q)>=0||p.category.toLowerCase().indexOf(q)>=0||p.subcategory.toLowerCase().indexOf(q)>=0);});}
-async function completeShopPurchase(productId){
- var d=state.data||{},task=shopTaskForProduct(d,productId);
- if(!task){setMessage('This Shop item is not assigned to your current cycle.','error');render();return;}
- if(task.status==='Completed'){saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));render();return;}
- if(busy)return;
- busyStart();render();
- try{
-  var result=await service.client().rpc('complete_task',{p_task_id:task.id});
-  if(result.error)throw result.error;
-  saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));
-  await refreshData();
-  if(result.data&&result.data.status==='WAITING_18H'){
-   setMessage('All assigned Shop tasks are complete. The 18-hour settlement timer has started.','success');
-  }else{
-   setMessage('Shop task completed successfully.','success');
-  }
-  state.messageTone='success';
- }catch(err){setMessage(authError(err));}
- finally{busy=false;render();}
-}
 function shopSection(d){
- var cart=loadShopCart(),filtered=shopProductList(),tasks=currentShopTasks(d),hasCycle=!!(d&&d.cycle),assignedCount=Math.min(tasks.length,PREMIUM_SHOP.length);
- var chips=SHOP_CATEGORIES.map(function(cat){return '<button type="button" class="aegis-shop-chip '+(shopCategory===cat?'active':'')+'" data-action="shop-category" data-category="'+esc(cat)+'">'+esc(cat)+'</button>';}).join('');
- var products=filtered.map(function(p){var inCart=cart.indexOf(p.id)>=0,task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';return '<article class="aegis-product"><div class="aegis-product-media"><span class="fallback">'+esc(p.emoji)+'</span><img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" onerror="this.classList.add(\'broken\')" loading="lazy"><span class="aegis-product-badge">'+esc(p.badge)+'</span>'+(pending?'<span class="aegis-task-badge">TASK</span>':'')+'</div><div class="aegis-product-body"><div class="aegis-product-brand">'+esc(p.brand)+'</div><div class="aegis-product-title">'+esc(p.title)+'</div><div class="aegis-stars">★★★★★ <span>'+Number(p.rating||4.5).toFixed(1)+'</span></div><div class="aegis-product-price"><strong>$'+Number(p.marketPrice).toFixed(2)+'</strong><small>display</small></div><div class="aegis-task-value '+(pending?'':'browse')+'">'+(pending?'Task '+money(task.task_value)+' assigned':'Browse only · no task')+'</div><button type="button" class="aegis-product-action '+(inCart?'added':(pending?'task':''))+'" data-action="shop-add" data-id="'+esc(p.id)+'">'+(inCart?'✓ Added to Cart':(pending?'Add to Cart':'Preview Item'))+'</button></div></article>';}).join('');
- var cartProducts=cart.map(function(id){for(var i=0;i<PREMIUM_SHOP.length;i++){if(PREMIUM_SHOP[i].id===id)return PREMIUM_SHOP[i];}return null;}).filter(Boolean);
- var cartRows=cartProducts.map(function(p){var task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';return '<div class="aegis-cart-item"><img class="aegis-cart-thumb" src="'+esc(p.image)+'" alt="" onerror="this.style.display=\'none\'"><div class="aegis-cart-copy"><b>'+esc(p.title)+'</b><small>'+esc(p.category)+' · $'+Number(p.marketPrice).toFixed(2)+' display</small><strong>'+(task?'Task: '+esc(task.title):'Preview item only')+'</strong></div><div class="aegis-cart-actions"><button type="button" class="remove" data-action="shop-remove" data-id="'+esc(p.id)+'">Remove</button>'+(pending?'<button type="button" class="buy" data-action="shop-buy" data-id="'+esc(p.id)+'">Buy</button>':'')+'</div></div>';}).join('');
- var total=cartProducts.reduce(function(a,p){return a+Number(p.marketPrice||0);},0);
- return '<section class="section aegis-shop" id="shop"><div class="aegis-shop-head"><div class="aegis-shop-brand"><span class="aegis-shop-logo">A</span><div><h3>'+t('shopTitle')+'</h3><small>Marketplace-style task center · '+PREMIUM_SHOP.length+' products</small></div></div><button type="button" class="aegis-shop-cart-top" data-action="shop-cart-focus" aria-label="Open cart">🛒<span class="aegis-shop-cart-count">'+cart.length+'</span></button></div><div class="aegis-shop-hero"><span class="kicker">AegisPay Marketplace</span><h4>Browse • Add to Cart • Buy • Complete</h4><p>Familiar shopping-style browsing from $2 to $999. Market prices are display-only; only TASK items are linked to assigned AegisPay tasks.</p><div class="aegis-shop-hero-meta"><span>'+PREMIUM_SHOP.length+' products</span><span>'+assignedCount+' assigned tasks</span><span>'+(hasCycle?'Cycle active':'Activate after verified deposit')+'</span></div></div><div class="aegis-shop-controls"><form id="shopSearchForm" class="aegis-shop-search"><input id="shopSearchInput" value="'+esc(shopSearch)+'" placeholder="Search products, brands or categories"><button type="submit" aria-label="Search">⌕</button></form><div class="aegis-shop-chips">'+chips+'</div></div>'+(products?'<div class="aegis-shop-grid">'+products+'</div>':'<div class="aegis-shop-empty"><b>No matching products</b>Try another search or category.</div>')+'<div class="aegis-cart" id="shop-cart"><div class="aegis-cart-head"><div><h4>Shopping Cart</h4><small>'+cart.length+' item'+(cart.length===1?'':'s')+' · simulated display</small></div><button type="button" class="aegis-shop-chip" data-action="shop-clear">Clear</button></div><div class="aegis-cart-list">'+(cartRows||'<div class="aegis-cart-empty">Your cart is empty. Add a TASK item to continue.</div>')+'</div><div class="aegis-cart-footer"><div><span>Cart display total</span><strong>$'+total.toFixed(2)+'</strong></div><div><span>Task rule</span><strong style="font-size:11px">'+(hasCycle?'Buy mapped tasks to complete them':'Verify deposit to activate tasks')+'</strong></div></div></div><div class="aegis-shop-notice"><div>🛡️</div><div><strong>TESTNET / DEMO SAFEGUARD</strong>This is an AegisPay task interface, not a real marketplace checkout. “Buy” completes the mapped assigned task through the existing secure backend function; no real product order is submitted.</div></div></section>';
+ var cycle=d.cycle,tasks=d.tasks||[],offers=d.offers||[];
+ if(!cycle)return '<section class="section" style="margin-top:18px"><h3>'+t('shopTitle')+'</h3><p>'+t('shopEmpty')+'</p></section>';
+ var current=tasks.filter(function(x){return x.cycle_id===cycle.id;});
+ var done=current.filter(function(x){return x.status==='Completed';}).length;
+ var remaining=current.filter(function(x){return x.status!=='Completed';}).reduce(function(a,x){return a+Number(x.task_value||0);},0);
+ var offerRows=offers.map(function(o){return '<article style="padding:11px;margin-top:7px;border:1px solid #e6eef3;border-radius:12px;background:#fff"><strong>'+esc(o.title)+'</strong><p style="margin:4px 0">'+esc(o.subtitle||o.instructions||'Assigned Shop task')+'</p><small>Tier '+esc(o.tier_min_id||'Any')+' · '+esc(o.reward_text||'Cycle task')+'</small></article>';}).join('');
+ var taskRows=current.map(function(x){var complete=x.status==='Completed';return '<article style="padding:13px;margin-top:9px;border:1px solid #e2edf4;border-radius:14px;background:#fbfdff"><div style="display:flex;justify-content:space-between;gap:12px"><div><strong>'+esc(x.title)+'</strong><p style="margin:5px 0">'+esc(x.description||'Complete the assigned Shop step.')+'</p><small>Task value '+money(x.task_value)+' · Reward '+money(x.reward)+'</small></div><div style="text-align:right;min-width:105px"><small>'+esc(x.status)+'</small><div style="margin-top:4px;font-weight:800;color:#1c789e">'+Number(x.progress||0)+'%</div>'+(complete?'':'<button class="primary" style="margin-top:7px;min-height:38px;padding:0 10px" data-action="complete-task" data-id="'+esc(x.id)+'">'+t('completeTask')+'</button>')+'</div></div></article>';}).join('');
+ return '<section class="section" style="margin-top:18px" id="shop"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h3>'+t('shopTitle')+'</h3><p style="margin:4px 0">'+t('shopReady')+'</p></div><strong>'+done+'/'+current.length+'</strong></div><div style="margin-top:10px;padding:12px;border-radius:13px;background:#f3fbff;border:1px solid #d8edf6"><div style="display:flex;justify-content:space-between"><span>'+t('cycleOpen')+'</span><strong>'+money(cycle.cycle_base)+'</strong></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span>'+t('remaining')+'</span><strong>'+money(remaining)+'</strong></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span>Status</span><strong>'+esc(cycle.status)+'</strong></div>'+(cycle.status==='WAITING_18H'?'<div id="cycleCountdown" data-ready="'+esc(cycle.ready_at||'')+'" style="margin-top:7px;color:#19769c;font-weight:800">'+cycleCountdown(cycle.ready_at)+'</div>':'')+'</div><div style="margin-top:14px"><strong>'+t('shopTitle')+' Offers</strong>'+(offerRows||'<p>'+t('empty')+'</p>')+'</div>'+taskRows+'</section>';
 }
-
 function referralsSection(d){
  var refs=d.referrals||[],l1=refs.filter(function(x){return x.referral_level===1;}).length,l2=refs.filter(function(x){return x.referral_level===2;}).length,reward=refs.reduce(function(a,x){return a+Number(x.platform_reward||0);},0);
  var link=location.origin+location.pathname+'?ref='+encodeURIComponent(state.profile&&state.profile.referral_code||'');
@@ -218,36 +178,40 @@ function updateCycleCountdown(){
 }
 
 function renderDashboard(){
- var p=state.profile||{},d=state.data||{},kyc=d.kyc;
- var kycLabel=kyc?kyc.status:(t('kycNeeded'));
- var kycSection=kyc&&kyc.status==='VERIFIED'
-  ?'<section class="section"><h3>'+t('kyc')+'</h3>'+statusBadge(t('kycDone'))+'</section>'
-  :(kyc&&(kyc.status==='PENDING_REVIEW'||kyc.status==='MANUAL_REVIEW')
-   ?'<section class="section" style="margin-top:18px"><h3>'+t('kycTitle')+'</h3><p>'+t('kycHelp')+'</p>'+statusBadge(kyc.status)+'<p>'+esc(kyc.review_reason||t('pending'))+'</p></section>'
-   :'<section class="section" style="margin-top:18px"><h3>'+t('kycTitle')+'</h3><p>'+t('kycHelp')+'</p><form id="kycForm">'+
-   '<div class="field"><label>'+t('documentType')+'</label><select id="kycType"><option value="CNIC">'+t('cnic')+'</option><option value="PASSPORT">'+t('passport')+'</option></select></div>'+
-   '<div class="field"><label>'+t('front')+'</label><input id="kycFront" type="file" accept="image/jpeg,image/png,image/webp" required></div>'+
-   '<div class="field" id="kycBackWrap"><label>'+t('backImage')+'</label><input id="kycBack" type="file" accept="image/jpeg,image/png,image/webp"></div>'+
-   '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 0"><input id="kycConsent" type="checkbox" required><span>'+t('consent')+'</span></label>'+
-   '<button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submitKyc')+'</button></form><p>'+t('kyc')+': '+statusBadge(kycLabel)+'</p></section>');
- var walletForm=p.destination_address
-  ?'<p>'+t('wallet')+': <code>'+esc(p.destination_address)+'</code></p>'
-  :'<div class="field"><label>'+t('wallet')+'</label><input id="walletAddress" autocomplete="off" required></div><div class="field"><label>'+t('walletOwner')+'</label><input id="walletOwner" value="'+esc(p.name||'')+'" required></div><button type="button" class="primary" data-action="link-wallet">'+t('linkWallet')+'</button>';
- var tiers=[['T1',30],['T2',50],['T3',100],['V1',250],['V2',500],['V3',1000]];
- var tierOptions=tiers.map(function(x){return '<option value="'+x[0]+'">'+x[0]+' — $'+x[1]+'</option>';}).join('');
- var body='<section class="aegis-dashboard-hero"><div class="aegis-dashboard-hero-row"><div><span class="aegis-kicker">PRIVATE CLIENT WORKSPACE · TESTNET DEMO</span><h1>'+t('hi')+', '+esc(p.name||'')+'</h1><div class="aegis-balance">'+money(p.current_platform_balance)+'</div><p class="aegis-sub">Available platform balance · secure client session</p></div><div class="aegis-dash-actions"><a class="aegis-shop-cta" href="#shop">Open Shop</a><button class="aegis-logout" data-action="logout">'+t('logout')+'</button></div></div><nav class="aegis-dash-nav"><a href="#overview">Overview</a><a href="#shop">Shop</a><a href="#deposit-area">Deposit</a><a href="#kyc-area">KYC</a><a href="#withdraw-area">Withdraw</a></nav></section>'+
-  '<div id="overview" class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 18px 15px"><div class="stat-card"><small>'+t('balance')+'</small><strong>'+money(p.current_platform_balance)+'</strong></div><div class="stat-card"><small>'+t('principal')+'</small><strong>'+money(p.principal_balance)+'</strong></div><div class="stat-card"><small>'+t('profit')+'</small><strong>'+money(p.profit_balance)+'</strong></div><div class="stat-card"><small>'+t('kyc')+'</small><strong style="font-size:15px">'+esc(kycLabel)+'</strong></div></div>'+
-  '<div class="notice" style="margin:14px 0">'+t('network')+'</div>'+
-  '<section class="section" id="deposit-area"><h3>'+t('deposit')+'</h3><p>'+t('depositHelp')+'</p><form id="depositForm"><div class="field"><label>'+t('tier')+'</label><select id="depositTier">'+tierOptions+'</select></div><div class="field"><label>'+t('amount')+'</label><input id="depositAmount" type="number" min="1" step="0.01" value="30" required></div><div class="field"><label>'+t('txid')+'</label><input id="depositTxid" type="text" minlength="64" maxlength="64" pattern="[A-Fa-f0-9]{64}" required></div><div class="field"><label>'+t('proof')+'</label><input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submit')+'</button></form></section>'+
-  '<div id="kyc-area">'+kycSection+'</div>'+
-  '<section class="section" id="withdraw-area" style="margin-top:18px"><h3>'+t('withdraw')+'</h3><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form></section>'+
-  '<section class="section" style="margin-top:18px"><h3>'+t('refCode')+'</h3><code>'+esc(p.referral_code||'')+'</code></section>'+
-  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal')+shopSection(d)+referralsSection(d)+notificationsSection(d)+aiSection();
+ var p=state.profile||{},d=state.data||{},kyc=d.kyc,refs=d.referrals||[],cycle=d.cycle,tasks=d.tasks||[];
+ var balance=Number(p.current_platform_balance||0),principal=Number(p.principal_balance||0),profit=Number(p.profit_balance||0);
+ var referralCode=p.referral_code||'AP10023',referralLink=location.origin+location.pathname+'?ref='+encodeURIComponent(referralCode);
+ var l1=refs.filter(function(x){return x.referral_level===1;}).length,l2=refs.filter(function(x){return x.referral_level===2;}).length;
+ var reward=refs.reduce(function(a,x){return a+Number(x.platform_reward||0);},0),current=cycle?tasks.filter(function(x){return x.cycle_id===cycle.id;}):[],done=current.filter(function(x){return x.status==='Completed';}).length;
+ var products=[
+  ['Travel Water Bottle','Aegis Active','$12.99','4.7','Popular','https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=700&q=82'],
+  ['Classic Sunglasses','Aegis Style','$15.99','4.6','New','https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=700&q=82'],
+  ['LED Desk Light','Aegis Home','$18.99','4.6','Deal','https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=700&q=82'],
+  ['Wireless Mouse','Aegis Tech','$21.99','4.7','Top Rated','https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=700&q=82'],
+  ['Beauty Vanity Kit','Aegis Beauty','$169.00','4.7','Featured','https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=82'],
+  ['Air Fryer Compact','Aegis Home','$179.00','4.8','Best Seller','https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=700&q=82'],
+  ['Smart Home Camera','Aegis Tech','$199.00','4.5','New','https://images.unsplash.com/photo-1558008258-3256797b43f3?auto=format&fit=crop&w=700&q=82'],
+  ['Premium Sports Shoe','Aegis Active','$219.00','4.7','Featured','https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=82']
+ ];
+ var cards=products.map(function(x){return '<article class="ap-product"><div class="ap-product-image"><span class="ap-product-badge">'+esc(x[4])+'</span><img src="'+x[5]+'" alt="'+esc(x[0])+'" loading="lazy"></div><div class="ap-product-body"><small>'+esc(x[1])+'</small><h4>'+esc(x[0])+'</h4><div class="ap-stars">★★★★★ <span>'+esc(x[3])+'</span></div><strong>'+esc(x[2])+'</strong><button type="button" data-action="preview-product" data-name="'+esc(x[0])+'">Preview Item</button></div></article>';}).join('');
+ var refRows=refs.length?refs.map(function(x){return '<div><span class="ap-avatar">●</span><section><b>'+esc(x.referred_name||x.name||'Referral')+'</b><small>ID: '+esc(x.referred_id||'')+'</small></section><strong>+'+money(x.platform_reward||0)+'</strong></div>';}).join(''):'<p>'+t('empty')+'</p>';
+ var body='<div class="ap-app">'+
+ '<header class="ap-header"><div class="ap-brand"><img src="/aegispay-logo.svg" alt=""><b>Aegis<span>Pay</span></b></div><div class="ap-head-actions"><button class="ap-icon" data-action="notifications">♧</button><button class="ap-icon" data-action="profile-view">●</button></div></header>'+
+ '<section class="ap-hero"><div><small>WELCOME,</small><h1>'+esc(p.name||'Client Name')+'</h1><p>Client ID: '+esc(p.client_id||'AP10023')+' <button data-action="copy-client-id">▣</button></p></div><div class="ap-building">◆</div></section>'+
+ '<section class="ap-tier-row"><div><b>♛</b><span>LV 1</span><strong>10%</strong></div><div><b>♛</b><span>LV 2</span><strong>5%</strong></div><div><b>♛</b><span>LV 3</span><strong>2%</strong></div></section>'+
+ '<div class="ap-view" id="apViewHome"><section class="ap-ref-card"><div class="ap-ref-icon">♟+</div><div><h2>Referral</h2><p>Invite Friends &amp; Earn Rewards</p><small>Your Unique Referral ID</small><b>'+esc(referralCode)+'</b></div><button data-action="view-referral">›</button></section>'+
+ '<section class="ap-grid2"><button class="ap-tile" data-action="view-topup"><i>＄</i><b>Top Up</b><small>Deposit Amount</small></button><button class="ap-tile" data-action="view-shop"><i>🛒</i><b>Shop</b><small>Browse &amp; Buy</small></button><button class="ap-tile" data-action="view-assets"><i>▣</i><b>Account Details</b><small>View Your Account</small></button><button class="ap-tile" data-action="view-crypto"><i>₿</i><b>Crypto</b><small>Buy &amp; Manage</small></button></section>'+
+ '<section class="ap-balance-strip"><div><small>Available</small><b>'+money(balance)+'</b></div><div><small>Principal</small><b>'+money(principal)+'</b></div><div><small>Profit</small><b>'+money(profit)+'</b></div></section>'+
+ (cycle?'<section class="ap-cycle"><div><div><small>Current Shop Cycle</small><b>'+done+'/'+current.length+' tasks</b></div><span>'+esc(cycle.status||'OPEN')+'</span></div><div class="ap-progress"><span style="width:'+Math.min(100,current.length?done/current.length*100:0)+'%"></span></div></section>':'')+'</div>'+
+ '<div class="ap-view hidden" id="apViewReferral"><div class="ap-page-title"><button data-action="view-home">‹</button><h2>Referral</h2><button>◷</button></div><section class="ap-ref-banner"><h2>Invite Friends<br>Earn Rewards</h2><p>Share your unique link and earn USDT rewards when they join and make a deposit.</p></section><section class="ap-reward-grid"><div><b>♟</b><strong>5 USDT</strong><small>When your direct referral joins<br><b>(Level 1)</b></small></div><div><b>♟♟</b><strong>2 USDT</strong><small>When your friend’s referral joins<br><b>(Level 2)</b></small></div></section><section class="ap-link-card"><h3>Your Referral Link</h3><div>'+esc(referralLink)+' <button data-action="copy-ref">▣</button></div><div class="ap-share"><button data-action="share-ref">Share on WhatsApp</button><button data-action="copy-ref">Share Link</button></div><small>Your Referral ID</small><b>'+esc(referralCode)+'</b></section><section class="ap-ref-stats"><div><strong>'+refs.length+'</strong><small>Total Referrals</small></div><div><strong>'+l1+'</strong><small>Level 1</small></div><div><strong>'+l2+'</strong><small>Level 2</small></div><div><strong>'+money(reward)+'</strong><small>Total Earned</small></div></section><div class="ap-list">'+refRows+'</div></div>'+
+ '<div class="ap-view hidden" id="apViewTopup"><div class="ap-page-title"><button data-action="view-home">‹</button><h2>Top Up</h2><button>⌁</button></div><section class="ap-card"><h3>Select Payment Method</h3><div class="ap-method selected"><b>🔴</b><span><strong>USDT (TRC20)</strong><small>Fast, Low Fees</small></span>✓</div><div class="ap-method"><b>◉</b><span><strong>USDT (ERC20)</strong><small>Network Fees Higher</small></span>›</div><div class="ap-method"><b>₿</b><span><strong>Bitcoin (BTC)</strong><small>Secure &amp; Global</small></span>›</div><div class="ap-method"><b>▣</b><span><strong>Bank Transfer</strong><small>Local Bank Deposit</small></span>›</div><form id="depositForm" class="ap-form"><label>Enter Deposit Amount<input id="depositAmount" type="number" min="1" step="0.01" value="100" required></label><div class="ap-amounts"><button type="button" data-amount="50">50</button><button type="button" data-amount="100">100</button><button type="button" data-amount="500">500</button><button type="button" data-amount="1000">1,000</button></div><label>TRON transaction ID<input id="depositTxid" type="text" minlength="64" maxlength="64" required></label><label>Payment screenshot<input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></label><button class="ap-primary" type="submit">Submit Deposit →</button></form></section></div>'+
+ '<div class="ap-view hidden" id="apViewShop"><div class="ap-page-title"><button data-action="view-home">‹</button><h2>Shop</h2><button>🛒</button></div><section class="ap-shop-banner"><div><small>AEGIS SHOP</small><h2>Browse &amp; Buy</h2><p>Products are paired with their own correct image, category and description.</p></div><span>🛍️</span></section><div class="ap-shop-search">⌕ <input placeholder="Search products..."></div><div class="ap-cats"><button class="active">All</button><button>Electronics</button><button>Fashion</button><button>Home &amp; Kitchen</button><button>Beauty</button></div><div class="ap-products">'+cards+'</div></div>'+
+ '<div class="ap-view hidden" id="apViewAssets"><div class="ap-page-title"><button data-action="view-home">‹</button><h2>Account Details</h2><button>⋮</button></div><section class="ap-account-card"><small>Available Balance</small><strong>'+money(balance)+'</strong><p>Principal: '+money(principal)+'</p><p>Profit: '+money(profit)+'</p><p>KYC Status: '+esc(kyc?kyc.status:t('kycNeeded'))+'</p><p>Referral ID: '+esc(referralCode)+'</p></section><section class="ap-card"><h3>Recent Deposits</h3>'+historyTable(t('deposits'),d.deposits||[],'deposit')+'</section><section class="ap-card"><h3>KYC</h3><form id="kycForm"><label>Document Type<select id="kycType"><option value="CNIC">CNIC</option><option value="PASSPORT">Passport</option></select></label><label>Front Image<input id="kycFront" type="file" accept="image/jpeg,image/png,image/webp" required></label><label id="kycBackWrap">Back Image<input id="kycBack" type="file" accept="image/jpeg,image/png,image/webp"></label><label class="ap-check"><input id="kycConsent" type="checkbox" required> I agree to the identity review.</label><button class="ap-primary" type="submit">Submit KYC</button></form></section></div>'+
+ '<div class="ap-view hidden" id="apViewCrypto"><div class="ap-page-title"><button data-action="view-home">‹</button><h2>Crypto</h2><button>⋮</button></div><section class="ap-card ap-crypto"><div>₿</div><h2>Crypto Wallet</h2><p>Manage your linked TRON wallet.</p><label>TRON Wallet Address<input id="walletAddress" value="'+esc(p.destination_address||'')+'"></label><label>Wallet Owner<input id="walletOwner" value="'+esc(p.name||'')+'"></label><button class="ap-primary" data-action="link-wallet">Link Wallet</button></section><section class="ap-card"><h3>Withdrawal</h3><form id="withdrawForm"><label>Withdrawal Amount (minimum $50)<input id="withdrawAmount" type="number" min="50" step="0.01" required></label><button class="ap-primary" type="submit">Request Withdrawal</button></form></section></div>'+
+ '<nav class="ap-bottom"><button class="active" data-action="view-home">⌂<span>Home</span></button><button data-action="view-assets">◇<span>Assets</span></button><button data-action="profile-view">●<span>My Profile</span></button><button data-action="ai-view">◉<span>AI Bot</span></button></nav></div>';
  root.innerHTML=shell(body,'dashboard');
- var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');
- if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
- var tier=document.getElementById('depositTier'),amount=document.getElementById('depositAmount');
- if(tier&&amount)tier.addEventListener('change',function(){var opt=tier.options[tier.selectedIndex];amount.value=opt.text.match(/\$(\d+(?:\.\d+)?)/)?.[1]||30;});
+ var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
+ root.querySelectorAll('[data-amount]').forEach(function(b){b.addEventListener('click',function(){var a=document.getElementById('depositAmount');if(a)a.value=b.getAttribute('data-amount');});});
 }
 function render(){
  if(state.appEnabled===false){
@@ -311,10 +275,10 @@ async function handleDeposit(e){
  try{
   var file=document.getElementById('depositProof').files[0];
   var path=await uploadImage(file,'deposits');
-  var result=await service.invokeFunction('submit-deposit',{body:{tierId:document.getElementById('depositTier').value,amount:Number(document.getElementById('depositAmount').value),txid:document.getElementById('depositTxid').value.trim(),screenshotPath:path}});
+  var result=await service.client().functions.invoke('submit-deposit',{body:{tierId:document.getElementById('depositTier').value,amount:Number(document.getElementById('depositAmount').value),txid:document.getElementById('depositTxid').value.trim(),screenshotPath:path}});
   if(result.error)throw result.error;
   if(result.data&&result.data.aiReviewStatus==='APPROVED'){
-   var verified=await service.invokeFunction('verify-deposit',{body:{depositId:result.data.depositId}});
+   var verified=await service.client().functions.invoke('verify-deposit',{body:{depositId:result.data.depositId}});
    if(verified.error)throw verified.error;
    setMessage(verified.data&&verified.data.status==='VERIFIED'?'Deposit confirmed and balance credited.':(verified.data&&verified.data.message)||t('pending'),'success');
   }else{
@@ -332,7 +296,7 @@ async function handleKyc(e){
   var front=await uploadImage(document.getElementById('kycFront').files[0],'kyc');
   var backFile=document.getElementById('kycBack').files[0];
   var back=doc==='CNIC'?await uploadImage(backFile,'kyc'):'';
-  var result=await service.invokeFunction('submit-kyc',{body:{documentType:doc,frontPath:front,backPath:back,processingConsent:true}});
+  var result=await service.client().functions.invoke('submit-kyc',{body:{documentType:doc,frontPath:front,backPath:back,processingConsent:true}});
   if(result.error)throw result.error;
   setMessage(result.data&&result.data.message||t('pending'),'success');state.messageTone='success';await refreshData();
  }catch(err){setMessage(authError(err));}
@@ -359,6 +323,17 @@ async function handleWithdraw(e){
 async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
+ if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
+  var target=a==='profile-view'||a==='notifications'||a==='ai-view'?'assets':a.replace(/^view-/,'');
+  var ids=['home','referral','topup','shop','assets','crypto'];
+  ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!==target);});
+  root.querySelectorAll('.ap-bottom button').forEach(function(b){b.classList.remove('active');});
+  var active=target==='home'?root.querySelector('.ap-bottom button[data-action="view-home"]'):root.querySelector('.ap-bottom button[data-action="view-assets"]');if(active)active.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});return;
+ }
+ if(a==='preview-product'){var n=el.getAttribute('data-name')||'Item';var toast=document.createElement('div');toast.className='ap-toast';toast.textContent=n+' — preview only';document.body.appendChild(toast);setTimeout(function(){toast.remove();},1800);return;}
+ if(a==='copy-client-id'){var id=(state.profile&&state.profile.client_id)||'AP10023';if(navigator.clipboard)navigator.clipboard.writeText(id);return;}
+ if(a==='share-ref'){var link=location.origin+location.pathname+'?ref='+encodeURIComponent((state.profile&&state.profile.referral_code)||'');if(navigator.share)navigator.share({title:'AegisPay Referral',text:'Join AegisPay using my referral link',url:link}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(link);return;}
  if(a==='language')return;
  if(a==='retry-runtime'){checkRuntime();return;}
   if(a==='complete-task'){
@@ -367,12 +342,6 @@ async function action(e){
    catch(err){setMessage(authError(err));}
    finally{busy=false;render();} return;
   }
-  if(a==='shop-category'){shopCategory=el.getAttribute('data-category')||'All';render();return;}
-  if(a==='shop-cart-focus'){var cartNode=document.getElementById('shop-cart');if(cartNode)cartNode.scrollIntoView({behavior:'smooth',block:'start'});return;}
-  if(a==='shop-add'){var sid=el.getAttribute('data-id'),cart=loadShopCart();if(cart.indexOf(sid)<0){cart.push(sid);saveShopCart(cart);}render();return;}
-  if(a==='shop-remove'){saveShopCart(loadShopCart().filter(function(x){return x!==el.getAttribute('data-id');}));render();return;}
-  if(a==='shop-clear'){saveShopCart([]);render();return;}
-  if(a==='shop-buy'){await completeShopPurchase(el.getAttribute('data-id'));return;}
   if(a==='copy-ref'){
    var refCode=state.profile&&state.profile.referral_code||'';
    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
@@ -390,14 +359,13 @@ async function action(e){
  }
 }
 root.addEventListener('submit',async function(e){
- if(e.target.id==='shopSearchForm'){e.preventDefault();shopSearch=document.getElementById('shopSearchInput').value||'';render();return;}
  if(e.target.id==='aiForm'){
   e.preventDefault();
   var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
   if(!question)return;
   if(aiReply)aiReply.textContent='Thinking…';
   try{
-    var aiResult=await service.invokeFunction('ai-support',{body:{message:question}});
+    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
     if(aiResult.error)throw aiResult.error;
     if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
   }catch(err){
