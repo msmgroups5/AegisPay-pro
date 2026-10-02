@@ -1,4 +1,5 @@
 const fs=require("node:fs");
+const path=require("node:path");
 const required=["index.html","master-admin.html","aegispay-logo.svg","styles.css","client-auth.js","admin-auth.js","supabase-client.js","supabase-service.js","aegis-auth-redirect.js","_redirects","service-worker.js","manifest.webmanifest","README.md","backend/server.js","backend/data.json","database/schema.sql","database/migrations/20260930_signup_private_evidence_and_kyc.sql","database/migrations/20260930_signup_referral_random_fix.sql","database/migrations/20260930_aegispay_global_runtime_switch.sql","database/migrations/20260930_dual_withdrawal_approval_dashboard_metrics.sql","database/migrations/20260930_telegram_withdrawal_txid_guard.sql","database/migrations/20260930_admin_rpc_role_null_guards.sql","database/migrations/20260930_clear_unverified_testnet_wallet.sql","database/migrations/20260930_network_aware_deposit_credit.sql","database/migrations/20260930_rls_and_foreign_key_indexes.sql","database/migrations/20260930_withdrawal_role_and_payout_recovery.sql","database/migrations/20261001_live_cycle_task_workflow.sql","database/migrations/20261002_align_shop_catalog_and_task_completion.sql","database/migrations/20261001_harden_withdrawal_and_frozen_operations.sql","database/migrations/20261002_runtime_status_invoker.sql","supabase/functions/submit-deposit/index.ts","supabase/functions/submit-kyc/index.ts","supabase/functions/admin-queues/index.ts","supabase/functions/admin-review/index.ts","supabase/functions/telegram-withdrawal/index.ts","supabase/functions/verify-deposit/index.ts","supabase/functions/monitor-deposits/index.ts","supabase/functions/ai-support/index.ts","supabase/functions/public-signup/index.ts",".github/workflows/pages.yml",".github/workflows/ci.yml",".github/workflows/android-apk.yml",".github/workflows/android-apk-export.yml","netlify.toml","package.json","scripts/smoke-api.js"];
 for(const f of required) if(!fs.existsSync(f)) throw new Error("Missing required file: "+f);
 const html=fs.readFileSync("index.html","utf8");
@@ -65,6 +66,18 @@ if(!website.includes("client.html") && !website.includes("/app/")) throw new Err
 const siteRedirects=fs.readFileSync("site/_redirects","utf8");
 for(const marker of ["/app/auth/callback /app/index.html 200","/auth/callback /app/index.html 200","/client /app/ 301","/client.html /app/ 301"]) if(!siteRedirects.includes(marker)) throw new Error("Netlify client route missing: "+marker);
 if(!fs.existsSync("site/app/index.html")) throw new Error("Published site/app/index.html missing");
+const siteClientHtml=fs.readFileSync("site/client.html","utf8");
+const siteAppHtml=fs.readFileSync("site/app/index.html","utf8");
+const siteAdminHtml=fs.readFileSync("site/master-admin.html","utf8");
+if(siteClientHtml!==html) throw new Error("site/client.html must stay identical to canonical client.html");
+if(siteAppHtml!==html) throw new Error("site/app/index.html must stay identical to canonical client.html");
+if(siteAdminHtml!==adminHtml) throw new Error("site/master-admin.html must stay identical to canonical master-admin.html");
+for(const match of html.matchAll(/(?:src|href)="(\.\/[^"]+)"/g)){
+  const target=match[1].replace(/^\.\//,"");
+  if(!fs.existsSync(path.join("site","app",target))) throw new Error("Missing /app asset in publish step: "+target);
+}
+const deployWorkflow=fs.readFileSync(".github/workflows/web-portal-deploy.yml","utf8");
+for(const marker of ["cp client.html site/client.html","cp client.html site/app/index.html","cp master-admin.html site/master-admin.html","cp admin-auth.js site/admin-auth.js"]) if(!deployWorkflow.includes(marker)) throw new Error("Web deployment source-of-truth copy missing: "+marker);
 if(!fs.readFileSync("site/index.html","utf8").includes('href="/app/"')) throw new Error("Public site must link to /app/");
 if(!fs.readFileSync("android/app/build.gradle","utf8").includes("include 'client.html'")) throw new Error("Android client fallback does not bundle client.html");
 if(!fs.existsSync("netlify.toml")) throw new Error("Netlify configuration missing");
