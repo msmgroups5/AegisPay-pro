@@ -73,7 +73,8 @@ if(siteAppHtml!==html) throw new Error("site/app/index.html must stay identical 
 if(siteAdminHtml!==adminHtml) throw new Error("site/master-admin.html must stay identical to canonical master-admin.html");
 for(const match of html.matchAll(/(?:src|href)="(\.\/[^"]+)"/g)){
   const target=match[1].replace(/^\.\//,"");
-  if(!fs.existsSync(path.join("site","app",target))) throw new Error("Missing /app asset in publish step: "+target);
+  if(target==='index.html') continue;
+  if(!deployWorkflow.includes(target)) throw new Error("Web build does not copy required /app asset: "+target);
 }
 const deployWorkflow=fs.readFileSync(".github/workflows/web-portal-deploy.yml","utf8");
 for(const marker of ["cp client.html site/client.html","cp client.html site/app/index.html","cp master-admin.html site/master-admin.html","cp admin-auth.js site/admin-auth.js"]) if(!deployWorkflow.includes(marker)) throw new Error("Web deployment source-of-truth copy missing: "+marker);
