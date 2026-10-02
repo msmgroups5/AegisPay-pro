@@ -1,12 +1,12 @@
 {
-  "versionCode": 27,
-  "versionName": "2.4.1",
+  "versionCode": 28,
+  "versionName": "2.4.2",
   "releaseChannel": "stable",
   "releasedAt": "2026-10-03T00:00:00Z",
   "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
   "notes": [
-    "Home Dashboard reference refinement",
-    "Notification badge and client-ID copy control added",
-    "Existing compact Home layout, LV cards, referral and Amazon promo retained"
+    "Home, Shop, Product Details, Top Up, Referral and Account Details strict reference/prompt UI pass",
+    "All reference action/category/payment/detail icons converted to SVG",
+    "Account actions, referral levels and product benefits refined to match the supplied screens"
   ]
 }
