@@ -14,7 +14,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 8cfe4e27-2e3c-4940-bd54-5926a201ee12
+      NETLIFY_SITE_ID: 80dd262c-dfec-427a-9820-0eb98ec829b5
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
@@ -68,15 +68,14 @@ jobs:
           cp aegispay-logo.svg site/aegispay-logo.svg
           if [ "$AEGIS_BUILD_TYPE" = "release" ]; then
             cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
-            cp android/app/build/outputs/apk/admin/release/app-admin-release.apk site/downloads/aegispay-admin.apk
+            cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
           else
             cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
-            cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk site/downloads/aegispay-admin.apk
+            cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk "$RUNNER_TEMP/aegispay-admin.apk"
           fi
           VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
           VERSION_NAME="$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)"
           CLIENT_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
-          ADMIN_SHA="$(sha256sum site/downloads/aegispay-admin.apk | awk '{print $1}')"
           cat > site/app-version.json <<EOF
           {
             "versionCode": ${VERSION_CODE},
@@ -84,9 +83,7 @@ jobs:
             "releaseChannel": "stable",
             "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
-            "adminApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-admin.apk",
             "clientSha256": "${CLIENT_SHA}",
-            "adminSha256": "${ADMIN_SHA}",
             "notes": [
               "Remote-first client portal",
               "Automatic update detection",
@@ -97,6 +94,13 @@ jobs:
           EOF
           cp site/app-version.json app-version.json
 
+      - name: Upload Master Admin APK separately
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-Master-Admin-Release
+          path: ${{ runner.temp }}/aegispay-admin.apk
+          if-no-files-found: error
+
       - name: Verify direct-download package
         run: |
           test -s site/index.html
@@ -106,9 +110,7 @@ jobs:
           test -s site/admin-auth.js
           test -s site/app-version.json
           test -s site/downloads/aegispay-client.apk
-          test -s site/downloads/aegispay-admin.apk
           test "$(wc -c < site/downloads/aegispay-client.apk)" -gt 100000
-          test "$(wc -c < site/downloads/aegispay-admin.apk)" -gt 100000
 
       - name: Upload website + APK package
         uses: actions/upload-artifact@v4
