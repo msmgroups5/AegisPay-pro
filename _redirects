@@ -7,3 +7,4 @@
 /client.html /app/ 301
 /admin /master-admin.html 200
 /admin/ /master-admin.html 200
+/app/master-admin.html /admin/ 301
