@@ -1,5 +1,5 @@
-const CACHE='aegispay-shell-v9-runtime-fix';
-const ASSETS=['./','./index.html','./app/','./app/index.html','./master-admin.html','./styles.css','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
+const CACHE='aegispay-shell-v10-premium-aligned';
+const ASSETS=['./','./index.html','./app/','./app/index.html','./master-admin.html','./styles.css','./premium.css','./shop-catalog.js','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS).catch(()=>{})));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',event=>{
