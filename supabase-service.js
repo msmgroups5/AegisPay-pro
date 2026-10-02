@@ -98,7 +98,20 @@ window.AegisSupabaseService={
     referralCode:String(referralCode||'').trim().toUpperCase(),
     preferredLanguage:preferredLanguage==='ur'?'ur':'en'
   }});
-  if(result.error)throw result.error;
+  if(result.error){
+    var serverBody=null;
+    try{
+      if(result.error.context&&typeof result.error.context.json==='function'){
+        serverBody=await result.error.context.json();
+      }
+    }catch(e){}
+    var message=(serverBody&&serverBody.error)||result.error.message||'AegisPay signup failed.';
+    var enriched=new Error(message);
+    enriched.code=(serverBody&&serverBody.code)||result.error.code||'SIGNUP_FAILED';
+    enriched.status=(serverBody&&serverBody.status)||result.error.status||0;
+    enriched.requestId=(serverBody&&serverBody.requestId)||'';
+    throw enriched;
+  }
   if(!result.data||!result.data.user)throw new Error('AegisPay signup service did not create an account.');
   return result.data;
  },
