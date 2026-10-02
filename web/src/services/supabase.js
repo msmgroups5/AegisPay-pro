@@ -57,7 +57,7 @@ export async function submitDeposit({ tierId, amount, txid, screenshot }) {
   if (!["image/jpeg","image/png","image/webp"].includes(screenshot.type)) throw new Error("Use JPG, PNG or WebP for the screenshot.");
   if (screenshot.size > 10 * 1024 * 1024) throw new Error("Screenshot must be 10 MB or smaller.");
 
-  const path = authData.user.id + "/deposits/" + crypto.randomUUID() + "-" + screenshot.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const path = authData.user.id + "/deposits/" + (crypto.randomUUID ? crypto.randomUUID() : Date.now()+"-"+Math.random().toString(16).slice(2)) + "-" + screenshot.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const upload = await supabase.storage.from("private-verification").upload(path, screenshot, {
     cacheControl: "3600", upsert: false, contentType: screenshot.type
   });
