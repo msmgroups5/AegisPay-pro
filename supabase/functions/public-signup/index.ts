@@ -21,6 +21,8 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
+  const requestId = crypto.randomUUID();
+
   try {
     if (!SUPABASE_URL || !SERVICE_KEY) return json({ error: "Signup service is not configured." }, 503);
 
@@ -30,7 +32,6 @@ Deno.serve(async (req: Request) => {
     const name = typeof body?.name === "string" ? body.name.trim() : "";
     const referralCode = typeof body?.referralCode === "string" ? body.referralCode.trim().toUpperCase() : "";
     const preferredLanguage = body?.preferredLanguage === "ur" ? "ur" : "en";
-    const requestId = crypto.randomUUID();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
       return json({ error: "Enter a valid email address." }, 400);
