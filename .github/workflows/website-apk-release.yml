@@ -62,7 +62,7 @@ jobs:
           rm -rf site/app site/downloads
           mkdir -p site/app site/downloads
           cp index.html site/client.html
-          cp styles.css premium.css client-auth.js supabase-client.js supabase-service.js \
+          cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js \
              aegis-auth-redirect.js app-update.js service-worker.js \
              manifest.webmanifest aegispay-logo.svg site/
           cp aegispay-logo.svg site/aegispay-logo.svg
