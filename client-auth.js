@@ -311,10 +311,10 @@ async function handleDeposit(e){
  try{
   var file=document.getElementById('depositProof').files[0];
   var path=await uploadImage(file,'deposits');
-  var result=await service.client().functions.invoke('submit-deposit',{body:{tierId:document.getElementById('depositTier').value,amount:Number(document.getElementById('depositAmount').value),txid:document.getElementById('depositTxid').value.trim(),screenshotPath:path}});
+  var result=await service.invokeFunction('submit-deposit',{body:{tierId:document.getElementById('depositTier').value,amount:Number(document.getElementById('depositAmount').value),txid:document.getElementById('depositTxid').value.trim(),screenshotPath:path}});
   if(result.error)throw result.error;
   if(result.data&&result.data.aiReviewStatus==='APPROVED'){
-   var verified=await service.client().functions.invoke('verify-deposit',{body:{depositId:result.data.depositId}});
+   var verified=await service.invokeFunction('verify-deposit',{body:{depositId:result.data.depositId}});
    if(verified.error)throw verified.error;
    setMessage(verified.data&&verified.data.status==='VERIFIED'?'Deposit confirmed and balance credited.':(verified.data&&verified.data.message)||t('pending'),'success');
   }else{
@@ -332,7 +332,7 @@ async function handleKyc(e){
   var front=await uploadImage(document.getElementById('kycFront').files[0],'kyc');
   var backFile=document.getElementById('kycBack').files[0];
   var back=doc==='CNIC'?await uploadImage(backFile,'kyc'):'';
-  var result=await service.client().functions.invoke('submit-kyc',{body:{documentType:doc,frontPath:front,backPath:back,processingConsent:true}});
+  var result=await service.invokeFunction('submit-kyc',{body:{documentType:doc,frontPath:front,backPath:back,processingConsent:true}});
   if(result.error)throw result.error;
   setMessage(result.data&&result.data.message||t('pending'),'success');state.messageTone='success';await refreshData();
  }catch(err){setMessage(authError(err));}
@@ -397,7 +397,7 @@ root.addEventListener('submit',async function(e){
   if(!question)return;
   if(aiReply)aiReply.textContent='Thinking…';
   try{
-    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
+    var aiResult=await service.invokeFunction('ai-support',{body:{message:question}});
     if(aiResult.error)throw aiResult.error;
     if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
   }catch(err){
