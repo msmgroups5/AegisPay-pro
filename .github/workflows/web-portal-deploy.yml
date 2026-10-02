@@ -30,6 +30,7 @@ jobs:
           rm -rf site/app site/downloads
           mkdir -p site/app site/downloads
           cp client.html site/app/index.html
+          cp _redirects site/_redirects
           cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js \
              aegis-auth-redirect.js app-update.js service-worker.js \
              manifest.webmanifest aegispay-logo.svg site/
@@ -59,6 +60,8 @@ jobs:
           test -s site/app-version.json
           test -s site/downloads/aegispay-client.apk
           test -s site/downloads/aegispay-admin.apk
+          test -s site/_redirects
+
 
       - name: Upload web portal artifact
         uses: actions/upload-artifact@v4
@@ -80,6 +83,16 @@ jobs:
           set -euo pipefail
           npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
           echo "Netlify upload accepted; waiting for the public assets to update."
+          for route in "/" "/app/" "/app" "/admin/" "/downloads/aegispay-client.apk" "/downloads/aegispay-admin.apk"; do
+            status="$(curl -sS -L -o /dev/null -w '%{http_code}' "https://aegispay-client1.netlify.app$route")"
+            echo "Route $route -> HTTP $status"
+            case "$route" in
+              "/downloads/"*) test "$status" = "200" ;;
+              "/app") test "$status" = "200" || test "$status" = "301" || test "$status" = "302" ;;
+              "/admin/") test "$status" = "200" ;;
+              *) test "$status" = "200" ;;
+            esac
+          done
           for i in {1..20}; do
             body="$(curl -fsSL "https://aegispay-client1.netlify.app/supabase-service.js?v=$GITHUB_SHA" || true)"
             if printf '%s' "$body" | grep -q "Final fallback: query the public REST endpoint directly"; then
