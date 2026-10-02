@@ -46,40 +46,30 @@ export async function signOut() {
   if (error) throw error;
 }
 
-export async function submitDeposit({ tierId, amount, txid }) {
-  const profile = await getSessionProfile();
-  if (!profile) throw new Error("Please sign in first.");
+export async function submitDeposit({ tierId, amount, txid, screenshot }) {
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) throw new Error("Please sign in first.");
   const gross = Number(amount);
   if (!Number.isFinite(gross) || gross <= 0) throw new Error("Enter a valid deposit amount.");
   if (!txid.trim()) throw new Error("Transaction hash / TXID is required.");
-  const fee = 2;
-  const credited = Math.max(0, gross - fee);
-  const { data, error } = await supabase.from("deposit_submissions").insert({
-    user_id: profile.id,
-    tier_id: tierId,
-    gross_amount: gross,
-    deposit_fee: fee,
-    credited_amount: credited,
-    txid: txid.trim(),
-    status: "PENDING_VERIFICATION"
-  }).select().single();
-  if (error) throw error;
-  return data;
-}
+  if (!/^[a-f\\d]{64}$/i.test(txid.trim())) throw new Error("Enter the 64-character TRON transaction ID.");
+  if (!screenshot) throw new Error("Deposit screenshot is required.");
+  if (!["image/jpeg","image/png","image/webp"].includes(screenshot.type)) throw new Error("Use JPG, PNG or WebP for the screenshot.");
+  if (screenshot.size > 10 * 1024 * 1024) throw new Error("Screenshot must be 10 MB or smaller.");
 
-export async function requestWithdrawal(amount) {
-  const { data, error } = await supabase.rpc("request_withdrawal", { p_amount: Number(amount) });
-  if (error) throw error;
-  return data;
-}
+  const path = authData.user.id + "/deposits/" + crypto.randomUUID() + "-" + screenshot.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const upload = await supabase.storage.from("private-verification").upload(path, screenshot, {
+    cacheControl: "3600", upsert: false, contentType: screenshot.type
+  });
+  if (upload.error) throw new Error("Evidence upload failed: " + upload.error.message);
 
-export async function getReferrals() {
-  const profile = await getSessionProfile();
-  if (!profile) return [];
-  const { data, error } = await supabase.from("referrals")
-    .select("id,referred_user_id,referral_level,bonus_amount,created_at")
-    .eq("user_id", profile.id)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return data || [];
+  const result = await supabase.functions.invoke("submit-deposit", {
+    body: { tierId, amount: gross, txid: txid.trim(), screenshotPath: path }
+  });
+  if (result.error) {
+    await supabase.storage.from("private-verification").remove([path]);
+    throw result.error;
+  }
+  if (!result.data?.depositId) throw new Error("Deposit service did not return a deposit reference.");
+  return result.data;
 }
