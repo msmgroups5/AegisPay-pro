@@ -62,5 +62,31 @@ var rows=[
 ['Smart Kitchen Scale','Aegis Home','Home & Kitchen','Kitchen Tools',36.99,4.6,'Popular','⚖️',59],
 ['Portable Projector','Aegis Tech','Electronics','Projectors',189,4.6,'Featured','📽️',60]
 ];
-window.AegisShopCatalog=rows.map(function(x){return{id:'SP-'+x[8],title:x[0],brand:x[1],category:x[2],subcategory:x[3],marketPrice:x[4],rating:x[5],badge:x[6],emoji:x[7],image:'https://cdn.dummyjson.com/product-images/'+x[8]+'/thumbnail.webp'};});
+var PRODUCT_IMAGES={
+  tech:'https://images.unsplash.com/photo-1769689268229-3e9c9ddaf1ee?auto=format&fit=crop&w=900&q=82',
+  laptop:'https://images.unsplash.com/photo-1610006330187-5f0c6ec0f9aa?auto=format&fit=crop&w=900&q=82',
+  bag:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=82',
+  camera:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=82',
+  shoes:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82',
+  watch:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=82',
+  headphones:'https://images.unsplash.com/photo-1674658556545-f18d4080ab6c?auto=format&fit=crop&w=900&q=82',
+  coffee:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=82',
+  chair:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=82',
+  home:'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=82'
+};
+function productImage(x){
+  var s=(x[0]+' '+x[1]+' '+x[2]+' '+x[3]).toLowerCase();
+  if(/camera|creator|streaming|photo/.test(s))return PRODUCT_IMAGES.camera;
+  if(/laptop|keyboard|monitor|mouse|computer/.test(s))return PRODUCT_IMAGES.laptop;
+  if(/headphone|earbud|audio/.test(s))return PRODUCT_IMAGES.headphones;
+  if(/phone|smart device|charger|charging/.test(s))return PRODUCT_IMAGES.tech;
+  if(/shoe|running|fitness|sport|training|gym/.test(s))return PRODUCT_IMAGES.shoes;
+  if(/watch|wearable/.test(s))return PRODUCT_IMAGES.watch;
+  if(/backpack|bag|luggage|travel|pouch|makeup case/.test(s))return PRODUCT_IMAGES.bag;
+  if(/chair|furniture|office/.test(s))return PRODUCT_IMAGES.chair;
+  if(/coffee|mug|espresso/.test(s))return PRODUCT_IMAGES.coffee;
+  if(/home|kitchen|cook|air fryer|blender|vacuum/.test(s))return PRODUCT_IMAGES.home;
+  return PRODUCT_IMAGES.tech;
+}
+window.AegisShopCatalog=rows.map(function(x){return{id:'SP-'+x[8],title:x[0],brand:x[1],category:x[2],subcategory:x[3],marketPrice:x[4],rating:x[5],badge:x[6],emoji:x[7],image:productImage(x)};});
 })();
