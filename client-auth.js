@@ -98,7 +98,7 @@ async function refreshProfile(){
  profileRequest=(async function(){
   try{
    var result=await service.claimAegisPayProfile();
-   if(result.profile.role==='MASTER ADMIN'){location.href='./master-admin.html';return;}
+   if(result.profile.role==='MASTER ADMIN'){location.href='/admin/';return;}
    if(result.profile.role!=='USER')throw new Error('This account does not have client access.');
    state.profile=result.profile;
    if(result.profile.preferred_language==='ur'||result.profile.preferred_language==='en'){
