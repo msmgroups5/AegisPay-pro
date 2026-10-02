@@ -1,0 +1,31 @@
+name: AegisPay Fresh APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [aegispay-fresh-v1]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Build React web
+        working-directory: web
+        run: npm install && npm run build
+      - name: Build Android APK
+        working-directory: fresh-android
+        run: gradle assembleDebug --no-daemon
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-Fresh-v1-debug-apk
+          path: fresh-android/app/build/outputs/apk/debug/app-debug.apk
