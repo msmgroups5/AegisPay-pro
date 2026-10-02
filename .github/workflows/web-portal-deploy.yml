@@ -54,19 +54,24 @@ jobs:
              aegis-auth-redirect.js app-update.js service-worker.js \
              manifest.webmanifest aegispay-logo.svg site/
           cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
+          cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk site/downloads/aegispay-admin.apk
           cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk "$RUNNER_TEMP/aegispay-admin-debug.apk"
-          cat > site/app-version.json <<'EOF'
+          CLIENT_SHA256="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
+          ADMIN_SHA256="$(sha256sum site/downloads/aegispay-admin.apk | awk '{print $1}')"
+          cat > site/app-version.json <<EOF
           {
-            "versionCode": 23,
-            "versionName": "2.1.2-web-test",
+            "versionCode": 24,
+            "versionName": "2.1.3",
             "releaseChannel": "test",
-            "releasedAt": "2026-10-01T00:00:00Z",
+            "releasedAt": "2026-10-02T00:00:00Z",
             "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
             "adminApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-admin.apk",
+            "clientSha256": "$CLIENT_SHA256",
+            "adminSha256": "$ADMIN_SHA256",
             "notes": [
-              "Stable client portal routing",
-              "Remote-first web portal deployment",
-              "Test APK package for verification"
+              "Premium black/red Client and Master Admin alignment",
+              "Bundled Shop catalog and Android asset synchronization",
+              "Traceable Client/Admin test APK build 2.1.3"
             ]
           }
           EOF
@@ -78,6 +83,7 @@ jobs:
           test -s site/app/index.html
           test -s site/app-version.json
           test -s site/downloads/aegispay-client.apk
+          test -s site/downloads/aegispay-admin.apk
           test -s site/_redirects
 
 
@@ -108,7 +114,7 @@ jobs:
           set -euo pipefail
           npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
           echo "Netlify upload accepted; waiting for the public assets to update."
-          for route in "/" "/app/" "/app" "/admin/" "/downloads/aegispay-client.apk"; do
+          for route in "/" "/app/" "/app" "/admin/" "/downloads/aegispay-client.apk" "/downloads/aegispay-admin.apk"; do
             status="$(curl -sS -L -o /dev/null -w '%{http_code}' "https://aegispay-client.netlify.app$route")"
             echo "Route $route -> HTTP $status"
             case "$route" in
