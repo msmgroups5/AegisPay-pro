@@ -121,7 +121,7 @@ async function refreshData(){
   c.from('cycle_runs').select('id,user_id,tier_id,cycle_base,status,task_completed_at,ready_at,settled_at,profit_amount,created_at,source_deposit_id').eq('user_id',p.id).order('created_at',{ascending:false}).limit(1).maybeSingle(),
   c.from('referrals').select('id,user_id,referred_user_id,referral_level,platform_reward,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100),
   c.from('notifications').select('id,user_id,notification_type,title,body,is_read,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(50),
-  c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,reward_text,status,instructions,created_at,updated_at').eq('status','ACTIVE').order('created_at',{ascending:false})
+  c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,product_id,reward_text,status,instructions,created_at,updated_at').eq('status','ACTIVE').order('created_at',{ascending:false})
  ]);
  if(profileRes.error)throw profileRes.error;
  state.profile=profileRes.data||p;
@@ -153,8 +153,35 @@ function shopCartKey(){return 'aegispay-premium-cart:'+((state.profile&&state.pr
 function loadShopCart(){try{var v=JSON.parse(localStorage.getItem(shopCartKey())||'[]');return Array.isArray(v)?v:[]}catch(e){return [];}}
 function saveShopCart(v){try{localStorage.setItem(shopCartKey(),JSON.stringify(v));}catch(e){}}
 function currentShopTasks(d){return d&&d.cycle?(d.tasks||[]).filter(function(x){return x.cycle_id===d.cycle.id;}):[];}
-function shopTaskForProduct(d,id){var idx=-1;for(var i=0;i<PREMIUM_SHOP.length;i++){if(PREMIUM_SHOP[i].id===id){idx=i;break;}}var tasks=currentShopTasks(d);return idx>=0?tasks[idx]||null:null;}
+function shopTaskForProduct(d,id){
+  var tasks=currentShopTasks(d),offers=(d&&d.offers)||[];
+  for(var i=0;i<tasks.length;i++){
+   var task=tasks[i],offer=offers.find(function(x){return String(x.id)===String(task.offer_id);});
+   if(offer&&String(offer.product_id||'')===String(id))return task;
+  }
+  return null;
+}
 function shopProductList(){var q=shopSearch.trim().toLowerCase(),cat=shopCategory.toLowerCase();return PREMIUM_SHOP.filter(function(p){return (cat==='all'||p.category.toLowerCase()===cat)&&(!q||p.title.toLowerCase().indexOf(q)>=0||p.brand.toLowerCase().indexOf(q)>=0||p.category.toLowerCase().indexOf(q)>=0||p.subcategory.toLowerCase().indexOf(q)>=0);});}
+async function completeShopPurchase(productId){
+ var d=state.data||{},task=shopTaskForProduct(d,productId);
+ if(!task){setMessage('This Shop item is not assigned to your current cycle.','error');render();return;}
+ if(task.status==='Completed'){saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));render();return;}
+ if(busy)return;
+ busyStart();render();
+ try{
+  var result=await service.client().rpc('complete_task',{p_task_id:task.id});
+  if(result.error)throw result.error;
+  saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));
+  await refreshData();
+  if(result.data&&result.data.status==='WAITING_18H'){
+   setMessage('All assigned Shop tasks are complete. The 18-hour settlement timer has started.','success');
+  }else{
+   setMessage('Shop task completed successfully.','success');
+  }
+  state.messageTone='success';
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
 function shopSection(d){
  var cart=loadShopCart(),filtered=shopProductList(),tasks=currentShopTasks(d),hasCycle=!!(d&&d.cycle),assignedCount=Math.min(tasks.length,PREMIUM_SHOP.length);
  var chips=SHOP_CATEGORIES.map(function(cat){return '<button type="button" class="aegis-shop-chip '+(shopCategory===cat?'active':'')+'" data-action="shop-category" data-category="'+esc(cat)+'">'+esc(cat)+'</button>';}).join('');
