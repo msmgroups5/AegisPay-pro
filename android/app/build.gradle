@@ -86,6 +86,7 @@ def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
         include 'client.html'
         include 'master-admin.html'
         include 'styles.css'
+        include 'premium.css'
         include 'client-auth.js'
         include 'admin-auth.js'
         include 'supabase-client.js'
