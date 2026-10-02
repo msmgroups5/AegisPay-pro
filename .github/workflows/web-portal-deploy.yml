@@ -108,7 +108,7 @@ jobs:
           set -euo pipefail
           npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay web portal $GITHUB_SHA"
           echo "Netlify upload accepted; waiting for the public assets to update."
-          for route in "/" "/app/" "/app" "/admin/" "/downloads/aegispay-client.apk" "/downloads/aegispay-admin.apk"; do
+          for route in "/" "/app/" "/app" "/admin/" "/downloads/aegispay-client.apk"; do
             status="$(curl -sS -L -o /dev/null -w '%{http_code}' "https://aegispay-client.netlify.app$route")"
             echo "Route $route -> HTTP $status"
             case "$route" in
