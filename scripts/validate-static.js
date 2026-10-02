@@ -73,7 +73,7 @@ if(siteAppHtml!==html) throw new Error("site/app/index.html must stay identical 
 if(siteAdminHtml!==adminHtml) throw new Error("site/master-admin.html must stay identical to canonical master-admin.html");
 const deployWorkflow=fs.readFileSync(".github/workflows/web-portal-deploy.yml","utf8");
 for(const match of html.matchAll(/(?:src|href)="(\.\/[^"]+)"/g)){
-  const target=match[1].replace(/^\.\//,"");
+  const target=match[1].replace(/^\.\//,"").split(/[?#]/,1)[0];
   if(target==='index.html') continue;
   if(!deployWorkflow.includes(target)) throw new Error("Web build does not copy required /app asset: "+target);
 }
