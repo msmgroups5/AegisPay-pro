@@ -3,8 +3,8 @@
   "versionName": "2.1.0",
   "releaseChannel": "stable",
   "releasedAt": "2026-10-01T00:00:00Z",
-  "clientApkUrl": "https://aegispay-client1.netlify.app/downloads/aegispay-client.apk",
-  "adminApkUrl": "https://aegispay-client1.netlify.app/downloads/aegispay-admin.apk",
+  "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
+  "adminApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-admin.apk",
   "notes": [
     "Stable client portal routing",
     "Remote-first web portal deployment",
