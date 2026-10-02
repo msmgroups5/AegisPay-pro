@@ -77,7 +77,7 @@ npm run check
 When served from HTTPS or localhost, the service worker caches the application shell for offline reloads. The standalone offline HTML artifact remains available for direct browser inspection.
 
 ## Netlify
-The AegisPay Netlify project is aegispay-pro and currently has a ready HTTPS deployment at https://aegispay-client1.netlify.app.
+The AegisPay Netlify project is aegispay-pro and currently has a ready HTTPS deployment at https://aegispay-client.netlify.app.
 
 The latest environment audit found no Netlify environment variables configured. The Supabase URL and publishable key in supabase-client.js are public browser settings; service-role credentials, Telegram bot configuration, and payout private keys must remain in Supabase Function secrets.
 
