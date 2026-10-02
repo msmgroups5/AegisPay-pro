@@ -95,7 +95,7 @@ function renderShop(){
    return '<article style="padding:12px;margin-top:8px;border:1px solid #edf2f6;border-radius:13px"><strong>'+esc(t.title)+'</strong><p style="margin:4px 0">'+esc(t.status)+' · '+Number(t.task_value||0).toFixed(2)+' USDT value · '+Number(t.reward||0).toFixed(2)+' USDT reward</p><small>User '+esc(t.user_id)+' · Cycle '+esc(t.cycle_id||'—')+'</small></article>';
  }).join('');
  root.innerHTML=shell('<section class="tg-admin-content">'+adminNav()+'<div class="tg-admin-heading"><div><span class="tg-kicker">SHOP OPERATIONS</span><h1>Shop offers & tasks</h1><p>Offers control what tasks are generated for newly verified deposits.</p></div><button class="tg-button-soft" data-action="refresh">Refresh</button></div>'+
- '<form id="offerForm" style="margin-top:16px"><label>Offer title<input id="offerTitle" required></label><label>Subtitle<input id="offerSubtitle"></label><label>Minimum tier<select id="offerTier">'+state.tiers.map(function(t){return '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>';}).join('')+'</select></label><label>Instructions<textarea id="offerInstructions" style="width:100%;min-height:80px;padding:10px;border:1px solid #dce7ee;border-radius:12px"></textarea></label><button type="submit">Create offer</button></form>'+
+ '<form id="offerForm" style="margin-top:16px"><label>Offer title<input id="offerTitle" required></label><label>Subtitle<input id="offerSubtitle"></label><label>Minimum tier<select id="offerTier">'+state.tiers.map(function(t){return '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>';}).join('')+'</select></label><label>Shop product<select id="offerProduct" required>'+((window.AegisShopCatalog||[]).map(function(p){return '<option value="'+esc(p.id)+'">'+esc(p.id+' · '+p.title)+'</option>';}).join('')||'<option value="">Catalog unavailable</option>')+'</select></label><label>Instructions<textarea id="offerInstructions" style="width:100%;min-height:80px;padding:10px;border:1px solid #dce7ee;border-radius:12px"></textarea></label><button type="submit">Create offer</button></form>'+
  '<h2 style="margin-top:22px">Active configuration</h2>'+(offers||'<div class="tg-empty">No Shop offers.</div>')+
  '<h2 style="margin-top:22px">Assigned tasks</h2>'+(tasks||'<div class="tg-empty">No tasks assigned yet.</div>')+
  '<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
@@ -122,7 +122,7 @@ async function loadOperations(){
  var c=service.client();
  var [users,offers,tiers,tasks,settings,referrals,audit]=await Promise.all([
    c.from('users').select('id,name,email,role,status,current_platform_balance,principal_balance,profit_balance,destination_address,created_at').order('created_at',{ascending:false}).limit(200),
-   c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,reward_text,status,instructions,created_at,updated_at').order('created_at',{ascending:false}),
+   c.from('shop_offers').select('id,title,subtitle,task_level,tier_min_id,product_id,reward_text,status,instructions,created_at,updated_at').order('created_at',{ascending:false}),
    c.from('vip_tiers').select('id,name,deposit_amount,initial_profit,enabled,display_order,color_key').order('display_order'),
    c.from('tasks').select('id,user_id,cycle_id,title,status,progress,reward,task_value,offer_id,start_date,due_date,completion_date').order('start_date',{ascending:false}).limit(200),
    c.from('platform_settings').select('key,value_json'),
@@ -166,7 +166,7 @@ async function toggleOffer(el){
 async function createOffer(e){
  e.preventDefault();state.busy=true;render();
  try{
-  var r=await service.client().from('shop_offers').insert({title:document.getElementById('offerTitle').value.trim(),subtitle:document.getElementById('offerSubtitle').value.trim(),tier_min_id:document.getElementById('offerTier').value,task_level:'CLIENT',instructions:document.getElementById('offerInstructions').value.trim(),reward_text:'Cycle task',status:'ACTIVE'});
+  var r=await service.client().from('shop_offers').insert({title:document.getElementById('offerTitle').value.trim(),subtitle:document.getElementById('offerSubtitle').value.trim(),tier_min_id:document.getElementById('offerTier').value,product_id:document.getElementById('offerProduct').value,task_level:'CLIENT',instructions:document.getElementById('offerInstructions').value.trim(),reward_text:'Cycle task',status:'ACTIVE'});
   if(r.error)throw r.error;await loadOperations();
  }catch(err){state.error=err.message||'Offer creation failed.';}finally{state.busy=false;render();}
 }
