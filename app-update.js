@@ -29,7 +29,7 @@ function setBanner(html){
   if(!html)return;
   var el=document.createElement('div');
   el.id='aegisUpdateBanner';
-  el.style.cssText='position:fixed;left:12px;right:12px;bottom:86px;z-index:99999;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,#0b1f48,#164fae 62%,#6f43df);color:#fff;box-shadow:0 18px 40px rgba(5,20,52,.35);font:700 13px/1.45 system-ui,sans-serif';
+  el.style.cssText='position:fixed;left:12px;right:12px;bottom:86px;z-index:99999;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,#0a0d13,#1a1f2a 64%,#5a141e);color:#fff;box-shadow:0 18px 40px rgba(17,21,29,.34);font:700 13px/1.45 system-ui,sans-serif';
   el.innerHTML=html;
   document.body.appendChild(el);
 }
