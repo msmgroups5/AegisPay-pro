@@ -4,6 +4,7 @@ var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
 var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
 var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null;
+var PREMIUM_SHOP=window.AegisShopCatalog||[];var SHOP_CATEGORIES=['All','Electronics','Fashion','Home & Kitchen','Beauty','Sports','Gaming','Office','Books','Outdoor'];var shopSearch='',shopCategory='All';
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
 var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
 var locale=saved==='ur'?'ur':saved==='en'?'en':detected;
@@ -124,10 +125,11 @@ async function refreshData(){
  ]);
  if(profileRes.error)throw profileRes.error;
  state.profile=profileRes.data||p;
- state.data={deposits:depositsRes.data||[],withdrawals:withdrawalsRes.data||[],kyc:(kycRes.data||[])[0]||null};
+ state.data={deposits:depositsRes.data||[],withdrawals:withdrawalsRes.data||[],kyc:(kycRes.data||[])[0]||null,tasks:tasksRes.data||[],cycle:(cycleRes.data||[])[0]||null,referrals:refsRes.data||[],notifications:notificationsRes.data||[],offers:offersRes.data||[]};
  if(depositsRes.error)state.data.deposits=[];
  if(withdrawalsRes.error)state.data.withdrawals=[];
  if(kycRes.error)state.data.kyc=null;
+ if(tasksRes.error)state.data.tasks=[];if(cycleRes.error)state.data.cycle=null;if(refsRes.error)state.data.referrals=[];if(notificationsRes.error)state.data.notifications=[];if(offersRes.error)state.data.offers=[];
 }
 function date(v){try{return new Date(v).toLocaleString(locale==='ur'?'ur-PK':'en-US');}catch(e){return v||'';}}
 function statusBadge(v){return '<span style="display:inline-block;padding:4px 8px;border-radius:99px;background:#edf3fa;color:#314760;font-size:12px">'+esc(String(v||'Pending').split('_').join(' '))+'</span>';}
