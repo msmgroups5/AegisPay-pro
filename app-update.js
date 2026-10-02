@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-var CHECK_URL=(window.AEGIS_UPDATE_MANIFEST_URL||'/app-version.json');
+var CHECK_URL=(window.AEGIS_UPDATE_MANIFEST_URL||(window.AEGIS_ANDROID_APP?'./app-version.json':'/app-version.json'));
 var checking=false;
 var downloaded=false;
 
