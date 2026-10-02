@@ -160,6 +160,21 @@ function currentShopTasks(d){return d&&d.cycle?(d.tasks||[]).filter(function(x){
 function shopTaskForProduct(d,id){var idx=-1;for(var i=0;i<PREMIUM_SHOP.length;i++){if(PREMIUM_SHOP[i].id===id){idx=i;break;}}var tasks=currentShopTasks(d);return idx>=0?tasks[idx]||null:null;}
 function shopProductList(){var q=shopSearch.trim().toLowerCase(),cat=shopCategory.toLowerCase();return PREMIUM_SHOP.filter(function(p){return (cat==='all'||p.category.toLowerCase()===cat)&&(!q||p.title.toLowerCase().indexOf(q)>=0||p.brand.toLowerCase().indexOf(q)>=0||p.category.toLowerCase().indexOf(q)>=0||p.subcategory.toLowerCase().indexOf(q)>=0);});}
 
+async function completeShopPurchase(productId){
+ var task=shopTaskForProduct(state.data||{},productId);
+ if(!task){setMessage(state.data&&state.data.cycle?'This catalog item is preview-only. Only assigned TASK items can be bought.':'Verify a testnet deposit first to activate the Shop task cycle.');render();return;}
+ if(task.status==='Completed'){saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));render();return;}
+ busyStart();render();
+ try{
+  var result=await service.client().rpc('complete_task',{p_task_id:task.id});
+  if(result.error)throw result.error;
+  saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));
+  await refreshData();
+  setMessage(result.data&&result.data.status==='WAITING_18H'?'All Shop tasks are complete. Your 18-hour settlement has started.':'Task completed successfully.','success');state.messageTone='success';
+ }catch(err){setMessage(authError(err));}
+ finally{busy=false;render();}
+}
+
 function referralsSection(d){
  var refs=d.referrals||[],l1=refs.filter(function(x){return x.referral_level===1;}).length,l2=refs.filter(function(x){return x.referral_level===2;}).length,reward=refs.reduce(function(a,x){return a+Number(x.platform_reward||0);},0);
  var link=location.origin+location.pathname+'?ref='+encodeURIComponent(state.profile&&state.profile.referral_code||'');
@@ -203,14 +218,13 @@ function renderDashboard(){
   :'<div class="field"><label>'+t('wallet')+'</label><input id="walletAddress" autocomplete="off" required></div><div class="field"><label>'+t('walletOwner')+'</label><input id="walletOwner" value="'+esc(p.name||'')+'" required></div><button type="button" class="primary" data-action="link-wallet">'+t('linkWallet')+'</button>';
  var tiers=[['T1',30],['T2',50],['T3',100],['V1',250],['V2',500],['V3',1000]];
  var tierOptions=tiers.map(function(x){return '<option value="'+x[0]+'">'+x[0]+' — $'+x[1]+'</option>';}).join('');
- var body='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h1>'+t('hi')+', '+esc(p.name||'')+'</h1><button class="ghost-dark" data-action="logout">'+t('logout')+'</button></div>'+
-  '<div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:15px 0"><div class="stat-card"><small>'+t('balance')+'</small><strong>'+money(p.current_platform_balance)+'</strong></div><div class="stat-card"><small>'+t('principal')+'</small><strong>'+money(p.principal_balance)+'</strong></div><div class="stat-card"><small>'+t('profit')+'</small><strong>'+money(p.profit_balance)+'</strong></div><div class="stat-card"><small>'+t('kyc')+'</small><strong style="font-size:15px">'+esc(kycLabel)+'</strong></div></div>'+
+ var body='<section class="aegis-dashboard-hero"><div class="aegis-dashboard-hero-row"><div><span class="aegis-kicker">PRIVATE CLIENT WORKSPACE · TESTNET DEMO</span><h1>'+t('hi')+', '+esc(p.name||'')+'</h1><div class="aegis-balance">'+money(p.current_platform_balance)+'</div><p class="aegis-sub">Available platform balance · secure client session</p></div><div class="aegis-dash-actions"><a class="aegis-shop-cta" href="#shop">Open Shop</a><button class="aegis-logout" data-action="logout">'+t('logout')+'</button></div></div><nav class="aegis-dash-nav"><a href="#overview">Overview</a><a href="#deposit-area">Deposit</a><a href="#shop">Shop</a><a href="#kyc-area">KYC</a><a href="#withdraw-area">Withdraw</a><a href="#ref-area">Referrals</a><a href="#ai-area">AI Help</a></nav></section><div id="overview" class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 18px 15px"><div class="stat-card"><small>'+t('balance')+'</small><strong>'+money(p.current_platform_balance)+'</strong></div><div class="stat-card"><small>'+t('principal')+'</small><strong>'+money(p.principal_balance)+'</strong></div><div class="stat-card"><small>'+t('profit')+'</small><strong>'+money(p.profit_balance)+'</strong></div><div class="stat-card"><small>'+t('kyc')+'</small><strong style="font-size:15px">'+esc(kycLabel)+'</strong></div></div>';  
   '<div class="notice" style="margin:14px 0">'+t('network')+'</div>'+
-  '<section class="section"><h3>'+t('deposit')+'</h3><p>'+t('depositHelp')+'</p><form id="depositForm"><div class="field"><label>'+t('tier')+'</label><select id="depositTier">'+tierOptions+'</select></div><div class="field"><label>'+t('amount')+'</label><input id="depositAmount" type="number" min="1" step="0.01" value="30" required></div><div class="field"><label>'+t('txid')+'</label><input id="depositTxid" type="text" minlength="64" maxlength="64" pattern="[A-Fa-f0-9]{64}" required></div><div class="field"><label>'+t('proof')+'</label><input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submit')+'</button></form></section>'+
-  kycSection+
-  '<section class="section" style="margin-top:18px"><h3>'+t('withdraw')+'</h3><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form></section>'+
+  '<section class="section" id="deposit-area"><h3>'+t('deposit')+'</h3><p>'+t('depositHelp')+'</p><form id="depositForm"><div class="field"><label>'+t('tier')+'</label><select id="depositTier">'+tierOptions+'</select></div><div class="field"><label>'+t('amount')+'</label><input id="depositAmount" type="number" min="1" step="0.01" value="30" required></div><div class="field"><label>'+t('txid')+'</label><input id="depositTxid" type="text" minlength="64" maxlength="64" pattern="[A-Fa-f0-9]{64}" required></div><div class="field"><label>'+t('proof')+'</label><input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submit')+'</button></form></section>'+
+  '<div id="kyc-area">'+kycSection+'</div>'+
+  '<section class="section" id="withdraw-area" style="margin-top:18px"><h3>'+t('withdraw')+'</h3><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form></section>'+
   '<section class="section" style="margin-top:18px"><h3>'+t('refCode')+'</h3><code>'+esc(p.referral_code||'')+'</code></section>'+
-  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal')+shopSection(d)+referralsSection(d)+notificationsSection(d)+aiSection();
+  historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal')+shopSection(d)+'<div id="ref-area">'+referralsSection(d)+'</div><div id="ai-area">'+notificationsSection(d)+aiSection()+'</div>';
  root.innerHTML=shell(body,'dashboard');
  var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');
  if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
@@ -335,6 +349,12 @@ async function action(e){
    catch(err){setMessage(authError(err));}
    finally{busy=false;render();} return;
   }
+  if(a==='shop-category'){shopCategory=el.getAttribute('data-category')||'All';render();return;}
+  if(a==='shop-cart-focus'){var cartNode=document.getElementById('shop-cart');if(cartNode)cartNode.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(a==='shop-add'){var sid=el.getAttribute('data-id'),scart=loadShopCart();if(scart.indexOf(sid)<0){scart.push(sid);saveShopCart(scart);}render();return;}
+  if(a==='shop-remove'){saveShopCart(loadShopCart().filter(function(x){return x!==el.getAttribute('data-id');}));render();return;}
+  if(a==='shop-clear'){saveShopCart([]);render();return;}
+  if(a==='shop-buy'){await completeShopPurchase(el.getAttribute('data-id'));return;}
   if(a==='copy-ref'){
    var refCode=state.profile&&state.profile.referral_code||'';
    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
@@ -352,6 +372,7 @@ async function action(e){
  }
 }
 root.addEventListener('submit',async function(e){
+ if(e.target.id==='shopSearchForm'){e.preventDefault();shopSearch=document.getElementById('shopSearchInput').value||'';render();return;}
  if(e.target.id==='aiForm'){
   e.preventDefault();
   var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
