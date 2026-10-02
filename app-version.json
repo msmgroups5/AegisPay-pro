@@ -1,12 +1,12 @@
 {
-  "versionCode": 25,
-  "versionName": "2.3.0",
+  "versionCode": 26,
+  "versionName": "2.4.0",
   "releaseChannel": "stable",
   "releasedAt": "2026-10-03T00:00:00Z",
   "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
   "notes": [
-    "Premium client dashboard refresh",
-    "Amazon-style shop layout with real product photography",
-    "Improved mobile product cards and visual hierarchy"
+    "Clean premium Home front page matched to supplied AegisPay reference",
+    "Compact hero, LV cards, action tiles, referral card and shop banner",
+    "Premium dark bottom navigation for Android client"
   ]
 }
