@@ -1,12 +1,12 @@
 {
-  "versionCode": 23,
-  "versionName": "2.1.2",
+  "versionCode": 24,
+  "versionName": "2.2.0",
   "releaseChannel": "stable",
-  "releasedAt": "2026-10-01T00:00:00Z",
+  "releasedAt": "2026-10-02T00:00:00Z",
   "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
   "notes": [
-    "Stable client portal routing",
-    "Remote-first web portal deployment",
-    "Master Admin web portal"
+    "Premium client dashboard refresh",
+    "Amazon-style shop layout with real product photography",
+    "Improved mobile product cards and visual hierarchy"
   ]
 }
