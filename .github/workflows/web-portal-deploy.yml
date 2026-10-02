@@ -38,8 +38,8 @@ jobs:
           curl -fsSL https://aegispay-client1.netlify.app/downloads/aegispay-admin.apk -o site/downloads/aegispay-admin.apk
           cat > site/app-version.json <<'EOF'
           {
-            "versionCode": 21,
-            "versionName": "2.1.0-web-test",
+            "versionCode": 22,
+            "versionName": "2.1.1-web-test",
             "releaseChannel": "test",
             "releasedAt": "2026-10-01T00:00:00Z",
             "clientApkUrl": "https://aegispay-client1.netlify.app/downloads/aegispay-client.apk",
