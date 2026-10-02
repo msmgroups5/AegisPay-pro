@@ -48,6 +48,9 @@ jobs:
           set -euo pipefail
           rm -rf site/app site/downloads
           mkdir -p site/app site/downloads
+          cp client.html site/client.html
+          cp master-admin.html site/master-admin.html
+          cp admin-auth.js site/admin-auth.js
           cp client.html site/app/index.html
           cp _redirects site/_redirects
           cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js \
