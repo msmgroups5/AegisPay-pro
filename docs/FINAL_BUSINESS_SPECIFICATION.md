@@ -137,7 +137,7 @@ Master Admin:
 Overview, Users, Withdrawals, Credits, Settings, Telegram.
 
 Visual direction:
-dark navy + electric blue + cyan + violet accents; emerald success states; amber transaction states; red security/rejection states; gold/VVIP tier accents.
+premium black + deep red + white client UI, with emerald success states, amber transaction states, gold/VVIP tier accents, and red security/rejection states.
 
 ## 16. User instructions are built into the app
 Every critical workflow includes on-screen instructions:
