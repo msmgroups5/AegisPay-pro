@@ -3,7 +3,7 @@ const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 const exists=p=>fs.existsSync(p);
 
 const must=[
-  'client.html','client-fresh.html','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
+  'client.html','client-fresh.html','client-home.css','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
   'service-worker.js','manifest.webmanifest','aegispay-logo.svg','_redirects','package.json','netlify.toml',
   'database/migrations/20261003_private_verification_storage_policies.sql',
@@ -15,7 +15,7 @@ const must=[
 for(const p of must)assert(exists(p),'Missing canonical source file: '+p);
 
 const client=fs.readFileSync('client.html','utf8');
-for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js','aegis-auth-redirect.js']) {
+for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js','aegis-auth-redirect.js','./client-home.css']) {
   assert(client.includes(marker),'Client runtime wiring is incomplete: '+marker);
 }
 for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
@@ -23,13 +23,13 @@ for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
 }
 assert(!client.includes('styles.css')&&!client.includes('premium.css')&&!client.includes('shop-catalog.js'),'Legacy client UI assets are still wired to client');
 const clientAuth=fs.readFileSync('client-auth.js','utf8');
-for(const marker of ['AegisPayClientRuntime','UI reset']) {
-  assert(clientAuth.includes(marker),'Clean client UI reset foundation missing: '+marker);
+for(const marker of ['function renderHome','function loginSubmit','function loadHomeData']) {
+  assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
 }
-for(const marker of ['renderDashboard','Shop Millions','Product Details','Invite Friends','Total Balance']) {
-  assert(!clientAuth.includes(marker),'Previous client UI remains in client-auth.js: '+marker);
+for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','Crypto','Referral','Shop Millions','Assets','My Profile','AI Bot']) {
+  assert(clientAuth.includes(marker),'Home Dashboard UI text missing: '+marker);
 }
-assert(clientAuth.length<5000,'Client UI reset source unexpectedly contains legacy UI code');
+assert(clientAuth.length<22000,'Client source unexpectedly contains later-screen UI code');
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
