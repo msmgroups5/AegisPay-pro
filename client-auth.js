@@ -9,7 +9,9 @@ var state={profile:null,unread:0,busy:false,mode:'login',message:''};
 
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
-function logoMark(){return '<span class="ap-logo-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 60 54c2 4-1 7-5 7H9c-4 0-7-4-5-7L32 5Z" fill="#ff2034"/><path d="M32 25 18 50h9l5-9 5 9h9L32 25Z" fill="#8e0712"/></svg></span>\n}\n\nfunction icon(type){
+function logoMark(){return '<span class="ap-logo-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 60 54c2 4-1 7-5 7H9c-4 0-7-4-5-7L32 5Z" fill="#ff2034"/><path d="M32 25 18 50h9l5-9 5 9h9L32 25Z" fill="#8e0712"/></svg></span>';}
+
+function icon(type){
  var m={
   bell:'<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>',
   user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6"/></svg>',
