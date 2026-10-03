@@ -10,7 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
+      NETLIFY_SITE_ID: 80dd262c-dfec-427a-9820-0eb98ec829b5
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
