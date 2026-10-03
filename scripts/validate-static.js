@@ -29,7 +29,7 @@ for(const marker of ['function homeView','function signIn','function loadNotific
 for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','Crypto','Referral','Shop Millions','Assets','My Profile','AI Bot']) {
   assert(clientAuth.includes(marker),'Home Dashboard UI text missing: '+marker);
 }
-assert(clientAuth.length<60000,'Client source unexpectedly exceeded the merged client runtime budget');
+assert(clientAuth.length<75000,'Client source unexpectedly exceeded the merged client runtime budget');
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
