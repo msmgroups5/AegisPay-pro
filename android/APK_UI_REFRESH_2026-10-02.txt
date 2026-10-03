@@ -1,1 +1,0 @@
-Fresh Android APK rebuild trigger for AegisPay Client v2.2.0 premium UI refresh.
