@@ -6,7 +6,7 @@ const must=[
   'client.html','client-fresh.html','client-home.css','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
   'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json','netlify.toml',
-  'database/migrations/20261003_private_verification_storage_policies.sql',
+  'database/migrations/20261003_private_verification_storage_policies.sql','database/migrations/20261004_restore_baseline_demo_configuration.sql',
   'site/index.html','site/site.css','android/app/build.gradle',
   'android/app/src/main/java/com/aegispay/app/MainActivity.java',
   '.github/workflows/ci.yml','.github/workflows/android-apk.yml',
@@ -46,7 +46,8 @@ assert(gradle.includes("include 'client.html'")&&gradle.includes("include 'clien
 assert(!gradle.includes('syncBlueprintRuntime')&&!gradle.includes('aegis-core.js')&&!gradle.includes('app.js'),'Legacy Android runtime remains wired');
 
 const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainActivity.java','utf8');
-assert(native.includes('aegispay-pro.netlify.app')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android remote/legacy identity is stale');
+assert(native.includes('aegispay-pro-web.aegispay.workers.dev')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android remote/legacy identity is stale');
+assert(native.includes('aegispay-pro.netlify.app')&&native.includes('UPDATE_HOST'),'Android update endpoint must remain explicitly allowlisted');
 
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
 assert(deploy.includes('cp client.html site/app/index.html'),'Deploy source of truth is not client.html');
