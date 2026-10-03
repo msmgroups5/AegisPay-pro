@@ -2213,3 +2213,114 @@ html,body{
 }
 
 /* Keep responsive geometry unchanged */
+
+
+/* AEGISPAY FINAL BLUE + RED CONTRAST THEME */
+:root{
+  --final-blue:#155EEF;
+  --final-blue-dark:#0B2A66;
+  --final-blue-mid:#2F80FF;
+  --final-blue-soft:#EAF2FF;
+  --final-blue-pale:#F5F8FF;
+  --final-red:#E5141B;
+  --final-red-dark:#B80F16;
+  --final-red-soft:#FFF0F1;
+  --final-ink:#102033;
+  --final-muted:#667085;
+  --final-line:#D8E3F3;
+}
+html,body{background:#F4F7FB!important}
+.ap-shell{background:linear-gradient(180deg,#F7FAFF 0%,#EFF4FA 100%)!important;color:var(--final-ink)!important}
+.ap-home-header{
+  background:#FFFFFF!important;
+  color:var(--final-ink)!important;
+  border-bottom:1px solid #E4EBF5!important;
+  box-shadow:0 2px 12px rgba(16,32,51,.06)!important;
+}
+.ap-circle-btn{color:var(--final-blue-dark)!important}
+.ap-circle-btn.profile{background:var(--final-red)!important;box-shadow:0 6px 14px rgba(229,20,27,.22)!important}
+.ap-notification-dot{background:var(--final-red)!important;border-color:#FFFFFF!important}
+
+/* Hero */
+.ap-welcome-card{
+  background:linear-gradient(120deg,#0A2148 0%,#155EEF 58%,#0D3B91 100%)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  box-shadow:0 10px 24px rgba(21,94,239,.20)!important;
+}
+.ap-welcome-kicker,.ap-client-row{color:#E5EEFF!important}
+.ap-welcome-name{color:#FFFFFF!important}
+.ap-copy-btn{
+  color:#FFFFFF!important;
+  background:rgba(255,255,255,.10)!important;
+  border-color:rgba(255,255,255,.22)!important;
+}
+.ap-building svg g{fill:var(--final-red)!important}
+.ap-building svg rect[fill="#240307"],
+.ap-building svg rect[fill="#120205"],
+.ap-building svg rect[fill="#1A0305"],
+.ap-building svg rect[fill="#0F0103"],
+.ap-building svg rect[fill="#170205"]{
+  fill:#17335F!important;
+  stroke:#4778C7!important;
+}
+
+/* VIP strip */
+.ap-vip{
+  background:#FFFFFF!important;
+  border:1px solid var(--final-line)!important;
+  box-shadow:0 7px 18px rgba(16,32,51,.08)!important;
+}
+.ap-vip-col:first-child{background:#FFF5F6!important}
+.ap-crown{color:var(--final-red)!important}
+.ap-vip-label{color:#475467!important}
+.ap-vip-value{color:var(--final-blue-dark)!important}
+.ap-vip-col:not(:last-child):after{background:var(--final-line)!important}
+
+/* Actions */
+.ap-action-card{
+  background:#FFFFFF!important;
+  border:1px solid #DDE6F2!important;
+  box-shadow:0 8px 18px rgba(16,32,51,.08)!important;
+}
+.ap-action-card.blue{background:var(--final-blue-pale)!important}
+.ap-action-card.red{background:var(--final-red-soft)!important}
+.ap-action-card.green,.ap-action-card.orange{background:#F8FAFD!important}
+.ap-action-card.blue .ap-action-icon{background:var(--final-blue)!important;color:#FFFFFF!important}
+.ap-action-card.red .ap-action-icon{background:var(--final-red)!important;color:#FFFFFF!important}
+.ap-action-card.green .ap-action-icon,
+.ap-action-card.orange .ap-action-icon{background:var(--final-blue-dark)!important;color:#FFFFFF!important}
+.ap-plus-badge{background:var(--final-red)!important}
+.ap-action-card>span:last-child strong{color:var(--final-ink)!important}
+.ap-action-card>span:last-child small{color:var(--final-muted)!important}
+
+/* Referral */
+.ap-referral-card{
+  background:linear-gradient(90deg,#EEF4FF 0%,#F7F9FD 100%)!important;
+  border:1px solid #D7E3F6!important;
+  box-shadow:0 8px 18px rgba(21,94,239,.08)!important;
+}
+.ap-ref-icon{background:linear-gradient(135deg,var(--final-blue) 0%,var(--final-blue-dark) 100%)!important}
+.ap-ref-copy strong{color:var(--final-ink)!important}
+.ap-ref-copy small{color:var(--final-blue)!important}
+.ap-arrow{color:var(--final-red)!important}
+
+/* Promo */
+.ap-promo-card{
+  background:linear-gradient(105deg,#081A3A 0%,#155EEF 62%,#C9131A 100%)!important;
+  border:1.5px solid var(--final-red)!important;
+  box-shadow:0 9px 20px rgba(16,32,51,.16)!important;
+}
+.ap-amazon-smile{border-bottom-color:#FFFFFF!important}
+.ap-cart-basket{border-color:#DDE7F7!important}
+.ap-cart-handle{background:#DDE7F7!important}
+.ap-cart-wheel{background:#102033!important;border-color:#9DB1CD!important}
+.ap-box{background:#E4ECF8!important;border-color:#B5C7E0!important;color:#233B60!important}
+
+/* Bottom nav */
+.ap-bottom-nav{
+  background:#0B1F3A!important;
+  border-top:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 -5px 18px rgba(11,31,58,.12)!important;
+}
+.ap-nav-item{color:#A9B9CF!important}
+.ap-nav-item.active{color:#FF4A50!important;font-weight:700!important}
