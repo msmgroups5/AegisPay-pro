@@ -2324,3 +2324,46 @@ html,body{background:#F4F7FB!important}
 }
 .ap-nav-item{color:#A9B9CF!important}
 .ap-nav-item.active{color:#FF4A50!important;font-weight:700!important}
+
+
+/* FOCUSED CLIENT PAGES */
+.ap-subpage-shell{background:linear-gradient(180deg,#f3f5f8 0%,#eef1f5 100%);color:#11151b;overflow-x:hidden}
+.ap-subpage-header{position:relative;z-index:3;min-height:76px;padding:14px 14px 10px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;background:#fff;border-bottom:1px solid #e2e6ec}
+.ap-subpage-back{width:42px;height:42px;border-radius:13px;background:#f1f4f7;color:#202733;font-size:30px;line-height:1;display:grid;place-items:center}
+.ap-subpage-brand{display:flex;justify-content:center;align-items:center;gap:7px;min-width:0}
+.ap-subpage-brand img{width:38px;height:38px;object-fit:contain}
+.ap-subpage-brand .ap-brand-word{font-size:25px;color:#20252e}
+.ap-subpage-title{padding:18px 16px 10px;background:#fff;border-bottom:1px solid #e4e8ed}
+.ap-page-kicker{display:block;color:#f0192b;font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+.ap-subpage-title h1{margin:5px 0 0;color:#141922;font-size:28px;line-height:1.05;font-weight:900;letter-spacing:-.7px}
+.ap-subpage-title p{margin:7px 0 0;color:#6d7583;font-size:11px;line-height:1.45}
+.ap-subpage-content{padding:14px 12px 96px;display:flex;flex-direction:column;gap:12px}
+.ap-page-card{background:#fff;border:1px solid #e1e6ec;border-radius:18px;padding:15px;box-shadow:0 8px 20px rgba(33,45,62,.05)}
+.ap-page-card.is-success{border-color:#b9e8d1}
+.ap-page-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.ap-page-card-head h2{margin:0;font-size:18px;line-height:1.1;color:#18202b;font-weight:900}
+.ap-page-card p{margin:8px 0;color:#657080;font-size:11px;line-height:1.5}
+.ap-page-card .field{margin-top:11px}
+.ap-page-card .field label{display:block;margin-bottom:6px;font-size:10px;font-weight:800;color:#4d5664}
+.ap-page-card .field input,.ap-page-card .field select,.ap-page-card input[type="text"],.ap-page-card input[type="number"],.ap-page-card input[type="email"],.ap-page-card input[type="password"],.ap-page-card select{width:100%;min-height:44px;border:1px solid #d8dee7;background:#fbfcfd;border-radius:11px;color:#11151b;padding:9px 11px;outline:none}
+.ap-page-card input:focus,.ap-page-card select:focus{border-color:#1878ff;box-shadow:0 0 0 3px rgba(24,120,255,.10)}
+.ap-page-card .primary{width:100%;min-height:46px;margin-top:13px;border-radius:11px;background:#1878ff;color:#fff;font-weight:900}
+.ap-page-card .notice{margin:10px 0;border:1px solid #dce5f0;background:#f5f8fc;color:#485b72;border-radius:12px;padding:10px;font-size:10px;line-height:1.45}
+.ap-page-card table{font-size:10px}
+.ap-page-card th{padding:8px;text-align:left;color:#78818f;border-bottom:1px solid #e9edf2}
+.ap-page-card td{padding:9px 8px;border-bottom:1px solid #eef1f4;color:#2a313c}
+.ap-detail-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.ap-detail-grid>div,.ap-asset-grid>div{padding:11px;border:1px solid #e8ecf1;background:#f9fafb;border-radius:12px}
+.ap-detail-grid small,.ap-asset-grid small,.ap-wallet-linked small{display:block;color:#7b8491;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.ap-detail-grid strong,.ap-asset-grid strong{display:block;margin-top:4px;color:#1d2430;font-size:13px;line-height:1.35;word-break:break-word}
+.ap-balance-big{font-size:32px;font-weight:900;letter-spacing:-1px;color:#171d27}
+.ap-muted{color:#7a8390!important}
+.ap-asset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.ap-wallet-linked{padding:12px;border:1px solid #dce5ee;background:#f7fbfe;border-radius:12px}
+.ap-wallet-linked code{display:block;margin-top:6px;color:#253c55;word-break:break-all;font-size:10px}
+.ap-check-row{display:flex;gap:9px;align-items:flex-start;margin:12px 0;color:#566170;font-size:10px;line-height:1.4}
+.ap-check-row input{margin-top:2px}
+.ap-status-success{display:flex;align-items:center;gap:8px;padding:11px;border-radius:12px;background:#effcf5;border:1px solid #c9f0dc}
+.ap-wide-btn{width:100%;margin-top:2px;text-align:center}
+@media(min-width:600px){.ap-subpage-content{padding-left:16px;padding-right:16px}.ap-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:365px){.ap-subpage-header{grid-template-columns:40px 1fr 40px}.ap-subpage-title h1{font-size:25px}.ap-asset-grid{grid-template-columns:1fr}}
