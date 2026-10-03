@@ -12,7 +12,7 @@ jobs:
   deploy-web:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 80dd262c-dfec-427a-9820-0eb98ec829b5
+      NETLIFY_SITE_ID: 5573011e-3f81-449a-9617-da0c176720d8
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +83,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npx -y netlify-cli status --auth="$NETLIFY_AUTH_TOKEN" --json
+          status_json="$(npx -y netlify-cli status --auth="$NETLIFY_AUTH_TOKEN" --json)"
+          echo "$status_json" | jq -e '.account.Email == "tryforsuccess1@gmail.com"' >/dev/null
           npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay canonical web $GITHUB_SHA"
           for route in "/" "/app/" "/admin/" "/downloads/aegispay-client.apk"; do
             status="$(curl -sS -L -o /dev/null -w '%{http_code}' "https://aegispay-pro.netlify.app$route")"
