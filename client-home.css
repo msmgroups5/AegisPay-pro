@@ -727,3 +727,146 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
 @media(max-width:365px){
  .ap-premium-home .ap-ref-gift-art{right:42px!important;transform:scale(.88) rotate(-4deg)!important;transform-origin:center!important}
 }
+
+
+/* 2026-10-04 REFERENCE MATCH FINAL PASS
+   Compact proportions, correct badge treatment, no overflow/overlap. */
+.ap-premium-home .ap-home-header{
+  padding:13px 12px 14px!important;
+}
+.ap-premium-home .ap-header-row{
+  min-height:46px!important;
+}
+.ap-premium-home .ap-brand img{
+  width:171px!important;height:38px!important;
+}
+.ap-premium-home .ap-circle-btn{
+  width:42px!important;height:42px!important;
+}
+.ap-premium-home .ap-welcome-premium{
+  height:122px!important;min-height:122px!important;
+  margin-top:12px!important;
+  padding:17px 18px!important;
+  border-radius:20px!important;
+}
+.ap-premium-home .ap-welcome-kicker{font-size:14px!important}
+.ap-premium-home .ap-welcome-name{font-size:28px!important;margin:3px 0 5px!important}
+.ap-premium-home .ap-client-row{font-size:12px!important}
+.ap-premium-home .ap-vip-premium{
+  height:118px!important;min-height:118px!important;
+  margin:11px 8px 0!important;
+  padding:7px!important;
+  border-radius:18px!important;
+}
+.ap-premium-home .ap-vip-premium .ap-vip-col{
+  height:102px!important;min-height:102px!important;
+}
+.ap-premium-home .ap-vip-premium .ap-crown{
+  width:34px!important;height:34px!important;
+  padding:6px!important;
+  margin:0 0 5px!important;
+  border-radius:50%!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#fff!important;
+}
+.ap-premium-home .ap-vip-premium .ap-crown .ap-icon{
+  width:21px!important;height:21px!important;
+}
+.ap-premium-home .ap-vip-premium .lv1 .ap-crown{
+  background:linear-gradient(145deg,#ff5367,#e50914)!important;
+  box-shadow:0 4px 10px rgba(229,9,20,.24)!important;
+}
+.ap-premium-home .ap-vip-premium .lv2 .ap-crown{
+  background:linear-gradient(145deg,#5fa0ff,#3b82f6)!important;
+  box-shadow:0 4px 10px rgba(59,130,246,.20)!important;
+}
+.ap-premium-home .ap-vip-premium .lv3 .ap-crown{
+  background:linear-gradient(145deg,#ffc451,#f59e0b)!important;
+  box-shadow:0 4px 10px rgba(245,158,11,.22)!important;
+}
+.ap-premium-home .ap-vip-premium .ap-vip-label{font-size:14px!important}
+.ap-premium-home .ap-vip-premium .ap-vip-value{font-size:24px!important}
+.ap-premium-home .ap-premium-content{
+  padding:11px 8px 12px!important;
+}
+.ap-premium-home .ap-premium-actions{gap:8px!important}
+.ap-premium-home .ap-action-card{
+  min-height:88px!important;height:88px!important;
+  padding:11px!important;
+  border-radius:17px!important;
+  gap:9px!important;
+}
+.ap-premium-home .ap-action-icon{
+  width:46px!important;height:46px!important;flex:0 0 46px!important;
+  border-radius:14px!important;
+}
+.ap-premium-home .ap-action-icon .ap-icon{
+  width:24px!important;height:24px!important;
+}
+.ap-premium-home .ap-action-title{font-size:15px!important}
+.ap-premium-home .ap-action-subtitle{font-size:9px!important;margin-top:4px!important}
+.ap-premium-home .ap-action-arrow{
+  width:27px!important;height:27px!important;flex:0 0 27px!important;
+}
+.ap-premium-home .ap-referral-premium{
+  position:relative!important;
+  min-height:88px!important;height:88px!important;
+  margin:8px 0 0!important;
+  padding:11px!important;
+  border-radius:17px!important;
+  gap:10px!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-icon{
+  width:46px!important;height:46px!important;flex:0 0 46px!important;
+  border-radius:14px!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-icon .ap-icon{
+  width:24px!important;height:24px!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-copy strong{font-size:16px!important}
+.ap-premium-home .ap-referral-premium .ap-ref-copy small{font-size:9px!important;margin-top:4px!important}
+.ap-premium-home .ap-ref-gift-art{
+  right:47px!important;top:9px!important;
+  width:62px!important;height:58px!important;
+  transform:scale(.78) rotate(-4deg)!important;
+}
+.ap-premium-home .ap-ref-arrow{width:27px!important;height:27px!important;flex-basis:27px!important}
+.ap-premium-home .ap-amazon-premium{
+  height:154px!important;min-height:154px!important;
+  margin:8px 0 0!important;
+  padding:13px!important;
+  border-radius:18px!important;
+}
+.ap-premium-home .ap-promo-copy{
+  left:13px!important;top:12px!important;width:54%!important;
+}
+.ap-premium-home .ap-amazon-wordmark{font-size:30px!important}
+.ap-premium-home .ap-amazon-smile-premium{
+  width:38px!important;height:11px!important;border-bottom-width:3px!important;
+}
+.ap-premium-home .ap-promo-copy strong{font-size:18px!important;margin-top:7px!important}
+.ap-premium-home .ap-promo-copy small{font-size:9px!important;margin-top:5px!important}
+.ap-premium-home .ap-amazon-cta{font-size:9px!important;padding:7px 10px!important;margin-top:8px!important}
+.ap-premium-home .ap-amazon-art{width:49%!important}
+.ap-premium-home .ap-mini-phone{width:54px!important;height:84px!important;right:9px!important;bottom:11px!important;padding:6px!important}
+.ap-premium-home .ap-mini-phone-logo{font-size:8px!important}
+.ap-premium-home .ap-mini-cart{width:96px!important;height:82px!important;bottom:5px!important}
+.ap-premium-home .ap-mini-cart-handle{top:24px!important;width:29px!important}
+.ap-premium-home .ap-mini-cart-basket{left:24px!important;top:30px!important;width:65px!important;height:34px!important}
+.ap-premium-home .ap-mini-box.box-a{width:34px!important;height:24px!important}
+.ap-premium-home .ap-mini-box.box-b{width:28px!important;height:20px!important}
+.ap-premium-home .ap-mini-box.box-c{width:30px!important;height:21px!important}
+.ap-premium-home .ap-bottom-premium{
+  height:67px!important;
+  padding:3px 6px!important;
+}
+@media(max-width:365px){
+  .ap-premium-home .ap-brand img{width:153px!important}
+  .ap-premium-home .ap-welcome-premium{height:116px!important;min-height:116px!important}
+  .ap-premium-home .ap-vip-premium{height:112px!important;min-height:112px!important}
+  .ap-premium-home .ap-vip-premium .ap-vip-col{height:96px!important;min-height:96px!important}
+  .ap-premium-home .ap-action-card{height:84px!important;min-height:84px!important;padding:9px!important}
+  .ap-premium-home .ap-action-title{font-size:14px!important}
+  .ap-premium-home .ap-amazon-premium{height:145px!important;min-height:145px!important}
+}
