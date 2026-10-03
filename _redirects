@@ -1,7 +1,7 @@
-/app/auth/callback /app/index.html 200
-/auth/callback /app/index.html 200
+/app/auth/callback /app/home.html 200
+/auth/callback /app/home.html 200
 /app /app/ 301
-/app/ /app/index.html 200
+/app/ /app/home.html 200
 /client /app/ 301
 /client/ /app/ 301
 /client.html /app/ 301
