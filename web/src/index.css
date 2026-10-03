@@ -40,3 +40,28 @@ button:disabled{cursor:not-allowed}
 .auth-primary:disabled{opacity:.65}
 .auth-secondary{width:100%;border:1px solid #e5e7eb;background:#fff;color:#252525;border-radius:14px;min-height:46px;font-size:13px;font-weight:800;transition:.18s}
 .auth-secondary:active{background:#fafafa}
+
+.home-hero{min-height:210px}
+.home-avatar{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.16);color:#fff;font-weight:800;font-size:15px;box-shadow:0 16px 36px rgba(0,0,0,.18)}
+.balance-card{background:linear-gradient(145deg,#17181c,#27282d);box-shadow:0 18px 45px rgba(17,24,39,.18);border:1px solid rgba(255,255,255,.06)}
+.status-pill{padding:6px 9px;border-radius:999px;background:rgba(34,197,94,.12);border:1px solid rgba(74,222,128,.16);color:#86efac;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.balance-mini{padding:10px 6px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.045);text-align:center}
+.balance-mini p{margin:0;color:rgba(255,255,255,.48);font-size:9px;font-weight:600}
+.balance-mini b{display:block;margin-top:4px;color:#fff;font-size:12px}
+.action-card{min-height:78px;background:#fff;border:1px solid #f0f0f2;border-radius:19px;padding:12px;display:flex;align-items:center;gap:11px;text-align:left;box-shadow:0 8px 22px rgba(17,24,39,.05);transition:transform .18s,box-shadow .18s}
+.action-card:active{transform:translateY(1px);box-shadow:0 5px 14px rgba(17,24,39,.06)}
+.action-card b{display:block;font-size:13px;color:#111827}
+.action-card small{display:block;color:#9ca3af;font-size:9px;font-weight:600;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.action-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto}
+.action-red{background:#fff0f1;color:#e50914}.action-blue{background:#eef5ff;color:#2563eb}.action-purple{background:#f5efff;color:#7c3aed}.action-yellow{background:#fff8db;color:#a16207}
+.tier-chip{min-width:152px;padding:10px 11px;border-radius:17px;background:#fff;border:1px solid #ececef;display:flex;align-items:center;gap:9px;box-shadow:0 7px 18px rgba(17,24,39,.04)}
+.tier-chip-active{border-color:#e50914;box-shadow:0 9px 22px rgba(229,9,20,.1)}
+.tier-crown{width:30px;height:30px;border-radius:10px;background:#fff0f1;color:#d1111b;display:grid;place-items:center;font-size:16px}
+.tier-chip b{display:block;font-size:12px}.tier-chip span{display:block;color:#9ca3af;font-size:8px;margin-top:2px}.tier-chip strong{margin-left:auto;color:#e50914;font-size:9px;white-space:nowrap}
+.promo-card{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px 17px;border-radius:22px;background:linear-gradient(135deg,#7e070b,#bd101b);color:#fff;box-shadow:0 16px 34px rgba(126,7,11,.18)}
+.promo-card:after{content:"";position:absolute;width:130px;height:130px;border-radius:999px;border:1px solid rgba(255,255,255,.14);right:-44px;top:-42px}
+.promo-kicker{font-size:8px;font-weight:800;letter-spacing:.2em;color:rgba(255,255,255,.56)}
+.promo-card h3{margin:5px 0 0;font-size:17px;font-weight:800}.promo-card p{margin:5px 0 10px;max-width:220px;color:rgba(255,255,255,.65);font-size:9px;line-height:1.5}.promo-btn{border:0;border-radius:10px;background:#fff;color:#8b0000;padding:8px 10px;font-size:9px;font-weight:800}.promo-art{width:53px;height:53px;border-radius:16px;background:rgba(255,255,255,.11);display:grid;place-items:center;font-size:24px;position:relative;z-index:1}
+.shopping-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px;border-radius:21px;background:#fff;border:1px solid #eeeeef;box-shadow:0 8px 20px rgba(17,24,39,.04)}
+.shopping-banner span:first-child{font-size:8px;font-weight:800;letter-spacing:.17em;color:#e50914}.shopping-banner h3{margin:4px 0 0;font-size:15px;font-weight:800}.shopping-banner p{margin:4px 0 0;color:#9ca3af;font-size:9px}.shopping-banner button{display:flex;align-items:center;gap:5px;border:0;border-radius:11px;background:#f9d835;padding:9px 11px;color:#151515;font-size:10px;font-weight:800}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;padding:10px 13px;border-radius:999px;background:#111827;color:#fff;font-size:10px;font-weight:700;box-shadow:0 12px 30px rgba(17,24,39,.22)}
