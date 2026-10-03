@@ -2034,3 +2034,17 @@ body{overflow-x:hidden!important;font-family:Inter,Roboto,Arial,sans-serif!impor
   .ap-promo-copy strong{font-size:18px!important}
   .ap-promo-copy small{font-size:12px!important}
 }
+
+/* Exact icon color treatment */
+.ap-action-card.blue .ap-action-icon{
+  background:transparent!important;
+  color:#1E6BFF!important;
+}
+.ap-action-card.red .ap-action-icon{
+  background:transparent!important;
+  color:#E5141B!important;
+}
+.ap-action-card.green .ap-action-icon{
+  background:#12B76A!important;
+  color:#FFFFFF!important;
+}
