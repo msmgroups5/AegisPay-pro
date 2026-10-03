@@ -2048,3 +2048,168 @@ body{overflow-x:hidden!important;font-family:Inter,Roboto,Arial,sans-serif!impor
   background:#12B76A!important;
   color:#FFFFFF!important;
 }
+
+
+/* AEGISPAY RED / BLUE / GRAY THEME — 2026-10-03 */
+:root{
+  --theme-red:#E5141B;
+  --theme-red-2:#F01920;
+  --theme-red-deep:#8F1016;
+  --theme-blue:#1E6BFF;
+  --theme-blue-2:#4B8DFF;
+  --theme-blue-deep:#1747A6;
+  --theme-gray-0:#F7F8FA;
+  --theme-gray-1:#EEF1F5;
+  --theme-gray-2:#DCE1E8;
+  --theme-gray-3:#6B7280;
+  --theme-gray-4:#374151;
+  --theme-dark:#202633;
+  --theme-dark-2:#111827;
+}
+
+/* Page */
+html,body{
+  background:#EEF1F5!important;
+}
+.ap-shell{
+  background:#EEF1F5!important;
+  color:#111827!important;
+}
+
+/* Header */
+.ap-home-header{
+  background:#FFFFFF!important;
+  color:#111827!important;
+  padding:14px 16px 12px!important;
+  box-shadow:0 2px 10px rgba(17,24,39,.06)!important;
+}
+.ap-head-actions{gap:10px!important}
+.ap-circle-btn{
+  color:#374151!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.ap-circle-btn.profile{
+  color:#FFFFFF!important;
+  background:#E5141B!important;
+  box-shadow:0 5px 12px rgba(229,20,27,.20)!important;
+}
+.ap-notification-dot{
+  background:#E5141B!important;
+  border:2px solid #FFFFFF!important;
+}
+
+/* Welcome */
+.ap-welcome-card{
+  background:linear-gradient(120deg,#27364B 0%,#3B5B84 56%,#1F2B3B 100%)!important;
+  border:1px solid rgba(30,107,255,.35)!important;
+  box-shadow:0 8px 20px rgba(31,43,59,.20)!important;
+}
+.ap-welcome-kicker,
+.ap-client-row{color:#E5E7EB!important}
+.ap-welcome-name{color:#FFFFFF!important}
+.ap-copy-btn{
+  color:#FFFFFF!important;
+  background:rgba(255,255,255,.08)!important;
+  border-color:rgba(255,255,255,.16)!important;
+}
+
+/* Building uses red/gray only */
+.ap-building svg{filter:none!important}
+.ap-building svg rect[fill="#240307"],
+.ap-building svg rect[fill="#120205"],
+.ap-building svg rect[fill="#1A0305"],
+.ap-building svg rect[fill="#0F0103"],
+.ap-building svg rect[fill="#170205"]{
+  fill:#27303D!important;
+  stroke:#667085!important;
+}
+.ap-building svg g{fill:#E5141B!important}
+
+/* Level strip */
+.ap-vip{
+  background:#FFFFFF!important;
+  border:1px solid #DCE1E8!important;
+  box-shadow:0 5px 16px rgba(17,24,39,.08)!important;
+}
+.ap-vip-col{background:#FFFFFF!important}
+.ap-vip-col:first-child{
+  background:#FFF5F5!important;
+}
+.ap-crown{
+  color:#E5141B!important;
+  filter:none!important;
+}
+.ap-vip-label,.ap-vip-value{color:#111827!important}
+.ap-vip-col:not(:last-child):after{background:#DCE1E8!important}
+
+/* Quick actions */
+.ap-action-card{
+  background:#FFFFFF!important;
+  border:1px solid #E1E5EA!important;
+  box-shadow:0 6px 16px rgba(17,24,39,.08)!important;
+}
+.ap-action-card.blue{background:#F2F6FF!important}
+.ap-action-card.red{background:#FFF4F5!important}
+.ap-action-card.green{background:#F4F7FA!important}
+.ap-action-card.orange{background:#F4F7FA!important}
+
+.ap-action-card.blue .ap-action-icon{
+  background:#1E6BFF!important;
+  color:#FFFFFF!important;
+}
+.ap-action-card.red .ap-action-icon{
+  background:#E5141B!important;
+  color:#FFFFFF!important;
+}
+.ap-action-card.green .ap-action-icon,
+.ap-action-card.orange .ap-action-icon{
+  background:#697386!important;
+  color:#FFFFFF!important;
+}
+.ap-plus-badge{
+  background:#1E6BFF!important;
+  border-color:#FFFFFF!important;
+}
+.ap-action-card>span:last-child strong{color:#1F2937!important}
+.ap-action-card>span:last-child small{color:#6B7280!important}
+
+/* Referral */
+.ap-referral-card{
+  background:#F3F5F8!important;
+  border:1px solid #D9DEE6!important;
+  box-shadow:0 6px 16px rgba(17,24,39,.07)!important;
+}
+.ap-ref-icon{
+  background:linear-gradient(135deg,#1E6BFF 0%,#1747A6 100%)!important;
+  box-shadow:none!important;
+}
+.ap-ref-copy strong{color:#111827!important}
+.ap-ref-copy small{color:#1E6BFF!important}
+.ap-arrow{color:#E5141B!important}
+
+/* Amazon promo */
+.ap-promo-card{
+  background:linear-gradient(105deg,#161B24 0%,#374151 58%,#B91C24 100%)!important;
+  border:1.5px solid #E5141B!important;
+  box-shadow:0 7px 18px rgba(17,24,39,.14)!important;
+}
+.ap-promo-copy strong,
+.ap-promo-copy small{color:#FFFFFF!important}
+
+/* Bottom navigation */
+.ap-bottom-nav{
+  background:#202633!important;
+  border-top:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+.ap-nav-item{color:#AAB2BF!important}
+.ap-nav-item.active{
+  color:#F01920!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/* Keep responsive geometry unchanged */
