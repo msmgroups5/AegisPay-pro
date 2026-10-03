@@ -3,209 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#8d0010">
-<title>AegisPay — Client</title>
+<meta name="theme-color" content="#0b0b0d">
+<meta name="description" content="AegisPay secure client portal">
+<title>AegisPay — Client Portal</title>
 <link rel="icon" href="./aegispay-logo.svg" type="image/svg+xml">
-<style>
-:root{
-  --red:#c40017;--red2:#8c0010;--red3:#4b0007;--black:#0c0d10;--white:#fff;--ink:#15161a;
-  --muted:#737783;--line:#e7e8ec;--yellow:#ffc400;--orange:#ff5a1f;--green:#14ad63;
-  --blue:#246bff;--purple:#7c22e6;--bg:#eef0f4;
-}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg)}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--ink)}
-button,input{font:inherit}.shell{width:min(100%,460px);min-height:100dvh;margin:auto;background:#f7f7f8;position:relative;overflow:hidden;box-shadow:0 0 32px rgba(0,0,0,.18)}
-.screen{min-height:100dvh;padding-bottom:86px}
-button{border:0;cursor:pointer}
-.hidden{display:none!important}
-.icon{width:22px;height:22px;display:inline-block;vertical-align:middle}
-.icon.sm{width:18px;height:18px}.icon.lg{width:26px;height:26px}
-.topbar{height:66px;padding:10px 16px;color:#fff;background:linear-gradient(135deg,var(--red3),var(--red) 60%,#e40020);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;box-shadow:0 4px 16px rgba(93,0,10,.22)}
-.topbar .title{font-size:21px;font-weight:800;flex:1}.topbar .back{background:transparent;color:#fff;padding:4px;margin:-4px 0 0 -6px}
-.topbar .right{display:flex;align-items:center;gap:12px}.badge{min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#ff2240;color:#fff;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.65)}
-.logo{display:flex;align-items:center;gap:8px;font-size:25px;font-weight:900;letter-spacing:-1px}.logo img{width:31px;height:31px}.logo .aegis{color:#fff}.logo .pay{color:#ff2d43}
-
-.home-hero{padding:18px 18px 16px;color:#fff;background:
- radial-gradient(circle at 85% 12%,rgba(255,255,255,.14),transparent 22%),
- linear-gradient(145deg,#1a0205,#74000b 46%,#dc001f);position:relative;overflow:hidden}
-.home-hero:after{content:"";position:absolute;right:-25px;bottom:-30px;width:230px;height:160px;opacity:.25;background:
- linear-gradient(90deg,transparent 0 7%,#fff 7% 10%,transparent 10% 18%,#fff 18% 22%,transparent 22% 30%,#fff 30% 34%,transparent 34%),
- linear-gradient(#160306,#160306);clip-path:polygon(9% 100%,9% 42%,18% 42%,18% 22%,30% 22%,30% 48%,39% 48%,39% 12%,55% 12%,55% 38%,67% 38%,67% 2%,82% 2%,82% 100%)}
-.home-head{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between}.home-head .tools{display:flex;gap:12px}
-.circle-btn{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.22);color:#fff;display:grid;place-items:center}
-.welcome{position:relative;z-index:2;margin-top:25px}.welcome .hello{font-size:15px;opacity:.92}.welcome .name{font-size:25px;font-weight:900;margin-top:2px}.cid{margin-top:6px;font-size:12px;display:flex;gap:7px;align-items:center;opacity:.95}.copy{display:inline-grid;place-items:center;color:#fff;background:rgba(255,255,255,.14);padding:3px;border-radius:6px}
-.home-body{padding:12px 12px 0;background:#f6f6f7}.tier-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;background:#fff;padding:14px 10px;border-radius:16px;box-shadow:0 8px 22px rgba(17,17,18,.14);margin-top:-1px;position:relative;z-index:3}.tier{padding:0 8px;text-align:center;border-right:1px solid #ececf0}.tier:last-child{border-right:0}.tier-ico{color:var(--red);margin-bottom:5px}.tier .lv{font-size:12px;font-weight:800}.tier .pct{font-size:15px;font-weight:900;margin-top:1px}
-.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.quick{min-height:84px;background:#fff;border-radius:15px;box-shadow:0 6px 18px rgba(17,18,20,.12);padding:14px;display:flex;gap:11px;align-items:center;text-align:left}.quick .qico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:0 0 auto}.qblue{background:linear-gradient(145deg,#2a87ff,#0f4bdb)}.qred{background:linear-gradient(145deg,#f2293c,#b60015)}.qgreen{background:linear-gradient(145deg,#35c97f,#0d9560)}.qorange{background:linear-gradient(145deg,#ffad25,#f36d00)}.quick .qt{font-weight:900;font-size:15px}.quick .qs{font-size:10px;color:#838690;margin-top:2px}
-.banner{margin-top:12px;border-radius:16px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 20px rgba(17,18,20,.14)}.ref-banner{padding:16px 17px;background:linear-gradient(135deg,#b00031,#7d1ae9)}.ref-banner:after{content:"✦ ✦ ✦";position:absolute;right:12px;top:10px;font-size:22px;opacity:.18;letter-spacing:7px}.ref-inner{display:flex;align-items:center;gap:12px}.ref-icon{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.18);display:grid;place-items:center}.banner .btitle{font-size:16px;font-weight:900}.banner .bsub{font-size:10px;opacity:.88;margin-top:2px}.arrow{margin-left:auto;font-size:24px}.promo-banner{padding:18px 16px;min-height:112px;background:linear-gradient(135deg,#350005,#d7001d 58%,#ff182f)}.promo-banner:before{content:"a";position:absolute;right:18px;bottom:-4px;font-size:118px;line-height:.8;font-family:Arial;font-weight:900;color:#fff}.boxes{position:absolute;right:10px;bottom:12px;width:130px;height:72px}.box{position:absolute;background:linear-gradient(135deg,#ffd0bf,#b76b4e);width:44px;height:32px;border-radius:4px;box-shadow:0 8px 14px rgba(0,0,0,.25);transform:skewY(-10deg)}.box:nth-child(1){right:58px;bottom:12px}.box:nth-child(2){right:17px;bottom:7px;background:linear-gradient(135deg,#f3c36a,#ad7834);transform:skewY(8deg)}.box:nth-child(3){right:45px;bottom:34px;background:linear-gradient(135deg,#f7f7f7,#c9c9c9);transform:rotate(-8deg)}.promo-banner .btitle{font-size:21px;max-width:210px}.promo-banner .bsub{font-size:11px;max-width:190px}.promo-banner .amazon{font-weight:950;font-size:14px;margin-bottom:3px}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,460px);height:78px;background:rgba(16,18,23,.98);display:grid;grid-template-columns:repeat(4,1fr);z-index:30;border-top:1px solid rgba(255,255,255,.08);padding-bottom:max(4px,env(safe-area-inset-bottom))}.nav-item{background:transparent;color:#8f95a2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:700}.nav-item.active{color:#ff243d}.nav-item .nav-ico{width:25px;height:25px}
-
-.content{padding:12px;background:#f6f6f7}.card{background:#fff;border-radius:16px;box-shadow:0 7px 20px rgba(18,20,25,.10)}
-.search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e6eb;padding:11px 12px;border-radius:15px;box-shadow:0 6px 15px rgba(18,20,25,.08);margin-top:11px}.search input{border:0;outline:none;flex:1;font-size:13px}.search button{background:transparent;color:#727680;padding:2px}
-.shop-banner{margin-top:12px;min-height:118px;border-radius:16px;color:#fff;overflow:hidden;position:relative;padding:16px;background:linear-gradient(135deg,#550007,#dc001f 63%,#ff2440)}.shop-banner .amazon-word{font-size:31px;font-weight:950;letter-spacing:-1px}.shop-banner .shop-sub{font-size:15px;font-weight:800;max-width:190px;line-height:1.05;margin-top:3px}.shop-banner .shop-small{font-size:10px;max-width:170px;margin-top:7px;opacity:.9}.delivery{display:flex;align-items:center;gap:8px;padding:11px 12px;background:#fff;border-radius:12px;margin-top:9px;font-size:12px;font-weight:800}.delivery span:nth-child(2){flex:1}.cat-wrap{margin-top:12px;display:flex;gap:9px;overflow:auto;padding-bottom:3px}.cat-wrap::-webkit-scrollbar{height:0}.cat{flex:0 0 72px;text-align:center;font-size:9px;color:#50535c}.cat .ci{width:50px;height:50px;border-radius:15px;background:#fff;margin:0 auto 5px;display:grid;place-items:center;box-shadow:0 4px 12px rgba(18,20,25,.08);font-size:23px}.cat.active{color:var(--red);font-weight:900}.cat.active .ci{background:linear-gradient(145deg,#e00b29,#b10014);color:#fff}.section-head{display:flex;align-items:center;margin:14px 2px 9px}.section-head h2{font-size:19px;margin:0}.section-head a{margin-left:auto;color:var(--red);font-size:12px;font-weight:900}.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.product{background:#fff;border-radius:15px;box-shadow:0 6px 16px rgba(18,20,25,.09);padding:9px;position:relative}.discount{position:absolute;left:8px;top:8px;background:#ec2031;color:#fff;border-radius:7px;padding:4px 6px;font-size:10px;font-weight:900}.heart{position:absolute;right:7px;top:7px;background:transparent;color:#9ca0a8;padding:3px}.product-art{height:145px;border-radius:10px;background:linear-gradient(150deg,#f5f5f8,#e2e3e8);display:grid;place-items:center;margin-bottom:8px}.phone-art{width:72px;height:128px;border-radius:17px;background:linear-gradient(140deg,#111,#4b4f56 38%,#0b0b0d);box-shadow:0 11px 22px rgba(0,0,0,.22);position:relative;border:3px solid #060606}.phone-art:after{content:"";position:absolute;inset:22px 8px 9px;background:linear-gradient(150deg,#e9eaf0,#767b84 56%,#111);border-radius:11px}.phone-art .cam{position:absolute;top:8px;left:8px;width:25px;height:25px;border-radius:8px;background:#0b0b0d;z-index:2;box-shadow:9px 0 0 #0b0b0d}.buds-art{display:flex;gap:8px}.buds-art:before,.buds-art:after{content:"";width:45px;height:70px;border-radius:22px 22px 12px 12px;background:linear-gradient(135deg,#fff,#d9dbe0);box-shadow:0 10px 18px rgba(0,0,0,.12)}.product .ptitle{font-size:12px;font-weight:900;line-height:1.15;min-height:29px}.rating{margin-top:5px;font-size:10px;color:#ffb900}.rating span{color:#545760;margin-left:3px}.prices{display:flex;align-items:baseline;gap:7px;margin-top:3px}.prices .now{font-size:18px;font-weight:950}.prices .old{font-size:10px;color:#8c9098;text-decoration:line-through}.add-btn{width:100%;background:var(--yellow);color:#181818;border-radius:10px;padding:9px 8px;margin-top:8px;font-size:11px;font-weight:950}
-
-.detail-wrap{padding:12px;background:#fff}.gallery{display:grid;grid-template-columns:72px 1fr;gap:10px}.thumbs{display:flex;flex-direction:column;gap:8px}.thumb{height:62px;border:2px solid #e1e3e8;border-radius:10px;background:#f3f4f6;display:grid;place-items:center}.thumb.active{border-color:var(--red)}.main-product{min-height:270px;border-radius:15px;background:linear-gradient(150deg,#f7f7f8,#e9e9ed);display:grid;place-items:center}.main-product .phone-art{width:152px;height:250px;border-radius:35px}.main-product .phone-art:after{inset:44px 15px 18px;border-radius:22px}.main-product .phone-art .cam{top:16px;left:16px;width:52px;height:52px;border-radius:15px;box-shadow:19px 0 0 #0b0b0d,0 19px 0 #0b0b0d}.detail-title{font-size:21px;font-weight:950;margin:15px 0 7px}.detail-rating{display:flex;align-items:center;gap:7px}.stars{color:#ffba00;letter-spacing:1px}.reviews{font-size:11px;color:#c62236}.detail-price{display:flex;align-items:center;gap:10px;margin-top:8px}.detail-price .now{font-size:28px;font-weight:950}.detail-price .old{font-size:13px;color:#92959c;text-decoration:line-through}.off{background:#eb293b;color:#fff;border-radius:8px;padding:5px 7px;font-size:11px;font-weight:900}.option{margin-top:14px}.option label{display:block;font-size:13px;font-weight:900;margin-bottom:7px}.swatches{display:flex;gap:10px}.swatch{width:39px;height:39px;border-radius:50%;border:2px solid transparent}.swatch.selected{outline:2px solid #303238;outline-offset:2px}.storage{display:flex;gap:8px}.pill{background:#fff;border:1px solid #dfe1e6;border-radius:11px;padding:9px 13px;font-size:12px;font-weight:800}.pill.selected{border:2px solid var(--red);padding:8px 12px}.purchase-row{display:flex;align-items:center;margin-top:15px;gap:12px}.qty{display:flex;border:1px solid #dcdfe4;border-radius:11px;overflow:hidden}.qty button{background:#fff;width:34px;height:38px}.qty span{width:34px;display:grid;place-items:center;font-weight:900}.stock{margin-left:auto;color:#2a984b;font-size:12px;font-weight:900}.cta{width:100%;margin-top:10px;padding:13px;border-radius:12px;font-weight:950;font-size:14px}.cta.yellow{background:var(--yellow)}.cta.orange{background:var(--orange);color:#fff}.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}.trust .t{font-size:9px;color:#4c5059;text-align:center;border-top:1px solid #e7e8ec;padding-top:10px}.trust .t strong{display:block;color:#2c3036;font-size:10px;margin-bottom:2px}
-
-.amount-label{font-size:13px;font-weight:900;margin:16px 3px 8px}.payment-list{margin-top:12px;background:#fff;border-radius:15px;overflow:hidden;border:1px solid #e9eaee}.pay-row{display:flex;align-items:center;gap:12px;padding:14px 12px;border-bottom:1px solid #eceef2}.pay-row:last-child{border-bottom:0}.pay-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#f1f3f8;font-weight:950;font-size:18px}.pay-row .ptext{flex:1}.ptext strong{font-size:13px;display:block}.ptext span{font-size:10px;color:#858993;display:block;margin-top:2px}.radio{width:20px;height:20px;border-radius:50%;border:2px solid #c5c8cf;display:grid;place-items:center}.radio.selected{border-color:var(--red)}.radio.selected:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--red)}.quick-amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.amt{background:#fff;border:1px solid #e0e2e8;border-radius:11px;padding:12px 5px;font-size:12px;font-weight:900}.amt.selected{background:var(--red);border-color:var(--red);color:#fff}.amount-input{display:flex;align-items:center;background:#eef1f7;border-radius:12px;padding:3px 12px}.amount-input input{width:100%;border:0;background:transparent;outline:none;font-size:22px;font-weight:900;padding:12px 0}.amount-input span{color:#707681;font-weight:800}.generate{margin-top:13px;background:linear-gradient(135deg,#ef2137,#b90016);color:#fff;padding:14px;border-radius:12px;font-weight:950;width:100%;box-shadow:0 7px 18px rgba(184,0,22,.25)}
-
-.ref-hero{padding:16px;border-radius:16px;background:linear-gradient(135deg,#a50013,#e21a26 65%,#6d00bf);color:#fff;position:relative;overflow:hidden;min-height:124px}.ref-hero h2{margin:0;font-size:21px;max-width:180px}.ref-hero p{margin:5px 0 0;font-size:10px;max-width:180px;opacity:.9}.gift{position:absolute;right:13px;bottom:12px;font-size:76px;filter:drop-shadow(0 10px 11px rgba(0,0,0,.24))}.reward-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.reward{padding:14px;border-radius:14px;background:linear-gradient(160deg,#f5f1ff,#fff);border:1px solid #eee3ff;text-align:center}.reward .rtitle{font-weight:900;font-size:13px}.reward .rsub{font-size:10px;color:#7b7e87;margin-top:3px}.ref-link{display:flex;align-items:center;gap:6px;border:1px solid #dbdde3;background:#fff;border-radius:11px;padding:10px 11px;margin-top:7px;font-size:10px}.ref-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.share-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.share{padding:12px;border-radius:11px;color:#fff;font-size:11px;font-weight:900}.wa{background:#16af65}.share-red{background:#dc1e31}.tabs{display:grid;grid-template-columns:1fr 1fr;margin-top:12px;border-bottom:1px solid #dddfe5}.tab{padding:10px 5px;background:transparent;color:#8b8e96;font-weight:900;font-size:11px;position:relative}.tab.active{color:var(--red)}.tab.active:after{content:"";position:absolute;left:20%;right:20%;bottom:-1px;height:3px;background:var(--red);border-radius:5px}.ref-list{margin-top:8px}.ref-item{display:flex;align-items:center;gap:9px;background:#fff;border-radius:13px;padding:10px;margin-bottom:7px;box-shadow:0 4px 12px rgba(18,20,25,.06)}.avatar{width:37px;height:37px;border-radius:50%;background:linear-gradient(145deg,#2f8eff,#1150d8);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}.ref-main{flex:1;min-width:0}.ref-main strong{display:block;font-size:12px}.ref-main span{display:block;font-size:9px;color:#8a8d95;margin-top:2px}.level{padding:6px 7px;border-radius:8px;font-size:9px;font-weight:950}.level1{background:#dcf8e9;color:#168e52}.level2{background:#f1e4ff;color:#7629bc}.earn{text-align:right}.earn strong{display:block;font-size:11px}.earn span{display:block;font-size:9px;color:#858993;margin-top:2px}
-
-.balance{padding:17px;border-radius:16px;background:radial-gradient(circle at 80% 20%,rgba(255,65,83,.5),transparent 35%),linear-gradient(145deg,#0e1015,#201318 60%,#8f0011);color:#fff;box-shadow:0 10px 25px rgba(17,18,20,.18)}.balance .cap{font-size:11px;opacity:.78}.balance .big{font-size:30px;font-weight:950;margin-top:3px}.balance .split{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}.mini-balance{background:rgba(255,255,255,.1);border-radius:11px;padding:10px}.mini-balance span{font-size:9px;opacity:.78;display:block}.mini-balance strong{font-size:12px;display:block;margin-top:3px}.account-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:11px}.acct-act{padding:11px 5px;background:#fff;border-radius:13px;box-shadow:0 5px 13px rgba(18,20,25,.08);text-align:center;font-size:9px;font-weight:900}.acct-act .ai{width:35px;height:35px;border-radius:10px;display:grid;place-items:center;margin:0 auto 6px;color:#fff}.ai.red{background:#e52135}.ai.green{background:#16aa61}.ai.blue{background:#2b78ff}.info{margin-top:11px;background:#fff;border-radius:15px;overflow:hidden}.info-title{font-size:15px;font-weight:950;padding:14px;border-bottom:1px solid #eceef2}.info-row{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:12px 13px;border-bottom:1px solid #f0f1f4}.info-row:last-child{border-bottom:0}.ii{color:#70757e}.lab{font-size:10px;color:#8a8d95}.val{font-size:11px;font-weight:900;text-align:right}.status{color:#13a55d;background:#dff8eb;padding:4px 7px;border-radius:999px;font-size:9px}
-
-.toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,14px);background:#15171b;color:#fff;padding:11px 15px;border-radius:12px;font-size:11px;font-weight:800;z-index:80;opacity:0;pointer-events:none;transition:.22s}.toast.show{opacity:1;transform:translate(-50%,0)}
-.safe{padding-bottom:max(8px,env(safe-area-inset-bottom))}
-@media(min-width:700px){body{padding:20px}.shell{border-radius:28px;overflow:hidden}.bottom-nav{border-bottom-left-radius:28px;border-bottom-right-radius:28px}}
-</style>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./premium.css">
 </head>
 <body>
-<div class="shell" id="app"></div>
-<div class="toast" id="toast"></div>
-
-<script>
-(function(){
-'use strict';
-
-var DATA={
-  name:'Ali Shahid',
-  clientId:'AP-CLIENT',
-  balance:'1,250.00',
-  deposit:'1,000.00',
-  profit:'250.00',
-  referralLink:'https://aegispay.com/signup/AP10023',
-  cart:3,
-  referrals:[
-    {name:'Ahmed Khan',id:'AP45872',date:'12 Sep 2026',level:'Level 1',earn:'+5 USDT',sub:'3 Referrals',cls:'level1'},
-    {name:'Sara Ali',id:'AP77219',date:'08 Sep 2026',level:'Level 1',earn:'+5 USDT',sub:'5 Referrals',cls:'level1'},
-    {name:'Usman Malik',id:'AP99012',date:'04 Sep 2026',level:'Level 2',earn:'+2 USDT',sub:'2 Referrals',cls:'level2'}
-  ]
-};
-var state={screen:'home',qty:1,payment:'USDT (TRC20)',amount:100,refTab:'my'};
-
-function svg(name,cls){
-  var paths={
-    bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
-    user:'<circle cx="12" cy="8" r="3.5"/><path d="M4 21a8 6.5 0 0 1 16 0"/>',
-    copy:'<rect x="8" y="8" width="10" height="10" rx="2"/><path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
-    cart:'<circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3h2l2.2 11h11l2-8H6"/><path d="M8 10h9"/>',
-    back:'<path d="M15 18l-6-6 6-6"/><path d="M9 12h11"/>',
-    heart:'<path d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.7Z"/>',
-    search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
-    camera:'<path d="M4 7h3l1.4-2h7.2L17 7h3v11H4Z"/><circle cx="12" cy="12.5" r="3.2"/>',
-    pin:'<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
-    home:'<path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 21v-6h6v6"/>',
-    box:'<path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/>',
-    orders:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
-    bot:'<rect x="4" y="7" width="16" height="12" rx="4"/><path d="M12 4v3M8 12h.01M16 12h.01M9 16h6"/>',
-    wallet:'<path d="M4 6h14a2 2 0 0 1 2 2v10H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M4 6V4h10M16 13h3"/>',
-    plus:'<path d="M12 5v14M5 12h14"/>',
-    down:'<path d="M12 4v15M6 13l6 6 6-6"/>',
-    up:'<path d="M12 20V5M6 11l6-6 6 6"/>',
-    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-    shield:'<path d="M12 3 20 6v6c0 5-3.3 8.2-8 9-4.7-.8-8-4-8-9V6Z"/><path d="m9 12 2 2 4-4"/>',
-    mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
-    phone:'<path d="M7 3h3l2 5-2 2a13 13 0 0 0 5 5l2-2 5 2v3c0 1-1 2-2 2C10 19 5 14 5 6c0-2 1-3 2-3Z"/>',
-    calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',
-    qr:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3M14 21h3"/>',
-    users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 5 0 0 1 12 0M16 11a3 3 0 1 0 0-6M17 15a5 5 0 0 1 4 5"/>'
-  };
-  return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(paths[name]||'')+'</svg>';
-}
-function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(function(){t.classList.remove('show')},1800)}
-function copyText(text){try{navigator.clipboard.writeText(text);toast('Copied')}catch(e){toast(text)}}
-function go(screen){state.screen=screen;render();window.scrollTo({top:0,behavior:'smooth'})}
-function topbar(title,right,back){
-  return '<div class="topbar">'+(back?'<button class="back" onclick="Aegis.go(\'home\')">'+svg('back')+'</button>':'')+
-    '<div class="title">'+title+'</div>'+(right||'')+'</div>'
-}
-function bottom(items){
-  return '<div class="bottom-nav">'+items.map(function(n){
-    return '<button class="nav-item '+(n.active?'active':'')+'" onclick="Aegis.nav(\''+n.key+'\')">'+svg(n.icon,'nav-ico')+'<span>'+n.label+'</span></button>'
-  }).join('')+'</div>'
-}
-function home(){
-  return '<div class="screen"><div class="home-hero"><div class="home-head"><div class="logo"><img src="./aegispay-logo.svg" alt=""><span class="aegis">Aegis</span><span class="pay">Pay</span></div><div class="tools"><button class="circle-btn">'+svg('bell')+'</button><button class="circle-btn" onclick="Aegis.go(\'account\')">'+svg('user')+'</button></div></div>'+
-  '<div class="welcome"><div class="hello">Welcome,</div><div class="name">'+DATA.name+'</div><div class="cid">Client ID: '+DATA.clientId+' <button class="copy" onclick="Aegis.copy(\''+DATA.clientId+'\')">'+svg('copy','sm')+'</button></div></div></div>'+
-  '<div class="home-body"><div class="tier-row"><div class="tier"><div class="tier-ico">👑</div><div class="lv">LV 1</div><div class="pct">10%</div></div><div class="tier"><div class="tier-ico">👑</div><div class="lv">LV 2</div><div class="pct">5%</div></div><div class="tier"><div class="tier-ico">👑</div><div class="lv">LV 3</div><div class="pct">2%</div></div></div>'+
-  '<div class="quick-grid"><button class="quick" onclick="Aegis.go(\'topup\')"><div class="qico qblue">'+svg('wallet')+'</div><div><div class="qt">Top Up</div><div class="qs">Deposit Amount</div></div></button>'+
-  '<button class="quick" onclick="Aegis.go(\'shop\')"><div class="qico qred">'+svg('cart')+'</div><div><div class="qt">Shop</div><div class="qs">Amazon-style</div></div></button>'+
-  '<button class="quick" onclick="Aegis.go(\'account\')"><div class="qico qgreen">'+svg('user')+'</div><div><div class="qt">Account Details</div><div class="qs">View Your Account</div></div></button>'+
-  '<button class="quick" onclick="Aegis.toast(\'Crypto module will be connected in the next phase.\')"><div class="qico qorange">₿</div><div><div class="qt">Crypto</div><div class="qs">Buy & Manage</div></div></button></div>'+
-  '<button class="banner ref-banner" onclick="Aegis.go(\'referral\')"><div class="ref-inner"><div class="ref-icon">'+svg('users')+'</div><div><div class="btitle">Referral</div><div class="bsub">Invite Friends & Earn Rewards</div></div><div class="arrow">›</div></div></button>'+
-  '<button class="banner promo-banner" onclick="Aegis.go(\'shop\')"><div class="amazon">amazon</div><div class="btitle">Shop Millions of Products</div><div class="bsub">Everything you need in one place</div><div class="boxes"><div class="box"></div><div class="box"></div><div class="box"></div></div></button></div>'+
-  bottom([{key:'home',label:'Home',icon:'home',active:true},{key:'assets',label:'Assets',icon:'box'},{key:'profile',label:'My Profile',icon:'user'},{key:'bot',label:'AI Bot',icon:'bot'}])+'</div>';
-}
-function shop(){
-  var products=[
-    {title:'Apple iPhone 15 (128GB)',rate:'4.8',price:'$699.00',old:'$829.00',discount:'-15%',art:'phone'},
-    {title:'Apple AirPods Pro 2',rate:'4.7',price:'$199.00',old:'$259.00',discount:'-22%',art:'buds'}
-  ];
-  return '<div class="screen">'+topbar('Shop','<div class="right"><button style="background:transparent;color:#fff;position:relative">'+svg('cart')+'<span class="badge" style="position:absolute;right:-6px;top:-4px">'+DATA.cart+'</span></button></div>',true)+
-  '<div class="content"><div class="shop-banner"><div class="amazon-word">amazon</div><div class="shop-sub">Shop Millions<br>of Products</div><div class="shop-small">Everything you need in one place</div><div class="boxes"><div class="box"></div><div class="box"></div><div class="box"></div></div></div>'+
-  '<div class="search">'+svg('search','sm')+'<input placeholder="Search Amazon products..."><button>'+svg('camera','sm')+'</button></div>'+
-  '<div class="delivery">'+svg('pin','sm')+'<span>Deliver to Pakistan</span><span>›</span></div>'+
-  '<div class="cat-wrap">'+[['All','▦'],['Electronics','▣'],['Fashion','👕'],['Home & Kitchen','⌂'],['Beauty','♙'],['Toys & Games','🎮'],['Books','▤'],['Sports','◉'],['Health & Care','✚'],['Automotive','🚗']].map(function(c,i){return '<div class="cat '+(i===0?'active':'')+'"><div class="ci">'+c[1]+'</div>'+c[0]+'</div>'}).join('')+'</div>'+
-  '<div class="section-head"><h2>Today\'s Deals</h2><a href="javascript:void(0)" onclick="Aegis.toast(\'All deals view will be connected later.\')">See All</a></div>'+
-  '<div class="product-grid">'+products.map(function(p,i){return '<div class="product" onclick="Aegis.product()"><span class="discount">'+p.discount+'</span><span class="heart">'+svg('heart','sm')+'</span><div class="product-art">'+(p.art==='phone'?'<div class="phone-art"><div class="cam"></div></div>':'<div class="buds-art"></div>')+'</div><div class="ptitle">'+p.title+'</div><div class="rating">★★★★★ <span>('+p.rate+')</span></div><div class="prices"><span class="now">'+p.price+'</span><span class="old">'+p.old+'</span></div><button class="add-btn" onclick="event.stopPropagation();Aegis.addCart()">🛒&nbsp; Add to Cart</button></div>'}).join('')+'</div></div>'+
-  bottom([{key:'home',label:'Home',icon:'home'},{key:'shop',label:'Shop',icon:'box',active:true},{key:'orders',label:'Orders',icon:'orders'},{key:'account',label:'Account',icon:'user'}])+'</div>';
-}
-function product(){
-  return '<div class="screen">'+topbar('Product Details','<div class="right"><button style="background:transparent;color:#fff">'+svg('heart')+'</button><button style="background:transparent;color:#fff;position:relative">'+svg('cart')+'<span class="badge" style="position:absolute;right:-6px;top:-4px">'+DATA.cart+'</span></button></div>',true)+
-  '<div class="detail-wrap"><div class="gallery"><div class="thumbs"><div class="thumb active"><div class="phone-art" style="transform:scale(.36)"></div></div><div class="thumb"><div class="phone-art" style="transform:scale(.32)"></div></div><div class="thumb"><div class="phone-art" style="transform:scale(.32)"></div></div><div class="thumb"><div class="phone-art" style="transform:scale(.32)"></div></div></div><div class="main-product"><div class="phone-art"><div class="cam"></div></div></div></div>'+
-  '<div class="detail-title">Apple iPhone 15 (128GB)</div><div class="detail-rating"><span class="stars">★★★★★</span><strong>4.8</strong><span class="reviews">2,341 reviews</span></div>'+
-  '<div class="detail-price"><span class="now">$699.00</span><span class="old">$829.00</span><span class="off">15% OFF</span></div>'+
-  '<div class="option"><label>Color:</label><div class="swatches"><button class="swatch selected" style="background:#1e2328"></button><button class="swatch" style="background:#f6ceda"></button><button class="swatch" style="background:#f3dd6b"></button><button class="swatch" style="background:#7bb3eb"></button><button class="swatch" style="background:#76b79d"></button></div></div>'+
-  '<div class="option"><label>Storage:</label><div class="storage"><button class="pill selected">128GB</button><button class="pill">256GB</button><button class="pill">512GB</button></div></div>'+
-  '<div class="purchase-row"><div class="qty"><button onclick="Aegis.qty(-1)">−</button><span>'+state.qty+'</span><button onclick="Aegis.qty(1)">+</button></div><div class="stock"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#18ac5f;margin-right:5px"></span>In Stock</div></div>'+
-  '<button class="cta yellow" onclick="Aegis.addCart()">🛒&nbsp; Add to Cart</button><button class="cta orange" onclick="Aegis.toast(\'Buy Now flow will be connected after UI approval.\')">Buy Now</button>'+
-  '<div class="trust"><div class="t">🚚<strong>Free Delivery</strong>in 3-5 days</div><div class="t">✓<strong>Secure Payment</strong>100% secure</div><div class="t">◇<strong>Easy Returns</strong>7 days</div></div></div></div>';
-}
-function topup(){
-  var opts=[['USDT (TRC20)','Fast, Low Fees','₮'],['USDT (ERC20)','Network Fees Higher','₮'],['Bitcoin (BTC)','Secure & Global','₿'],['Bank Transfer','Local Bank Deposit','🏦']];
-  return '<div class="screen">'+topbar('Top Up','',true)+'<div class="content"><div style="font-size:15px;font-weight:950;margin:3px 0">Select Payment Method</div><div class="payment-list">'+opts.map(function(o){return '<button class="pay-row" onclick="Aegis.payment(\''+o[0]+'\')"><div class="pay-icon">'+o[2]+'</div><div class="ptext"><strong>'+o[0]+'</strong><span>'+o[1]+'</span></div><div class="radio '+(state.payment===o[0]?'selected':'')+'"></div></button>'}).join('')+'</div><div class="amount-label">Enter Deposit Amount</div><div class="amount-input"><input value="'+state.amount+'" inputmode="decimal" onchange="Aegis.setAmount(this.value)"><span>USDT</span></div><div class="amount-label">Quick Select</div><div class="quick-amounts">'+[50,100,500,1000].map(function(n){return '<button class="amt '+(Number(state.amount)===n?'selected':'')+'" onclick="Aegis.amount('+n+')">'+n.toLocaleString()+'</button>'}).join('')+'</div><button class="generate" onclick="Aegis.toast(\'Deposit link UI is ready; payment processing will be connected next.\')">Generate Deposit Link&nbsp; →</button></div></div>';
-}
-function referral(){
-  return '<div class="screen">'+topbar('Referral','<div class="right"><button style="background:transparent;color:#fff;font-size:11px;font-weight:900" onclick="Aegis.toast(\'Referral history will be connected later.\')">'+svg('clock','sm')+'&nbsp; History</button></div>',true)+
-  '<div class="content"><div class="ref-hero"><h2>Invite Friends<br>Earn Rewards</h2><p>Share your unique link and earn USDT when they join and make a deposit.</p><div class="gift">🎁</div></div>'+
-  '<div class="reward-grid"><div class="reward"><div style="font-size:23px">👤</div><div class="rtitle">Get 5 USDT</div><div class="rsub">When your direct referral joins</div></div><div class="reward"><div style="font-size:23px">👥</div><div class="rtitle">Get 2 USDT</div><div class="rsub">When your friend\'s referral joins</div></div></div>'+
-  '<div class="amount-label">Your Referral Link</div><div class="ref-link"><span>'+DATA.referralLink+'</span><button style="background:transparent" onclick="Aegis.copy(\''+DATA.referralLink+'\')">'+svg('copy','sm')+'</button></div>'+
-  '<div class="share-row"><button class="share wa" onclick="Aegis.toast(\'WhatsApp share will use the referral link.\')">☘&nbsp; Share on WhatsApp</button><button class="share share-red" onclick="Aegis.copy(\''+DATA.referralLink+'\')">🔗&nbsp; Share Link</button></div>'+
-  '<div class="tabs"><button class="tab '+(state.refTab==='my'?'active':'')+'" onclick="Aegis.refTab(\'my\')">My Referrals (12)</button><button class="tab '+(state.refTab==='network'?'active':'')+'" onclick="Aegis.refTab(\'network\')">Network View</button></div>'+
-  '<div class="ref-list">'+(state.refTab==='my'?DATA.referrals.map(function(r){return '<div class="ref-item"><div class="avatar">'+r.name.charAt(0)+'</div><div class="ref-main"><strong>'+r.name+'</strong><span>ID: '+r.id+'</span><span>'+r.date+'</span></div><span class="level '+r.cls+'">'+r.level+'</span><div class="earn"><strong style="color:'+(r.cls==='level1'?'#149659':'#7325b7')+'">'+r.earn+'</strong><span>'+r.sub+'</span></div></div>'}).join(''):'<div class="card" style="padding:24px;text-align:center;color:#777;font-size:12px">Network view UI placeholder — structure ready for the data layer.</div>')+'</div></div></div>';
-}
-function account(){
-  return '<div class="screen">'+topbar('Account Details','',true)+'<div class="content"><div class="balance"><div class="cap">Total Balance</div><div class="big">'+DATA.balance+' <span style="font-size:14px;font-weight:800">USDT</span></div><div class="split"><div class="mini-balance"><span>💼 Total Deposit</span><strong>'+DATA.deposit+' USDT</strong></div><div class="mini-balance"><span>🔥 Total Profit</span><strong>'+DATA.profit+' USDT</strong></div></div></div>'+
-  '<div class="account-actions"><button class="acct-act" onclick="Aegis.go(\'topup\')"><div class="ai red">'+svg('down')+'</div>Deposit</button><button class="acct-act" onclick="Aegis.toast(\'Withdraw UI will connect to the secured withdrawal flow later.\')"><div class="ai red">'+svg('up')+'</div>Withdraw</button><button class="acct-act" onclick="Aegis.toast(\'KYC UI will connect to the verification flow later.\')"><div class="ai green">'+svg('shield')+'</div>KYC</button><button class="acct-act" onclick="Aegis.toast(\'Transaction history will be connected later.\')"><div class="ai blue">'+svg('clock')+'</div>Transaction History</button></div>'+
-  '<div class="info"><div class="info-title">Account Information</div>'+
-  '<div class="info-row">'+svg('user','ii')+'<div class="lab">Client Name</div><div class="val">'+DATA.name+'</div></div>'+
-  '<div class="info-row">'+svg('qr','ii')+'<div class="lab">Client ID</div><div class="val">'+DATA.clientId+'</div></div>'+
-  '<div class="info-row">'+svg('mail','ii')+'<div class="lab">Email</div><div class="val">ali@gmail.com</div></div>'+
-  '<div class="info-row">'+svg('phone','ii')+'<div class="lab">Phone</div><div class="val">+92 300 1234567</div></div>'+
-  '<div class="info-row">'+svg('calendar','ii')+'<div class="lab">Registration Date</div><div class="val">01 Sep 2026</div></div>'+
-  '<div class="info-row">'+svg('shield','ii')+'<div class="lab">Status</div><div class="val"><span class="status">Active</span></div></div>'+
-  '</div></div></div>';
-}
-
-function render(){
-  var root=document.getElementById('app');
-  if(state.screen==='home')root.innerHTML=home();
-  else if(state.screen==='shop')root.innerHTML=shop();
-  else if(state.screen==='product')root.innerHTML=product();
-  else if(state.screen==='topup')root.innerHTML=topup();
-  else if(state.screen==='referral')root.innerHTML=referral();
-  else if(state.screen==='account' || state.screen==='assets' || state.screen==='profile')root.innerHTML=account();
-  else root.innerHTML=home();
-}
-window.Aegis={
-  go:go,toast:toast,copy:copyText,product:function(){go('product')},
-  addCart:function(){DATA.cart++;toast('Added to cart');render()},
-  qty:function(d){state.qty=Math.max(1,state.qty+d);render()},
-  payment:function(p){state.payment=p;render()},
-  amount:function(n){state.amount=n;render()},
-  setAmount:function(v){state.amount=Number(v||0)||0},
-  refTab:function(t){state.refTab=t;render()},
-  nav:function(k){if(k==='home')go('home');else if(k==='shop')go('shop');else if(k==='account'||k==='assets'||k==='profile')go('account');else if(k==='bot')toast('AI Bot screen will be added in the next UI phase.');else if(k==='orders')toast('Orders screen will be added in the next UI phase.')}
-};
-render();
-})();
-</script>
+<div id="app" aria-live="polite"></div>
+<script>window.AEGIS_ANDROID_APP=!!window.AegisNative;window.AEGIS_ADMIN_PORTAL=false;</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-client.js"></script>
+<script src="./supabase-service.js"></script>
+<script src="./aegis-auth-redirect.js"></script>
+<script src="./app-update.js"></script>
+<script src="./shop-catalog.js"></script>
+<script src="./client-auth.js"></script>
 </body>
 </html>
