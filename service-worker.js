@@ -1,4 +1,4 @@
-const CACHE='aegispay-shell-v13-approved-ui';
+const CACHE='aegispay-shell-v14-ui-locked';
 const APP_SCOPE=self.registration&&self.registration.scope?new URL(self.registration.scope).pathname:'/';
 const APP_MODE=APP_SCOPE.startsWith('/app/');
 const ASSETS=APP_MODE
@@ -22,7 +22,7 @@ self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin)return;
-  const networkFirst=url.pathname.endsWith('.js')||url.pathname.endsWith('.html')||url.pathname.endsWith('/app-version.json');
+  const networkFirst=url.pathname.endsWith('.js')||url.pathname.endsWith('.html')||url.pathname.endsWith('.css')||url.pathname.endsWith('.webmanifest')||url.pathname.endsWith('/app-version.json');
   if(networkFirst){
     event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
       if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{});}
