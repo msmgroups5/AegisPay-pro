@@ -384,7 +384,7 @@ function homeView(){
      actionCard('green','next-account',icon('doc'),'Account Details','View Your Account')+
      actionCard('orange','next-crypto',icon('btc'),'Crypto','Buy & Manage')+
    '</div>'+
-   '<button class="ap-referral-card ap-referral-premium" data-action="next-referral">'+
+   '<button class="ap-referral-card ap-referral-premium" data-action="next-referral" style="position:relative;">'+
      '<span class="ap-ref-icon">'+icon('gift')+'</span>'+
      '<span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span>'+
      '<span class="ap-ref-gift-art" aria-hidden="true"><span class="gift-lid"></span><span class="gift-box"></span><span class="gift-ribbon-v"></span><span class="gift-ribbon-h"></span></span>'+
