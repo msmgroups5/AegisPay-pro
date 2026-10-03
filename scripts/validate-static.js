@@ -15,13 +15,10 @@ const must=[
 for(const p of must)assert(exists(p),'Missing canonical source file: '+p);
 
 const client=fs.readFileSync('client.html','utf8');
-assert(
-  client.includes('./client-auth.js')&&
-  client.includes('./supabase-client.js')&&
-  client.includes('./supabase-service.js')&&
-  client.includes('./shop-catalog.js'),
-  'Client entry wiring incomplete'
-);
+for(const marker of ['function home()','function shop()','function product()','function topup()','function referral()','function account()']) {
+  assert(client.includes(marker),'Client reference UI is incomplete: '+marker);
+}
+
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
@@ -34,7 +31,7 @@ for(const m of [
 ])assert(service.includes(m),'Supabase marker missing: '+m);
 
 const gradle=fs.readFileSync('android/app/build.gradle','utf8');
-assert(gradle.includes("include 'client.html'")&&gradle.includes("include 'master-admin.html'"),'Android canonical entries missing');
+assert(gradle.includes("include 'client.html'")&&gradle.includes("include 'client-fresh.html'")&&gradle.includes("include 'master-admin.html'"),'Android canonical entries missing');
 assert(!gradle.includes('syncBlueprintRuntime')&&!gradle.includes('aegis-core.js')&&!gradle.includes('app.js'),'Legacy Android runtime remains wired');
 
 const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainActivity.java','utf8');
