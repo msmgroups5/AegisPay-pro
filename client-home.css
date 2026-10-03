@@ -1443,3 +1443,152 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
   border:1px solid rgba(255,255,255,.10)!important;
   font-size:9px!important;
 }
+
+
+/* AEGISPAY COLOR SCHEME — OBSIDIAN / INDIGO / MINT / CYAN */
+:root{
+  --ap-obsidian:#080B14;
+  --ap-obsidian-2:#0D1120;
+  --ap-indigo:#5B3FD1;
+  --ap-violet:#7A4DE8;
+  --ap-mint:#55F2B0;
+  --ap-cyan:#38D9FF;
+  --ap-white:#FFFFFF;
+  --ap-slate:#94A0B5;
+}
+
+/* 60% — Deep Obsidian Navy foundation */
+.ap-shell{
+  background:
+    radial-gradient(circle at 90% 2%,rgba(91,63,209,.16),transparent 27%),
+    linear-gradient(180deg,#080B14 0%,#0A0E18 55%,#080B14 100%)!important;
+  color:var(--ap-white)!important;
+}
+
+/* 30% — Electric Indigo / Violet brand surfaces */
+.ap-home-header{
+  background:
+    radial-gradient(circle at 88% 10%,rgba(122,77,232,.32),transparent 31%),
+    linear-gradient(135deg,#17102f 0%,#241548 48%,#101426 100%)!important;
+  border-bottom:1px solid rgba(122,77,232,.28)!important;
+  box-shadow:0 12px 30px rgba(5,3,16,.42)!important;
+}
+.ap-circle-btn{
+  background:rgba(91,63,209,.25)!important;
+  border-color:rgba(122,77,232,.38)!important;
+}
+.ap-circle-btn.profile{
+  background:linear-gradient(145deg,#7A4DE8,#5131C5)!important;
+  box-shadow:0 8px 20px rgba(91,63,209,.32)!important;
+}
+
+/* Welcome / primary brand card */
+.ap-welcome-card{
+  background:
+    radial-gradient(circle at 88% 12%,rgba(56,217,255,.13),transparent 24%),
+    radial-gradient(circle at 15% 95%,rgba(122,77,232,.25),transparent 42%),
+    linear-gradient(135deg,#11152A 0%,#211744 58%,#11172A 100%)!important;
+  border-color:rgba(122,77,232,.48)!important;
+  box-shadow:0 18px 42px rgba(4,3,14,.42),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+.ap-welcome-card:before{
+  background:linear-gradient(90deg,rgba(8,11,20,.88),rgba(8,11,20,.30) 54%,transparent 84%)!important;
+}
+.ap-welcome-kicker,.ap-client-row{color:var(--ap-slate)!important}
+.ap-welcome-name{color:var(--ap-white)!important}
+.ap-copy-btn{
+  color:var(--ap-cyan)!important;
+  background:rgba(56,217,255,.08)!important;
+  border-color:rgba(56,217,255,.28)!important;
+}
+
+/* Level strip */
+.ap-vip{
+  background:linear-gradient(145deg,#111528,#0C101D)!important;
+  border-color:rgba(122,77,232,.22)!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.28)!important;
+}
+.ap-vip-col:first-child{
+  background:linear-gradient(145deg,rgba(91,63,209,.24),rgba(122,77,232,.10))!important;
+}
+.ap-crown{
+  color:var(--ap-cyan)!important;
+  filter:drop-shadow(0 3px 7px rgba(56,217,255,.25))!important;
+}
+.ap-vip-label{color:#D9DEEA!important}
+
+/* Quick actions — obsidian surfaces with indigo depth */
+.ap-action-card{
+  background:linear-gradient(145deg,#111625,#0C101A)!important;
+  border-color:rgba(255,255,255,.075)!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.ap-action-card>span:last-child strong{color:var(--ap-white)!important}
+.ap-action-card>span:last-child small{color:var(--ap-slate)!important}
+
+/* 10% — Neon Mint reserved for action / buy intent */
+.ap-action-card.green .ap-action-icon,
+.ap-action-card.orange .ap-action-icon{
+  background:linear-gradient(145deg,#73FFD0,#28DFA0 58%,#13A875)!important;
+  box-shadow:0 10px 22px rgba(40,223,160,.22),inset 0 1px 0 rgba(255,255,255,.42)!important;
+}
+.ap-action-card.green .ap-action-icon>.ap-icon,
+.ap-action-card.orange .ap-action-icon>.ap-icon{
+  color:#062018!important;
+}
+.ap-action-card.red .ap-action-icon{
+  background:linear-gradient(145deg,#7A4DE8,#4D2AC2)!important;
+}
+.ap-action-card.blue .ap-action-icon{
+  background:linear-gradient(145deg,#52E7FF,#168BD9)!important;
+}
+
+/* Cyber cyan highlights */
+.ap-plus-badge{
+  background:var(--ap-cyan)!important;
+  border-color:#0D1420!important;
+  box-shadow:0 4px 12px rgba(56,217,255,.28)!important;
+}
+.ap-referral-card{
+  background:
+    radial-gradient(circle at 86% 15%,rgba(56,217,255,.13),transparent 25%),
+    linear-gradient(145deg,#11162A,#0D1220)!important;
+  border-color:rgba(122,77,232,.26)!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.24)!important;
+}
+.ap-ref-icon{
+  background:linear-gradient(145deg,#7A4DE8,#4D2AC2)!important;
+  box-shadow:0 10px 20px rgba(91,63,209,.30)!important;
+}
+.ap-ref-copy strong{color:var(--ap-white)!important}
+.ap-ref-copy small,.ap-arrow{color:var(--ap-cyan)!important}
+
+/* Amazon remains visually distinct but fits the dark foundation */
+.ap-promo-card{
+  background:
+    radial-gradient(circle at 85% 70%,rgba(85,242,176,.08),transparent 26%),
+    linear-gradient(145deg,#10141F,#0A0D14)!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+
+/* Bottom navigation */
+.ap-bottom-nav{
+  background:rgba(8,11,20,.97)!important;
+  border-color:rgba(122,77,232,.20)!important;
+  box-shadow:0 18px 42px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.ap-nav-item{color:#758096!important}
+.ap-nav-item.active{
+  color:var(--ap-mint)!important;
+  background:linear-gradient(180deg,rgba(85,242,176,.13),rgba(85,242,176,.035))!important;
+}
+
+/* Balance */
+.ap-balance-row span{color:var(--ap-slate)!important}
+.ap-balance-row strong{color:var(--ap-white)!important}
+.ap-balance-row strong em{color:var(--ap-mint)!important}
+.ap-balance-eye{
+  color:var(--ap-cyan)!important;
+  background:rgba(56,217,255,.07)!important;
+  border-color:rgba(56,217,255,.22)!important;
+}
