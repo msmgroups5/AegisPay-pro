@@ -196,3 +196,52 @@
   .aegis-shop-hero{padding:18px!important}
   .aegis-shop-hero h4{font-size:21px!important}
 }
+
+
+/* 2026-10-04 MASTER ADMIN LOGIN PALETTE
+   Keep the operational/admin screens on the same dark red palette as login. */
+.tg-admin-page{
+ background:radial-gradient(circle at 16% 8%,rgba(213,31,53,.13),transparent 28%),linear-gradient(145deg,#07090e,#11151d 55%,#090b11)!important;
+ color:#f7f8fb!important;
+}
+.tg-admin-card{
+ background:#0e1219!important;
+ border-color:rgba(255,255,255,.08)!important;
+ box-shadow:0 28px 80px rgba(0,0,0,.42)!important;
+}
+.tg-admin-content h1,.tg-admin-content h2,.tg-admin-content h3{color:#fff!important}
+.tg-admin-content p,.tg-admin-content small{color:#9da6b4!important}
+.tg-admin-content input,.tg-admin-content select,.tg-admin-content textarea{
+ background:#0a0e15!important;color:#f4f6fa!important;border-color:rgba(255,255,255,.11)!important;
+}
+.tg-admin-content input:focus,.tg-admin-content select:focus,.tg-admin-content textarea:focus{
+ outline:3px solid rgba(213,31,53,.16);border-color:rgba(241,58,80,.85)!important;
+}
+.tg-admin-content article,
+.tg-admin-stats article,
+.tg-power-panel{
+ background:linear-gradient(180deg,#11151e,#0d1118)!important;
+ border-color:rgba(255,255,255,.08)!important;
+ color:#f7f8fb!important;
+}
+.tg-admin-content article h3{color:#fff!important}
+.tg-admin-content .tg-button-soft,
+.tg-admin-content .tg-admin-nav button{
+ background:#161b24!important;color:#ff5367!important;border-color:rgba(255,255,255,.08)!important;
+}
+.tg-admin-content .tg-admin-nav button[aria-pressed=true]{
+ background:linear-gradient(135deg,#b81025,#df2940)!important;color:#fff!important;border-color:#b81025!important;
+}
+.tg-admin-content button:not(.tg-button-soft):not(.tg-admin-danger){
+ background:linear-gradient(135deg,#b81025,#df2940 55%,#ef4458)!important;color:#fff!important;
+}
+.tg-admin-content .tg-admin-danger{
+ background:#351017!important;color:#ff8a99!important;border:1px solid rgba(213,31,53,.24)!important;
+}
+.tg-power-panel{background:linear-gradient(135deg,#151a23,#0d1118)!important}
+.tg-power-copy strong{color:#fff!important}
+.tg-power-icon{background:#351017!important;color:#ff6375!important}
+.tg-power-switch{background:#b81025!important}
+.tg-power-switch.is-on{background:#161b24!important}
+.tg-review-card code{color:#dbe1ea!important}
+.tg-empty,.tg-paused-admin,.tg-review-link{color:#b9c0ca!important}
