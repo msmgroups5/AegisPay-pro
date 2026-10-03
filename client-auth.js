@@ -397,7 +397,11 @@ function profileSection(p){p=p||{};return '<section class="section" id="profile-
 function render(){
  if(state.appEnabled===false){
   root.innerHTML=shell('<section class="tg-paused"><span class="tg-paused-icon">⏻</span><span class="tg-kicker">SERVICE STATUS</span><h1>'+t('pausedTitle')+'</h1><p>'+t(state.runtimeUnverified?'runtimeUnknown':'pausedInfo')+'</p><button type="button" class="tg-button tg-button-primary" data-action="retry-runtime">'+t('retryRuntime')+'</button></section>','auth');
- }else if(state.profile&&state.mode==='dashboard'){renderClientView();}
+ }else if(state.profile&&state.mode==='dashboard'){
+  renderClientView();
+ }else{
+  renderAuth();
+ }
 }
 async function uploadImage(file,area){
  if(!file)throw new Error(t('chooseFile'));
