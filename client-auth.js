@@ -359,6 +359,7 @@ async function handleWithdraw(e){
 async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
+  if(a==='home'){homeScreen=true;render();return;}
   if((a==='next-topup'||a==='next-shop'||a==='next-account'||a==='next-crypto'||a==='next-referral'||a==='next-assets'||a==='next-ai'||a==='profile'||a==='notice')&&homeScreen){
    homeScreen=false; render();
    var target=(a==='next-topup')?'deposit-area':(a==='next-shop')?'shop':(a==='next-account'||a==='profile')?'profile-area':(a==='next-crypto')?'withdraw-area':(a==='next-referral')?'referrals-area':(a==='next-assets')?'overview':'ai-area';
