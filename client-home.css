@@ -319,3 +319,7 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
 .ap-welcome-card .ap-building{display:none}
 .ap-plus-badge{position:absolute;right:-4px;top:-5px;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;background:#1878ff;color:#fff;border:2px solid #fff}
 .ap-plus-badge>.ap-icon{width:12px!important;height:12px!important;flex-basis:12px}
+
+.ap-logo-mark{width:45px;height:45px;display:inline-flex;flex:0 0 45px;align-items:center;justify-content:center}
+.ap-logo-mark svg{width:100%;height:100%;display:block}
+.ap-login-logo .ap-logo-mark{width:48px;height:48px;flex-basis:48px}
