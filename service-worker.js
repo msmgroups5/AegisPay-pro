@@ -1,4 +1,4 @@
-const CACHE='aegispay-shell-v13-approved-ui';
+const CACHE='aegispay-shell-v15-canonical';
 const APP_SCOPE=self.registration&&self.registration.scope?new URL(self.registration.scope).pathname:'/';
 const APP_MODE=APP_SCOPE.startsWith('/app/');
 const ASSETS=APP_MODE
