@@ -483,3 +483,7 @@ a{color:inherit}
 
 /* Prevent the demo percentage/value bars from resurfacing on the supplied reference UI. */
 .ap-reference-ui .lv strong,.ap-reference-ui .lv .bar,.ap-reference-ui .lv-line{display:none!important}
+
+
+/* Dark header uses the light master logo while preserving the actual AegisPay mark. */
+.ap-reference-ui .logo img{content:url("./aegispay-logo-light.svg")!important}
