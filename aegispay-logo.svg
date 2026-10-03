@@ -1,8 +1,9 @@
+
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 110" role="img" aria-label="AegisPay">
 <g transform="translate(8 6)">
-<path d="M12 86 L55 12 Q62 0 71 12 L117 86 Q122 97 111 97 L95 97 Q88 97 84 89 L65 55 L47 89 Q43 97 34 97 H18 Q3 97 12 86Z" fill="#F01920"/>
-<path d="M56 71 Q65 56 72 63 L89 88 Q95 97 84 97 H66 Q61 97 57 90 L51 79 Q49 75 56 71Z" fill="#7A0A0F"/>
+<path d="M12 86 L55 12 Q62 0 71 12 L117 86 Q122 97 111 97 L95 97 Q88 97 84 89 L65 55 L47 89 Q43 97 34 97 H18 Q3 97 12 86Z" fill="#E5141B"/>
+<path d="M56 71 Q65 56 72 63 L89 88 Q95 97 84 97 H66 Q61 97 57 90 L51 79 Q49 75 56 71Z" fill="#8F1016"/>
 </g>
-<text x="135" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="#FFFFFF">Aegis</text>
+<text x="135" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="#111827">Aegis</text>
 <text x="325" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="#F01920">Pay</text>
 </svg>
