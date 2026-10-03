@@ -38,7 +38,9 @@ jobs:
           cp master-admin.html site/master-admin.html
           cp admin-auth.js site/admin-auth.js
           cp client.html site/app/index.html
+          cp client.html site/app/home.html
           cp _redirects site/_redirects
+          cp _headers site/_headers
           cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/
           cp client-home.css client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
           cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
@@ -64,6 +66,7 @@ jobs:
           test -s site/client.html
           test -s site/master-admin.html
           test -s site/app/index.html
+          test -s site/app/home.html
           test -s site/app/client-auth.js
           test -s site/downloads/aegispay-client.apk
           test -s site/_redirects
