@@ -263,3 +263,8 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
   .ap-action-title{font-size:15px}.ap-action-subtitle{font-size:9px}
   .ap-ref-copy strong{font-size:19px}.ap-promo-copy strong{font-size:18px}
 }
+
+.ap-plus-badge{position:absolute;width:20px;height:20px;border-radius:50%;right:-5px;top:-5px;background:#1878ff;color:#fff;display:grid;place-items:center;border:2px solid #fff}.ap-plus-badge .ap-icon{width:12px;height:12px}
+.ap-action-icon{position:relative}
+.ap-login-loading{text-align:center;padding:25px 0 8px}.ap-login-loading h1{font-size:22px;margin:12px 0 6px}.ap-login-loading p{font-size:10px;color:#949ba6}.ap-spinner{display:inline-block;width:30px;height:30px;border:3px solid #333943;border-top-color:#f0192b;border-radius:50%;animation:apspin .8s linear infinite}@keyframes apspin{to{transform:rotate(360deg)}}
+.ap-link-btn{border:0;background:none;color:#ff4d5b;font-size:9px;font-weight:800;padding:2px 0}.ap-auth-links{display:flex;justify-content:space-between;margin-top:14px}
