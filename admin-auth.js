@@ -142,7 +142,7 @@ async function loadOperations(){
 async function changeUserStatus(el){
  var id=el.getAttribute('data-id'),status=el.getAttribute('data-status');
  state.busy=true;render();
- try{var r=await service.client().rpc('set_user_account_status',{p_user_id:id,p_status:status});if(r.error)throw r.error;await loadOperations();state.error='';}
+ try{var r=await service.invokeFunction('admin-account-ops',{body:{action:'status',userId:id,status:status}});if(r.error)throw r.error;await loadOperations();state.error='';}
  catch(e){state.error=e.message||'Account status update failed.';}
  finally{state.busy=false;render();}
 }
@@ -153,7 +153,7 @@ async function adjustBalance(el){
  var amount=Number(window.prompt('Amount in USDT','5'));if(!Number.isFinite(amount)||amount<=0){state.error='Enter a positive amount.';render();return;}
  var reason=window.prompt('Reason','Master Admin balance adjustment')||'Master Admin balance adjustment';
  state.busy=true;render();
- try{var r=await service.client().rpc('master_admin_adjust_balance',{p_user_id:id,p_amount:amount,p_type:type,p_reason:reason});if(r.error)throw r.error;await loadOperations();}
+ try{var r=await service.invokeFunction('admin-account-ops',{body:{action:'balance',userId:id,amount:amount,type:type,reason:reason}});if(r.error)throw r.error;await loadOperations();}
  catch(e){state.error=e.message||'Balance adjustment failed.';}
  finally{state.busy=false;render();}
 }
