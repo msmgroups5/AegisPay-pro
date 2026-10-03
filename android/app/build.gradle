@@ -82,6 +82,7 @@ def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', 
     from(webRoot) {
         include 'client.html'
         include 'client-fresh.html'
+        include 'client-home.css'
         include 'client-auth.js'
         include 'supabase-client.js'
         include 'supabase-service.js'
