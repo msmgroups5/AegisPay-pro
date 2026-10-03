@@ -870,3 +870,99 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
   .ap-premium-home .ap-action-title{font-size:14px!important}
   .ap-premium-home .ap-amazon-premium{height:145px!important;min-height:145px!important}
 }
+
+/* FINAL UI POLISH — keep every element in its own layout box */
+.ap-premium-home .ap-welcome-premium:before,
+.ap-premium-home .ap-welcome-premium:after{pointer-events:none!important}
+.ap-premium-home .ap-copy-btn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  vertical-align:middle!important;
+  flex:0 0 18px!important;
+  position:relative!important;
+  z-index:5!important;
+  overflow:hidden!important;
+  line-height:0!important;
+}
+.ap-premium-home .ap-copy-btn .ap-icon{
+  width:14px!important;height:14px!important;
+  display:block!important;
+  flex:0 0 14px!important;
+}
+.ap-premium-home .ap-copy-btn .ap-icon svg{
+  width:14px!important;height:14px!important;
+}
+
+/* Referral is a clean four-column row: icon / copy / gift / arrow. */
+.ap-premium-home .ap-referral-premium{
+  display:grid!important;
+  grid-template-columns:46px minmax(0,1fr) 66px 28px!important;
+  align-items:center!important;
+  gap:9px!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-icon{
+  grid-column:1!important;
+  grid-row:1!important;
+  margin:0!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-copy{
+  grid-column:2!important;
+  grid-row:1!important;
+  min-width:0!important;
+  z-index:3!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-gift-art{
+  grid-column:3!important;
+  grid-row:1!important;
+  position:relative!important;
+  right:auto!important;
+  top:auto!important;
+  width:62px!important;
+  height:58px!important;
+  transform:rotate(-4deg)!important;
+  z-index:2!important;
+  justify-self:center!important;
+}
+.ap-premium-home .ap-referral-premium .ap-ref-arrow{
+  grid-column:4!important;
+  grid-row:1!important;
+  justify-self:end!important;
+  z-index:4!important;
+}
+
+/* Compact gift, intentionally close to supplied reference */
+.ap-premium-home .ap-ref-gift-art .gift-box{
+  left:13px!important;bottom:3px!important;width:42px!important;height:34px!important;
+}
+.ap-premium-home .ap-ref-gift-art .gift-lid{
+  left:9px!important;top:20px!important;width:50px!important;height:11px!important;
+}
+.ap-premium-home .ap-ref-gift-art .gift-ribbon-v{
+  left:31px!important;top:20px!important;width:8px!important;height:40px!important;
+}
+.ap-premium-home .ap-ref-gift-art .gift-ribbon-h{
+  left:12px!important;top:24px!important;width:46px!important;height:7px!important;
+}
+.ap-premium-home .ap-ref-gift-art:before{left:25px!important;top:5px!important}
+.ap-premium-home .ap-ref-gift-art:after{left:38px!important;top:5px!important}
+
+/* Reference proportions: don't let the first screen become too compressed. */
+.ap-premium-home .ap-home-header{padding-bottom:15px!important}
+.ap-premium-home .ap-welcome-premium{height:124px!important;min-height:124px!important}
+.ap-premium-home .ap-vip-premium{height:120px!important;min-height:120px!important}
+.ap-premium-home .ap-vip-premium .ap-vip-col{height:104px!important;min-height:104px!important}
+.ap-premium-home .ap-action-card{height:90px!important;min-height:90px!important}
+.ap-premium-home .ap-referral-premium{height:90px!important;min-height:90px!important}
+.ap-premium-home .ap-amazon-premium{height:158px!important;min-height:158px!important}
+@media(max-width:365px){
+  .ap-premium-home .ap-referral-premium{
+    grid-template-columns:43px minmax(0,1fr) 52px 27px!important;
+  }
+  .ap-premium-home .ap-referral-premium .ap-ref-gift-art{
+    transform:scale(.82) rotate(-4deg)!important;
+    transform-origin:center!important;
+  }
+}
