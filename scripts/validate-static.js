@@ -21,7 +21,7 @@ for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js'
 for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
   assert(client.includes(marker),'Client entry marker missing: '+marker);
 }
-assert(!client.includes('styles.css')&&!client.includes('premium.css')&&!client.includes('shop-catalog.js'),'Legacy client UI assets are still wired to client');
+assert(client.includes('styles.css')&&client.includes('premium.css')&&client.includes('shop-catalog.js'),'Recovered client workspace assets are not wired to client');
 const clientAuth=fs.readFileSync('client-auth.js','utf8');
 for(const marker of ['function homeView','function signIn','function loadNotifications']) {
   assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
@@ -29,7 +29,7 @@ for(const marker of ['function homeView','function signIn','function loadNotific
 for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','Crypto','Referral','Shop Millions','Assets','My Profile','AI Bot']) {
   assert(clientAuth.includes(marker),'Home Dashboard UI text missing: '+marker);
 }
-assert(clientAuth.length<22000,'Client source unexpectedly contains later-screen UI code');
+assert(clientAuth.length<60000,'Client source unexpectedly exceeded the merged client runtime budget');
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
@@ -49,16 +49,16 @@ const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainAct
 assert(native.includes('aegispay-pro.netlify.app')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android remote/legacy identity is stale');
 
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
-assert(deploy.includes('NETLIFY_SITE_ID: 5573011e-3f81-449a-9617-da0c176720d8'),'Netlify site ID is not canonical');
 assert(deploy.includes('cp client.html site/app/index.html'),'Deploy source of truth is not client.html');
 assert(deploy.includes('cp master-admin.html site/master-admin.html'),'Admin deploy source is not master-admin.html');
 assert(deploy.includes('rm -rf site/app site/downloads'),'Generated deploy directories are rebuilt cleanly');
-assert(!deploy.includes('0aa38615-c9e6-4129-bc08-cd28739606d0')&&!deploy.includes('aegispay-client.netlify.app'),'Stale Netlify target remains');
+assert(!deploy.includes('netlify-cli deploy'),'Legacy Netlify production deployment must stay disabled during Cloudflare migration');
 
 const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
-assert(rel.includes('cp client.html site/app/index.html')&&rel.includes('5573011e-3f81-449a-9617-da0c176720d8')&&!rel.includes('0aa38615-c9e6-4129-bc08-cd28739606d0'),'Release workflow is not canonical');
+assert(rel.includes('cp client.html site/app/index.html'),'Release workflow source is not client.html');
+assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Netlify production deployment');
 
-assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.netlify.app/app-version.json'),'Updater endpoint is stale');
+assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.netlify.app/app-version.json'),'Updater fallback endpoint missing');
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
