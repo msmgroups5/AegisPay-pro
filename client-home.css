@@ -268,3 +268,54 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
 .ap-action-icon{position:relative}
 .ap-login-loading{text-align:center;padding:25px 0 8px}.ap-login-loading h1{font-size:22px;margin:12px 0 6px}.ap-login-loading p{font-size:10px;color:#949ba6}.ap-spinner{display:inline-block;width:30px;height:30px;border:3px solid #333943;border-top-color:#f0192b;border-radius:50%;animation:apspin .8s linear infinite}@keyframes apspin{to{transform:rotate(360deg)}}
 .ap-link-btn{border:0;background:none;color:#ff4d5b;font-size:9px;font-weight:800;padding:2px 0}.ap-auth-links{display:flex;justify-content:space-between;margin-top:14px}
+
+/* FINAL REFERENCE ALIGNMENT PASS */
+.ap-icon{display:inline-flex!important;width:22px!important;height:22px!important;flex:0 0 22px;align-items:center;justify-content:center}
+.ap-icon svg{width:100%!important;height:100%!important}
+.ap-brand .ap-icon{width:44px!important;height:44px!important;flex-basis:44px}
+.ap-header-row{min-height:52px}
+.ap-brand-word{font-size:30px;line-height:1}
+.ap-brand-word span{color:#ff1d31}
+.ap-circle-btn{width:44px;height:44px}
+.ap-circle-btn .ap-icon{width:22px!important;height:22px!important;flex-basis:22px}
+.ap-welcome-card{min-height:185px;padding:20px 18px}
+.ap-welcome-copy{max-width:61%}
+.ap-welcome-kicker{font-size:18px}
+.ap-welcome-name{font-size:32px}
+.ap-client-row{font-size:14px}
+.ap-action-card{min-height:108px;padding:13px 14px;gap:13px}
+.ap-action-card>span:last-child{min-width:0}
+.ap-action-card>span:last-child strong{display:block;font-size:18px;line-height:1.05}
+.ap-action-card>span:last-child small{display:block;margin-top:5px;font-size:11px;line-height:1.15;color:#677081}
+.ap-action-icon{width:58px;height:58px;flex:0 0 58px}
+.ap-action-icon>.ap-icon{width:34px!important;height:34px!important;flex-basis:34px}
+.ap-referral-card{min-height:121px;padding:13px 15px}
+.ap-ref-copy strong{font-size:22px;line-height:1}
+.ap-ref-copy small{font-size:12px}
+.ap-ref-icon{width:62px;height:62px;flex-basis:62px}
+.ap-ref-icon>.ap-icon{width:39px!important;height:39px!important;flex-basis:39px}
+.ap-arrow{width:24px;height:24px;flex-basis:24px}
+.ap-promo-card{min-height:166px;padding:17px 16px}
+.ap-promo-copy strong{font-size:22px}
+.ap-promo-copy small{font-size:10px}
+.ap-bottom-nav{height:72px;bottom:8px;border-radius:20px}
+.ap-nav-item{font-size:10px;gap:5px}
+.ap-nav-item .ap-icon{width:25px!important;height:25px!important;flex-basis:25px}
+.ap-shell{padding-bottom:102px}
+.ap-welcome-card:before{
+ content:"";
+ position:absolute;right:0;bottom:0;width:62%;height:100%;opacity:.82;
+ background:
+  linear-gradient(90deg,transparent 0 17%,rgba(255,30,48,.16) 17% 18%,transparent 18% 30%,rgba(255,30,48,.12) 30% 31%,transparent 31% 47%,rgba(255,30,48,.15) 47% 48%,transparent 48% 64%,rgba(255,30,48,.10) 64% 65%,transparent 65%),
+  linear-gradient(180deg,transparent 0 23%,rgba(255,34,50,.18) 23% 24%,transparent 24% 48%,rgba(255,34,50,.16) 48% 49%,transparent 49% 72%,rgba(255,34,50,.18) 72% 73%,transparent 73%),
+  linear-gradient(120deg,transparent 0 40%,rgba(255,44,61,.28) 40% 41%,transparent 41%);
+ clip-path:polygon(23% 47%,39% 28%,49% 8%,60% 30%,79% 18%,100% 30%,100% 100%,0 100%,0 59%);
+ pointer-events:none;
+}
+.ap-welcome-card:after{
+ content:"AegisPay";
+ position:absolute;right:26px;bottom:27px;color:#ff2638;font-weight:900;font-size:11px;letter-spacing:.4px;opacity:.9;
+}
+.ap-welcome-card .ap-building{display:none}
+.ap-plus-badge{position:absolute;right:-4px;top:-5px;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;background:#1878ff;color:#fff;border:2px solid #fff}
+.ap-plus-badge>.ap-icon{width:12px!important;height:12px!important;flex-basis:12px}
