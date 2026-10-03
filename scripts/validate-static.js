@@ -47,7 +47,7 @@ assert(!gradle.includes('syncBlueprintRuntime')&&!gradle.includes('aegis-core.js
 
 const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainActivity.java','utf8');
 assert(native.includes('aegispay-pro-web.aegispay.workers.dev')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android remote/legacy identity is stale');
-assert(native.includes('aegispay-pro.netlify.app')&&native.includes('UPDATE_HOST'),'Android update endpoint must remain explicitly allowlisted');
+assert(native.includes('aegispay-pro.pages.dev')&&native.includes('UPDATE_HOST'),'Android update endpoint must remain explicitly allowlisted for Cloudflare Pages');
 
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
 assert(deploy.includes('cp client.html site/app/index.html'),'Deploy source of truth is not client.html');
@@ -59,7 +59,7 @@ const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
 assert(rel.includes('cp client.html site/app/index.html'),'Release workflow source is not client.html');
 assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Netlify production deployment');
 
-assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.netlify.app/app-version.json'),'Updater fallback endpoint missing');
+assert(fs.readFileSync('app-update.js','utf8').includes('/app-version.json'),'Updater manifest endpoint missing');
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
