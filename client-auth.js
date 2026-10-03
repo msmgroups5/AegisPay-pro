@@ -3,7 +3,7 @@
 var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
 var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
-var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null; var homeScreen=true; var homeScreen=true;
+var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null; var homeScreen=true;
 var PREMIUM_SHOP=window.AegisShopCatalog||[];var SHOP_CATEGORIES=['All','Electronics','Fashion','Home & Kitchen','Beauty','Sports','Gaming','Office','Books','Outdoor'];var shopSearch='',shopCategory='All';
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
 var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
@@ -275,6 +275,14 @@ function icon(type){
  return '<span class="ap-icon">'+(m[type]||m.user)+'</span>';
 }
 
+
+function actionCard(theme,action,iconHtml,title,subtitle){
+ var tone=['blue','red','green','orange'].indexOf(theme)>=0?theme:'blue';
+ return '<button type="button" class="ap-action-card '+tone+'" data-action="'+esc(action)+'" aria-label="'+esc(title)+'">'+
+   '<span class="ap-action-icon">'+iconHtml+'</span>'+
+   '<span class="ap-action-copy"><span class="ap-action-title">'+esc(title)+'</span><span class="ap-action-subtitle">'+esc(subtitle)+'</span></span>'+
+ '</button>';
+}
 
 function homeView(){
  var p=state.profile||{};
