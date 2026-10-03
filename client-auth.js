@@ -327,8 +327,10 @@ function icon(type){
   plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
   cart:'<svg viewBox="0 0 24 24"><path d="M3 4h2.3l2.1 10.8h10.7l2.2-7.5H6.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.2" cy="19" r="1.6" fill="currentColor"/><circle cx="17.3" cy="19" r="1.6" fill="currentColor"/><path d="M8.2 8.2h11.1" stroke="currentColor" stroke-width="1.2" opacity=".55"/></svg>',
   card:'<svg viewBox="0 0 24 24"><rect x="2.7" y="4.2" width="18.6" height="15.6" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.2" cy="11" r="2.4" fill="currentColor"/><path d="M12.5 9h5M12.5 12h5M6 15.6h11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  doc:'<svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 8h6M9 12h6M9 16h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
   btc:'<svg viewBox="0 0 24 24"><path d="M8.7 5.1v13.8M11.8 5.1h2.4c1.8 0 3 1.1 3 2.6s-1.2 2.6-3 2.6H8.7m3.1 0h2.8c2.1 0 3.5 1.1 3.5 2.9s-1.4 3.1-3.5 3.1H8.7M7.2 3.8l1.5 1.3M14.2 3.8l-1.2 1.3" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   crown:'<svg viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="m3 7 5 4 4-8 4 8 5-4-2 12H5L3 7Z"/></svg>',
+  gift:'<svg viewBox="0 0 24 24"><path d="M3.5 10h17v10.5H3.5zM2.8 7.2h18.4v3H2.8zM12 7.2v13.3M12 7.2H7.7c-1.6 0-2.7-.8-2.7-2s1.1-2.2 2.4-2.2c2.1 0 4.6 3.4 4.6 4.2ZM12 7.2h4.3c1.6 0 2.7-.8 2.7-2s-1.1-2.2-2.4-2.2c-2.1 0-4.6 3.4-4.6 4.2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
   users:'<svg viewBox="0 0 24 24"><circle cx="8.3" cy="9" r="3" fill="currentColor"/><circle cx="16.7" cy="10" r="2.4" fill="currentColor" opacity=".72"/><path d="M2.8 20c.7-4 2.7-6 5.7-6s5 2 5.7 6M14.1 15.8c2.9.2 4.9 1.6 5.5 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
   arrow:'<svg viewBox="0 0 24 24"><path d="m8.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   home:'<svg viewBox="0 0 24 24"><path d="m3 10.5 9-7.5 9 7.5v8.2a1.8 1.8 0 0 1-1.8 1.8H4.8A1.8 1.8 0 0 1 3 18.7Z" fill="currentColor" stroke="none"/><path d="M9.2 20.5v-5.8h5.6v5.8" fill="#0F1218" stroke="none"/></svg>',
@@ -344,6 +346,7 @@ function actionCard(theme,action,iconHtml,title,subtitle){
  return '<button type="button" class="ap-action-card '+tone+'" data-action="'+esc(action)+'" aria-label="'+esc(title)+'">'+
    '<span class="ap-action-icon">'+iconHtml+'</span>'+
    '<span class="ap-action-copy"><span class="ap-action-title">'+esc(title)+'</span><span class="ap-action-subtitle">'+esc(subtitle)+'</span></span>'+
+   '<span class="ap-action-arrow">'+icon('arrow')+'</span>'+
  '</button>';
 }
 
@@ -351,9 +354,8 @@ function homeView(){
  var p=state.profile||{};
  var userName=String(p.name||'Ali Shahid');
  var clientId=String(p.client_id||'AP-CLIENT');
- var dot=true;
 
- root.innerHTML='<div class="ap-shell">'+
+ root.innerHTML='<div class="ap-shell ap-premium-home">'+
  '<header class="ap-home-header">'+
    '<div class="ap-header-row">'+
      '<div class="ap-brand"><img src="./aegispay-logo.svg" alt="AegisPay"></div>'+
@@ -362,7 +364,7 @@ function homeView(){
        '<button class="ap-circle-btn profile" data-action="profile" aria-label="My Profile">'+icon('user')+'</button>'+
      '</div>'+
    '</div>'+
-   '<section class="ap-welcome-card ap-welcome-card-clean">'+
+   '<section class="ap-welcome-card ap-welcome-premium">'+
      '<div class="ap-welcome-copy">'+
        '<div class="ap-welcome-kicker">Welcome,</div>'+
        '<div class="ap-welcome-name">'+esc(userName)+'</div>'+
@@ -370,33 +372,48 @@ function homeView(){
      '</div>'+
    '</section>'+
  '</header>'+
- '<section class="ap-vip">'+
-   '<div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 1</span><span class="ap-vip-value">10%</span></div>'+
-   '<div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 2</span><span class="ap-vip-value">5%</span></div>'+
-   '<div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 3</span><span class="ap-vip-value">2%</span></div>'+
+ '<section class="ap-vip ap-vip-premium">'+
+   '<div class="ap-vip-col lv1"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 1</span><span class="ap-vip-value">10%</span></div>'+
+   '<div class="ap-vip-col lv2"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 2</span><span class="ap-vip-value">5%</span></div>'+
+   '<div class="ap-vip-col lv3"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 3</span><span class="ap-vip-value">2%</span></div>'+
  '</section>'+
- '<main class="ap-content">'+
-   '<div class="ap-actions-grid">'+
+ '<main class="ap-content ap-premium-content">'+
+   '<div class="ap-actions-grid ap-premium-actions">'+
      actionCard('blue','next-topup',icon('wallet')+'<span class="ap-plus-badge">'+icon('plus')+'</span>','Top Up','Deposit Amount')+
      actionCard('red','next-shop',icon('cart'),'Shop','Amazon-style')+
-     actionCard('green','next-account',icon('card'),'Account Details','View Your Account')+
+     actionCard('green','next-account',icon('doc'),'Account Details','View Your Account')+
      actionCard('orange','next-crypto',icon('btc'),'Crypto','Buy & Manage')+
    '</div>'+
-   '<button class="ap-referral-card" data-action="next-referral"><span class="ap-ref-icon">'+icon('users')+'</span><span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span><span class="ap-arrow">'+icon('arrow')+'</span></button>'+
-   '<button class="ap-promo-card" data-action="next-shop">'+
-     '<span class="ap-promo-copy"><span class="ap-amazon-official"><span class="ap-amazon-a">a</span><span class="ap-amazon-smile"></span></span><strong>Shop Millions<br>of Products</strong><small>Everything you need in one place.</small></span>'+
-     '<span class="ap-cart-official"><span class="ap-cart-shape" aria-hidden="true"><span class="ap-cart-handle"></span><span class="ap-cart-basket"></span><span class="ap-box bx1">amazon</span><span class="ap-box bx2">amazon</span><span class="ap-box bx3">amazon</span><span class="ap-cart-wheel w1"></span><span class="ap-cart-wheel w2"></span></span></span>'+
+   '<button class="ap-referral-card ap-referral-premium" data-action="next-referral">'+
+     '<span class="ap-ref-icon">'+icon('gift')+'</span>'+
+     '<span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span>'+
+     '<span class="ap-ref-arrow">'+icon('arrow')+'</span>'+
+   '</button>'+
+   '<button class="ap-promo-card ap-amazon-premium" data-action="next-shop">'+
+     '<span class="ap-promo-copy">'+
+       '<span class="ap-amazon-wordmark">amazon<span class="ap-amazon-smile-premium"></span></span>'+
+       '<strong>Shop Millions of <em>Products</em></strong>'+
+       '<small>Everything you need in one place.</small>'+
+       '<span class="ap-amazon-cta">Start Shopping <span>→</span></span>'+
+     '</span>'+
+     '<span class="ap-amazon-art" aria-hidden="true">'+
+       '<span class="ap-mini-phone"><span class="ap-mini-phone-logo">amazon</span><span class="ap-mini-products"><i></i><i></i><i></i></span></span>'+
+       '<span class="ap-mini-cart">'+
+         '<span class="ap-mini-cart-handle"></span><span class="ap-mini-cart-basket"></span>'+
+         '<span class="ap-mini-box box-a">amazon</span><span class="ap-mini-box box-b">amazon</span><span class="ap-mini-box box-c">amazon</span>'+
+         '<span class="ap-mini-wheel w1"></span><span class="ap-mini-wheel w2"></span>'+
+       '</span>'+
+     '</span>'+
    '</button>'+
  '</main>'+
- '<nav class="ap-bottom-nav">'+
-   '<button class="ap-nav-item active" data-action="home">'+icon('home')+'<span class="ap-nav-label">Home</span></button>'+
+ '<nav class="ap-bottom-nav ap-bottom-premium">'+
+   '<button class="ap-nav-item active" data-action="home-dashboard">'+icon('home')+'<span class="ap-nav-label">Home</span></button>'+
    '<button class="ap-nav-item" data-action="next-assets">'+icon('check')+'<span class="ap-nav-label">Assets</span></button>'+
    '<button class="ap-nav-item" data-action="profile">'+icon('user')+'<span class="ap-nav-label">My Profile</span></button>'+
    '<button class="ap-nav-item" data-action="next-ai">'+icon('robot')+'<span class="ap-nav-label">AI Bot</span></button>'+
  '</nav>'+
  '</div>';
 }
-
 
 function profileSection(p){p=p||{};return '<section class="section" id="profile-area" style="margin-top:18px"><h3>Account Details</h3><div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"><div class="stat-card"><small>Name</small><strong style="font-size:15px">'+esc(p.name||'')+'</strong></div><div class="stat-card"><small>Email</small><strong style="font-size:13px;word-break:break-word">'+esc(p.email||'')+'</strong></div><div class="stat-card"><small>Client ID</small><strong style="font-size:13px;word-break:break-word">'+esc(p.client_id||'AP-CLIENT')+'</strong></div><div class="stat-card"><small>Account Status</small><strong style="font-size:15px">'+esc(p.status||'Active')+'</strong></div></div></section>';}
 
