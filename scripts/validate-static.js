@@ -5,7 +5,7 @@ const exists=p=>fs.existsSync(p);
 const must=[
   'client.html','client-fresh.html','client-home.css','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
-  'service-worker.js','manifest.webmanifest','aegispay-logo.svg','_redirects','package.json','netlify.toml',
+  'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json','netlify.toml',
   'database/migrations/20261003_private_verification_storage_policies.sql',
   'site/index.html','site/site.css','android/app/build.gradle',
   'android/app/src/main/java/com/aegispay/app/MainActivity.java',
@@ -59,7 +59,7 @@ const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
 assert(rel.includes('cp client.html site/app/index.html')&&rel.includes('5573011e-3f81-449a-9617-da0c176720d8')&&!rel.includes('0aa38615-c9e6-4129-bc08-cd28739606d0'),'Release workflow is not canonical');
 
 assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.netlify.app/app-version.json'),'Updater endpoint is stale');
-assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301'),'Canonical app redirect missing');
+assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
   'admin-queues','admin-review','ai-support','execute-payout','monitor-deposits',
