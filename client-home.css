@@ -1,0 +1,265 @@
+/* AegisPay Home Dashboard — standalone UI
+   One screen only. No legacy client UI styles are imported. */
+
+:root{
+  --ap-red:#f0192b;
+  --ap-red-deep:#6f0710;
+  --ap-red-dark:#260308;
+  --ap-black:#05070a;
+  --ap-panel:#0d1016;
+  --ap-text:#ffffff;
+  --ap-muted:#707789;
+  --ap-line:#e6e7eb;
+  --ap-blue:#1878ff;
+  --ap-green:#11c97b;
+  --ap-orange:#ff9e21;
+  --ap-purple:#8b20ff;
+  --ap-yellow:#ffbc14;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,Roboto,Arial,sans-serif;background:var(--ap-black)}
+body{overflow-x:hidden}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+#app{min-height:100vh}
+
+.ap-login-wrap{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:radial-gradient(circle at 50% 0%,#36070d 0%,#0c0d12 42%,#05070a 100%);
+}
+.ap-login{
+  width:min(430px,100%);
+  background:#11141a;
+  border:1px solid #2a2e37;
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 28px 80px rgba(0,0,0,.45);
+  color:#fff;
+}
+.ap-login-logo{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.ap-login-logo img{width:46px;height:46px}
+.ap-login-logo strong{font-size:26px}.ap-login-logo strong span{color:var(--ap-red)}
+.ap-login h1{margin:0;font-size:27px}.ap-login p{color:#9da4b0;font-size:11px;line-height:1.5}
+.ap-field{margin-top:12px}.ap-field label{display:block;color:#c7ccd4;font-size:10px;font-weight:700;margin-bottom:6px}
+.ap-field input{width:100%;height:46px;border:1px solid #333843;background:#181b22;border-radius:11px;color:#fff;padding:0 12px;outline:none}
+.ap-field input:focus{border-color:var(--ap-red);box-shadow:0 0 0 3px rgba(240,25,43,.14)}
+.ap-login-btn{width:100%;height:48px;margin-top:16px;border-radius:11px;background:linear-gradient(135deg,#fa2637,#a70d1b);color:#fff;font-weight:900}
+.ap-login-message{margin-top:10px;padding:10px;border-radius:10px;font-size:9px;background:#351017;color:#ffb9c1;border:1px solid #60202a}
+
+.ap-shell{
+  width:min(100%,430px);
+  min-height:100vh;
+  margin:0 auto;
+  background:
+    radial-gradient(circle at 50% 32%,rgba(112,9,20,.20),transparent 32%),
+    linear-gradient(180deg,#180306 0,#08090d 22%,#090b10 100%);
+  color:#11151b;
+  position:relative;
+  padding-bottom:79px;
+  overflow:hidden;
+}
+
+/* Header */
+.ap-home-header{
+  position:relative;
+  overflow:hidden;
+  padding:17px 15px 18px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 90% 22%,rgba(255,42,54,.34),transparent 24%),
+    linear-gradient(180deg,#4f050b 0%,#a40a18 54%,#62050d 100%);
+  box-shadow:0 12px 28px rgba(66,0,8,.38);
+}
+.ap-home-header:before{
+  content:"";
+  position:absolute;
+  inset:auto -25px -1px auto;
+  width:230px;
+  height:145px;
+  background:linear-gradient(145deg,transparent 0 18%,rgba(255,255,255,.05) 18% 19%,transparent 19% 35%,rgba(255,255,255,.04) 35% 36%,transparent 36%);
+  opacity:.7;
+  transform:skewX(-16deg);
+}
+.ap-home-header:after{
+  content:"";
+  position:absolute;
+  width:170px;
+  height:110px;
+  right:7px;
+  bottom:4px;
+  opacity:.55;
+  background:
+    linear-gradient(90deg,transparent 0 17%,#19060a 17% 18%,transparent 18% 33%,#19060a 33% 34%,transparent 34% 49%,#19060a 49% 50%,transparent 50% 68%,#19060a 68% 69%,transparent 69%),
+    linear-gradient(180deg,transparent 0 27%,#19060a 27% 29%,transparent 29% 51%,#19060a 51% 53%,transparent 53% 75%,#19060a 75% 77%,transparent 77%);
+  clip-path:polygon(25% 40%,45% 20%,55% 0,68% 26%,86% 13%,100% 28%,100% 100%,0 100%,0 52%);
+}
+
+.ap-header-row{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between}
+.ap-brand{display:flex;align-items:center;gap:10px}
+.ap-brand img{width:44px;height:44px;object-fit:contain}
+.ap-brand-word{font-size:28px;font-weight:900;letter-spacing:-1.2px}
+.ap-brand-word span{color:var(--ap-red)}
+.ap-head-actions{display:flex;gap:9px}
+.ap-circle-btn{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18)}
+.ap-circle-btn.profile{background:var(--ap-red);border:0}
+.ap-circle-btn .ap-icon{width:21px;height:21px}
+.ap-notification-dot{position:absolute;right:0;top:0;width:12px;height:12px;border-radius:50%;background:#ff2435;border:2px solid #a20c19}
+
+.ap-welcome-card{
+  position:relative;
+  z-index:3;
+  margin-top:18px;
+  min-height:172px;
+  overflow:hidden;
+  border:1px solid #ff2839;
+  border-radius:20px;
+  padding:20px 18px;
+  background:
+    linear-gradient(105deg,rgba(32,2,7,.94) 0%,rgba(57,4,11,.80) 48%,rgba(175,15,28,.66) 100%);
+  box-shadow:0 14px 35px rgba(22,0,4,.30), inset 0 0 45px rgba(255,28,47,.08);
+}
+.ap-welcome-copy{position:relative;z-index:3;max-width:58%}
+.ap-welcome-kicker{font-size:17px;opacity:.98}
+.ap-welcome-name{font-size:31px;line-height:1.05;margin:7px 0 10px;font-weight:900;letter-spacing:-.8px}
+.ap-client-row{display:flex;align-items:center;gap:7px;font-size:14px;color:#fff}
+.ap-copy-btn{width:28px;height:28px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;padding:5px}
+.ap-building{
+  position:absolute;
+  right:-3px;
+  bottom:-1px;
+  width:58%;
+  height:100%;
+  pointer-events:none;
+}
+.ap-building .b1,.ap-building .b2,.ap-building .b3{
+  position:absolute;bottom:0;border:2px solid rgba(255,43,55,.82);
+  background:linear-gradient(180deg,rgba(56,8,14,.50),rgba(10,2,5,.94));
+  box-shadow:0 0 16px rgba(255,21,36,.22),inset 0 0 18px rgba(255,20,36,.10);
+}
+.ap-building .b1{right:0;width:54%;height:58%}
+.ap-building .b2{right:38%;width:26%;height:79%}
+.ap-building .b3{right:53%;width:17%;height:63%}
+.ap-building:after{
+  content:"AegisPay";
+  position:absolute;right:10px;bottom:37px;color:#ff3343;font-weight:900;font-size:10px;
+  letter-spacing:.4px;opacity:.88;
+}
+
+/* VIP */
+.ap-vip{
+  margin:-1px 13px 0;
+  background:#fff;
+  border-radius:18px;
+  border:1px solid #ededf0;
+  box-shadow:0 8px 22px rgba(0,0,0,.16);
+  display:grid;grid-template-columns:repeat(3,1fr);
+  overflow:hidden;
+}
+.ap-vip-col{
+  min-height:108px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;
+}
+.ap-vip-col:not(:last-child):after{content:"";position:absolute;right:0;top:22px;bottom:22px;width:1px;background:#e0e0e4}
+.ap-crown{width:34px;height:29px;color:var(--ap-red);margin-bottom:7px}
+.ap-vip-label{font-size:14px;font-weight:800}
+.ap-vip-value{font-size:21px;font-weight:900;margin-top:2px}
+
+/* Action area */
+.ap-content{padding:10px 13px 0}
+.ap-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ap-action-card{
+  min-height:105px;
+  background:#fff;
+  border:1px solid #e8e9ed;
+  border-radius:17px;
+  box-shadow:0 7px 18px rgba(0,0,0,.08);
+  display:flex;align-items:center;gap:13px;padding:13px 12px;text-align:left;
+}
+.ap-action-icon{
+  width:59px;height:59px;border-radius:16px;display:grid;place-items:center;flex:0 0 auto
+}
+.ap-action-icon .ap-icon{width:34px;height:34px}
+.ap-action-card.blue .ap-action-icon{color:var(--ap-blue);background:#eaf2ff}
+.ap-action-card.red .ap-action-icon{color:var(--ap-red);background:#fff0f2}
+.ap-action-card.green .ap-action-icon{color:var(--ap-green);background:#e8fbf3}
+.ap-action-card.orange .ap-action-icon{color:var(--ap-orange);background:#fff3e2}
+.ap-action-title{font-size:17px;font-weight:900;color:#15181e}
+.ap-action-subtitle{display:block;margin-top:4px;color:#656d7b;font-size:10px;line-height:1.2}
+
+/* Referral */
+.ap-referral-card{
+  width:100%;min-height:119px;margin-top:9px;
+  background:linear-gradient(112deg,#ead9ff 0%,#f2dfff 42%,#fbebff 100%);
+  border:1px solid rgba(140,34,255,.08);
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(97,23,156,.12);
+  display:flex;align-items:center;gap:13px;padding:12px 14px;text-align:left;
+}
+.ap-ref-icon{
+  width:61px;height:61px;border-radius:17px;background:linear-gradient(145deg,#a51dff,#6817e7);
+  color:#fff;display:grid;place-items:center;flex:0 0 auto;box-shadow:0 8px 20px rgba(106,21,228,.24)
+}
+.ap-ref-icon .ap-icon{width:38px;height:38px}
+.ap-ref-copy{flex:1;min-width:0}
+.ap-ref-copy strong{display:block;font-size:21px;color:#15151a}
+.ap-ref-copy small{display:block;color:#8e22e8;font-size:12px;font-weight:700;margin-top:4px;line-height:1.2}
+.ap-arrow{width:28px;height:28px;color:var(--ap-red);flex:0 0 auto}
+
+/* Amazon promo */
+.ap-promo-card{
+  min-height:162px;margin-top:9px;border-radius:18px;overflow:hidden;position:relative;
+  border:1px solid #ff3343;
+  background:
+    radial-gradient(circle at 74% 78%,rgba(255,34,50,.26),transparent 22%),
+    linear-gradient(108deg,#050506 0%,#170407 38%,#8b0b17 70%,#f02030 100%);
+  box-shadow:0 10px 25px rgba(112,4,16,.30),inset 0 0 36px rgba(255,28,43,.10);
+  color:#fff;text-align:left;padding:17px 16px;
+}
+.ap-promo-copy{position:relative;z-index:3;max-width:56%}
+.ap-amazon-a{font-size:74px;line-height:.85;font-weight:900;letter-spacing:-10px;font-family:Arial,sans-serif}
+.ap-amazon-smile{width:58px;height:18px;border-bottom:5px solid #ffb612;border-radius:0 0 60px 60px;transform:translateX(4px) rotate(-3deg);margin-bottom:2px}
+.ap-promo-copy strong{display:block;font-size:21px;line-height:1.03;margin-top:3px}
+.ap-promo-copy small{display:block;font-size:10px;line-height:1.25;margin-top:7px;color:#ffe6e8}
+.ap-cart-art{position:absolute;z-index:2;right:-2px;bottom:4px;width:47%;height:92%}
+.ap-cart-basket{position:absolute;right:9%;top:30%;width:72%;height:40%;border:4px solid #cfd5dc;border-top:0;transform:skew(-6deg);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.14));box-shadow:inset 0 0 15px rgba(255,255,255,.08)}
+.ap-cart-handle{position:absolute;right:73%;top:22%;width:28%;height:5%;background:#d6dce2;border-radius:5px;transform:rotate(14deg)}
+.ap-cart-wheel{position:absolute;bottom:13%;width:15px;height:15px;border-radius:50%;background:#16191d;border:3px solid #aab1b9}.ap-cart-wheel.w1{right:17%}.ap-cart-wheel.w2{right:67%}
+.ap-box{position:absolute;border:1px solid #ca7f4a;background:linear-gradient(135deg,#dfaa78,#bb6b3a);color:#22120b;font-size:7px;font-weight:900;display:grid;place-items:center;box-shadow:0 5px 10px rgba(0,0,0,.28)}
+.ap-box.bx1{width:55px;height:42px;right:21%;top:23%;transform:rotate(7deg)}
+.ap-box.bx2{width:45px;height:34px;right:43%;top:35%;transform:rotate(-4deg)}
+.ap-box.bx3{width:48px;height:35px;right:9%;top:39%;transform:rotate(10deg)}
+.ap-box:after{content:"amazon";position:absolute;font-size:6px;color:#2e160d}
+
+/* Bottom nav */
+.ap-bottom-nav{
+  position:fixed;z-index:50;left:50%;bottom:7px;transform:translateX(-50%);
+  width:min(412px,calc(100% - 16px));height:67px;padding:5px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:3px;
+  border-radius:21px;background:rgba(7,10,15,.98);
+  border:1px solid #252b35;box-shadow:0 14px 36px rgba(0,0,0,.38);
+}
+.ap-nav-item{
+  border-radius:14px;background:transparent;color:#9aa2b2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  font-size:9px;font-weight:700;
+}
+.ap-nav-item.active{color:#ff2636;background:rgba(255,38,54,.07)}
+.ap-nav-icon{width:23px;height:23px}
+.ap-nav-label{line-height:1}
+
+/* Small-screen tuning */
+@media(max-width:365px){
+  .ap-home-header{padding-left:12px;padding-right:12px}
+  .ap-brand-word{font-size:25px}
+  .ap-welcome-card{min-height:158px;padding:16px}.ap-welcome-name{font-size:27px}
+  .ap-action-card{gap:9px;padding:10px}.ap-action-icon{width:51px;height:51px}
+  .ap-action-title{font-size:15px}.ap-action-subtitle{font-size:9px}
+  .ap-ref-copy strong{font-size:19px}.ap-promo-copy strong{font-size:18px}
+}
