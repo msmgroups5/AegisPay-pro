@@ -13,20 +13,20 @@ function logoMark(){return '<span class="ap-logo-mark"><svg viewBox="0 0 64 64" 
 
 function icon(type){
  var m={
-  bell:'<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>',
-  user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6"/></svg>',
-  copy:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M5 16H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
-  wallet:'<svg viewBox="0 0 24 24"><path d="M4 6h15a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14"/><path d="M16 13h5"/></svg>',
-  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
-  cart:'<svg viewBox="0 0 24 24"><path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>',
-  card:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 14h3M7 9h10"/></svg>',
-  btc:'<svg viewBox="0 0 24 24"><path d="M9 4v16M13 4v16M7 7h6a3 3 0 0 1 0 6H7h7a3 3 0 0 1 0 6H7"/></svg>',
+  bell:'<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" fill="currentColor" opacity=".96"/><path d="M10 21h4" stroke="currentColor" stroke-width="1.8"/></svg>',
+  user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="currentColor"/><path d="M5 21c.7-4.2 3.1-6.5 7-6.5s6.3 2.3 7 6.5" fill="currentColor"/></svg>',
+  copy:'<svg viewBox="0 0 24 24"><rect x="8" y="7" width="12" height="13" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 16H4.6A2.6 2.6 0 0 1 2 13.4V5.6A2.6 2.6 0 0 1 4.6 3h9.8A2.6 2.6 0 0 1 17 5.6V6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+  wallet:'<svg viewBox="0 0 24 24"><rect x="2.8" y="5.1" width="18.4" height="14.2" rx="3.1" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M15 11.1h6v4.5h-6.1a2.2 2.2 0 0 1 0-4.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.7" cy="13.4" r=".9" fill="currentColor"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  cart:'<svg viewBox="0 0 24 24"><path d="M3 4h2.3l2.1 10.8h10.7l2.2-7.5H6.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.2" cy="19" r="1.6" fill="currentColor"/><circle cx="17.3" cy="19" r="1.6" fill="currentColor"/><path d="M8.2 8.2h11.1" stroke="currentColor" stroke-width="1.2" opacity=".55"/></svg>',
+  card:'<svg viewBox="0 0 24 24"><rect x="2.7" y="4.2" width="18.6" height="15.6" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.2" cy="11" r="2.4" fill="currentColor"/><path d="M12.5 9h5M12.5 12h5M6 15.6h11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  btc:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.6 6.7v10.6M13 6.7v10.6M8 8.1h5.1a2.5 2.5 0 0 1 0 5H8h5.7a2.5 2.5 0 0 1 0 5H8M8.1 5.6l.9 1.1M14.7 5.6l-1.2 1.1" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   crown:'<svg viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="m3 7 5 4 4-8 4 8 5-4-2 12H5L3 7Z"/></svg>',
-  users:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c.6-4 2.8-6 6-6s5.4 2 6 6M15 16c2.8.1 4.8 1.5 5.2 4"/></svg>',
-  arrow:'<svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>',
-  home:'<svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H5v-7h14"/></svg>',
-  check:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>',
-  robot:'<svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="12" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M9 16h6"/></svg>'
+  users:'<svg viewBox="0 0 24 24"><circle cx="8.3" cy="9" r="3" fill="currentColor"/><circle cx="16.7" cy="10" r="2.4" fill="currentColor" opacity=".72"/><path d="M2.8 20c.7-4 2.7-6 5.7-6s5 2 5.7 6M14.1 15.8c2.9.2 4.9 1.6 5.5 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24"><path d="m8.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  home:'<svg viewBox="0 0 24 24"><path d="m3.3 10.8 8.7-7.3 8.7 7.3v8.4a1.8 1.8 0 0 1-1.8 1.8H5.1a1.8 1.8 0 0 1-1.8-1.8Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.2 20.5v-6.2h5.6v6.2" fill="currentColor" opacity=".84"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8 12 2.6 2.6L16.5 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  robot:'<svg viewBox="0 0 24 24"><rect x="4.4" y="7.1" width="15.2" height="12.1" rx="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.2v3.4M8.1 12h.01M15.9 12h.01M8.6 15.7h6.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.9 8.9h10.2" stroke="currentColor" stroke-width="1.2" opacity=".5"/></svg>'
  };
  return '<span class="ap-icon">'+(m[type]||m.user)+'</span>';
 }
