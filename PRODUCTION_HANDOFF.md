@@ -5,13 +5,13 @@
 - Repository: `msmgroups5/AegisPay-pro`
 - Production branch: `main`
 - Supabase project: `wtcspnrmsoisroavojop`
-- Netlify project: `aegispay-pro`
-- Netlify site ID: `5573011e-3f81-449a-9617-da0c176720d8`
-- Production website: `https://aegispay-pro.netlify.app/`
-- Client entry: `https://aegispay-pro.netlify.app/app/`
-- Master Admin entry: `https://aegispay-pro.netlify.app/admin/`
-- Client APK: `https://aegispay-pro.netlify.app/downloads/aegispay-client.apk`
-- Update manifest: `https://aegispay-pro.netlify.app/app-version.json`
+- Cloudflare Pages project: `aegispay-pro`
+- Cloudflare Pages project ID: `61848c21-fc40-4436-8c89-5b46cbdcdf6a`
+- Production website: `https://aegispay-pro.pages.dev/`
+- Client entry: `https://aegispay-pro.pages.dev/app/`
+- Master Admin entry: `https://aegispay-pro.pages.dev/admin/`
+- Client APK: `https://aegispay-pro.pages.dev/downloads/aegispay-client.apk`
+- Update manifest: `https://aegispay-pro.pages.dev/app-version.json`
 - Android client baseline: versionCode 28 / versionName 2.4.2
 
 ## Source-of-truth rules
@@ -20,7 +20,7 @@
 - Master Admin source: root `master-admin.html`
 - Shared web runtime: root `client-auth.js`, `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
 - Shared styles/assets: root `styles.css`, `premium.css`, `shop-catalog.js`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`
-- Netlify `site/` files are deployment artifacts generated from these canonical sources; they are not independent application sources.
+- Cloudflare Pages `site/` files are deployment artifacts generated from these canonical sources; they are not independent application sources.
 - Android client/admin flavors bundle the canonical root portals and shared assets.
 - Supabase database changes are forward-only migrations under `database/migrations/`.
 - Supabase Edge Function source is under `supabase/functions/`.
@@ -54,4 +54,4 @@ Before real-money use:
 5. Configure production Android signing secrets and keep the same signing identity for updates.
 6. Verify direct APK download and in-app SHA-256 update flow on a physical Android device.
 
-Never place service-role keys, payout private keys, Telegram bot credentials, AI API keys or release keystore material in browser assets or Netlify client variables.
+Never place service-role keys, payout private keys, Telegram bot credentials, AI API keys or release keystore material in browser assets or Cloudflare Pages client variables.
