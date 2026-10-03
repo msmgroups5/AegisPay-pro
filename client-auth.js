@@ -2,7 +2,7 @@
 'use strict';
 var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
-var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
+var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},catalog:[],cart:[],shopCategory:'All',referralTab:'list',message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
 var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null;
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
 var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
@@ -224,6 +224,8 @@ function renderDashboard(){
   {name:'Everyday Backpack',brand:'Aegis Style',cat:'Fashion',price:54.99,old:79.99,rating:'4.7',reviews:'902',badge:'Featured',desc:'Everyday backpack with practical storage for work, travel and daily carry.',image:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=88'},
   {name:'Premium Sports Shoe',brand:'Aegis Active',cat:'Sports',price:219,old:299,rating:'4.7',reviews:'1,064',badge:'Featured',desc:'Premium athletic shoe designed for comfortable everyday movement and training.',image:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=88'}
  ];
+ try{state.cart=JSON.parse(localStorage.getItem('aegispay-cart')||'[]');if(!Array.isArray(state.cart))state.cart=[];}catch(e){state.cart=[];}
+ state.catalog=products;
  function icon(type){var m={user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6"/></svg>',bell:'<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>',bag:'<svg viewBox="0 0 24 24"><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>',cart:'<svg viewBox="0 0 24 24"><path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>',wallet:'<svg viewBox="0 0 24 24"><path d="M4 6h15a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14"/><path d="M16 13h5"/></svg>',card:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 9h18M7 14h3"/></svg>',ref:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6"/><path d="M16 15c3 0 4.5 1.5 5 4"/></svg>',btc:'<svg viewBox="0 0 24 24"><path d="M8 4v16M12 4v16M6 7h7a3 3 0 0 1 0 6H6h8a3 3 0 0 1 0 6H6"/><path d="M5 4h2M5 20h2"/></svg>',home:'<svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H5v-7h14"/></svg>',cube:'<svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg>',head:'<svg viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13h3v5H4zM17 13h3v5h-3zM20 18c0 2-2 3-5 3"/></svg>',crown:'<svg viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M2.5 7.1 7 10.8 12 3.2l5 7.6 4.5-3.7-2 12.1H4.5L2.5 7.1Z"/><path d="M5 16.5h14"/></svg>',grid:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',electronics:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>',fashion:'<svg viewBox="0 0 24 24"><path d="m8 5 4-2 4 2 3 4-3 2v10H8V11L5 9l3-4Z"/></svg>',home2:'<svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H5v-7h14"/></svg>',beauty:'<svg viewBox="0 0 24 24"><path d="M8 3h8v4l-2 2v10H10V9L8 7V3Z"/><path d="M8 7h8"/></svg>',game:'<svg viewBox="0 0 24 24"><path d="M7 8h10a5 5 0 0 1 4.7 6.7l-1.2 3.1a2 2 0 0 1-3.4.6L15 16H9l-2.1 2.4a2 2 0 0 1-3.4-.6l-1.2-3.1A5 5 0 0 1 7 8Z"/><path d="M7 11v4M5 13h4M16 12h.01M19 14h.01"/></svg>',book:'<svg viewBox="0 0 24 24"><path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4V4ZM20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6V4Z"/></svg>',sports:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 7 4 3 4-3M7 16l5-3 5 3M12 10v3"/></svg>',health:'<svg viewBox="0 0 24 24"><path d="M12 20S4 15.3 4 9.2A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 8 2.2C20 15.3 12 20 12 20Z"/><path d="M9 12h6M12 9v6"/></svg>',car:'<svg viewBox="0 0 24 24"><path d="m5 11 2-5h10l2 5 2 1v5h-2v2h-3v-2H8v2H5v-2H3v-5l2-1Z"/><path d="M7 12h10M7 16h.01M17 16h.01"/></svg>',usdt:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 7h10M12 7v10M8 10h8"/></svg>',bitcoin:'<svg viewBox="0 0 24 24"><path d="M9 4v16M13 4v16M7 7h6a3 3 0 0 1 0 6H7h7a3 3 0 0 1 0 6H7"/><path d="M6 4h2M6 20h2"/></svg>',bank:'<svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5H3Z"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg>',gift:'<svg viewBox="0 0 24 24"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13"/><path d="M12 7H8.5A2.5 2.5 0 1 1 11 4.5C11 6 12 7 12 7ZM12 7h3.5A2.5 2.5 0 1 0 13 4.5C13 6 12 7 12 7Z"/></svg>',whatsapp:'<svg viewBox="0 0 24 24"><path d="M12 3a8 8 0 0 0-6.9 12.1L4 21l5.9-1.1A8 8 0 1 0 12 3Z"/><path d="M9 8.5c.3 2.3 2.2 4.3 4.5 4.8l1.3-1.2c.3-.3.8-.3 1.1-.1l1.2.6"/></svg>',share:'<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.5-4.4M8.2 13.2l7.5 4.4"/></svg>',download:'<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 20h14"/></svg>',upload:'<svg viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 4h14"/></svg>',kyc:'<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M8 16c.7-2 2-3 4-3s3.3 1 4 3"/></svg>',history:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M5 6H3v2"/></svg>',fire:'<svg viewBox="0 0 24 24"><path d="M12 21c4 0 7-2.7 7-6.7 0-3-1.7-5-4.5-7.3.1 2.3-1.1 3.5-2.2 4.2.2-3.6-1.7-5.8-3.2-7.2.1 3.4-4.1 5.7-4.1 10.3C5 18.3 8 21 12 21Z"/></svg>',truck:'<svg viewBox="0 0 24 24"><path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>',shield:'<svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10V6l8-3Z"/><path d="m8 12 2.5 2.5L16 9"/></svg>',return:'<svg viewBox="0 0 24 24"><path d="M8 7H4l3-3M4 7c2-2 4.5-3 7-3 5 0 8 3.5 8 8s-3 8-8 8H7"/></svg>'};return '<span class="ui-svg">'+(m[type]||m.bag)+'</span>';}
  var cards=products.map(function(x,i){return '<article class="amazon-product" data-action="open-product" data-product-index="'+i+'"><div class="amazon-product-image"><span class="amazon-badge">'+esc(x.badge)+'</span><button class="amazon-heart" type="button">♡</button><img src="'+x.image+'" alt="'+esc(x.name)+'" loading="lazy"></div><div class="amazon-product-body"><h4>'+esc(x.name)+'</h4><div class="amazon-stars">★★★★★ <span>'+esc(x.rating)+'</span></div><small>'+esc(x.reviews)+' reviews</small><div class="amazon-price">$'+Number(x.price).toFixed(2)+' <del>$'+Number(x.old).toFixed(2)+'</del></div><button class="amazon-add" type="button" data-action="open-product" data-product-index="'+i+'">'+icon('cart')+' Add to Cart</button></div></article>';}).join('');
  var refRows=refs.length?refs.map(function(x){return '<div class="ref-row"><span class="ref-avatar">'+icon('user')+'</span><section><b>'+esc(x.referred_name||x.name||'Referral')+'</b><small>ID: '+esc(x.referred_id||'')+'</small><em class="ref-level-pill">LEVEL '+esc(x.level||x.referral_level||'1')+'</em></section><strong>+'+money(x.platform_reward||0)+'</strong></div>';}).join(''):'<p>'+t('empty')+'</p>';
@@ -236,7 +238,7 @@ function renderDashboard(){
  '<button data-action="view-referral" class="home-ref"><span>'+icon('ref')+'</span><div><b>Referral</b><small>Invite Friends &amp; Earn Rewards</small></div><strong>›</strong></button>'+
  '<section class="home-shop-banner" data-action="view-shop"><div class="home-amazon-mark"><strong>a</strong><i></i></div><div class="home-shop-copy"><b>Shop Millions<br>of Products</b><small>Everything you need in<br>one place</small></div><div class="banner-cart-visual" aria-hidden="true"><span></span><span></span><span></span><div class="cart-basket"></div><div class="cart-wheel w1"></div><div class="cart-wheel w2"></div></div></section>'+
   '</div>'+
- '<div class="exact-view hidden" id="apViewShop"><div class="amazon-top"><button data-action="view-home">‹</button><b>Shop</b><div>'+icon('cart')+' <span class="cart-count">3</span></div></div><section class="amazon-hero"><div class="amazon-word">amazon<span>⌣</span></div><h1>Shop Millions<br>of Products</h1><p>Everything you need in one place</p><div class="amazon-boxes">▣ ▣ ▣</div></section><div class="amazon-search"><span>⌕</span><input id="apShopSearch" placeholder="Search Amazon products..."><b>⌕</b></div><div class="amazon-delivery">● <span>Deliver to Pakistan</span><b>›</b></div><div class="amazon-categories"><button class="active">'+icon('grid')+'<small>All</small></button><button>'+icon('electronics')+'<small>Electronics</small></button><button>'+icon('fashion')+'<small>Fashion</small></button><button>'+icon('home2')+'<small>Home &amp; Kitchen</small></button><button>'+icon('beauty')+'<small>Beauty</small></button><button>'+icon('game')+'<small>Toys &amp; Games</small></button><button>'+icon('book')+'<small>Books</small></button><button>'+icon('sports')+'<small>Sports</small></button><button>'+icon('health')+'<small>Health &amp; Care</small></button><button>'+icon('car')+'<small>Automotive</small></button></div><div class="amazon-section-head"><h2>Today&#39;s Deals</h2><button>See All ›</button></div><div class="amazon-products">'+cards+'</div></div>'+
+ '<div class="exact-view hidden" id="apViewShop"><div class="amazon-top"><button data-action="view-home">‹</button><b>Shop</b><div>'+icon('cart')+' <span class="cart-count" id="shopCartCount">' + (state.cart.length||0) + '</span></div></div><section class="amazon-hero"><div class="amazon-word">amazon<span>⌣</span></div><h1>Shop Millions<br>of Products</h1><p>Everything you need in one place</p><div class="amazon-boxes">▣ ▣ ▣</div></section><div class="amazon-search"><span>⌕</span><input id="apShopSearch" placeholder="Search Amazon products..."><b>⌕</b></div><div class="amazon-delivery">● <span>Deliver to Pakistan</span><b>›</b></div><div class="amazon-categories"><button class="active">'+icon('grid')+'<small>All</small></button><button>'+icon('electronics')+'<small>Electronics</small></button><button>'+icon('fashion')+'<small>Fashion</small></button><button>'+icon('home2')+'<small>Home &amp; Kitchen</small></button><button>'+icon('beauty')+'<small>Beauty</small></button><button>'+icon('game')+'<small>Toys &amp; Games</small></button><button>'+icon('book')+'<small>Books</small></button><button>'+icon('sports')+'<small>Sports</small></button><button>'+icon('health')+'<small>Health &amp; Care</small></button><button>'+icon('car')+'<small>Automotive</small></button></div><div class="amazon-section-head"><h2>Today&#39;s Deals</h2><button>See All ›</button></div><div class="amazon-products">'+cards+'</div></div>'+
  '<div class="exact-view hidden" id="apViewProduct"><div class="amazon-top"><button data-action="view-shop">‹</button><b>Product Details</b><div>♡ '+icon('cart')+'</div></div><section id="apProductDetail" class="amazon-detail"></section></div>'+
  '<div class="exact-view hidden" id="apViewTopup"><div class="red-page-head"><button data-action="view-home">‹</button><b>Top Up</b><span></span></div><section class="white-panel"><h3>Select Payment Method</h3><div class="pay-method selected"><i>'+icon('usdt')+'</i><div><b>USDT (TRC20)</b><small>Fast, Low Fees</small></div><strong>✓</strong></div><div class="pay-method"><i>'+icon('usdt')+'</i><div><b>USDT (ERC20)</b><small>Network Fees Higher</small></div><strong>›</strong></div><div class="pay-method"><i>'+icon('bitcoin')+'</i><div><b>Bitcoin (BTC)</b><small>Secure &amp; Global</small></div><strong>›</strong></div><div class="pay-method"><i>'+icon('bank')+'</i><div><b>Bank Transfer</b><small>Local Bank Deposit</small></div><strong>›</strong></div><form id="depositForm" class="exact-form"><h3>Deposit Details</h3><label>Deposit Tier<select id="depositTier" '+(tiers.length?"":"disabled")+'> '+(tierOptions||'<option value="">No active deposit tiers configured</option>')+'</select></label><div class="amount-input"><span>Amount (USDT)</span><b id="depositAmountLabel">'+(selectedTier?Number(selectedTier.deposit_amount).toLocaleString():"—")+'</b><em>USDT</em></div><input id="depositAmount" type="hidden" value="'+(selectedTier?Number(selectedTier.deposit_amount):0)+'"><div class="quick-amounts"><button type="button" data-amount="50">50</button><button type="button" data-amount="100">100</button><button type="button" data-amount="500">500</button><button type="button" data-amount="1000">1,000</button></div><label>TRON transaction ID<input id="depositTxid" type="text" minlength="64" maxlength="64" required></label><label>Payment screenshot<input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></label><button class="red-button" type="submit" '+(tiers.length?"":"disabled")+'>'+(tiers.length?"Generate Deposit Link →":"Awaiting tier configuration")+'</button>'+(tiers.length?"":'<small class="exact-note">Master Admin needs to configure an active deposit tier before submission.</small>')+'</form></section></div>'+
  '<div class="exact-view hidden" id="apViewReferral"><div class="red-page-head"><button data-action="view-home">‹</button><b>Referral</b><button>◷</button></div><section class="ref-banner"><div class="ref-banner-icon">'+icon('gift')+'</div><h1>Invite Friends<br>Earn Rewards</h1><p>Share your unique link and earn USDT rewards when they join and make a deposit.</p></section><div class="ref-rewards"><div><b>'+icon('user')+'</b><strong>Get 5 USDT</strong><small>When your direct referral joins<br><b>(Level 1)</b></small></div><div><b>'+icon('ref')+'</b><strong>Get 2 USDT</strong><small>When your friend’s referral joins<br><b>(Level 2)</b></small></div></div><section class="ref-link"><b>Your Referral Link</b><div>'+esc(referralLink)+'<button data-action="copy-ref" aria-label="Copy referral link">'+icon('share')+'</button></div><div class="ref-share"><button data-action="share-ref">'+icon('whatsapp')+' Share on WhatsApp</button><button data-action="copy-ref">'+icon('share')+' Share Link</button></div></section><div class="ref-tabs"><button class="active">My Referrals ('+refs.length+')</button><button>Network View</button></div><div class="ref-list">'+refRows+'</div></div>'+
@@ -247,7 +249,11 @@ function renderDashboard(){
  var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});
  root.querySelectorAll('[data-amount]').forEach(function(b){b.addEventListener('click',function(){var a=document.getElementById('depositAmount'),lab=document.getElementById('depositAmountLabel');if(a)a.value=b.getAttribute('data-amount');if(lab)lab.textContent=b.getAttribute('data-amount');root.querySelectorAll('.quick-amounts button').forEach(function(x){x.classList.remove('active');});b.classList.add('active');});});
  var tierSelect=document.getElementById('depositTier');if(tierSelect){tierSelect.addEventListener('change',function(){var picked=tiers.find(function(x){return x.id===tierSelect.value;});var amount=document.getElementById('depositAmount'),lab=document.getElementById('depositAmountLabel');if(picked){if(amount)amount.value=Number(picked.deposit_amount);if(lab)lab.textContent=Number(picked.deposit_amount).toLocaleString();}});}
- var search=document.getElementById('apShopSearch');if(search){search.addEventListener('input',function(){var q=search.value.toLowerCase();root.querySelectorAll('.amazon-product').forEach(function(card){card.style.display=card.textContent.toLowerCase().indexOf(q)>=0?'':'none';});});}
+ var search=document.getElementById('apShopSearch');if(search){search.addEventListener('input',function(){var q=search.value.toLowerCase();root.querySelectorAll('.amazon-product').forEach(function(card){var hay=card.textContent.toLowerCase();var match=hay.indexOf(q)>=0;var cat=card.getAttribute('data-category')||'All';var catMatch=state.shopCategory==='All'||cat===state.shopCategory;card.style.display=(match&&catMatch)?'':'none';});});}
+ var categories=['All','Electronics','Fashion','Home & Kitchen','Beauty','Toys & Games','Books','Sports','Health & Care','Automotive'];
+ root.querySelectorAll('.amazon-categories button').forEach(function(btn,i){btn.setAttribute('data-action','shop-category');btn.setAttribute('data-category',categories[i]||'All');});
+ root.querySelectorAll('.amazon-product').forEach(function(card){var idx=Number(card.getAttribute('data-product-index'));card.setAttribute('data-category',(state.catalog[idx]&&state.catalog[idx].cat)||'All');});
+ syncCartBadges();
 }
 function render(){
  if(state.appEnabled===false){
@@ -359,7 +365,352 @@ async function handleWithdraw(e){
  }catch(err){setMessage(authError(err));}
  finally{busy=false;render();}
 }
-async function action(e){
+async 
+function cartCount(){return Array.isArray(state.cart)?state.cart.reduce(function(n,x){return n+Number(x.qty||1);},0):0;}
+function saveCart(){try{localStorage.setItem('aegispay-cart',JSON.stringify(state.cart||[]));}catch(e){}}
+function syncCartBadges(){
+ var count=cartCount();
+ root.querySelectorAll('.cart-count,#shopCartCount').forEach(function(x){x.textContent=String(count);x.style.display=count?'inline-block':'none';});
+}
+function addToCart(prod,qty){
+ if(!prod)return;
+ qty=Math.max(1,Number(qty||1));
+ var found=state.cart.find(function(x){return x.name===prod.name;});
+ if(found)found.qty=Number(found.qty||1)+qty;
+ else state.cart.push({name:prod.name,price:Number(prod.price||0),image:prod.image||'',qty:qty});
+ saveCart();syncCartBadges();
+}
+function showToast(message){
+ var toast=document.createElement('div');toast.className='ap-toast';toast.textContent=message;document.body.appendChild(toast);setTimeout(function(){if(toast.parentNode)toast.remove();},1800);
+}
+function showOrdersView(){
+ var rows=(state.cart||[]).map(function(x){return '<div class="order-row"><div class="order-art"><img src="'+esc(x.image||'')+'" alt=""></div><div class="order-main"><b>'+esc(x.name)+'</b><small>Qty '+Number(x.qty||1)+' · 
+ var el=e.target.closest('[data-action]');if(!el)return;
+ var a=el.getAttribute('data-action');
+ if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
+  var orderModal=el.closest('.ap-order-modal');if(orderModal && (a==='view-shop'||a==='view-home'))orderModal.remove();
+  var target=a==='profile-view'?'assets':(a==='ai-view'?'ai':(a==='notifications'?'notifications':a.replace(/^view-/,'')));
+  var ids=['home','referral','topup','shop','product','assets','crypto','ai','notifications'];
+  ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!==target);});
+  root.querySelectorAll('.exact-bottom button').forEach(function(b){b.classList.remove('active');});
+  var homeNav=document.getElementById('homeNav'),shopNav=document.getElementById('shopNav');
+  if(homeNav)homeNav.classList.toggle('hidden',target!=='home');
+  if(shopNav)shopNav.classList.toggle('hidden',target!=='shop');
+  var active=target==='home'?(homeNav&&homeNav.querySelector('[data-action="view-home"]')):(target==='shop'?(shopNav&&shopNav.querySelector('[data-action="view-shop"]')):null);
+  if(active)active.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});return;
+ }
+ if(a==='open-product'){var pi=Number(el.getAttribute('data-product-index'));var prod=(state.catalog||[])[pi];var detail=document.getElementById('apProductDetail');if(prod&&detail){detail.innerHTML='<div class="amazon-detail-media"><div class="detail-thumbs"><button class="selected"><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button></div><div class="detail-main-image"><img src="'+prod.image+'" alt="'+esc(prod.name)+'"></div></div><div class="amazon-detail-info"><h1>'+esc(prod.name)+'</h1><div class="amazon-detail-rating">★★★★★ <span>'+esc(prod.rating)+'</span> · <b>'+esc(prod.reviews)+' reviews</b></div><div class="amazon-detail-price">$'+Number(prod.price).toFixed(2)+' <del>$'+Number(prod.old).toFixed(2)+'</del> <em>'+esc(prod.badge)+'</em></div><p>'+esc(prod.desc)+'</p><div class="detail-choice"><b>Color:</b><span class="choice-dot active" data-action="product-option" data-group="color"></span><span class="choice-dot" data-action="product-option" data-group="color"></span><span class="choice-dot" data-action="product-option" data-group="color"></span></div><div class="detail-choice"><b>Storage:</b><button class="choice-pill active" data-action="product-option" data-group="storage">128GB</button><button class="choice-pill" data-action="product-option" data-group="storage">256GB</button><button class="choice-pill" data-action="product-option" data-group="storage">512GB</button></div><div class="detail-quantity"><b>Quantity:</b><button type="button" data-action="product-qty" data-dir="down">−</button><span>1</span><button type="button" data-action="product-qty" data-dir="up">+</button><i>● In Stock</i></div><button class="amazon-cart-big" data-action="product-action" data-product-index="'+pi+'" data-name="'+esc(prod.name)+'">'+icon('cart')+' Add to Cart</button><button class="amazon-buy" data-action="product-action" data-product-index="'+pi+'" data-name="'+esc(prod.name)+'">Buy Now</button><div class="detail-benefits"><span>'+icon('truck')+'<b>Free Delivery</b><small>in 3–5 days</small></span><span>'+icon('shield')+'<b>Secure Payment</b><small>100% Secure</small></span><span>'+icon('return')+'<b>Easy Returns</b><small>7 Days</small></span></div></div>';}var ids=['home','referral','topup','shop','product','assets','crypto'];ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!=='product');});var hn=document.getElementById('homeNav'),sn=document.getElementById('shopNav');if(hn)hn.classList.add('hidden');if(sn)sn.classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});return;}
+ if(a==='preview-product'){showToast((el.getAttribute('data-name')||'Item')+' — preview only');return;}
+ if(a==='shop-category'){
+  state.shopCategory=el.getAttribute('data-category')||'All';
+  root.querySelectorAll('.amazon-categories button').forEach(function(b){b.classList.toggle('active',b===el);});
+  var q=((document.getElementById('apShopSearch')||{}).value||'').toLowerCase();
+  root.querySelectorAll('.amazon-product').forEach(function(card){var idx=Number(card.getAttribute('data-product-index')),prod=(state.catalog||[])[idx]||{},match=card.textContent.toLowerCase().indexOf(q)>=0,catMatch=state.shopCategory==='All'||(prod.cat||'All')===state.shopCategory;card.style.display=(match&&catMatch)?'':'none';});
+  return;
+ }
+ if(a==='shop-orders'){showOrdersView();return;}
+ if(a==='close-orders'){var ov=el.closest('.ap-order-modal');if(ov)ov.remove();return;}
+ if(a==='checkout-cart'){showToast('Checkout is ready for order integration.');return;}
+ if(a==='product-action'){
+  var idx=Number(el.getAttribute('data-product-index')),prod=(!isNaN(idx)?(state.catalog||[])[idx]:null);
+  var name=el.getAttribute('data-name'),catalog=state.catalog||[];
+  if(!prod&&name)prod=catalog.find(function(x){return x.name===name;});
+  if(prod){var qtyNode=document.querySelector('#apProductDetail .detail-quantity span');addToCart(prod,Math.max(1,Number(qtyNode&&qtyNode.textContent||1)));showToast(el.textContent.indexOf('Buy')>=0?'Added to cart — ready to checkout.':'Added to cart.');}
+  return;
+ }
+ if(a==='product-qty'){
+  var detailQty=document.querySelector('#apProductDetail .detail-quantity span');
+  var dir=el.getAttribute('data-dir')==='up'?1:-1,currentQty=Math.max(1,Number(detailQty&&detailQty.textContent||1)+dir);
+  if(detailQty)detailQty.textContent=String(currentQty);return;
+ }
+ if(a==='product-option'){
+  var group=el.getAttribute('data-group');
+  root.querySelectorAll('[data-group="'+group+'"]').forEach(function(x){x.classList.remove('active');});el.classList.add('active');return;
+ }
+ if(a==='copy-client-id'){var id=(state.profile&&state.profile.client_id)||'AP-CLIENT';if(navigator.clipboard)navigator.clipboard.writeText(id);return;}
+ if(a==='share-ref'){var link=location.origin+location.pathname+'?ref='+encodeURIComponent((state.profile&&state.profile.referral_code)||'');if(navigator.share)navigator.share({title:'AegisPay Referral',text:'Join AegisPay using my referral link',url:link}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(link);return;}
+ if(a==='language')return;
+ if(a==='retry-runtime'){checkRuntime();return;}
+  if(a==='complete-task'){
+   if(busy)return;busyStart();render();
+   try{var taskResult=await service.client().rpc('complete_task',{p_task_id:el.getAttribute('data-id')});if(taskResult.error)throw taskResult.error;setMessage(t('taskCompleted'),'success');await refreshData();state.messageTone='success';}
+   catch(err){setMessage(authError(err));}
+   finally{busy=false;render();} return;
+  }
+  if(a==='copy-ref'){
+   var referralLink=location.origin+location.pathname+'?ref='+encodeURIComponent((state.profile&&state.profile.referral_code)||'');
+   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(referralLink).then(function(){setMessage('Referral link copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
+   else{setMessage(t('error'));render();}
+   return;
+  }
+ if(a==='keep-language'){askLanguage=false;try{localStorage.setItem('aegispay-language',locale);}catch(e){}render();return;}
+ if(a==='login'){state.mode='login';state.message='';render();}
+ else if(a==='signup'){state.mode='signup';state.message='';render();}
+ else if(a==='reset'){state.mode='reset';state.message='';render();}
+ else if(a==='logout'){await service.signOut();state.profile=null;state.mode='login';state.phase='ready';render();}
+ else if(a==='link-wallet'){
+  try{busyStart();var r=await service.client().rpc('link_withdrawal_wallet',{p_address:document.getElementById('walletAddress').value.trim(),p_owner_name:document.getElementById('walletOwner').value.trim()});if(r.error)throw r.error;setMessage(t('walletLinked'),'success');state.messageTone='success';await refreshData();}
+  catch(err){setMessage(authError(err));}finally{busy=false;render();}
+ }
+}
+root.addEventListener('submit',async function(e){
+ if(e.target.id==='aiForm'){
+  e.preventDefault();
+  var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
+  if(!question)return;
+  if(aiReply)aiReply.textContent='Thinking…';
+  try{
+    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
+    if(aiResult.error)throw aiResult.error;
+    if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
+  }catch(err){
+    if(aiReply)aiReply.textContent=aiAnswer(question);
+  }
+  if(aiInput)aiInput.value='';
+  return;
+ }
+ if(e.target.id==='loginForm')handleLogin(e);
+ else if(e.target.id==='signupForm')handleSignup(e);
+ else if(e.target.id==='resetForm')handleReset(e);
+ else if(e.target.id==='passwordForm')handlePassword(e);
+ else if(e.target.id==='depositForm')handleDeposit(e);
+ else if(e.target.id==='kycForm')handleKyc(e);
+ else if(e.target.id==='withdrawForm')handleWithdraw(e);
+});
+root.addEventListener('click',action);root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
+
+async function boot(){
+ render();
+ if(!service||!service.isAvailable()){state.phase='ready';setMessage(t('unavailable'));render();return;}
+ service.onAuthStateChange(function(event,session){
+  if(event==='SIGNED_OUT'){state.profile=null;state.mode='login';state.phase='ready';render();}
+  if(event==='PASSWORD_RECOVERY'){state.profile=null;state.mode='password-update';state.phase='ready';render();}
+ });
+ try{
+  state.appEnabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;
+  if(!state.appEnabled){state.phase='paused';render();}
+  else{var session=await service.session();if(session)await refreshProfile();else{state.phase='ready';render();}}
+ }catch(err){state.appEnabled=false;state.runtimeUnverified=true;state.phase='paused';setMessage(t('runtimeUnknown'));render();}
+ if(!runtimeTimer)runtimeTimer=setInterval(function(){checkRuntime();updateCycleCountdown();},10000);
+ updateCycleCountdown();
+}
+async function checkRuntime(){
+ if(!service||!service.isAvailable()||runtimeRequest||busy)return runtimeRequest;
+ runtimeRequest=(async function(){
+  var was=state.appEnabled,wasUnverified=state.runtimeUnverified,wasPaused=state.phase==='paused';
+  try{
+   var enabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;state.appEnabled=enabled;
+   if(!enabled){var changed=was!==false||!wasPaused||wasUnverified;state.profile=null;state.phase='paused';state.mode='login';state.message='';if(changed)render();return;}
+   if(was===false||wasPaused||wasUnverified){state.phase='ready';state.message='';var session=await service.session();if(session)await refreshProfile();else{state.profile=null;state.mode='login';render();}}
+  }catch(err){var changed=!state.runtimeUnverified||state.phase!=='paused';state.appEnabled=false;state.runtimeUnverified=true;state.profile=null;state.phase='paused';if(changed){setMessage(t('runtimeUnknown'));render();}}
+ })();
+ try{return await runtimeRequest;}finally{runtimeRequest=null;}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
++Number(x.price||0).toFixed(2)+'</small></div><strong>
+ var el=e.target.closest('[data-action]');if(!el)return;
+ var a=el.getAttribute('data-action');
+ if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
+  var target=a==='profile-view'?'assets':(a==='ai-view'?'ai':(a==='notifications'?'notifications':a.replace(/^view-/,'')));
+  var ids=['home','referral','topup','shop','product','assets','crypto','ai','notifications'];
+  ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!==target);});
+  root.querySelectorAll('.exact-bottom button').forEach(function(b){b.classList.remove('active');});
+  var homeNav=document.getElementById('homeNav'),shopNav=document.getElementById('shopNav');
+  if(homeNav)homeNav.classList.toggle('hidden',target!=='home');
+  if(shopNav)shopNav.classList.toggle('hidden',target!=='shop');
+  var active=target==='home'?(homeNav&&homeNav.querySelector('[data-action="view-home"]')):(target==='shop'?(shopNav&&shopNav.querySelector('[data-action="view-shop"]')):null);
+  if(active)active.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});return;
+ }
+ if(a==='open-product'){var pi=Number(el.getAttribute('data-product-index'));var prod=products[pi];var detail=document.getElementById('apProductDetail');if(prod&&detail){detail.innerHTML='<div class="amazon-detail-media"><div class="detail-thumbs"><button class="selected"><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button></div><div class="detail-main-image"><img src="'+prod.image+'" alt="'+esc(prod.name)+'"></div></div><div class="amazon-detail-info"><h1>'+esc(prod.name)+'</h1><div class="amazon-detail-rating">★★★★★ <span>'+esc(prod.rating)+'</span> · <b>'+esc(prod.reviews)+' reviews</b></div><div class="amazon-detail-price">$'+Number(prod.price).toFixed(2)+' <del>$'+Number(prod.old).toFixed(2)+'</del> <em>'+esc(prod.badge)+'</em></div><p>'+esc(prod.desc)+'</p><div class="detail-choice"><b>Color:</b><span class="choice-dot active"></span><span class="choice-dot"></span><span class="choice-dot"></span></div><div class="detail-choice"><b>Storage:</b><button class="choice-pill active">128GB</button><button class="choice-pill">256GB</button><button class="choice-pill">512GB</button></div><div class="detail-quantity"><b>Quantity:</b><button>−</button><span>1</span><button>+</button><i>● In Stock</i></div><button class="amazon-cart-big" data-action="product-action" data-name="'+esc(prod.name)+'">'+icon('cart')+' Add to Cart</button><button class="amazon-buy" data-action="product-action" data-name="'+esc(prod.name)+'">Buy Now</button><div class="detail-benefits"><span>'+icon('truck')+'<b>Free Delivery</b><small>in 3–5 days</small></span><span>'+icon('shield')+'<b>Secure Payment</b><small>100% Secure</small></span><span>'+icon('return')+'<b>Easy Returns</b><small>7 Days</small></span></div></div>';}var ids=['home','referral','topup','shop','product','assets','crypto'];ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!=='product');});var hn=document.getElementById('homeNav'),sn=document.getElementById('shopNav');if(hn)hn.classList.add('hidden');if(sn)sn.classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});return;}
+ if(a==='preview-product'){var n=el.getAttribute('data-name')||'Item';var toast=document.createElement('div');toast.className='ap-toast';toast.textContent=n+' — preview only';document.body.appendChild(toast);setTimeout(function(){toast.remove();},1800);return;}
+ if(a==='copy-client-id'){var id=(state.profile&&state.profile.client_id)||'AP-CLIENT';if(navigator.clipboard)navigator.clipboard.writeText(id);return;}
+ if(a==='share-ref'){var link=location.origin+location.pathname+'?ref='+encodeURIComponent((state.profile&&state.profile.referral_code)||'');if(navigator.share)navigator.share({title:'AegisPay Referral',text:'Join AegisPay using my referral link',url:link}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(link);return;}
+ if(a==='language')return;
+ if(a==='retry-runtime'){checkRuntime();return;}
+  if(a==='complete-task'){
+   if(busy)return;busyStart();render();
+   try{var taskResult=await service.client().rpc('complete_task',{p_task_id:el.getAttribute('data-id')});if(taskResult.error)throw taskResult.error;setMessage(t('taskCompleted'),'success');await refreshData();state.messageTone='success';}
+   catch(err){setMessage(authError(err));}
+   finally{busy=false;render();} return;
+  }
+  if(a==='copy-ref'){
+   var refCode=state.profile&&state.profile.referral_code||'';
+   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
+   else{setMessage(t('error'));render();}
+   return;
+  }
+ if(a==='keep-language'){askLanguage=false;try{localStorage.setItem('aegispay-language',locale);}catch(e){}render();return;}
+ if(a==='login'){state.mode='login';state.message='';render();}
+ else if(a==='signup'){state.mode='signup';state.message='';render();}
+ else if(a==='reset'){state.mode='reset';state.message='';render();}
+ else if(a==='logout'){await service.signOut();state.profile=null;state.mode='login';state.phase='ready';render();}
+ else if(a==='link-wallet'){
+  try{busyStart();var r=await service.client().rpc('link_withdrawal_wallet',{p_address:document.getElementById('walletAddress').value.trim(),p_owner_name:document.getElementById('walletOwner').value.trim()});if(r.error)throw r.error;setMessage(t('walletLinked'),'success');state.messageTone='success';await refreshData();}
+  catch(err){setMessage(authError(err));}finally{busy=false;render();}
+ }
+}
+root.addEventListener('submit',async function(e){
+ if(e.target.id==='aiForm'){
+  e.preventDefault();
+  var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
+  if(!question)return;
+  if(aiReply)aiReply.textContent='Thinking…';
+  try{
+    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
+    if(aiResult.error)throw aiResult.error;
+    if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
+  }catch(err){
+    if(aiReply)aiReply.textContent=aiAnswer(question);
+  }
+  if(aiInput)aiInput.value='';
+  return;
+ }
+ if(e.target.id==='loginForm')handleLogin(e);
+ else if(e.target.id==='signupForm')handleSignup(e);
+ else if(e.target.id==='resetForm')handleReset(e);
+ else if(e.target.id==='passwordForm')handlePassword(e);
+ else if(e.target.id==='depositForm')handleDeposit(e);
+ else if(e.target.id==='kycForm')handleKyc(e);
+ else if(e.target.id==='withdrawForm')handleWithdraw(e);
+});
+root.addEventListener('click',action);root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
+
+async function boot(){
+ render();
+ if(!service||!service.isAvailable()){state.phase='ready';setMessage(t('unavailable'));render();return;}
+ service.onAuthStateChange(function(event,session){
+  if(event==='SIGNED_OUT'){state.profile=null;state.mode='login';state.phase='ready';render();}
+  if(event==='PASSWORD_RECOVERY'){state.profile=null;state.mode='password-update';state.phase='ready';render();}
+ });
+ try{
+  state.appEnabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;
+  if(!state.appEnabled){state.phase='paused';render();}
+  else{var session=await service.session();if(session)await refreshProfile();else{state.phase='ready';render();}}
+ }catch(err){state.appEnabled=false;state.runtimeUnverified=true;state.phase='paused';setMessage(t('runtimeUnknown'));render();}
+ if(!runtimeTimer)runtimeTimer=setInterval(function(){checkRuntime();updateCycleCountdown();},10000);
+ updateCycleCountdown();
+}
+async function checkRuntime(){
+ if(!service||!service.isAvailable()||runtimeRequest||busy)return runtimeRequest;
+ runtimeRequest=(async function(){
+  var was=state.appEnabled,wasUnverified=state.runtimeUnverified,wasPaused=state.phase==='paused';
+  try{
+   var enabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;state.appEnabled=enabled;
+   if(!enabled){var changed=was!==false||!wasPaused||wasUnverified;state.profile=null;state.phase='paused';state.mode='login';state.message='';if(changed)render();return;}
+   if(was===false||wasPaused||wasUnverified){state.phase='ready';state.message='';var session=await service.session();if(session)await refreshProfile();else{state.profile=null;state.mode='login';render();}}
+  }catch(err){var changed=!state.runtimeUnverified||state.phase!=='paused';state.appEnabled=false;state.runtimeUnverified=true;state.profile=null;state.phase='paused';if(changed){setMessage(t('runtimeUnknown'));render();}}
+ })();
+ try{return await runtimeRequest;}finally{runtimeRequest=null;}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
++(Number(x.price||0)*Number(x.qty||1)).toFixed(2)+'</strong></div>';}).join('');
+ var total=(state.cart||[]).reduce(function(a,x){return a+Number(x.price||0)*Number(x.qty||1);},0);
+ var panel=document.createElement('div');panel.className='ap-order-modal';panel.innerHTML='<section class="ap-order-sheet"><div class="ap-order-head"><button type="button" data-action="close-orders">‹</button><b>Orders</b><span class="order-pill">'+cartCount()+' items</span></div><div class="ap-order-body">'+(rows||'<div class="order-empty"><div>🛍️</div><b>No items yet</b><small>Add a product from Shop to build your cart.</small><button type="button" data-action="view-shop">Go to Shop</button></div>')+(rows?'<div class="order-total"><span>Total</span><strong>
+ var el=e.target.closest('[data-action]');if(!el)return;
+ var a=el.getAttribute('data-action');
+ if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
+  var target=a==='profile-view'?'assets':(a==='ai-view'?'ai':(a==='notifications'?'notifications':a.replace(/^view-/,'')));
+  var ids=['home','referral','topup','shop','product','assets','crypto','ai','notifications'];
+  ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!==target);});
+  root.querySelectorAll('.exact-bottom button').forEach(function(b){b.classList.remove('active');});
+  var homeNav=document.getElementById('homeNav'),shopNav=document.getElementById('shopNav');
+  if(homeNav)homeNav.classList.toggle('hidden',target!=='home');
+  if(shopNav)shopNav.classList.toggle('hidden',target!=='shop');
+  var active=target==='home'?(homeNav&&homeNav.querySelector('[data-action="view-home"]')):(target==='shop'?(shopNav&&shopNav.querySelector('[data-action="view-shop"]')):null);
+  if(active)active.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});return;
+ }
+ if(a==='open-product'){var pi=Number(el.getAttribute('data-product-index'));var prod=products[pi];var detail=document.getElementById('apProductDetail');if(prod&&detail){detail.innerHTML='<div class="amazon-detail-media"><div class="detail-thumbs"><button class="selected"><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button><button><img src="'+prod.image+'"></button></div><div class="detail-main-image"><img src="'+prod.image+'" alt="'+esc(prod.name)+'"></div></div><div class="amazon-detail-info"><h1>'+esc(prod.name)+'</h1><div class="amazon-detail-rating">★★★★★ <span>'+esc(prod.rating)+'</span> · <b>'+esc(prod.reviews)+' reviews</b></div><div class="amazon-detail-price">$'+Number(prod.price).toFixed(2)+' <del>$'+Number(prod.old).toFixed(2)+'</del> <em>'+esc(prod.badge)+'</em></div><p>'+esc(prod.desc)+'</p><div class="detail-choice"><b>Color:</b><span class="choice-dot active"></span><span class="choice-dot"></span><span class="choice-dot"></span></div><div class="detail-choice"><b>Storage:</b><button class="choice-pill active">128GB</button><button class="choice-pill">256GB</button><button class="choice-pill">512GB</button></div><div class="detail-quantity"><b>Quantity:</b><button>−</button><span>1</span><button>+</button><i>● In Stock</i></div><button class="amazon-cart-big" data-action="product-action" data-name="'+esc(prod.name)+'">'+icon('cart')+' Add to Cart</button><button class="amazon-buy" data-action="product-action" data-name="'+esc(prod.name)+'">Buy Now</button><div class="detail-benefits"><span>'+icon('truck')+'<b>Free Delivery</b><small>in 3–5 days</small></span><span>'+icon('shield')+'<b>Secure Payment</b><small>100% Secure</small></span><span>'+icon('return')+'<b>Easy Returns</b><small>7 Days</small></span></div></div>';}var ids=['home','referral','topup','shop','product','assets','crypto'];ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!=='product');});var hn=document.getElementById('homeNav'),sn=document.getElementById('shopNav');if(hn)hn.classList.add('hidden');if(sn)sn.classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});return;}
+ if(a==='preview-product'){var n=el.getAttribute('data-name')||'Item';var toast=document.createElement('div');toast.className='ap-toast';toast.textContent=n+' — preview only';document.body.appendChild(toast);setTimeout(function(){toast.remove();},1800);return;}
+ if(a==='copy-client-id'){var id=(state.profile&&state.profile.client_id)||'AP-CLIENT';if(navigator.clipboard)navigator.clipboard.writeText(id);return;}
+ if(a==='share-ref'){var link=location.origin+location.pathname+'?ref='+encodeURIComponent((state.profile&&state.profile.referral_code)||'');if(navigator.share)navigator.share({title:'AegisPay Referral',text:'Join AegisPay using my referral link',url:link}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(link);return;}
+ if(a==='language')return;
+ if(a==='retry-runtime'){checkRuntime();return;}
+  if(a==='complete-task'){
+   if(busy)return;busyStart();render();
+   try{var taskResult=await service.client().rpc('complete_task',{p_task_id:el.getAttribute('data-id')});if(taskResult.error)throw taskResult.error;setMessage(t('taskCompleted'),'success');await refreshData();state.messageTone='success';}
+   catch(err){setMessage(authError(err));}
+   finally{busy=false;render();} return;
+  }
+  if(a==='copy-ref'){
+   var refCode=state.profile&&state.profile.referral_code||'';
+   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
+   else{setMessage(t('error'));render();}
+   return;
+  }
+ if(a==='keep-language'){askLanguage=false;try{localStorage.setItem('aegispay-language',locale);}catch(e){}render();return;}
+ if(a==='login'){state.mode='login';state.message='';render();}
+ else if(a==='signup'){state.mode='signup';state.message='';render();}
+ else if(a==='reset'){state.mode='reset';state.message='';render();}
+ else if(a==='logout'){await service.signOut();state.profile=null;state.mode='login';state.phase='ready';render();}
+ else if(a==='link-wallet'){
+  try{busyStart();var r=await service.client().rpc('link_withdrawal_wallet',{p_address:document.getElementById('walletAddress').value.trim(),p_owner_name:document.getElementById('walletOwner').value.trim()});if(r.error)throw r.error;setMessage(t('walletLinked'),'success');state.messageTone='success';await refreshData();}
+  catch(err){setMessage(authError(err));}finally{busy=false;render();}
+ }
+}
+root.addEventListener('submit',async function(e){
+ if(e.target.id==='aiForm'){
+  e.preventDefault();
+  var aiInput=document.getElementById('aiInput'),aiReply=document.getElementById('aiReply'),question=aiInput&&aiInput.value.trim();
+  if(!question)return;
+  if(aiReply)aiReply.textContent='Thinking…';
+  try{
+    var aiResult=await service.client().functions.invoke('ai-support',{body:{message:question}});
+    if(aiResult.error)throw aiResult.error;
+    if(aiReply)aiReply.textContent=(aiResult.data&&aiResult.data.answer)||aiAnswer(question);
+  }catch(err){
+    if(aiReply)aiReply.textContent=aiAnswer(question);
+  }
+  if(aiInput)aiInput.value='';
+  return;
+ }
+ if(e.target.id==='loginForm')handleLogin(e);
+ else if(e.target.id==='signupForm')handleSignup(e);
+ else if(e.target.id==='resetForm')handleReset(e);
+ else if(e.target.id==='passwordForm')handlePassword(e);
+ else if(e.target.id==='depositForm')handleDeposit(e);
+ else if(e.target.id==='kycForm')handleKyc(e);
+ else if(e.target.id==='withdrawForm')handleWithdraw(e);
+});
+root.addEventListener('click',action);root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
+
+async function boot(){
+ render();
+ if(!service||!service.isAvailable()){state.phase='ready';setMessage(t('unavailable'));render();return;}
+ service.onAuthStateChange(function(event,session){
+  if(event==='SIGNED_OUT'){state.profile=null;state.mode='login';state.phase='ready';render();}
+  if(event==='PASSWORD_RECOVERY'){state.profile=null;state.mode='password-update';state.phase='ready';render();}
+ });
+ try{
+  state.appEnabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;
+  if(!state.appEnabled){state.phase='paused';render();}
+  else{var session=await service.session();if(session)await refreshProfile();else{state.phase='ready';render();}}
+ }catch(err){state.appEnabled=false;state.runtimeUnverified=true;state.phase='paused';setMessage(t('runtimeUnknown'));render();}
+ if(!runtimeTimer)runtimeTimer=setInterval(function(){checkRuntime();updateCycleCountdown();},10000);
+ updateCycleCountdown();
+}
+async function checkRuntime(){
+ if(!service||!service.isAvailable()||runtimeRequest||busy)return runtimeRequest;
+ runtimeRequest=(async function(){
+  var was=state.appEnabled,wasUnverified=state.runtimeUnverified,wasPaused=state.phase==='paused';
+  try{
+   var enabled=await service.appRuntimeEnabled();state.runtimeUnverified=false;state.appEnabled=enabled;
+   if(!enabled){var changed=was!==false||!wasPaused||wasUnverified;state.profile=null;state.phase='paused';state.mode='login';state.message='';if(changed)render();return;}
+   if(was===false||wasPaused||wasUnverified){state.phase='ready';state.message='';var session=await service.session();if(session)await refreshProfile();else{state.profile=null;state.mode='login';render();}}
+  }catch(err){var changed=!state.runtimeUnverified||state.phase!=='paused';state.appEnabled=false;state.runtimeUnverified=true;state.profile=null;state.phase='paused';if(changed){setMessage(t('runtimeUnknown'));render();}}
+ })();
+ try{return await runtimeRequest;}finally{runtimeRequest=null;}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
++total.toFixed(2)+'</strong></div><button class="red-button" type="button" data-action="checkout-cart">Continue to Checkout</button>':'')+'</div></section>';
+ root.appendChild(panel);
+}
+function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
  if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
