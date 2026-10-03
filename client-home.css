@@ -2582,3 +2582,88 @@ html,body{background:var(--login-bg)!important;color:var(--login-white)!importan
   color:#fff!important;
   border-color:#b81025!important;
 }
+
+
+/* HOME SCREEN — exact login palette */
+.ap-home-header{
+  background:radial-gradient(circle at 88% 0,rgba(213,31,53,.20),transparent 28%),linear-gradient(135deg,#090c12 0%,#141923 68%,#3b1117 100%)!important;
+  color:#fff!important;
+  border-bottom:1px solid rgba(255,255,255,.06)!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.28)!important;
+}
+.ap-brand-word{color:#fff!important}
+.ap-brand-word span{color:#ff5367!important}
+.ap-circle-btn{color:#dfe3ea!important;background:#161b24!important;border-color:rgba(255,255,255,.08)!important}
+.ap-circle-btn.profile{color:#fff!important;background:linear-gradient(135deg,#b81025,#df2940)!important;box-shadow:0 6px 16px rgba(213,31,53,.28)!important}
+.ap-notification-dot{background:#ff5367!important;border-color:#0d1118!important}
+
+.ap-welcome-card{
+  background:
+    radial-gradient(circle at 86% 10%,rgba(255,255,255,.10),transparent 22%),
+    linear-gradient(135deg,#080b10 0%,#151a22 58%,#4b1019 100%)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.28)!important;
+}
+.ap-welcome-kicker,.ap-client-row{color:#c9ced7!important}
+.ap-welcome-name{color:#fff!important}
+.ap-copy-btn{color:#fff!important;background:#161b24!important;border-color:rgba(255,255,255,.10)!important}
+.ap-welcome-card .ap-building svg g{fill:#d51f35!important}
+.ap-welcome-card .ap-building svg rect[fill="#240307"],
+.ap-welcome-card .ap-building svg rect[fill="#120205"],
+.ap-welcome-card .ap-building svg rect[fill="#1A0305"],
+.ap-welcome-card .ap-building svg rect[fill="#0F0103"],
+.ap-welcome-card .ap-building svg rect[fill="#170205"]{fill:#28303b!important;stroke:#566171!important}
+
+.ap-vip{
+  background:#11151d!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.22)!important;
+}
+.ap-vip-col{background:#11151d!important}
+.ap-vip-col:first-child{background:#221018!important}
+.ap-crown{color:#f0192b!important}
+.ap-vip-label{color:#9da6b4!important}
+.ap-vip-value{color:#fff!important}
+.ap-vip-col:not(:last-child):after{background:rgba(255,255,255,.08)!important}
+
+.ap-action-card,
+.ap-action-card.blue,
+.ap-action-card.red,
+.ap-action-card.green,
+.ap-action-card.orange{
+  background:linear-gradient(180deg,#11151e,#0d1118)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.20)!important;
+}
+.ap-action-card.blue .ap-action-icon{background:linear-gradient(135deg,#155eef,#2f80ff)!important;color:#fff!important}
+.ap-action-card.red .ap-action-icon{background:linear-gradient(135deg,#b81025,#ef4458)!important;color:#fff!important}
+.ap-action-card.green .ap-action-icon,
+.ap-action-card.orange .ap-action-icon{background:#161b24!important;color:#fff!important;border:1px solid rgba(255,255,255,.08)!important}
+.ap-plus-badge{background:#ef4458!important;border-color:#11151e!important}
+.ap-action-card>span:last-child strong{color:#fff!important}
+.ap-action-card>span:last-child small{color:#9da6b4!important}
+
+.ap-referral-card{
+  background:linear-gradient(90deg,#11151e,#151922)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.20)!important;
+}
+.ap-ref-icon{background:linear-gradient(135deg,#155eef,#0b2a66)!important}
+.ap-ref-copy strong{color:#fff!important}
+.ap-ref-copy small{color:#ff5367!important}
+.ap-arrow{color:#ff5367!important}
+
+.ap-promo-card{
+  background:linear-gradient(105deg,#080b10 0%,#151a22 58%,#57121e 100%)!important;
+  border:1.5px solid #d51f35!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.24)!important;
+}
+.ap-promo-copy strong,.ap-promo-copy small{color:#fff!important}
+
+.ap-bottom-nav{
+  background:#0d1118!important;
+  border-top:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 -10px 30px rgba(0,0,0,.30)!important;
+}
+.ap-nav-item{color:#7f8897!important}
+.ap-nav-item.active{color:#ff4b60!important}
