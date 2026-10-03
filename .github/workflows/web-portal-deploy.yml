@@ -82,15 +82,5 @@ jobs:
           name: AegisPay-Master-Admin-Debug
           path: android/app/build/outputs/apk/admin/debug/app-admin-debug.apk
           if-no-files-found: error
-      - name: Deploy production website to Netlify
-        if: env.NETLIFY_AUTH_TOKEN != ''
-        shell: bash
-        run: |
-          set -euo pipefail
-          status_json="$(npx -y netlify-cli status --auth="$NETLIFY_AUTH_TOKEN" --json)"
-          echo "$status_json" | jq -e '.siteData["site-id"] == "5573011e-3f81-449a-9617-da0c176720d8"' >/dev/null
-          npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay canonical web $GITHUB_SHA"
-          for route in "/" "/app/" "/admin/" "/downloads/aegispay-client.apk"; do
-            status="$(curl -sS -L -o /dev/null -w '%{http_code}' "https://aegispay-pro.netlify.app$route")"
-            test "$status" = "200"
-          done
+      # Netlify production deployment intentionally removed during migration to Cloudflare Pages.
+      # Cloudflare Pages will become the production web deployment target.
