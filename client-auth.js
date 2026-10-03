@@ -32,7 +32,7 @@ function icon(type){
 }
 
 function authView(){
- root.innerHTML='<div class="ap-login-wrap"><section class="ap-login"><div class="ap-login-logo"><img src="./aegispay-logo.svg" alt="AegisPay"><span class="ap-login-word">Aegis<span>Pay</span></span></div><h1>Welcome back</h1><p>Sign in to continue to AegisPay.</p><form id="loginForm"><div class="ap-field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="ap-field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><button class="ap-login-btn" type="submit">Sign In</button></form>'+(state.message?'<div class="ap-login-message">'+esc(state.message)+'</div>':'')+'</section></div>';
+ root.innerHTML='<div class="ap-login-wrap"><section class="ap-login"><div class="ap-login-logo"><img src="./aegispay-logo.svg" alt="AegisPay"></div><h1>Welcome back</h1><p>Sign in to continue to AegisPay.</p><form id="loginForm"><div class="ap-field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="ap-field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><button class="ap-login-btn" type="submit">Sign In</button></form>'+(state.message?'<div class="ap-login-message">'+esc(state.message)+'</div>':'')+'</section></div>';
 }
 
 function actionCard(cls,action,ico,title,sub){
