@@ -48,14 +48,14 @@ const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainAct
 assert(native.includes('aegispay-pro.netlify.app')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android remote/legacy identity is stale');
 
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
-assert(deploy.includes('NETLIFY_SITE_ID: 80dd262c-dfec-427a-9820-0eb98ec829b5'),'Netlify site ID is not canonical');
+assert(deploy.includes('NETLIFY_SITE_ID: 5573011e-3f81-449a-9617-da0c176720d8'),'Netlify site ID is not canonical');
 assert(deploy.includes('cp client.html site/app/index.html'),'Deploy source of truth is not client.html');
 assert(deploy.includes('cp master-admin.html site/master-admin.html'),'Admin deploy source is not master-admin.html');
 assert(deploy.includes('rm -rf site/app site/downloads'),'Generated deploy directories are rebuilt cleanly');
 assert(!deploy.includes('0aa38615-c9e6-4129-bc08-cd28739606d0')&&!deploy.includes('aegispay-client.netlify.app'),'Stale Netlify target remains');
 
 const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
-assert(rel.includes('cp client.html site/app/index.html')&&rel.includes('80dd262c-dfec-427a-9820-0eb98ec829b5')&&!rel.includes('0aa38615-c9e6-4129-bc08-cd28739606d0'),'Release workflow is not canonical');
+assert(rel.includes('cp client.html site/app/index.html')&&rel.includes('5573011e-3f81-449a-9617-da0c176720d8')&&!rel.includes('0aa38615-c9e6-4129-bc08-cd28739606d0'),'Release workflow is not canonical');
 
 assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.netlify.app/app-version.json'),'Updater endpoint is stale');
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301'),'Canonical app redirect missing');
