@@ -63,7 +63,7 @@ assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.ne
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
-  'admin-queues','admin-review','ai-support','execute-payout','monitor-deposits',
+  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits',
   'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit'
 ];
 for(const f of functions)assert(exists('supabase/functions/'+f+'/index.ts'),'Missing Edge Function source: '+f);
