@@ -1,78 +1,56 @@
 name: AegisPay Website + Direct APK Release
-
 on:
   workflow_dispatch:
-
 concurrency:
   group: aegispay-production-release
   cancel-in-progress: true
-
 permissions:
   contents: read
-
 jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 80dd262c-dfec-427a-9820-0eb98ec829b5
+      NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
       AEGIS_RELEASE_KEY_ALIAS: ${{ secrets.AEGIS_RELEASE_KEY_ALIAS }}
       AEGIS_RELEASE_KEY_PASSWORD: ${{ secrets.AEGIS_RELEASE_KEY_PASSWORD }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-
-      - name: Require production signing secrets
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: gradle/actions/setup-gradle@v4
+        with: {gradle-version: '8.9'}
+      - name: Require release signing secrets
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$AEGIS_RELEASE_KEYSTORE_B64" || { echo "Missing AEGIS_RELEASE_KEYSTORE_B64"; exit 1; }
-          test -n "$AEGIS_RELEASE_STORE_PASSWORD" || { echo "Missing AEGIS_RELEASE_STORE_PASSWORD"; exit 1; }
-          test -n "$AEGIS_RELEASE_KEY_ALIAS" || { echo "Missing AEGIS_RELEASE_KEY_ALIAS"; exit 1; }
-          test -n "$AEGIS_RELEASE_KEY_PASSWORD" || { echo "Missing AEGIS_RELEASE_KEY_PASSWORD"; exit 1; }
-
+          test -n "$AEGIS_RELEASE_KEYSTORE_B64"
+          test -n "$AEGIS_RELEASE_STORE_PASSWORD"
+          test -n "$AEGIS_RELEASE_KEY_ALIAS"
+          test -n "$AEGIS_RELEASE_KEY_PASSWORD"
       - name: Configure release signing
         run: |
-          set -euo pipefail
           echo "$AEGIS_RELEASE_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/aegispay-release.jks"
-          test -s "$RUNNER_TEMP/aegispay-release.jks"
           echo "AEGIS_RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/aegispay-release.jks" >> "$GITHUB_ENV"
-
-      - name: Build production Client and Master Admin APKs
-        run: |
-          gradle -p android :app:assembleClientRelease :app:assembleAdminRelease --no-daemon
-          echo "AEGIS_BUILD_TYPE=release" >> "$GITHUB_ENV"
-      - name: Assemble website package
+      - name: Build production APKs
+        run: gradle -p android :app:assembleClientRelease :app:assembleAdminRelease --no-daemon
+      - name: Assemble canonical website package
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site/app site/downloads
           mkdir -p site/app site/downloads
-          cp index.html site/client.html
-          cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js \
-             aegis-auth-redirect.js app-update.js service-worker.js \
-             manifest.webmanifest aegispay-logo.svg site/
-          cp aegispay-logo.svg site/aegispay-logo.svg
-          if [ "$AEGIS_BUILD_TYPE" = "release" ]; then
-            cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
-            cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
-          else
-            cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
-            cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk "$RUNNER_TEMP/aegispay-admin.apk"
-          fi
+          cp client.html site/client.html
+          cp master-admin.html site/master-admin.html
+          cp admin-auth.js site/admin-auth.js
+          cp client.html site/app/index.html
+          cp _redirects site/_redirects
+          cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/
+          cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/app/
+          cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
+          cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
           VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
           VERSION_NAME="$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)"
           CLIENT_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
@@ -82,43 +60,27 @@ jobs:
             "versionName": "${VERSION_NAME}",
             "releaseChannel": "stable",
             "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
+            "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
             "clientSha256": "${CLIENT_SHA}",
-            "notes": [
-              "Remote-first client portal",
-              "Automatic update detection",
-              "Shop, Tasks, Referrals, Notifications and secure AI Help",
-              "Master Admin operations, referrals and audit views"
-            ]
+            "notes": ["Canonical Client portal source: client.html","Canonical Master Admin source: master-admin.html","Signed release"]
           }
           EOF
           cp site/app-version.json app-version.json
-
-      - name: Upload Master Admin APK separately
-        uses: actions/upload-artifact@v4
-        with:
-          name: AegisPay-Master-Admin-Release
-          path: ${{ runner.temp }}/aegispay-admin.apk
-          if-no-files-found: error
-
-      - name: Verify direct-download package
-        run: |
           test -s site/index.html
-          test -s site/client.html
-          test -s site/premium.css
-          test -s site/master-admin.html
-          test -s site/admin-auth.js
-          test -s site/app-version.json
+          test -s site/app/index.html
           test -s site/downloads/aegispay-client.apk
-          test "$(wc -c < site/downloads/aegispay-client.apk)" -gt 100000
-
-      - name: Upload website + APK package
+      - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-Website-and-Direct-APK-Package
           path: site/
           if-no-files-found: error
-
+      - name: Upload Master Admin APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-Master-Admin-Release
+          path: ${{ runner.temp }}/aegispay-admin.apk
+          if-no-files-found: error
       - name: Deploy production website
         if: env.NETLIFY_AUTH_TOKEN != ''
-        run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay main $GITHUB_SHA"
+        run: npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay signed release $GITHUB_SHA"
