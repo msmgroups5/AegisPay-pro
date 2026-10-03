@@ -1,4 +1,5 @@
 name: AegisPay Fresh APK
+# Fresh build validates the React client and Android wrapper after each hardening change.
 on:
   workflow_dispatch:
   push:
