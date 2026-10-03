@@ -63,8 +63,7 @@ function redirect(location, status = 301) {
   return new Response(null, { status, headers: { Location: location } });
 }
 
-export default {
-  async fetch(request) {
+async function handleRequest(request) {
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -111,5 +110,8 @@ export default {
         headers: { "Content-Type": "text/plain; charset=UTF-8" },
       });
     }
-  },
-};
+}
+
+addEventListener("fetch", event => {
+  event.respondWith(handleRequest(event.request));
+});
