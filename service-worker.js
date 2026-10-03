@@ -1,4 +1,4 @@
-const CACHE='aegispay-shell-v21-home-clean';
+const CACHE='aegispay-shell-v22-premium-guide';
 const APP_SCOPE=self.registration&&self.registration.scope?new URL(self.registration.scope).pathname:'/';
 const APP_MODE=APP_SCOPE.startsWith('/app/');
 const ASSETS=APP_MODE
