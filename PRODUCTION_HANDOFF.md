@@ -1,131 +1,57 @@
 # AegisPay Production Handoff
 
-## Current technical baseline
+## Canonical technical baseline
 
 - Repository: `msmgroups5/AegisPay-pro`
+- Production branch: `main`
 - Supabase project: `wtcspnrmsoisroavojop`
-- Netlify site: `aegispay-client1`
-- Production version baseline: Android versionCode 21 / versionName 2.1.0
-- Client entry: `/app/`
-- Public website: `/`
-- Client APK path: `/downloads/aegispay-client.apk`
-- Update manifest: `/app-version.json`
+- Netlify project: `aegispay-pro`
+- Netlify site ID: `0aa38615-c9e6-4129-bc08-cd28739606d0`
+- Production website: `https://aegispay-pro.netlify.app/`
+- Client entry: `https://aegispay-pro.netlify.app/app/`
+- Master Admin entry: `https://aegispay-pro.netlify.app/admin/`
+- Client APK: `https://aegispay-pro.netlify.app/downloads/aegispay-client.apk`
+- Update manifest: `https://aegispay-pro.netlify.app/app-version.json`
+- Android client baseline: versionCode 28 / versionName 2.4.2
 
-## Completed by engineering
+## Source-of-truth rules
 
-- Remote-first Android WebView shell with offline bundled fallback.
-- In-app native update detection, HTTPS download, SHA-256 verification and Android installer hand-off.
-- Client and Master Admin portal split.
-- Premium public AegisPay website with direct Client APK distribution flow.
-- “SINCE 2023 — 2026” branding in the public site and application portals.
-- Server-side Shop cycle creation after verified deposits.
-- Controlled task completion with runtime/account-state guards.
-- Referral, notification and secure AI support flows.
-- Master Admin users, balance adjustment, Shop, settings, referrals and audit views.
-- Legacy 3-argument withdrawal RPC disabled for API/client roles.
-- Withdrawal and Shop task operations now respect app runtime and active-account gates.
-- CI validation and Android build workflows.
-- Production website workflow is intentionally blocked unless release-signing secrets exist.
+- Client source: root `client.html`
+- Master Admin source: root `master-admin.html`
+- Shared web runtime: root `client-auth.js`, `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
+- Shared styles/assets: root `styles.css`, `premium.css`, `shop-catalog.js`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`
+- Netlify `site/` files are deployment artifacts generated from these canonical sources; they are not independent application sources.
+- Android client/admin flavors bundle the canonical root portals and shared assets.
+- Supabase database changes are forward-only migrations under `database/migrations/`.
+- Supabase Edge Function source is under `supabase/functions/`.
 
-## Required production configuration
+## Verified Supabase state on 2026-10-03
 
-### 1. Supabase Auth URL Configuration
+- Project status: ACTIVE_HEALTHY.
+- Two Auth users exist and both are email-confirmed.
+- Two application profiles are linked: one active MASTER ADMIN and one active USER.
+- Private `private-verification` Storage bucket exists, public access is disabled, max size is 10 MB, and allowed MIME types are JPEG/PNG/WebP.
+- Storage policies are owner-scoped and guarded by the application runtime switch.
+- One active pg_cron job runs `public.settle_due_cycles()` every minute.
+- Current system mode is `TESTNET_DEMO`, with real payouts disabled and live deposits disabled.
+- No Supabase development branches currently exist.
 
-Set the production Site URL to:
+## Security review
 
-`https://aegispay-client.netlify.app`
+Supabase Security Advisor currently reports:
+- 11 authenticated SECURITY DEFINER RPCs. These are intentionally used by the client/admin/RLS workflow and contain explicit role/ownership/runtime gates; they require function-by-function review rather than blanket disabling.
+- Leaked Password Protection is disabled and should be enabled before real production use.
 
-Add these exact Redirect URLs:
+Supabase Performance Advisor currently reports 12 unused indexes. These are review candidates and should not be deleted solely because the current dataset is small.
 
-`https://aegispay-client.netlify.app/app/auth/callback`
+## Production prerequisites
 
-`com.aegispay.app.client://auth/callback`
+Before real-money use:
+1. Enable leaked-password protection in Supabase Auth.
+2. Verify real Master Admin identity and production Auth redirect URLs on a physical device.
+3. Configure and verify required AI, Telegram and controlled Shasta/testnet payout secrets server-side.
+4. Verify deposit confirmation, Shop cycle/task completion, 18-hour settlement, KYC, withdrawal dual approval and payout reconciliation end-to-end.
+5. Configure production Android signing secrets and keep the same signing identity for updates.
+6. Verify direct APK download and in-app SHA-256 update flow on a physical Android device.
 
-`com.aegispay.app.admin://auth/callback`
-
-### 2. Supabase Auth security
-
-Enable leaked-password protection in Auth password security settings.
-
-### 3. Master Admin identity
-
-Provision the real Master Admin Auth account and ensure its linked AegisPay profile has role `MASTER ADMIN` and an active status.
-
-Do not create a fake Auth user through SQL.
-
-### 4. AI support
-
-Configure the Supabase Edge Function secrets/variables:
-
-- `AI_REVIEW_ENDPOINT`
-- `AI_REVIEW_API_KEY`
-- `AI_REVIEW_MODEL`
-
-The function is intentionally informational only and must not approve or execute financial actions.
-
-### 5. Telegram withdrawal approval
-
-Configure the Telegram bot secret/configuration and authorized numeric approver IDs.
-
-Use the existing withdrawal approval design: panel decision + Telegram decision before payout.
-
-### 6. Testnet payout
-
-Configure a controlled Shasta payout wallet and server-side:
-
-- `TRON_TESTNET_PAYOUT_PRIVATE_KEY`
-
-Keep the private key server-side only. Fund only the required test amount.
-
-### 7. Android production signing
-
-Add GitHub Actions repository secrets:
-
-- `AEGIS_RELEASE_KEYSTORE_B64`
-- `AEGIS_RELEASE_STORE_PASSWORD`
-- `AEGIS_RELEASE_KEY_ALIAS`
-- `AEGIS_RELEASE_KEY_PASSWORD`
-
-Use the existing production signing key for the installed AegisPay app. Future APK updates must keep the same signing identity.
-
-### 8. Netlify production deployment
-
-Add the GitHub Actions secret:
-
-- `NETLIFY_AUTH_TOKEN`
-
-The production workflow already knows the existing site ID:
-
-`0aa38615-c9e6-4129-bc08-cd28739606d0`
-
-The workflow refuses to publish debug APKs as production downloads.
-
-## Physical verification order
-
-1. Open the public website on desktop and Android.
-2. Download the Client APK from the website.
-3. Install the Client APK.
-4. Verify email confirmation returns to `/app/auth/callback`.
-5. Log in and verify dashboard/Shop/referrals/notifications.
-6. Submit a controlled test deposit and verify Admin review.
-7. Verify the server-side Shop cycle and task completion flow.
-8. Verify the 18-hour settlement state.
-9. Complete KYC test flow.
-10. Link a controlled Shasta test wallet.
-11. Create a test withdrawal and verify dual approval.
-12. Verify testnet payout reconciliation.
-13. Push a harmless UI change to `main`.
-14. Reopen/reconnect the installed Client and verify the remote UI changed without downloading a new APK.
-15. Increase Android versionCode/versionName, publish a signed release, and verify the installed APK detects/downloads/verifies the new APK and opens Android's installer flow.
-
-## Do not treat the app as real-market production until
-
-- Production signing is configured.
-- Auth redirect configuration is verified on a real device.
-- Master Admin identity is verified.
-- Telegram approval delivery is verified.
-- Testnet payout is verified end-to-end.
-- AI provider configuration is verified.
-- Website direct APK download is verified.
-- Remote UI update is verified on an installed device.
-- No unresolved critical CI/build errors remain.
+Never place service-role keys, payout private keys, Telegram bot credentials, AI API keys or release keystore material in browser assets or Netlify client variables.
