@@ -2367,3 +2367,218 @@ html,body{background:#F4F7FB!important}
 .ap-wide-btn{width:100%;margin-top:2px;text-align:center}
 @media(min-width:600px){.ap-subpage-content{padding-left:16px;padding-right:16px}.ap-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:365px){.ap-subpage-header{grid-template-columns:40px 1fr 40px}.ap-subpage-title h1{font-size:25px}.ap-asset-grid{grid-template-columns:1fr}}
+
+
+/* 2026-10-04 LOGIN PALETTE APPLIED ACROSS ALL CLIENT SCREENS
+   Match the authenticated UI to the login interface:
+   #07090e / #11151d / #0a0e15 + AegisPay red accents. */
+:root{
+  --login-bg:#07090e;
+  --login-panel:#0e1219;
+  --login-panel-2:#11151d;
+  --login-input:#0a0e15;
+  --login-line:rgba(255,255,255,.08);
+  --login-muted:#9da6b4;
+  --login-soft:#161b24;
+  --login-red:#b81025;
+  --login-red-mid:#df2940;
+  --login-red-bright:#ef4458;
+  --login-red-pale:#4b131c;
+  --login-white:#f7f8fb;
+}
+
+/* Global client page canvas */
+html,body{background:var(--login-bg)!important;color:var(--login-white)!important}
+.ap-shell,
+.ap-subpage-shell{
+  background:linear-gradient(180deg,#07090e 0%,#0d1118 46%,#090b11 100%)!important;
+  color:var(--login-white)!important;
+}
+
+/* Focused-page header + title */
+.ap-subpage-header,
+.ap-subpage-title{
+  background:linear-gradient(135deg,#0a0d13,#171b24 64%,#351018)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.06)!important;
+}
+.ap-subpage-brand .ap-brand-word{color:#fff!important}
+.ap-subpage-back{
+  background:#161b24!important;
+  color:#f1f3f6!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+.ap-subpage-title h1{color:#fff!important}
+.ap-subpage-title p{color:#9da6b4!important}
+.ap-page-kicker{color:#ff5367!important}
+
+/* Dedicated page cards */
+.ap-page-card{
+  background:linear-gradient(180deg,#11151e,#0d1118)!important;
+  color:#f7f8fb!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 18px 45px rgba(0,0,0,.22)!important;
+}
+.ap-page-card.is-success{border-color:rgba(20,207,145,.28)!important}
+.ap-page-card-head h2,
+.ap-page-card p,
+.ap-detail-grid strong,
+.ap-asset-grid strong,
+.ap-balance-big{color:#fff!important}
+.ap-page-card p,.ap-muted,.ap-detail-grid small,.ap-asset-grid small,.ap-wallet-linked small{color:#9da6b4!important}
+.ap-detail-grid>div,
+.ap-asset-grid>div{
+  background:#0a0e15!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+.ap-wallet-linked{
+  background:#0a0e15!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+.ap-wallet-linked code{color:#dbe1ea!important}
+
+/* Forms on every dedicated page */
+.ap-page-card .field label{color:#c7ccd5!important}
+.ap-page-card .field input,
+.ap-page-card .field select,
+.ap-page-card input[type="text"],
+.ap-page-card input[type="number"],
+.ap-page-card input[type="email"],
+.ap-page-card input[type="password"],
+.ap-page-card select{
+  background:#0a0e15!important;
+  color:#f4f6fa!important;
+  border-color:rgba(255,255,255,.11)!important;
+}
+.ap-page-card input::placeholder{color:#626b79!important}
+.ap-page-card input:focus,
+.ap-page-card select:focus{
+  border-color:rgba(241,58,80,.85)!important;
+  box-shadow:0 0 0 3px rgba(213,31,53,.16)!important;
+}
+.ap-page-card .primary{
+  background:linear-gradient(135deg,#b81025,#df2940 55%,#ef4458)!important;
+  box-shadow:0 14px 28px rgba(213,31,53,.22)!important;
+}
+.ap-page-card .notice{
+  background:#151a23!important;
+  border-color:rgba(213,31,53,.20)!important;
+  color:#c6cbd4!important;
+}
+
+/* Tables / status */
+.ap-page-card th{color:#858e9d!important;border-color:rgba(255,255,255,.08)!important}
+.ap-page-card td{color:#d9dde4!important;border-color:rgba(255,255,255,.06)!important}
+.ap-status-success{background:rgba(20,207,145,.07)!important;border-color:rgba(20,207,145,.20)!important}
+
+/* Bottom nav uses the login palette */
+.ap-bottom-nav{
+  background:#0d1118!important;
+  border-top:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 -10px 30px rgba(0,0,0,.22)!important;
+}
+.ap-nav-item{color:#777f8d!important}
+.ap-nav-item.active{color:#ff4b60!important}
+
+/* Shop: dark marketplace matching login */
+.aegis-shop{
+  background:linear-gradient(180deg,#0d1118,#11151e)!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+.aegis-shop-head{border-color:rgba(255,255,255,.07)!important}
+.aegis-shop-brand h3{color:#fff!important}
+.aegis-shop-brand small{color:#8993a1!important}
+.aegis-shop-cart-top{
+  background:#161b24!important;
+  border-color:rgba(255,255,255,.09)!important;
+  color:#ff5367!important;
+}
+.aegis-shop-chips .aegis-shop-chip{
+  background:#161b24!important;
+  color:#9da6b4!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+.aegis-shop-chips .aegis-shop-chip.active{
+  background:linear-gradient(135deg,#b81025,#df2940)!important;
+  color:#fff!important;
+  border-color:#b81025!important;
+}
+.aegis-shop-search{background:#0a0e15!important;border-color:rgba(255,255,255,.09)!important}
+.aegis-shop-search input{color:#fff!important}
+.aegis-shop-search button{background:linear-gradient(135deg,#b81025,#df2940)!important;color:#fff!important}
+.aegis-product{
+  background:#11151e!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.18)!important;
+}
+.aegis-product-media{background:linear-gradient(145deg,#171c26,#0a0e15)!important}
+.aegis-product-media .fallback{background:linear-gradient(145deg,#171c26,#0a0e15)!important}
+.aegis-product-brand{color:#828b99!important}
+.aegis-product-title,.aegis-product-price strong{color:#f4f6fa!important}
+.aegis-product-price small,.aegis-stars span{color:#87909d!important}
+.aegis-task-value{background:#241018!important;border-color:rgba(213,31,53,.20)!important;color:#ff91a0!important}
+.aegis-task-value.browse{background:#161b24!important;border-color:rgba(255,255,255,.06)!important;color:#858e9d!important}
+.aegis-product-action{background:#161b24!important}
+.aegis-product-action.task{background:linear-gradient(135deg,#b81025,#df2940)!important}
+.aegis-product-action.added{background:#0d1118!important;color:#ff5367!important;border-color:rgba(213,31,53,.35)!important}
+.aegis-cart{background:#12161f!important}
+.aegis-shop-notice{background:#231117!important;border-color:rgba(213,31,53,.20)!important;color:#d0a8ae!important}
+.aegis-shop-notice strong{color:#ff7383!important}
+
+/* Legacy workspace fallback sections, kept dark if any are rendered */
+.tg-card-dashboard .section{
+  background:#11151e!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#f7f8fb!important;
+}
+.tg-card-dashboard .section h3,
+.tg-card-dashboard .stat-card strong{color:#fff!important}
+.tg-card-dashboard .stat-card{
+  background:#0d1118!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+.tg-card-dashboard input:not([type=checkbox]):not([type=file]),
+.tg-card-dashboard select{
+  background:#0a0e15!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.11)!important;
+}
+.tg-card-dashboard .notice{
+  background:#241117!important;
+  color:#d4aeb5!important;
+  border-color:rgba(213,31,53,.20)!important;
+}
+
+/* Master Admin body also follows the login palette */
+.tg-admin-page{
+  background:radial-gradient(circle at 16% 8%,rgba(213,31,53,.13),transparent 28%),linear-gradient(145deg,#07090e,#11151d 55%,#090b11)!important;
+  color:#f7f8fb!important;
+}
+.tg-admin-card{
+  background:#0e1219!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.42)!important;
+}
+.tg-admin-content h1,.tg-admin-content h2,.tg-admin-content h3{color:#fff!important}
+.tg-admin-content p{color:#9da6b4!important}
+.tg-admin-content input,.tg-admin-content select,.tg-admin-content textarea{
+  background:#0a0e15!important;
+  color:#f4f6fa!important;
+  border-color:rgba(255,255,255,.11)!important;
+}
+.tg-admin-content article{
+  background:#11151e!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#f7f8fb!important;
+}
+.tg-admin-content .tg-button-soft,
+.tg-admin-content .tg-admin-nav button{
+  background:#161b24!important;
+  color:#ff5367!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+.tg-admin-content .tg-admin-nav button[aria-pressed=true]{
+  background:linear-gradient(135deg,#b81025,#df2940)!important;
+  color:#fff!important;
+  border-color:#b81025!important;
+}
