@@ -547,3 +547,173 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
 
 /* Remove any percentage values even if another rule/component tries to inject them. */
 .ap-vip-value{display:none!important;}
+
+
+/* PREMIUM ICONOGRAPHY + CARD POLISH — 2026-10-03 */
+.ap-actions-grid{gap:10px!important}
+.ap-action-card{
+  min-height:104px!important;
+  padding:12px 13px!important;
+  gap:11px!important;
+  border-radius:18px!important;
+  border:1px solid #e2e4e9!important;
+  background:linear-gradient(145deg,#ffffff 0%,#f7f8fa 100%)!important;
+  box-shadow:
+    0 10px 26px rgba(11,16,24,.08),
+    0 2px 6px rgba(11,16,24,.04),
+    inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+.ap-action-card:active{transform:translateY(1px);box-shadow:0 5px 14px rgba(11,16,24,.08)!important}
+.ap-action-icon{
+  width:56px!important;
+  height:56px!important;
+  flex-basis:56px!important;
+  border-radius:17px!important;
+  border:0!important;
+  overflow:hidden!important;
+  box-shadow:
+    0 10px 20px rgba(10,15,22,.15),
+    inset 0 1px 0 rgba(255,255,255,.38),
+    inset 0 -7px 12px rgba(0,0,0,.10)!important;
+}
+.ap-action-icon:before{
+  left:8px!important;right:8px!important;top:5px!important;height:13px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,0))!important;
+}
+.ap-action-icon>.ap-icon{
+  width:30px!important;
+  height:30px!important;
+  flex-basis:30px!important;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.22))!important;
+}
+.ap-action-card.blue .ap-action-icon{
+  background:linear-gradient(145deg,#55b2ff 0%,#1976ef 54%,#0d57bd 100%)!important;
+}
+.ap-action-card.red .ap-action-icon{
+  background:linear-gradient(145deg,#ff5b69 0%,#ed1d35 54%,#b60920 100%)!important;
+}
+.ap-action-card.green .ap-action-icon{
+  background:linear-gradient(145deg,#47e7a5 0%,#0fc27f 54%,#078e5e 100%)!important;
+}
+.ap-action-card.orange .ap-action-icon{
+  background:linear-gradient(145deg,#ffd45a 0%,#ff9f1d 54%,#db6500 100%)!important;
+}
+.ap-action-card>span:last-child strong{
+  color:#161a21!important;
+  font-size:15.5px!important;
+  font-weight:850!important;
+  letter-spacing:-.15px!important;
+}
+.ap-action-card>span:last-child small{
+  color:#7a8190!important;
+  font-size:9.5px!important;
+  font-weight:600!important;
+  margin-top:4px!important;
+}
+
+/* Refined VIP strip */
+.ap-vip{
+  border-radius:19px!important;
+  box-shadow:0 10px 24px rgba(10,14,20,.11)!important;
+}
+.ap-vip-col{min-height:90px!important}
+.ap-crown{
+  color:#ec1f34!important;
+  width:29px!important;
+  height:25px!important;
+  margin-bottom:6px!important;
+  filter:drop-shadow(0 3px 5px rgba(236,31,52,.20))!important;
+}
+.ap-vip-label{
+  font-size:13px!important;
+  font-weight:850!important;
+  color:#171a20!important;
+  letter-spacing:.1px!important;
+}
+
+/* More premium header controls */
+.ap-circle-btn{
+  width:42px!important;height:42px!important;
+  backdrop-filter:blur(10px)!important;
+  box-shadow:0 8px 18px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+.ap-circle-btn .ap-icon{
+  width:20px!important;height:20px!important;flex-basis:20px!important;
+}
+.ap-circle-btn.profile{
+  background:linear-gradient(145deg,#ff4254,#db1228)!important;
+  box-shadow:0 8px 18px rgba(218,18,40,.28)!important;
+}
+
+/* Referral visual hierarchy */
+.ap-referral-card{
+  min-height:112px!important;
+  border-radius:19px!important;
+  padding:11px 14px!important;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(168,73,255,.12),transparent 25%),
+    linear-gradient(110deg,#efe3ff 0%,#f7edff 55%,#fbf5ff 100%)!important;
+  box-shadow:0 10px 24px rgba(91,30,149,.10)!important;
+}
+.ap-ref-icon{
+  width:56px!important;height:56px!important;flex-basis:56px!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,#b14dff,#7a20e9 56%,#5410ba)!important;
+  box-shadow:0 10px 20px rgba(95,22,190,.22)!important;
+}
+.ap-ref-icon>.ap-icon{width:32px!important;height:32px!important;flex-basis:32px!important}
+.ap-ref-copy strong{font-size:19px!important;font-weight:850!important}
+.ap-ref-copy small{font-size:10.5px!important;color:#8325d8!important}
+.ap-arrow{color:#d4172d!important}
+
+/* Amazon promo kept equal width but made cleaner */
+.ap-promo-card{
+  min-height:112px!important;
+  height:112px!important;
+  border-radius:19px!important;
+  margin-top:10px!important;
+  background:
+    radial-gradient(circle at 82% 75%,rgba(255,51,66,.24),transparent 26%),
+    linear-gradient(115deg,#050609 0%,#151923 44%,#6f0b16 76%,#c7162b 100%)!important;
+  box-shadow:0 10px 24px rgba(72,7,14,.22),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.ap-amazon-official{
+  width:76px!important;height:26px!important;
+  border-radius:6px!important;
+  padding:3px 5px!important;
+}
+.ap-amazon-official img{width:66px!important}
+.ap-promo-copy strong{font-size:17px!important;line-height:1.02!important}
+.ap-promo-copy small{font-size:8.5px!important}
+.ap-cart-official{width:46%!important}
+.ap-cart-badge-icon{
+  width:70px!important;height:62px!important;
+  right:24px!important;bottom:16px!important;
+  border-radius:13px!important;
+}
+.ap-cart-badge-icon img{width:52px!important;height:52px!important}
+
+/* Bottom navigation: cleaner, more premium */
+.ap-bottom-nav{
+  height:68px!important;
+  width:min(404px,calc(100% - 22px))!important;
+  padding:4px!important;
+  border-radius:20px!important;
+  background:rgba(8,11,16,.97)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06)!important;
+  backdrop-filter:blur(18px)!important;
+}
+.ap-nav-item{
+  border-radius:15px!important;
+  color:#7f8797!important;
+  font-size:8.5px!important;
+  font-weight:750!important;
+}
+.ap-nav-item.active{
+  color:#ff3043!important;
+  background:linear-gradient(180deg,rgba(255,40,58,.12),rgba(255,40,58,.04))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+.ap-nav-item .ap-icon{
+  width:23px!important;height:23px!important;flex-basis:23px!important;
+}
