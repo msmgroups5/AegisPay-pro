@@ -9,7 +9,7 @@ var state={profile:null,unread:0,busy:false,mode:'login',message:''};
 
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
-function icon(type){
+function logoMark(){return '<span class="ap-logo-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 60 54c2 4-1 7-5 7H9c-4 0-7-4-5-7L32 5Z" fill="#ff2034"/><path d="M32 25 18 50h9l5-9 5 9h9L32 25Z" fill="#8e0712"/></svg></span>\n}\n\nfunction icon(type){
  var m={
   bell:'<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>',
   user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6"/></svg>',
@@ -30,7 +30,7 @@ function icon(type){
 }
 
 function authView(){
- root.innerHTML='<div class="ap-login-wrap"><section class="ap-login"><div class="ap-login-logo"><img src="./aegispay-logo.svg"><strong>Aegis<span>Pay</span></strong></div><h1>Welcome back</h1><p>Sign in to continue to AegisPay.</p><form id="loginForm"><div class="ap-field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="ap-field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><button class="ap-login-btn" type="submit">Sign In</button></form>'+(state.message?'<div class="ap-login-message">'+esc(state.message)+'</div>':'')+'</section></div>';
+ root.innerHTML='<div class="ap-login-wrap"><section class="ap-login"><div class="ap-login-logo">'+logoMark()+'<strong>Aegis<span>Pay</span></strong></div><h1>Welcome back</h1><p>Sign in to continue to AegisPay.</p><form id="loginForm"><div class="ap-field"><label>Email</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="ap-field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><button class="ap-login-btn" type="submit">Sign In</button></form>'+(state.message?'<div class="ap-login-message">'+esc(state.message)+'</div>':'')+'</section></div>';
 }
 
 function actionCard(cls,action,ico,title,sub){
@@ -44,7 +44,7 @@ function homeView(){
  var dot=state.unread>0;
 
  root.innerHTML='<div class="ap-shell">'+
- '<header class="ap-home-header"><div class="ap-header-row"><div class="ap-brand"><img src="./aegispay-logo.svg"><span class="ap-brand-word">Aegis<span>Pay</span></span></div><div class="ap-head-actions"><button class="ap-circle-btn" data-action="notice">'+icon('bell')+(dot?'<span class="ap-notification-dot"></span>':'')+'</button><button class="ap-circle-btn profile" data-action="profile">'+icon('user')+'</button></div></div>'+
+ '<header class="ap-home-header"><div class="ap-header-row"><div class="ap-brand">'+logoMark()+'<span class="ap-brand-word">Aegis<span>Pay</span></span></div><div class="ap-head-actions"><button class="ap-circle-btn" data-action="notice">'+icon('bell')+(dot?'<span class="ap-notification-dot"></span>':'')+'</button><button class="ap-circle-btn profile" data-action="profile">'+icon('user')+'</button></div></div>'+
  '<section class="ap-welcome-card"><div class="ap-welcome-copy"><div class="ap-welcome-kicker">Welcome,</div><div class="ap-welcome-name">'+esc(userName||'Client')+'</div><div class="ap-client-row">Client ID: '+esc(clientId||'—')+'<button class="ap-copy-btn" data-action="copy-client-id">'+icon('copy')+'</button></div></div><div class="ap-building"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div></section></header>'+
  '<section class="ap-vip"><div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 1</span><span class="ap-vip-value">10%</span></div><div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 2</span><span class="ap-vip-value">5%</span></div><div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 3</span><span class="ap-vip-value">2%</span></div></section>'+
  '<main class="ap-content"><div class="ap-actions-grid">'+
