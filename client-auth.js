@@ -366,68 +366,32 @@ function homeView(){
  var p=state.profile||{};
  var userName=String(p.name||'Ali Shahid');
  var clientId=String(p.client_id||'AP-CLIENT');
-
- root.innerHTML='<div class="ap-shell ap-premium-home" style="--ui-red:'+AP_UI_SETTINGS.palette.primaryRed+';--ui-light-red:'+AP_UI_SETTINGS.palette.lightRed+';--ui-dark-red:'+AP_UI_SETTINGS.palette.darkRed+';--ui-bg:'+AP_UI_SETTINGS.palette.background+';--ui-navy:'+AP_UI_SETTINGS.palette.navy+';--ui-card:'+AP_UI_SETTINGS.palette.card+';--ui-soft-pink:'+AP_UI_SETTINGS.palette.softPink+';--ui-text:'+AP_UI_SETTINGS.palette.textPrimary+';--ui-muted:'+AP_UI_SETTINGS.palette.textSecondary+';--ui-border:'+AP_UI_SETTINGS.palette.border+';--ui-blue:'+AP_UI_SETTINGS.palette.blue+';--ui-orange:'+AP_UI_SETTINGS.palette.warning+';--ap-red:'+AP_UI_SETTINGS.palette.primaryRed+';--ap-red-deep:'+AP_UI_SETTINGS.palette.darkRed+';--ap-blue:'+AP_UI_SETTINGS.palette.blue+';--ap-orange:'+AP_UI_SETTINGS.palette.warning+';--ap-green:'+AP_UI_SETTINGS.palette.success+';--ap-black:'+AP_UI_SETTINGS.palette.background+';--ap-text:'+AP_UI_SETTINGS.palette.textPrimary+';--ap-muted:'+AP_UI_SETTINGS.palette.textSecondary+';--ap-line:'+AP_UI_SETTINGS.palette.border+';font-family:'+AP_UI_SETTINGS.typography.family+';">'+
- '<header class="ap-home-header">'+
-   '<div class="ap-header-row">'+
-     '<div class="ap-brand"><img src="./aegispay-logo.svg" alt="AegisPay"></div>'+
-     '<div class="ap-head-actions">'+
-       '<button class="ap-circle-btn ap-notice-btn" data-action="notice" aria-label="Notifications">'+icon('bell')+'<span class="ap-notification-dot"></span></button>'+
-       '<button class="ap-circle-btn profile" data-action="profile" aria-label="My Profile">'+icon('user')+'</button>'+
-     '</div>'+
+ root.innerHTML='<div class="ap-reference-home">'+
+   '<div class="rh-top">'+
+     '<div class="rh-logo"><svg class="rh-logo-mark" viewBox="0 0 40 38" aria-hidden="true"><path d="M20 0 40 36H27L20 22 13 36H0z" fill="#3B82F6"/><path d="M20 10 31 36H21L20 30 18 36H9z" fill="#E50914"/></svg><span>Aegis <b>Pay</b></span></div>'+
+     '<div class="rh-actions"><button type="button" class="rh-bell" data-action="notice" aria-label="Notifications">'+icon('bell')+'</button><button type="button" class="rh-avatar" data-action="profile" aria-label="My Profile">'+icon('user')+'</button></div>'+
    '</div>'+
-   '<section class="ap-welcome-card ap-welcome-premium">'+
-     '<div class="ap-welcome-copy">'+
-       '<div class="ap-welcome-kicker">Welcome,</div>'+
-       '<div class="ap-welcome-name">'+esc(userName)+'</div>'+
-       '<div class="ap-client-row">Client ID: '+esc(clientId)+'<button class="ap-copy-btn" data-action="copy-client-id" aria-label="Copy Client ID">'+icon('copy')+'</button></div>'+
-     '</div>'+
+   '<section class="rh-card rh-welcome"><p>Welcome,</p><h1>'+esc(userName)+'</h1><div class="rh-client">Client ID: '+esc(clientId)+'<button type="button" class="rh-copy" data-action="copy-client-id" aria-label="Copy Client ID">'+icon('copy')+'</button></div></section>'+
+   '<section class="rh-card rh-vip">'+
+     '<div class="rh-vip-col"><span class="rh-crown red">'+icon('crown')+'</span><small>LV 1</small><strong>10%</strong><div class="rh-bar red"><i></i></div></div>'+
+     '<div class="rh-vip-col"><span class="rh-crown blue">'+icon('crown')+'</span><small>LV 2</small><strong>5%</strong><div class="rh-bar blue"><i></i></div></div>'+
+     '<div class="rh-vip-col"><span class="rh-crown orange">'+icon('crown')+'</span><small>LV 3</small><strong>2%</strong><div class="rh-bar orange"><i></i></div></div>'+
    '</section>'+
- '</header>'+
- '<section class="ap-vip ap-vip-premium">'+
-   '<div class="ap-vip-col lv1"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 1</span><span class="ap-vip-value">10%</span></div>'+
-   '<div class="ap-vip-col lv2"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 2</span><span class="ap-vip-value">5%</span></div>'+
-   '<div class="ap-vip-col lv3"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 3</span><span class="ap-vip-value">2%</span></div>'+
- '</section>'+
- '<main class="ap-content ap-premium-content">'+
-   '<div class="ap-actions-grid ap-premium-actions">'+
-     actionCard('blue','next-topup',icon('wallet')+'<span class="ap-plus-badge">'+icon('plus')+'</span>','Top Up','Deposit Amount')+
-     actionCard('red','next-shop',icon('cart'),'Shop','Amazon-style')+
-     actionCard('green','next-account',icon('doc'),'Account Details','View Your Account')+
-     actionCard('orange','next-crypto',icon('btc'),'Crypto','Buy & Manage')+
+   '<div class="rh-grid">'+
+     '<button type="button" class="rh-card rh-tile" data-action="next-topup"><span class="rh-ico">'+icon('wallet')+'</span><span><h3>Top Up</h3><p>Deposit Amount</p></span><span class="rh-chevron">'+icon('arrow')+'</span></button>'+
+     '<button type="button" class="rh-card rh-tile" data-action="next-shop"><span class="rh-ico">'+icon('cart')+'</span><span><h3>Shop</h3><p>Amazon-style</p></span><span class="rh-chevron">'+icon('arrow')+'</span></button>'+
+     '<button type="button" class="rh-card rh-tile" data-action="next-account"><span class="rh-ico">'+icon('doc')+'</span><span><h3>Account Details</h3><p>View Your Account</p></span><span class="rh-chevron">'+icon('arrow')+'</span></button>'+
+     '<button type="button" class="rh-card rh-tile" data-action="next-crypto"><span class="rh-ico red" style="font-weight:700;font-size:26px">₿</span><span><h3>Crypto</h3><p>Buy &amp; Manage</p></span><span class="rh-chevron">'+icon('arrow')+'</span></button>'+
    '</div>'+
-   '<button class="ap-referral-card ap-referral-premium" data-action="next-referral">'+
-     '<span class="ap-ref-icon">'+icon('gift')+'</span>'+
-     '<span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span>'+
-     '<span class="ap-ref-gift-art" aria-hidden="true"><span class="gift-lid"></span><span class="gift-box"></span><span class="gift-ribbon-v"></span><span class="gift-ribbon-h"></span></span>'+
-     '<span class="ap-ref-arrow">'+icon('arrow')+'</span>'+
+   '<button type="button" class="rh-card rh-ref" data-action="next-referral"><span class="rh-ico red">'+icon('users')+'</span><span><h3>Referral</h3><p>Invite Friends &amp; Earn Rewards</p></span><svg class="rh-icon rh-gift" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v5H3zM5 13v7h14v-7M12 8v12M3 10.5h18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 8c-1.4-4.5-5.5-5.1-6.1-2.7C5.3 7.7 8.7 8 12 8ZM12 8c1.4-4.5 5.5-5.1 6.1-2.7.6 2.4-2.8 2.7-6.1 2.7Z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><span class="rh-chevron">'+icon('arrow')+'</span></button>'+
+   '<button type="button" class="rh-card rh-amz" data-action="next-shop">'+
+     '<div class="lg"><svg width="150" height="48" viewBox="0 0 150 48" aria-label="amazon"><text x="2" y="30" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="34" letter-spacing="-1.5" fill="#131A22">amazon</text><path d="M14 37Q70 56 126 34" stroke="#FF9900" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M127 33l-10-1 5 8z" fill="#FF9900"/></svg></div>'+
+     '<h2>Shop Millions<br>of <span>Products</span></h2><p>Everything you need in one place.</p><span class="rh-btn">Start Shopping '+icon('arrow')+'</span>'+
+     '<svg class="rh-art" viewBox="0 0 190 150" width="190" height="150" aria-hidden="true"><ellipse cx="100" cy="140" rx="86" ry="9" fill="rgba(43,78,216,.18)"/><rect x="104" y="6" width="58" height="104" rx="10" fill="#131A22"/><rect x="108" y="12" width="50" height="92" rx="7" fill="#fff"/><text x="114" y="30" font-family="Arial" font-weight="700" font-size="11" fill="#131A22">amazon</text><path d="M115 33q14 6 28 0" stroke="#FF9900" stroke-width="2" fill="none"/><rect x="113" y="42" width="18" height="18" rx="3" fill="#DCE4FF"/><rect x="135" y="42" width="18" height="18" rx="3" fill="#FFE4E8"/><rect x="113" y="66" width="18" height="18" rx="3" fill="#FFE4E8"/><rect x="135" y="66" width="18" height="18" rx="3" fill="#DCE4FF"/><rect x="30" y="78" width="62" height="56" fill="#C99A5B"/><rect x="30" y="78" width="62" height="12" fill="#D8AE72"/><rect x="56" y="78" width="10" height="56" fill="#E8C792" opacity=".7"/><text x="34" y="112" font-family="Arial" font-weight="700" font-size="12" fill="#131A22">amazon</text><path d="M36 118q18 8 36 0" stroke="#FF9900" stroke-width="2.5" fill="none"/><rect x="100" y="104" width="44" height="34" fill="#C99A5B"/><rect x="100" y="104" width="44" height="8" fill="#D8AE72"/><path d="M106 126q16 7 32 0" stroke="#FF9900" stroke-width="2" fill="none"/><g fill="none" stroke="#E23A4E" stroke-width="4" stroke-linecap="round"><path d="M4 40h12l8 46h46"/><path d="M24 54h50l-6 24H27"/></g><circle cx="32" cy="98" r="5" fill="#E23A4E"/><circle cx="62" cy="98" r="5" fill="#E23A4E"/></svg>'+
    '</button>'+
-   '<button class="ap-promo-card ap-amazon-premium" data-action="next-shop">'+
-     '<span class="ap-promo-copy">'+
-       '<span class="ap-amazon-wordmark">amazon<span class="ap-amazon-smile-premium"></span></span>'+
-       '<strong>Shop Millions of <em>Products</em></strong>'+
-       '<small>Everything you need in one place.</small>'+
-       '<span class="ap-amazon-cta">Start Shopping <span>→</span></span>'+
-     '</span>'+
-     '<span class="ap-amazon-art" aria-hidden="true">'+
-       '<span class="ap-mini-phone"><span class="ap-mini-phone-logo">amazon</span><span class="ap-mini-products"><i></i><i></i><i></i></span></span>'+
-       '<span class="ap-mini-cart">'+
-         '<span class="ap-mini-cart-handle"></span><span class="ap-mini-cart-basket"></span>'+
-         '<span class="ap-mini-box box-a">amazon</span><span class="ap-mini-box box-b">amazon</span><span class="ap-mini-box box-c">amazon</span>'+
-         '<span class="ap-mini-wheel w1"></span><span class="ap-mini-wheel w2"></span>'+
-       '</span>'+
-     '</span>'+
-   '</button>'+
- '</main>'+
- '<nav class="ap-bottom-nav ap-bottom-premium">'+
-   '<button class="ap-nav-item active" data-action="home-dashboard">'+icon('home')+'<span class="ap-nav-label">Home</span></button>'+
-   '<button class="ap-nav-item" data-action="next-assets">'+icon('check')+'<span class="ap-nav-label">Assets</span></button>'+
-   '<button class="ap-nav-item" data-action="profile">'+icon('user')+'<span class="ap-nav-label">My Profile</span></button>'+
-   '<button class="ap-nav-item" data-action="next-ai">'+icon('robot')+'<span class="ap-nav-label">AI Bot</span></button>'+
- '</nav>'+
+   '<nav class="rh-card rh-nav"><button type="button" class="rh-nav-item active" data-action="home-dashboard"><span class="rh-nav-icon">'+icon('home')+'</span>Home</button><button type="button" class="rh-nav-item" data-action="next-assets"><span class="rh-nav-icon">'+icon('check')+'</span>Assets</button><button type="button" class="rh-nav-item" data-action="profile"><span class="rh-nav-icon">'+icon('user')+'</span>My Profile</button><button type="button" class="rh-nav-item" data-action="next-ai"><span class="rh-nav-icon">'+icon('robot')+'</span>AI Bot</button></nav>'+
  '</div>';
 }
-
 function profileSection(p){p=p||{};return '<section class="section" id="profile-area" style="margin-top:18px"><h3>Account Details</h3><div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"><div class="stat-card"><small>Name</small><strong style="font-size:15px">'+esc(p.name||'')+'</strong></div><div class="stat-card"><small>Email</small><strong style="font-size:13px;word-break:break-word">'+esc(p.email||'')+'</strong></div><div class="stat-card"><small>Client ID</small><strong style="font-size:13px;word-break:break-word">'+esc(p.client_id||'AP-CLIENT')+'</strong></div><div class="stat-card"><small>Account Status</small><strong style="font-size:15px">'+esc(p.status||'Active')+'</strong></div></div></section>';}
 
 function render(){
@@ -549,7 +513,8 @@ async function action(e){
  if(a==='next-assets'){navigateView('assets');return;}
  if(a==='next-ai'){navigateView('ai');return;}
  if(a==='next-kyc'){navigateView('kyc');return;}
- if(a==='notice'){navigateView('notifications');return;}
+
+ if(a==='copy-client-id'){var idValue=String(state.profile&&state.profile.client_id||'AP-CLIENT');if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(idValue).catch(function(){});return;} if(a==='notice'){navigateView('notifications');return;}
  if(a==='language')return;
  if(a==='retry-runtime'){checkRuntime();return;}
   if(a==='complete-task'){
