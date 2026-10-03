@@ -1,1 +1,0 @@
-(function(){'use strict';window.AegisUniAppService={ready:true,appId:'__UNI__D835ED9',native:!!window.AegisNative};})();
