@@ -388,7 +388,7 @@ function homeView(){
  '<button type="button" class="bell" data-action="notice" aria-label="Notifications">'+useIconRef('bell')+(dot?'<span class="ap-reference-dot"></span>':'')+'</button>'+
  '<button type="button" class="av" data-action="profile" aria-label="My Profile">'+useIconRef('user')+'</button></div></div>'+
  '<div class="card welcome"><p>Welcome,</p><h1>'+esc(userName)+'</h1><div class="cid">Client ID: '+esc(clientId||'—')+'<button type="button" class="copy-reference" data-action="copy-client-id" aria-label="Copy Client ID">'+useIconRef('copy')+'</button></div></div>'+
- '<div class="card lv"><div><span class="crown lv1">'+useIconRef('crown')+'</span><small>LV 1</small><span class="lv-line lv1-line"></span></div><div><span class="crown lv2">'+useIconRef('crown')+'</span><small>LV 2</small><span class="lv-line lv2-line"></span></div><div><span class="crown lv3">'+useIconRef('crown')+'</span><small>LV 3</small><span class="lv-line lv3-line"></span></div></div>'+
+ '<div class="card lv"><div><span class="crown lv1">'+useIconRef('crown')+'</span><small>LV 1</small></div><div><span class="crown lv2">'+useIconRef('crown')+'</span><small>LV 2</small></div><div><span class="crown lv3">'+useIconRef('crown')+'</span><small>LV 3</small></div></div>'+
  '<div class="grid">'+
  '<button type="button" class="card tile" data-action="next-topup"><div class="ico blue">'+useIconRef('wallet')+'</div><div><h3>Top Up</h3><p>Deposit Amount</p></div><span class="chev">'+useIconRef('chevron')+'</span></button>'+
  '<button type="button" class="card tile" data-action="next-shop"><div class="ico red">'+useIconRef('cart')+'</div><div><h3>Shop</h3><p>Amazon-style</p></div><span class="chev">'+useIconRef('chevron')+'</span></button>'+
