@@ -365,7 +365,6 @@ async function handleWithdraw(e){
  }catch(err){setMessage(authError(err));}
  finally{busy=false;render();}
 }
-async 
 function cartCount(){return Array.isArray(state.cart)?state.cart.reduce(function(n,x){return n+Number(x.qty||1);},0):0;}
 function saveCart(){try{localStorage.setItem('aegispay-cart',JSON.stringify(state.cart||[]));}catch(e){}}
 function syncCartBadges(){
@@ -384,7 +383,13 @@ function showToast(message){
  var toast=document.createElement('div');toast.className='ap-toast';toast.textContent=message;document.body.appendChild(toast);setTimeout(function(){if(toast.parentNode)toast.remove();},1800);
 }
 function showOrdersView(){
- var rows=(state.cart||[]).map(function(x){return '<div class="order-row"><div class="order-art"><img src="'+esc(x.image||'')+'" alt=""></div><div class="order-main"><b>'+esc(x.name)+'</b><small>Qty '+Number(x.qty||1)+' · 
+ var rows=(state.cart||[]).map(function(x){return '<div class="order-row"><div class="order-art"><img src="'+esc(x.image||'')+'" alt=""></div><div class="order-main"><b>'+esc(x.name)+'</b><small>Qty '+Number(x.qty||1)+' · $'+Number(x.price||0).toFixed(2)+'</small></div><strong>$'+(Number(x.price||0)*Number(x.qty||1)).toFixed(2)+'</strong></div>';}).join('');
+ var total=(state.cart||[]).reduce(function(a,x){return a+Number(x.price||0)*Number(x.qty||1);},0);
+ var panel=document.createElement('div');panel.className='ap-order-modal';
+ panel.innerHTML='<section class="ap-order-sheet"><div class="ap-order-head"><button type="button" data-action="close-orders">‹</button><b>Orders</b><span class="order-pill">'+cartCount()+' items</span></div><div class="ap-order-body">'+(rows||'<div class="order-empty"><div>🛍️</div><b>No items yet</b><small>Add a product from Shop to build your cart.</small><button type="button" data-action="view-shop">Go to Shop</button></div>')+(rows?'<div class="order-total"><span>Total</span><strong>$'+total.toFixed(2)+'</strong></div><button class="red-button" type="button" data-action="checkout-cart">Continue to Checkout</button>':'')+'</div></section>';
+ root.appendChild(panel);
+}
+async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
  if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
