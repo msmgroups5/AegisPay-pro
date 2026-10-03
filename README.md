@@ -46,3 +46,12 @@ Never put service-role keys, payout private keys, Telegram bot secrets, AI provi
 ## Branch policy
 
 `main` is the only production source of truth. Experimental branches are not production sources. Any future UI or business change must start from and return to `main`.
+
+## Canonical production baseline
+
+- Production branch: `main`
+- Client portal: `/app/` from root `client.html`
+- Master Admin: `/admin/` from root `master-admin.html`
+- Netlify: `aegispay-pro`
+- Supabase: `wtcspnrmsoisroavojop`
+- Android baseline: versionCode 28 / versionName 2.4.2
