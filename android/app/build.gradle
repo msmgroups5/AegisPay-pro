@@ -72,17 +72,12 @@ dependencies {
     implementation 'androidx.media:media:1.7.0'
     implementation 'androidx.multidex:multidex:2.0.1'
 
-    // Huawei Mobile Services / AppGallery Connect compatibility layer from the supplied blueprint.
-    implementation 'com.huawei.hms:base:6.5.0.300'
-    implementation 'com.huawei.agconnect:agconnect-core:1.6.5.300'
-
     // Native QR/barcode scan bridge.
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }
 
 def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
     from(rootProject.projectDir.parentFile) {
-        include 'index.html'
         include 'client.html'
         include 'master-admin.html'
         include 'styles.css'
@@ -97,20 +92,10 @@ def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
         include 'manifest.webmanifest'
         include 'aegispay-logo.svg'
         include 'app-update.js'
-        include 'aegis-core.js'
-        include 'app.js'
     }
     into(layout.projectDirectory.dir('src/main/assets/aegispay'))
 }
 
-def syncBlueprintRuntime = tasks.register('syncBlueprintRuntime', Copy) {
-    from(project.rootDir.parentFile) {
-        include 'assets/apps/__UNI__D835ED9/www/**'
-    }
-    into(layout.projectDirectory.dir('src/main/assets'))
-}
-
 tasks.named('preBuild').configure {
     dependsOn(syncAegisPayWebAssets)
-    dependsOn(syncBlueprintRuntime)
 }
