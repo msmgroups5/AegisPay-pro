@@ -41,25 +41,69 @@ function actionCard(cls,action,ico,title,sub){
 
 function homeView(){
  var p=state.profile||{};
- var userName=String(p.name||'');
- var clientId=String(p.client_id||'');
- var balance=p.usdt_balance!=null?p.usdt_balance:(p.available_balance!=null?p.available_balance:(p.total_balance!=null?p.total_balance:(p.balance!=null?p.balance:null)));
- var balanceText=balance==null?'—':Number(balance).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
- var dot=state.unread>0;
+ var userName=String(p.name||'Ali Shahid');
+ var clientId=String(p.client_id||'AP-CLIENT');
+ var dot=true;
 
  root.innerHTML='<div class="ap-shell">'+
- '<header class="ap-home-header"><div class="ap-header-row"><div class="ap-brand"><img src="./aegispay-logo.svg" alt="AegisPay"></div><div class="ap-head-actions"><button class="ap-circle-btn" data-action="notice">'+icon('bell')+(dot?'<span class="ap-notification-dot"></span>':'')+'</button><button class="ap-circle-btn profile" data-action="profile">'+icon('user')+'</button></div></div>'+
- '<section class="ap-welcome-card"><div class="ap-welcome-copy"><div class="ap-welcome-kicker">Welcome,</div><div class="ap-welcome-name">'+esc(userName||'Client')+'</div><div class="ap-client-row">Client ID: '+esc(clientId||'—')+'<button class="ap-copy-btn" data-action="copy-client-id">'+icon('copy')+'</button></div><div class="ap-balance-row"><div><span>Total Balance</span><strong id="apBalanceValue">'+esc(balanceText)+' <em>USDT</em></strong></div><button class="ap-balance-eye" data-action="toggle-balance" aria-label="Show or hide balance">●</button></div></div><div class="ap-building" aria-hidden="true"><svg viewBox="0 0 260 180" preserveAspectRatio="none" focusable="false"><defs><linearGradient id="bldgRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5361"/><stop offset=".55" stop-color="#bd1526"/><stop offset="1" stop-color="#4a050d"/></linearGradient><linearGradient id="bldgGlass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd3d7" stop-opacity=".9"/><stop offset="1" stop-color="#ff4a5a" stop-opacity=".28"/></linearGradient></defs><path d="M14 180V76L55 45V180Z" fill="url(#bldgRed)" stroke="#ff7883" stroke-width="1.5"/><path d="M55 180V18L101 0V180Z" fill="url(#bldgRed)" stroke="#ff9aa2" stroke-width="1.5"/><path d="M101 180V57L142 36V180Z" fill="#8e0d1b" stroke="#ff727e" stroke-width="1.5"/><path d="M142 180V31L198 10V180Z" fill="url(#bldgRed)" stroke="#ff8c96" stroke-width="1.5"/><path d="M198 180V68L246 42V180Z" fill="#670710" stroke="#ff626f" stroke-width="1.5"/><g fill="url(#bldgGlass)" opacity=".96"><path d="M29 87h16v10H29zM29 109h16v10H29zM29 131h16v10H29zM29 153h16v10H29z"/><path d="M68 36h19v11H68zM68 59h19v11H68zM68 82h19v11H68zM68 105h19v11H68zM68 128h19v11H68zM68 151h19v11H68z"/><path d="M111 75h18v11h-18zM111 99h18v11h-18zM111 123h18v11h-18zM111 147h18v11h-18z"/><path d="M153 49h22v11h-22zM153 73h22v11h-22zM153 97h22v11h-22zM153 121h22v11h-22zM153 145h22v11h-22z"/><path d="M210 83h18v11h-18zM210 107h18v11h-18zM210 131h18v11h-18zM210 155h18v11h-18z"/></g><path d="M49 180h185" stroke="#ff3446" stroke-width="3" opacity=".9"/></svg></div></section></header>'+
- '<section class="ap-vip"><div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 1</span></div><div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 2</span></div><div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 3</span></div></section>'+
- '<main class="ap-content"><div class="ap-actions-grid">'+
- actionCard('blue','next-topup',icon('wallet')+'<span class="ap-plus-badge">'+icon('plus')+'</span>','Top Up','Deposit Amount')+
- actionCard('red','next-shop',icon('cart'),'Shop','Amazon-style')+
- actionCard('green','next-account',icon('card'),'Account Details','View Your Account')+
- actionCard('orange','next-crypto',icon('btc'),'Crypto','Buy & Manage')+
- '</div>'+
- '<button class="ap-referral-card" data-action="next-referral"><span class="ap-ref-icon">'+icon('users')+'</span><span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span><span class="ap-arrow">'+icon('arrow')+'</span></button>'+
- '<button class="ap-promo-card" data-action="next-shop"><span class="ap-promo-copy"><span class="ap-amazon-official"><img src="https://m.media-amazon.com/images/G/01/authportal/tiv/amazon_logo_RGB._CB424887820_.png" alt="Amazon"></span><strong>Shop Millions<br>of Products</strong><small>Everything you need in<br>one place.</small><em>Amazon and the Amazon logo are trademarks of Amazon.com, Inc. or its affiliates.</em></span><span class="ap-cart-official"><span class="ap-cart-badge-icon"><img src="https://m.media-amazon.com/images/G/01/support_images/GUID-04D75C28-8DEF-436D-93AD-18419392FB09=1=en-US=Normal.png" alt="Amazon shopping cart"></span><span class="ap-box bx1">A</span><span class="ap-box bx2">A</span><span class="ap-box bx3">A</span></span></button></main>'+
- '<nav class="ap-bottom-nav"><button class="ap-nav-item active" data-action="home">'+icon('home')+'<span class="ap-nav-label">Home</span></button><button class="ap-nav-item" data-action="next-assets">'+icon('check')+'<span class="ap-nav-label">Assets</span></button><button class="ap-nav-item" data-action="profile">'+icon('user')+'<span class="ap-nav-label">My Profile</span></button><button class="ap-nav-item" data-action="next-ai">'+icon('robot')+'<span class="ap-nav-label">AI Bot</span></button></nav></div>';
+ '<header class="ap-home-header">'+
+   '<div class="ap-header-row">'+
+     '<div class="ap-brand"><img src="./aegispay-logo.svg" alt="AegisPay"></div>'+
+     '<div class="ap-head-actions">'+
+       '<button class="ap-circle-btn ap-notice-btn" data-action="notice" aria-label="Notifications">'+icon('bell')+'<span class="ap-notification-dot"></span></button>'+
+       '<button class="ap-circle-btn profile" data-action="profile" aria-label="My Profile">'+icon('user')+'</button>'+
+     '</div>'+
+   '</div>'+
+   '<section class="ap-welcome-card">'+
+     '<div class="ap-welcome-copy">'+
+       '<div class="ap-welcome-kicker">Welcome,</div>'+
+       '<div class="ap-welcome-name">'+esc(userName)+'</div>'+
+       '<div class="ap-client-row">Client ID: '+esc(clientId)+'<button class="ap-copy-btn" data-action="copy-client-id" aria-label="Copy Client ID">'+icon('copy')+'</button></div>'+
+     '</div>'+
+     '<div class="ap-building" aria-hidden="true">'+
+       '<svg viewBox="0 0 260 150" focusable="false">'+
+         '<rect x="6" y="52" width="46" height="98" rx="1" fill="#240307" stroke="#7A0A0F" stroke-width="1"/>'+
+         '<rect x="48" y="18" width="56" height="132" rx="1" fill="#120205" stroke="#7A0A0F" stroke-width="1"/>'+
+         '<rect x="99" y="43" width="50" height="107" rx="1" fill="#1A0305" stroke="#7A0A0F" stroke-width="1"/>'+
+         '<rect x="145" y="8" width="67" height="142" rx="1" fill="#0F0103" stroke="#7A0A0F" stroke-width="1"/>'+
+         '<rect x="207" y="37" width="47" height="113" rx="1" fill="#170205" stroke="#7A0A0F" stroke-width="1"/>'+
+         '<g fill="#E5141B">'+
+           '<rect x="15" y="67" width="10" height="8"/><rect x="31" y="67" width="10" height="8"/><rect x="15" y="83" width="10" height="8"/><rect x="31" y="83" width="10" height="8"/><rect x="15" y="99" width="10" height="8"/><rect x="31" y="99" width="10" height="8"/><rect x="15" y="115" width="10" height="8"/><rect x="31" y="115" width="10" height="8"/>'+
+           '<rect x="58" y="32" width="12" height="9"/><rect x="76" y="32" width="12" height="9"/><rect x="58" y="49" width="12" height="9"/><rect x="76" y="49" width="12" height="9"/><rect x="58" y="66" width="12" height="9"/><rect x="76" y="66" width="12" height="9"/><rect x="58" y="83" width="12" height="9"/><rect x="76" y="83" width="12" height="9"/><rect x="58" y="100" width="12" height="9"/><rect x="76" y="100" width="12" height="9"/><rect x="58" y="117" width="12" height="9"/><rect x="76" y="117" width="12" height="9"/>'+
+           '<rect x="110" y="57" width="11" height="8"/><rect x="127" y="57" width="11" height="8"/><rect x="110" y="73" width="11" height="8"/><rect x="127" y="73" width="11" height="8"/><rect x="110" y="89" width="11" height="8"/><rect x="127" y="89" width="11" height="8"/><rect x="110" y="105" width="11" height="8"/><rect x="127" y="105" width="11" height="8"/><rect x="110" y="121" width="11" height="8"/><rect x="127" y="121" width="11" height="8"/>'+
+           '<rect x="157" y="22" width="14" height="9"/><rect x="178" y="22" width="14" height="9"/><rect x="157" y="40" width="14" height="9"/><rect x="178" y="40" width="14" height="9"/><rect x="157" y="58" width="14" height="9"/><rect x="178" y="58" width="14" height="9"/><rect x="157" y="76" width="14" height="9"/><rect x="178" y="76" width="14" height="9"/><rect x="157" y="94" width="14" height="9"/><rect x="178" y="94" width="14" height="9"/><rect x="157" y="112" width="14" height="9"/><rect x="178" y="112" width="14" height="9"/>'+
+           '<rect x="217" y="51" width="10" height="8"/><rect x="234" y="51" width="10" height="8"/><rect x="217" y="67" width="10" height="8"/><rect x="234" y="67" width="10" height="8"/><rect x="217" y="83" width="10" height="8"/><rect x="234" y="83" width="10" height="8"/><rect x="217" y="99" width="10" height="8"/><rect x="234" y="99" width="10" height="8"/><rect x="217" y="115" width="10" height="8"/><rect x="234" y="115" width="10" height="8"/>'+
+         '</g>'+
+         '<text x="151" y="139" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="7" font-weight="700">Aegis</text><text x="173" y="139" fill="#F01920" font-family="Inter,Arial,sans-serif" font-size="7" font-weight="700">Pay</text>'+
+       '</svg>'+
+     '</div>'+
+   '</section>'+
+ '</header>'+
+ '<section class="ap-vip">'+
+   '<div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 1</span><span class="ap-vip-value">10%</span></div>'+
+   '<div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 2</span><span class="ap-vip-value">5%</span></div>'+
+   '<div class="ap-vip-col"><span class="ap-crown">'+icon('crown')+'</span><span class="ap-vip-label">LV 3</span><span class="ap-vip-value">2%</span></div>'+
+ '</section>'+
+ '<main class="ap-content">'+
+   '<div class="ap-actions-grid">'+
+     actionCard('blue','next-topup',icon('wallet')+'<span class="ap-plus-badge">'+icon('plus')+'</span>','Top Up','Deposit Amount')+
+     actionCard('red','next-shop',icon('cart'),'Shop','Amazon-style')+
+     actionCard('green','next-account',icon('card'),'Account Details','View Your Account')+
+     actionCard('orange','next-crypto',icon('btc'),'Crypto','Buy & Manage')+
+   '</div>'+
+   '<button class="ap-referral-card" data-action="next-referral"><span class="ap-ref-icon">'+icon('users')+'</span><span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span><span class="ap-arrow">'+icon('arrow')+'</span></button>'+
+   '<button class="ap-promo-card" data-action="next-shop">'+
+     '<span class="ap-promo-copy"><span class="ap-amazon-official"><span class="ap-amazon-a">a</span><span class="ap-amazon-smile"></span></span><strong>Shop Millions<br>of Products</strong><small>Everything you need in one place.</small></span>'+
+     '<span class="ap-cart-official"><span class="ap-cart-shape" aria-hidden="true"><span class="ap-cart-handle"></span><span class="ap-cart-basket"></span><span class="ap-box bx1">amazon</span><span class="ap-box bx2">amazon</span><span class="ap-box bx3">amazon</span><span class="ap-cart-wheel w1"></span><span class="ap-cart-wheel w2"></span></span></span>'+
+   '</button>'+
+ '</main>'+
+ '<nav class="ap-bottom-nav">'+
+   '<button class="ap-nav-item active" data-action="home">'+icon('home')+'<span class="ap-nav-label">Home</span></button>'+
+   '<button class="ap-nav-item" data-action="next-assets">'+icon('check')+'<span class="ap-nav-label">Assets</span></button>'+
+   '<button class="ap-nav-item" data-action="profile">'+icon('user')+'<span class="ap-nav-label">My Profile</span></button>'+
+   '<button class="ap-nav-item" data-action="next-ai">'+icon('robot')+'<span class="ap-nav-label">AI Bot</span></button>'+
+ '</nav>'+
+ '</div>';
 }
 
 function toast(msg){
