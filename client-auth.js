@@ -5,7 +5,7 @@ var root=document.getElementById('app');
 if(!root)return;
 
 var service=window.AegisSupabaseService||null;
-var state={profile:null,unread:0,busy:false,mode:'login',message:''};
+var state={profile:null,unread:0,busy:false,mode:'login',message:'',balanceHidden:false};
 
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
@@ -114,6 +114,17 @@ root.addEventListener('click',function(e){
  var a=el.getAttribute('data-action');
  if(a==='home'){homeView();return;}
  if(a==='copy-client-id'){var id=String((state.profile&&state.profile.client_id)||'');if(navigator.clipboard&&id)navigator.clipboard.writeText(id);toast('Client ID copied');return;}
+ if(a==='toggle-balance'){
+   state.balanceHidden=!state.balanceHidden;
+   var bv=document.getElementById('apBalanceValue');
+   if(bv){
+     var p=state.profile||{},b=p.usdt_balance!=null?p.usdt_balance:(p.available_balance!=null?p.available_balance:(p.total_balance!=null?p.total_balance:(p.balance!=null?p.balance:null)));
+     var txt=b==null?'—':Number(b).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+     bv.innerHTML=(state.balanceHidden?'••••••':txt)+' <em>USDT</em>';
+   }
+   el.textContent=state.balanceHidden?'○':'●';
+   return;
+ }
  if(a==='profile'||a==='notice'||a.indexOf('next-')===0){toast('This screen will be built after Home Dashboard approval.');return;}
 });
 
