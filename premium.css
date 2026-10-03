@@ -196,3 +196,117 @@
   .aegis-shop-hero{padding:18px!important}
   .aegis-shop-hero h4{font-size:21px!important}
 }
+
+
+/* AEGISPAY CLIENT AUTH — REFERENCE UI LOCK — 2026-10-03 */
+.tg-page:not(.tg-page-dashboard){
+  padding:0!important;
+  min-height:100vh!important;
+  display:grid!important;
+  place-items:center!important;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(239,38,54,.24),transparent 30%),
+    radial-gradient(circle at 92% 100%,rgba(126,11,19,.22),transparent 34%),
+    linear-gradient(145deg,#260206 0%,#5a070e 48%,#1a0205 100%)!important;
+  color:#eef1f5!important;
+}
+.tg-card-auth{
+  width:min(100%,460px)!important;
+  min-height:100vh;
+  border:0!important;
+  border-radius:0!important;
+  background:#0b0d11!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+.tg-card-auth .tg-topbar{
+  min-height:76px!important;
+  padding:14px 18px!important;
+  background:linear-gradient(180deg,#06070a,#101217)!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+.tg-card-auth .tg-brand img{width:40px!important;height:40px!important}
+.tg-card-auth .tg-brand b{font-size:22px!important;color:#fff!important}
+.tg-card-auth .tg-brand b span{color:#ff3348!important}
+.tg-card-auth .tg-brand small{color:#8d96a4!important}
+.tg-card-auth .tg-language{color:#b8c0cb!important}
+.tg-card-auth .tg-language select{
+  border:1px solid rgba(255,255,255,.10)!important;
+  background:#171a20!important;
+  color:#fff!important;
+}
+.tg-card-auth .tg-auth-content{
+  padding:34px 20px 26px!important;
+  min-height:calc(100vh - 76px)!important;
+  background:
+    radial-gradient(circle at 92% 3%,rgba(220,25,44,.18),transparent 28%),
+    linear-gradient(180deg,#110c10 0%,#0b0d11 64%,#090a0d 100%)!important;
+}
+.tg-card-auth .tg-auth-content .auth-hero{padding:8px 2px 22px!important}
+.tg-card-auth .tg-kicker{
+  color:#ff5162!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:2px!important;
+}
+.tg-card-auth .tg-auth-content .auth-hero h1{
+  color:#fff!important;
+  font-size:clamp(30px,8vw,38px)!important;
+  letter-spacing:-1.4px!important;
+  margin:10px 0 8px!important;
+}
+.tg-card-auth .tg-auth-content .auth-hero p{
+  color:#9da5b1!important;
+  font-size:13px!important;
+}
+.tg-card-auth .field label{color:#ccd1d9!important}
+.tg-card-auth .field-wrap input,
+.tg-card-auth input:not([type=checkbox]):not([type=file]),
+.tg-card-auth select{
+  min-height:52px!important;
+  border:1px solid #2a2e36!important;
+  border-radius:14px!important;
+  background:#151820!important;
+  color:#f8fafc!important;
+}
+.tg-card-auth .field-wrap input:focus,
+.tg-card-auth input:focus,
+.tg-card-auth select:focus{
+  border-color:#ef3044!important;
+  outline:3px solid rgba(239,48,68,.13)!important;
+}
+.tg-card-auth .field-wrap input::placeholder{color:#6e7785!important}
+.tg-card-auth .primary{
+  min-height:54px!important;
+  border-radius:15px!important;
+  background:linear-gradient(135deg,#b80d24 0%,#e02039 58%,#f13b51 100%)!important;
+  box-shadow:0 15px 30px rgba(224,32,57,.22)!important;
+  color:#fff!important;
+}
+.tg-card-auth .primary:hover{transform:translateY(-1px)!important}
+.tg-card-auth .ghost-dark{
+  min-height:46px!important;
+  border:1px solid #2a2e36!important;
+  background:#151820!important;
+  color:#f0f2f5!important;
+}
+.tg-card-auth .tg-auth-links .ghost-dark:first-child{color:#ff6675!important}
+.tg-card-auth .tg-footer{
+  color:#606875!important;
+  background:#090a0d!important;
+  border-top:1px solid #181b21!important;
+}
+.tg-card-auth .tg-alert{
+  margin:0 0 15px!important;
+  background:#2a0d12!important;
+  border-color:#5d1d26!important;
+  color:#ffadb6!important;
+}
+.tg-card-auth .tg-alert.is-success{
+  background:#0d271d!important;
+  border-color:#1c553b!important;
+  color:#91e3b9!important;
+}
+@media(max-width:520px){
+  .tg-card-auth{width:100%!important}
+}
