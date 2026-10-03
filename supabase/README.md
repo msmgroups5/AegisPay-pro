@@ -1,29 +1,46 @@
 # Supabase production layer
 
-The connected Supabase project wtcspnrmsoisroavojop is active and healthy in ap-northeast-1.
+Project: `wtcspnrmsoisroavojop`
 
-## Verified state on 2026-09-29
+Verified on 2026-10-03: ACTIVE/HEALTHY, region `ap-northeast-1`.
 
-- All 14 exposed public application tables inspected have RLS enabled. FORCE ROW LEVEL SECURITY is off.
-- Six application profiles exist, but there are zero Auth users and zero linked profiles.
-- claim_aegispay_profile now requires a verified email and either a Supabase Auth invitation or server-controlled app metadata with aegispay_approved=true before linking an unclaimed profile.
-- Four Edge Functions are active: verify-deposit, monitor-deposits, telegram-withdrawal and execute-payout. JWT verification is enabled for all except monitor-deposits, which checks the AEGIS_CRON_SECRET header in its body.
-- execute-payout now atomically claims an approved withdrawal before sending. An uncertain chain result stays PROCESSING for manual reconciliation.
-- No Storage buckets or Storage policies are configured.
-- The repository app still uses its localStorage demo store. The Supabase client/service wrappers are loaded but are not yet connected to the app login or business-data workflows.
-- The Netlify project has no environment variables configured. The browser Supabase URL and publishable key are public client settings, not server secrets.
+## Live application surface
 
-## Important live boundary
+RLS-enabled public application tables:
+`users`, `tasks`, `referrals`, `withdrawal_requests`, `activity_logs`, `notifications`, `platform_settings`, `vip_tiers`, `deposit_submissions`, `cycle_runs`, `account_ledger`, `admin_adjustments`, `shop_offers`, `audit_events`, `kyc_verifications`.
 
-execute-payout submits a TRON mainnet USDT transfer when its payout private key is configured. Secret values and their presence are not exposed through the current connected read tools. Do not treat this path as a demo or assume it is inactive.
+Active Edge Functions align with the repository function directories: `public-signup`, `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `ai-support`, `verify-deposit`, `monitor-deposits`, `telegram-withdrawal`, `execute-payout`.
 
-## Remaining work
+## Storage
 
-1. Provision approved Auth identities through Supabase invitation or server-controlled app metadata, then connect browser sign-in and profile loading.
-2. Replace the demo localStorage business store with Supabase reads and authorized RPC/Edge Function writes before presenting the app as live.
-3. Define a private Storage bucket and owner-scoped policies before storing deposit evidence.
-4. Check in the source for the other three deployed Edge Functions and reconcile the repository's consolidated schema with the six live migrations.
-5. Review the remaining authenticated SECURITY DEFINER advisor findings and the performance advisor findings before production use.
-6. Verify required Supabase runtime secrets through the Supabase dashboard; the connected audit interface does not reveal their presence or values.
+Bucket `private-verification` is live and private, limited to 10 MB and JPEG/PNG/WebP.
 
-Keep all service-role keys, bot tokens and payout keys server-side. Never place them in browser configuration or Netlify client variables.
+Storage policies are owner-scoped and guarded by `app_runtime_enabled()`:
+- authenticated users can upload only under their own `auth.uid()` folder;
+- users can read only their own evidence;
+- `MASTER ADMIN` can read evidence for review;
+- users can delete only their own evidence.
+
+The canonical repository tracks this policy in `database/migrations/20261003_private_verification_storage_policies.sql`.
+
+## Runtime boundary
+
+Current `platform_settings.system_mode` is `TESTNET_DEMO` with real payouts disabled and live deposits disabled.
+
+One active pg_cron job, `aegispay-cycle-settlement`, runs every minute.
+
+## Current review items
+
+Security Advisor reports authenticated execution of several SECURITY DEFINER RPCs. These require function-by-function authorization review rather than blind revocation because some are intentionally used by the client workflow.
+
+Leaked-password protection is currently reported as disabled and should be enabled before real production use.
+
+Performance Advisor reports several unused indexes. With the present small dataset, these are review candidates rather than automatic deletion targets.
+
+## Migration alignment
+
+The live project contains historical migrations that predate the consolidated repository migration directory. They are already applied in production and must not be replayed. New database changes are tracked as forward-only migrations in `database/migrations/`.
+
+## Secrets
+
+Secret values are not exposed by the audit tools. Keep service-role, payout, Telegram and AI credentials server-side in Supabase configuration only.
