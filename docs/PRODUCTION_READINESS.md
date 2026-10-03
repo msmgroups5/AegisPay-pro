@@ -1,29 +1,57 @@
 # AegisPay Production Readiness
 
-## Verified deployment state — 2026-09-29
+## Verified deployment state — 2026-10-03
 
-- GitHub repository: msmgroups5/AegisPay-pro, default branch main.
-- Netlify project aegispay-pro has a ready HTTPS deployment. No Netlify environment variables are configured.
-- Supabase project wtcspnrmsoisroavojop is active and healthy.
-- Supabase has six application profiles and zero Auth users or linked profiles.
-- All 14 public application tables inspected have RLS enabled; FORCE ROW LEVEL SECURITY is off.
-- Four Supabase Edge Functions are active. monitor-deposits has platform JWT verification disabled but checks the AEGIS_CRON_SECRET header in its function code. The other three require JWT verification.
-- No Storage buckets or Storage policies exist.
-- The browser app uses localStorage demo data. Supabase client/service wrappers are loaded but are not used by the app's login or business-data flows.
-- execute-payout is a live TRON mainnet USDT payout path when its private key is configured. The connected read interface does not expose whether that secret is set.
-- A live migration now restricts profile claiming to verified, invited or server-approved Auth identities. The payout function now uses an atomic claim and keeps uncertain broadcasts locked for manual reconciliation.
+- GitHub repository: `msmgroups5/AegisPay-pro`
+- Production source branch: `main`
+- Netlify project: `aegispay-pro` (site ID `0aa38615-c9e6-4129-bc08-cd28739606d0`)
+- Supabase project: `wtcspnrmsoisroavojop`, ACTIVE_HEALTHY
+- Public website route: `/`
+- Client portal route: `/app/`
+- Master Admin route: `/admin/`
+- Client APK route: `/downloads/aegispay-client.apk`
 
-## Remaining production work
+## Source-of-truth alignment
 
-- Provision approved Auth users and connect sign-in/profile mapping to the browser.
-- Replace localStorage demo reads/writes with the Supabase business tables and protected server-side operations.
-- Set and verify required Supabase Function secrets securely; do not put service-role or payout credentials in the browser or Netlify.
-- Configure a private Storage bucket and owner-scoped policies if deposit evidence upload is required.
-- Check in the source for the three remaining deployed Edge Functions and reconcile the full live migration history with repository SQL.
-- Review the seven authenticated SECURITY DEFINER advisor warnings and outstanding performance findings. All exposed public application tables inspected have RLS enabled, but that alone does not complete role/security validation.
-- Verify Auth provider, email-confirmation, and redirect settings in the Supabase dashboard; those settings were not exposed by the available project connection.
-- Complete domain, monitoring, operational incident, security, and applicable compliance reviews.
+- Client portal source is root `client.html`.
+- Master Admin source is root `master-admin.html`.
+- Shared browser assets are rooted at the repository top level.
+- `site/` is the Netlify publish package; `site/app/index.html` mirrors `client.html`.
+- Netlify workflows copy the canonical root client/admin/runtime assets into the publish package on every build.
+- Android client/admin flavors bundle the same canonical root portal files.
+- No alternate React/Vite client, demo REST backend, preview site, or legacy UniApp/Huawei web runtime remains in `main`.
 
-## Financial scope
+## Supabase verified state
 
-The browser UI and demo REST API display demonstration/system data and do not settle payments. The separate execute-payout Edge Function can broadcast a real mainnet USDT transfer when configured, so it must be governed as a money-moving operation.
+- RLS is enabled on the application tables.
+- Two Auth users exist and both are email-confirmed.
+- Two AegisPay profiles are linked: one active MASTER ADMIN and one active USER.
+- `private-verification` Storage bucket is present, private, limited to 10 MB, and restricted to JPEG/PNG/WebP.
+- Storage access policies are owner-scoped and runtime-gated.
+- One active cycle-settlement cron runs every minute.
+- Current system mode is `TESTNET_DEMO`; real payouts and live deposit crediting are disabled.
+- No Supabase development branches exist.
+
+## Security review
+
+Supabase Security Advisor currently reports 11 authenticated-callable SECURITY DEFINER functions. These functions are intentionally used by authenticated client/admin/RLS workflows and enforce explicit identity, role, ownership and/or runtime checks. They require continued function-by-function review rather than blanket execution revocation.
+
+Leaked Password Protection is still disabled and is a production prerequisite.
+
+Public table grants were hardened to least privilege on 2026-10-03:
+- sensitive tables no longer grant write privileges to `anon` or `authenticated`;
+- client-readable tables are SELECT-only;
+- notifications retain UPDATE for read-state changes;
+- Shop offers and platform settings retain only the authenticated operations required by the Master Admin UI.
+
+## Performance review
+
+Supabase Performance Advisor reports 12 currently unused indexes. With the present small dataset, these are review candidates, not automatic deletion targets. Do not remove an index solely because it has not yet been used.
+
+## Current production blockers
+
+1. Enable Leaked Password Protection in Supabase Auth.
+2. Verify Auth redirect/provider/SMTP configuration on the physical client device.
+3. Configure and verify server-side AI, Telegram and controlled Shasta/testnet payout secrets.
+4. Verify deposit evidence review, on-chain deposit confirmation, Shop/task workflow, 18-hour settlement, KYC and withdrawal dual approval end-to-end.
+5. Configure release signing and perform physical APK update verification.
