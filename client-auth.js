@@ -227,6 +227,8 @@ function renderDashboard(){
   var m={
    bell:'<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>',
    user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6"/></svg>',
+   mail:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
+   calendar:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>',
    copy:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M5 16H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
    card:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 9h18M7 14h3"/></svg>',
    cart:'<svg viewBox="0 0 24 24"><path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>',
@@ -294,7 +296,7 @@ function renderDashboard(){
  var accountRows=[
   ['user','Client Name',p.name||'—'],['cube','Client ID',p.client_id||'AP-CLIENT'],['mail','Email',p.email||'—'],['phone','Phone',p.phone||'—'],['calendar','Registration Date',p.created_at?date(p.created_at):'—'],['shield','Status',p.status||'Active']
  ];
- var accountInfo=accountRows.map(function(r){var ico=r[0]==='mail'?'copy':r[0];return '<div class="ap-info-row"><span class="ap-info-icon">'+icon(ico)+'</span><div class="ap-info-copy"><span>'+esc(r[1])+'</span><strong class="'+(r[1]==='Status'?'ap-status':'')+'">'+esc(r[2])+'</strong></div></div>';}).join('');
+ var accountInfo=accountRows.map(function(r){var ico=r[0];return '<div class="ap-info-row"><span class="ap-info-icon">'+icon(ico)+'</span><div class="ap-info-copy"><span>'+esc(r[1])+'</span><strong class="'+(r[1]==='Status'?'ap-status':'')+'">'+esc(r[2])+'</strong></div></div>';}).join('');
 
  var body='<div class="ap-shell">'+
   '<section class="ap-screen active" id="apScreenHome">'+
