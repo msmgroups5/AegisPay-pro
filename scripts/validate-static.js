@@ -18,6 +18,11 @@ const client=fs.readFileSync('client.html','utf8');
 for(const marker of ['function home()','function shop()','function product()','function topup()','function referral()','function account()']) {
   assert(client.includes(marker),'Client reference UI is incomplete: '+marker);
 }
+for(const marker of ['Welcome,','Client ID:','Top Up','Shop Millions of Products','Product Details','Select Payment Method','Invite Friends','Total Balance','Home','Assets','My Profile','AI Bot']) {
+  assert(client.includes(marker),'Client reference UI text missing: '+marker);
+}
+assert(client.includes('--red:#c40017')&&client.includes('--yellow:#ffc400')&&client.includes('--purple:#7c22e6'),'Client reference theme tokens are incomplete');
+assert(client.length>30000,'Client reference UI source is unexpectedly small');
 
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
