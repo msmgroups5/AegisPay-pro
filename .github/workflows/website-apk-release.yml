@@ -47,7 +47,9 @@ jobs:
           cp master-admin.html site/master-admin.html
           cp admin-auth.js site/admin-auth.js
           cp client.html site/app/index.html
+          cp client.html site/app/home.html
           cp _redirects site/_redirects
+          cp _headers site/_headers
           cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/
           cp client-home.css client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
           cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
@@ -69,6 +71,7 @@ jobs:
           cp site/app-version.json app-version.json
           test -s site/index.html
           test -s site/app/index.html
+          test -s site/app/home.html
           test -s site/downloads/aegispay-client.apk
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4
