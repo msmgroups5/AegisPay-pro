@@ -407,3 +407,143 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
  .ap-amazon-official{width:78px;height:28px}.ap-amazon-official img{width:68px}
  .ap-promo-copy strong{font-size:17px!important}.ap-promo-copy small{font-size:8px!important}
 }
+
+
+/* FINAL HOME REQUEST PASS — 2026-10-03 */
+.ap-brand{
+  width:182px!important;
+  height:42px!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.ap-brand img{
+  width:182px!important;
+  height:auto!important;
+  max-height:42px!important;
+  display:block!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+}
+.ap-home-header .ap-header-row{min-height:50px!important}
+
+/* Make the building illustration unmistakably visible inside the welcome card. */
+.ap-welcome-card{
+  isolation:isolate;
+}
+.ap-welcome-card .ap-building{
+  display:block!important;
+  position:absolute!important;
+  right:-1px!important;
+  bottom:-1px!important;
+  width:64%!important;
+  height:96%!important;
+  z-index:4!important;
+  opacity:1!important;
+  pointer-events:none!important;
+}
+.ap-welcome-card .ap-building svg{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  filter:drop-shadow(-10px 8px 18px rgba(0,0,0,.38));
+}
+.ap-welcome-copy{z-index:6!important}
+.ap-welcome-card:before{
+  z-index:3!important;
+  width:67%!important;
+  opacity:.72!important;
+  background:
+    linear-gradient(90deg,rgba(18,2,6,.78),rgba(18,2,6,.18) 48%,transparent 78%),
+    linear-gradient(180deg,transparent 0 56%,rgba(255,32,48,.12) 56% 57%,transparent 57%);
+}
+.ap-welcome-card:after{
+  display:none!important;
+}
+
+/* Match the referral card footprint exactly and keep Amazon promo equally wide. */
+.ap-referral-card,
+.ap-promo-card{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.ap-promo-card{
+  min-height:121px!important;
+  height:121px!important;
+  padding:12px 14px!important;
+  display:block!important;
+}
+.ap-promo-copy{
+  max-width:56%!important;
+}
+.ap-cart-official{
+  position:absolute!important;
+  right:3px!important;
+  bottom:2px!important;
+  width:46%!important;
+  height:98%!important;
+  z-index:5!important;
+}
+.ap-cart-badge-icon{
+  width:78px!important;
+  height:69px!important;
+  right:28px!important;
+  bottom:18px!important;
+  position:absolute!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:14px!important;
+  background:rgba(255,255,255,.97)!important;
+  box-shadow:0 10px 20px rgba(0,0,0,.22)!important;
+}
+.ap-cart-badge-icon img{
+  width:58px!important;
+  height:58px!important;
+  display:block!important;
+  object-fit:contain!important;
+}
+.ap-cart-official .ap-box{
+  z-index:6!important;
+}
+
+/* Premium action icons: depth, highlight and stronger icon presence. */
+.ap-action-icon{
+  position:relative!important;
+  overflow:visible!important;
+  width:61px!important;
+  height:61px!important;
+  flex-basis:61px!important;
+  border-radius:18px!important;
+  box-shadow:
+    0 11px 24px rgba(0,0,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.42),
+    inset 0 -5px 12px rgba(0,0,0,.10)!important;
+}
+.ap-action-icon:before{
+  content:"";
+  position:absolute;
+  left:7px;right:7px;top:5px;
+  height:16px;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.34),transparent);
+  pointer-events:none;
+}
+.ap-action-icon>.ap-icon{
+  position:relative;
+  z-index:2;
+  width:34px!important;
+  height:34px!important;
+  flex-basis:34px!important;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.24))!important;
+}
+.ap-action-card.green .ap-action-icon>.ap-icon,
+.ap-action-card.blue .ap-action-icon>.ap-icon,
+.ap-action-card.red .ap-action-icon>.ap-icon,
+.ap-action-card.orange .ap-action-icon>.ap-icon{
+  color:#fff!important;
+}
+.ap-plus-badge{
+  z-index:4!important;
+}
+
+/* Remove any percentage values even if another rule/component tries to inject them. */
+.ap-vip-value{display:none!important;}
