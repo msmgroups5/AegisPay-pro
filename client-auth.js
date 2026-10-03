@@ -3,7 +3,7 @@
 var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
 var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
-var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null; var homeScreen=true;
+var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null; var homeScreen=true; var homeScreen=true;
 var PREMIUM_SHOP=window.AegisShopCatalog||[];var SHOP_CATEGORIES=['All','Electronics','Fashion','Home & Kitchen','Beauty','Sports','Gaming','Office','Books','Outdoor'];var shopSearch='',shopCategory='All';
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
 var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
@@ -249,6 +249,12 @@ function renderWorkspace(){
  var tier=document.getElementById('depositTier'),amount=document.getElementById('depositAmount');
  if(tier&&amount)tier.addEventListener('change',function(){var opt=tier.options[tier.selectedIndex];amount.value=opt.text.match(/\$(\d+(?:\.\d+)?)/)?.[1]||30;});
 }
+
+
+
+
+function profileSection(p){p=p||{};return '<section class="section" id="profile-area" style="margin-top:18px"><h3>Account Details</h3><div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"><div class="stat-card"><small>Name</small><strong style="font-size:15px">'+esc(p.name||'')+'</strong></div><div class="stat-card"><small>Email</small><strong style="font-size:13px;word-break:break-word">'+esc(p.email||'')+'</strong></div><div class="stat-card"><small>Client ID</small><strong style="font-size:13px;word-break:break-word">'+esc(p.client_id||'AP-CLIENT')+'</strong></div><div class="stat-card"><small>Account Status</small><strong style="font-size:15px">'+esc(p.status||'Active')+'</strong></div></div></section>';}
+
 function render(){
  if(state.appEnabled===false){
   root.innerHTML=shell('<section class="tg-paused"><span class="tg-paused-icon">⏻</span><span class="tg-kicker">SERVICE STATUS</span><h1>'+t('pausedTitle')+'</h1><p>'+t(state.runtimeUnverified?'runtimeUnknown':'pausedInfo')+'</p><button type="button" class="tg-button tg-button-primary" data-action="retry-runtime">'+t('retryRuntime')+'</button></section>','auth');
@@ -359,6 +365,14 @@ async function handleWithdraw(e){
 async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
+  if(a==='home'){homeScreen=true;render();return;}
+  if((a==='next-topup'||a==='next-shop'||a==='next-account'||a==='next-crypto'||a==='next-referral'||a==='next-assets'||a==='next-ai'||a==='profile'||a==='notice')&&homeScreen){
+   homeScreen=false;render();
+   var target=(a==='next-topup')?'deposit-area':(a==='next-shop')?'shop':(a==='next-account'||a==='profile')?'profile-area':(a==='next-crypto')?'withdraw-area':(a==='next-referral')?'referrals-area':(a==='next-assets')?'overview':'ai-area';
+   setTimeout(function(){var n=document.getElementById(target);if(n)n.scrollIntoView({behavior:'smooth',block:'start'});},40);
+   return;
+  }
+  if(a==='home-dashboard'){homeScreen=true;render();return;}
   if(a==='home'){homeScreen=true;render();return;}
   if((a==='next-topup'||a==='next-shop'||a==='next-account'||a==='next-crypto'||a==='next-referral'||a==='next-assets'||a==='next-ai'||a==='profile'||a==='notice')&&homeScreen){
    homeScreen=false; render();
