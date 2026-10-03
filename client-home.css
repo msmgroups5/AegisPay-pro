@@ -717,3 +717,96 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
 .ap-nav-item .ap-icon{
   width:23px!important;height:23px!important;flex-basis:23px!important;
 }
+
+
+/* CONCEPT 1 — MODERN GEOMETRIC SHIELD BRAND SYSTEM */
+:root{
+  --ap-brand-navy:#071525!important;
+  --ap-brand-blue:#1558c8!important;
+  --ap-brand-cyan:#4fe0ff!important;
+  --ap-platinum:#f7fbff!important;
+}
+
+/* Header and welcome now use the same geometric fintech palette as the new logo. */
+.ap-home-header{
+  background:
+    radial-gradient(circle at 88% 18%,rgba(79,224,255,.18),transparent 25%),
+    linear-gradient(145deg,#061323 0%,#0a2441 54%,#07111f 100%)!important;
+  box-shadow:0 12px 30px rgba(0,19,42,.40)!important;
+}
+.ap-home-header:before{opacity:.45!important}
+.ap-home-header:after{opacity:.28!important}
+.ap-welcome-card{
+  border-color:rgba(79,224,255,.65)!important;
+  background:
+    radial-gradient(circle at 86% 20%,rgba(79,224,255,.20),transparent 29%),
+    linear-gradient(115deg,#06111e 0%,#0b2038 52%,#0d3760 100%)!important;
+  box-shadow:0 14px 35px rgba(0,12,30,.34),inset 0 0 45px rgba(79,224,255,.07)!important;
+}
+.ap-welcome-card:before{
+  background:
+    linear-gradient(90deg,rgba(3,12,24,.82),rgba(3,12,24,.18) 48%,transparent 78%),
+    linear-gradient(180deg,transparent 0 56%,rgba(79,224,255,.10) 56% 57%,transparent 57%)!important;
+}
+.ap-welcome-card .ap-building svg{
+  filter:drop-shadow(-10px 8px 18px rgba(0,0,0,.42))!important;
+}
+.ap-circle-btn.profile{
+  background:linear-gradient(145deg,#4fe0ff,#1d77df)!important;
+  box-shadow:0 8px 18px rgba(30,153,236,.25)!important;
+}
+.ap-notification-dot{
+  background:#4fe0ff!important;
+  border-color:#0a2a48!important;
+}
+.ap-crown{
+  color:#16bfe9!important;
+  filter:drop-shadow(0 3px 5px rgba(22,191,233,.25))!important;
+}
+
+/* All core action marks share one premium geometric language. */
+.ap-action-card.blue .ap-action-icon{
+  background:linear-gradient(145deg,#61e9ff,#168adf 55%,#124db8)!important;
+}
+.ap-action-card.red .ap-action-icon{
+  background:linear-gradient(145deg,#50d9ff,#1877d9 55%,#1645a8)!important;
+}
+.ap-action-card.green .ap-action-icon{
+  background:linear-gradient(145deg,#73eaff,#21b5d9 55%,#1767bf)!important;
+}
+.ap-action-card.orange .ap-action-icon{
+  background:linear-gradient(145deg,#b5f5ff,#3cc9e9 55%,#2465c4)!important;
+}
+.ap-action-icon{
+  box-shadow:0 10px 22px rgba(4,70,130,.22),inset 0 1px 0 rgba(255,255,255,.48),inset 0 -7px 12px rgba(0,0,0,.12)!important;
+}
+
+/* Referral gets a platinum/navy treatment instead of unrelated purple. */
+.ap-referral-card{
+  background:
+    radial-gradient(circle at 88% 18%,rgba(79,224,255,.15),transparent 25%),
+    linear-gradient(110deg,#edfaff 0%,#f5fbff 55%,#eaf6ff 100%)!important;
+  box-shadow:0 10px 24px rgba(8,80,130,.10)!important;
+}
+.ap-ref-icon{
+  background:linear-gradient(145deg,#56e5ff,#147bdc 56%,#123f9c)!important;
+  box-shadow:0 10px 20px rgba(16,100,180,.22)!important;
+}
+.ap-ref-copy small{color:#126eaa!important}
+.ap-arrow{color:#1558c8!important}
+
+/* Bottom navigation follows the same navy/cyan identity. */
+.ap-bottom-nav{
+  background:rgba(4,13,24,.97)!important;
+}
+.ap-nav-item.active{
+  color:#4fe0ff!important;
+  background:linear-gradient(180deg,rgba(79,224,255,.14),rgba(79,224,255,.035))!important;
+}
+
+/* Copy button follows brand palette. */
+.ap-copy-btn{
+  color:#4fe0ff!important;
+  border-color:rgba(79,224,255,.45)!important;
+  background:rgba(79,224,255,.08)!important;
+}
