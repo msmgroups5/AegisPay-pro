@@ -3,7 +3,7 @@ const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 const exists=p=>fs.existsSync(p);
 
 const must=[
-  'client.html','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
+  'client.html','client-fresh.html','client-ui.css','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
   'service-worker.js','manifest.webmanifest','aegispay-logo.svg','_redirects','package.json','netlify.toml',
   'database/migrations/20261003_private_verification_storage_policies.sql',
@@ -15,7 +15,7 @@ const must=[
 for(const p of must)assert(exists(p),'Missing canonical source file: '+p);
 
 const client=fs.readFileSync('client.html','utf8');
-for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js','aegis-auth-redirect.js','./styles.css','./premium.css']) {
+for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js','aegis-auth-redirect.js','./client-ui.css']) {
   assert(client.includes(marker),'Authenticated client entry wiring is incomplete: '+marker);
 }
 for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
@@ -50,12 +50,13 @@ assert(native.includes('aegispay-pro.netlify.app')&&!native.includes('aegispay-c
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
 assert(deploy.includes('NETLIFY_SITE_ID: 5573011e-3f81-449a-9617-da0c176720d8'),'Netlify site ID is not canonical');
 assert(deploy.includes('cp client.html site/app/index.html'),'Deploy source of truth is not client.html');
+assert(deploy.includes('cp client-ui.css styles.css premium.css shop-catalog.js'),'Standalone client UI stylesheet is not deployed');
 assert(deploy.includes('cp master-admin.html site/master-admin.html'),'Admin deploy source is not master-admin.html');
 assert(deploy.includes('rm -rf site/app site/downloads'),'Generated deploy directories are rebuilt cleanly');
 assert(!deploy.includes('0aa38615-c9e6-4129-bc08-cd28739606d0')&&!deploy.includes('aegispay-client.netlify.app'),'Stale Netlify target remains');
 
 const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
-assert(rel.includes('cp client.html site/app/index.html')&&rel.includes('5573011e-3f81-449a-9617-da0c176720d8')&&!rel.includes('0aa38615-c9e6-4129-bc08-cd28739606d0'),'Release workflow is not canonical');
+assert(rel.includes('cp client.html site/app/index.html')&&rel.includes('cp client-ui.css styles.css premium.css shop-catalog.js')&&rel.includes('5573011e-3f81-449a-9617-da0c176720d8')&&!rel.includes('0aa38615-c9e6-4129-bc08-cd28739606d0'),'Release workflow is not canonical');
 
 assert(fs.readFileSync('app-update.js','utf8').includes('https://aegispay-pro.netlify.app/app-version.json'),'Updater endpoint is stale');
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301'),'Canonical app redirect missing');
