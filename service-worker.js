@@ -2,8 +2,8 @@ const CACHE='aegispay-shell-v17-home-dashboard';
 const APP_SCOPE=self.registration&&self.registration.scope?new URL(self.registration.scope).pathname:'/';
 const APP_MODE=APP_SCOPE.startsWith('/app/');
 const ASSETS=APP_MODE
-  ? ['./','./index.html','./client-home.css','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./aegispay-logo.svg','./manifest.webmanifest']
-  : ['./','./index.html','./app/','./app/index.html','./master-admin.html','./client-home.css','./client-ui.css','./styles.css','./premium.css','./shop-catalog.js','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
+  ? ['./','./index.html','./home.html','./client-home.css','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./aegispay-logo.svg','./manifest.webmanifest']
+  : ['./','./index.html','./app/','./app/index.html','./app/home.html','./master-admin.html','./client-home.css','./client-ui.css','./styles.css','./premium.css','./shop-catalog.js','./supabase-client.js','./supabase-service.js','./aegis-auth-redirect.js','./app-update.js','./client-auth.js','./admin-auth.js','./aegispay-logo.svg','./manifest.webmanifest'];
 self.addEventListener('install',event=>{
   event.waitUntil(
     caches.open(CACHE).then(async cache=>{
