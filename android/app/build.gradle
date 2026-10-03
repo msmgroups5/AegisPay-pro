@@ -81,6 +81,7 @@ def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
         include 'client.html'
         include 'client-fresh.html'
         include 'master-admin.html'
+        include 'client-ui.css'
         include 'styles.css'
         include 'premium.css'
         include 'shop-catalog.js'
