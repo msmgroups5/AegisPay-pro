@@ -63,10 +63,13 @@ function toast(msg){
 }
 
 async function signIn(e){
- e.preventDefault();state.busy=true;state.message='';authView();
+ e.preventDefault();
+ var emailInput=document.getElementById('loginEmail'),passwordInput=document.getElementById('loginPassword');
+ var email=emailInput?emailInput.value.trim():'',password=passwordInput?passwordInput.value:'';
+ state.busy=true;state.message='';authView();
  try{
   if(!service||!service.signIn)throw new Error('AegisPay sign-in service is not ready.');
-  await service.signIn(document.getElementById('loginEmail').value,document.getElementById('loginPassword').value);
+  await service.signIn(email,password);
   var r=await service.claimAegisPayProfile();
   state.profile=r&&r.profile?r.profile:null;
   if(!state.profile)throw new Error('Client profile is not available.');
