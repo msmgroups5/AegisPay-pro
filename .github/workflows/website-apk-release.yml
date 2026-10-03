@@ -10,8 +10,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 5573011e-3f81-449a-9617-da0c176720d8
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
       AEGIS_RELEASE_KEY_ALIAS: ${{ secrets.AEGIS_RELEASE_KEY_ALIAS }}
@@ -85,11 +83,4 @@ jobs:
           name: AegisPay-Master-Admin-Release
           path: ${{ runner.temp }}/aegispay-admin.apk
           if-no-files-found: error
-      - name: Deploy production website
-        if: env.NETLIFY_AUTH_TOKEN != ''
-        shell: bash
-        run: |
-          set -euo pipefail
-          status_json="$(npx -y netlify-cli status --auth="$NETLIFY_AUTH_TOKEN" --json)"
-          echo "$status_json" | jq -e '.siteData["site-id"] == "5573011e-3f81-449a-9617-da0c176720d8"' >/dev/null
-          npx -y netlify-cli deploy --dir=site --prod --site="$NETLIFY_SITE_ID" --auth="$NETLIFY_AUTH_TOKEN" --message="AegisPay signed release $GITHUB_SHA"
+      # Netlify production deployment intentionally disabled; Cloudflare migration is in progress.
