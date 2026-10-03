@@ -6,7 +6,7 @@
 - Production branch: `main`
 - Supabase project: `wtcspnrmsoisroavojop`
 - Netlify project: `aegispay-pro`
-- Netlify site ID: `0aa38615-c9e6-4129-bc08-cd28739606d0`
+- Netlify site ID: `80dd262c-dfec-427a-9820-0eb98ec829b5`
 - Production website: `https://aegispay-pro.netlify.app/`
 - Client entry: `https://aegispay-pro.netlify.app/app/`
 - Master Admin entry: `https://aegispay-pro.netlify.app/admin/`
