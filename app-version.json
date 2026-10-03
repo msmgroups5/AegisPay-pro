@@ -3,10 +3,9 @@
   "versionName": "2.4.2",
   "releaseChannel": "stable",
   "releasedAt": "2026-10-03T00:00:00Z",
-  "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
+  "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
   "notes": [
-    "Home, Shop, Product Details, Top Up, Referral and Account Details strict reference/prompt UI pass",
-    "All reference action/category/payment/detail icons converted to SVG",
-    "Account actions, referral levels and product benefits refined to match the supplied screens"
+    "Canonical AegisPay Client portal source is client.html.",
+    "Client and Master Admin share the canonical root web assets and Supabase backend."
   ]
 }
