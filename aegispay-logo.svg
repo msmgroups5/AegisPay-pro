@@ -1,22 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" role="img" aria-label="AegisPay">
-<defs>
- <linearGradient id="shield" x1="8%" y1="0%" x2="92%" y2="100%">
-  <stop offset="0" stop-color="#63e6ff"/>
-  <stop offset=".48" stop-color="#18bde8"/>
-  <stop offset="1" stop-color="#1558c8"/>
- </linearGradient>
- <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
-  <stop offset="0" stop-color="#bff7ff"/>
-  <stop offset="1" stop-color="#3b8dff"/>
- </linearGradient>
-</defs>
-<g transform="translate(8 8)">
- <path d="M52 5 103 23v34c0 31-20 45-51 55C21 102 1 88 1 57V23L52 5Z" fill="url(#shield)" stroke="url(#edge)" stroke-width="2.5"/>
- <path d="M52 27 25 79h13l8-16 6 12 8-15 10 19h13L52 27Z" fill="#061425"/>
- <path d="M52 39 41 59h9l2-4 3 6 7-13-10-9Z" fill="#f7fbff" opacity=".96"/>
- <path d="M69 43h18v9H64z" fill="#f7fbff" opacity=".96"/>
- <path d="M69 58h18v9H64z" fill="#f7fbff" opacity=".96"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 110" role="img" aria-label="AegisPay">
+<defs><linearGradient id="red" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ff2435"/><stop offset=".55" stop-color="#ff1b2e"/><stop offset="1" stop-color="#c90e1c"/></linearGradient></defs>
+<g transform="translate(8 6)">
+<path d="M12 86 L55 12 Q62 0 71 12 L117 86 Q122 97 111 97 L95 97 Q88 97 84 89 L65 55 L47 89 Q43 97 34 97 H18 Q3 97 12 86Z" fill="url(#red)"/>
+<path d="M56 71 Q65 56 72 63 L89 88 Q95 97 84 97 H66 Q61 97 57 90 L51 79 Q49 75 56 71Z" fill="#e51d2b"/>
 </g>
-<text x="140" y="78" font-family="Inter,Montserrat,Arial,sans-serif" font-size="61" font-weight="800" letter-spacing="-1.8" fill="#f7fbff">Aegis</text>
-<text x="337" y="78" font-family="Inter,Montserrat,Arial,sans-serif" font-size="61" font-weight="800" letter-spacing="-1.8" fill="#4fe0ff">Pay</text>
+<text x="135" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="#111318">Aegis</text>
+<text x="325" y="80" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="700" font-style="italic" fill="url(#red)">Pay</text>
 </svg>
