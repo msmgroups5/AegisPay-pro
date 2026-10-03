@@ -76,28 +76,43 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }
 
-def syncAegisPayWebAssets = tasks.register('syncAegisPayWebAssets', Copy) {
-    from(rootProject.projectDir.parentFile) {
+def webRoot = rootProject.projectDir.parentFile
+
+def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', Copy) {
+    from(webRoot) {
         include 'client.html'
         include 'client-fresh.html'
-        include 'master-admin.html'
-        include 'client-ui.css'
-        include 'styles.css'
-        include 'premium.css'
-        include 'shop-catalog.js'
         include 'client-auth.js'
-        include 'admin-auth.js'
         include 'supabase-client.js'
         include 'supabase-service.js'
         include 'aegis-auth-redirect.js'
+        include 'app-update.js'
         include 'service-worker.js'
         include 'manifest.webmanifest'
         include 'aegispay-logo.svg'
-        include 'app-update.js'
     }
-    into(layout.projectDirectory.dir('src/main/assets/aegispay'))
+    into(layout.projectDirectory.dir('src/client/assets/aegispay'))
+}
+
+def syncAdminAegisPayWebAssets = tasks.register('syncAdminAegisPayWebAssets', Copy) {
+    from(webRoot) {
+        include 'master-admin.html'
+        include 'admin-auth.js'
+        include 'styles.css'
+        include 'premium.css'
+        include 'shop-catalog.js'
+        include 'supabase-client.js'
+        include 'supabase-service.js'
+        include 'aegis-auth-redirect.js'
+        include 'app-update.js'
+        include 'service-worker.js'
+        include 'manifest.webmanifest'
+        include 'aegispay-logo.svg'
+    }
+    into(layout.projectDirectory.dir('src/admin/assets/aegispay'))
 }
 
 tasks.named('preBuild').configure {
-    dependsOn(syncAegisPayWebAssets)
+    dependsOn(syncClientAegisPayWebAssets)
+    dependsOn(syncAdminAegisPayWebAssets)
 }
