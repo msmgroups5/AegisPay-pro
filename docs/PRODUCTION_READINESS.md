@@ -4,7 +4,7 @@
 
 - GitHub repository: `msmgroups5/AegisPay-pro`
 - Production source branch: `main`
-- Netlify project: `aegispay-pro` (site ID `80dd262c-dfec-427a-9820-0eb98ec829b5`)
+- Netlify project: `aegispay-pro` (site ID `5573011e-3f81-449a-9617-da0c176720d8`)
 - Supabase project: `wtcspnrmsoisroavojop`, ACTIVE_HEALTHY
 - Public website route: `/`
 - Client portal route: `/app/`
