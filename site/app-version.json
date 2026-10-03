@@ -1,12 +1,12 @@
 {
-  "versionCode": 23,
-  "versionName": "2.1.2",
+  "versionCode": 28,
+  "versionName": "2.4.2",
   "releaseChannel": "stable",
-  "releasedAt": "2026-10-01T00:00:00Z",
-  "clientApkUrl": "https://aegispay-client.netlify.app/downloads/aegispay-client.apk",
+  "releasedAt": "2026-10-03T00:00:00Z",
+  "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
   "notes": [
-    "Stable client portal routing",
-    "Remote-first web portal deployment",
-    "Master Admin web portal"
+    "Canonical Client portal source is client.html.",
+    "Canonical Master Admin source is master-admin.html.",
+    "Supabase-backed TESTNET/DEMO workflow."
   ]
 }
