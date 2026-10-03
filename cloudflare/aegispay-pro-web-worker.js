@@ -1,4 +1,4 @@
-const COMMIT = "2a4e5764f7c9c1b5139607e38313f9868b9e4cd7";
+const COMMIT = "e300b111b9e3214cd25f836db4132199e4bd5d5d";
 const RAW = "https://raw.githubusercontent.com/msmgroups5/AegisPay-pro/" + COMMIT + "/";
 const MIME = {
   html: "text/html; charset=UTF-8",
@@ -71,10 +71,21 @@ export default {
     if (path === "/app") return redirect("/app/");
     if (path === "/admin") return redirect("/admin/");
     if (path === "/auth/callback" || path === "/app/auth/callback") {
-      return redirect("/app/home.html", 302);
+      return redirect("/app/home.html" + url.search, 302);
     }
 
     const file = sourcePath(path);
+    if (!file && path.startsWith("/downloads/")) {
+      const downloadUrl = "https://f785d8a2.aegispay-pro.pages.dev" + path;
+      try {
+        const download = await fetch(downloadUrl, { cache: "no-store" });
+        if (download.ok) {
+          const headers = new Headers(download.headers);
+          headers.set("Cache-Control", "public, max-age=3600");
+          return new Response(download.body, { status: download.status, headers });
+        }
+      } catch (error) {}
+    }
     if (!file) {
       return new Response("AegisPay resource not found", {
         status: 404,
