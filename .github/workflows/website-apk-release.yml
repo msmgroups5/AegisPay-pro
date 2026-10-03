@@ -48,8 +48,8 @@ jobs:
           cp client.html site/app/home.html
           cp _redirects site/_redirects
           cp _headers site/_headers
-          cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/
-          cp client-home.css client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
+          cp styles.css premium.css client-ui-reference.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
+          cp client-home.css client-ui-reference.css client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/app/
           cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
           cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
           VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
@@ -61,7 +61,7 @@ jobs:
             "versionName": "${VERSION_NAME}",
             "releaseChannel": "stable",
             "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
+            "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client.apk",
             "clientSha256": "${CLIENT_SHA}",
             "notes": ["Canonical Client portal source: client.html","Canonical Master Admin source: master-admin.html","Signed release"]
           }
@@ -83,4 +83,10 @@ jobs:
           name: AegisPay-Master-Admin-Release
           path: ${{ runner.temp }}/aegispay-admin.apk
           if-no-files-found: error
-      # Netlify production deployment intentionally disabled; Cloudflare migration is in progress.
+      - name: Deploy canonical release package to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=aegispay-pro --branch=main --commit-hash=${{ github.sha }} --commit-message="AegisPay signed release" --commit-dirty=false
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
