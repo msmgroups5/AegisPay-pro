@@ -4,6 +4,18 @@ var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
 var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},view:(new URLSearchParams((location.hash||'').replace(/^#/,'')).get('page')||'home'),message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
 var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null; var homeScreen=true;
+var AP_UI_SETTINGS=Object.freeze({
+ palette:{
+  primaryRed:'#E50914',lightRed:'#FF4D6D',darkRed:'#C81E3A',
+  background:'#F6F8FC',navy:'#102033',card:'#FFFFFF',softPink:'#FFF4F6',
+  textPrimary:'#1A1A1A',textSecondary:'#6B7280',border:'#E5E7EB',
+  success:'#22C55E',warning:'#F59E0B',blue:'#3B82F6'
+ },
+ typography:{family:'Poppins,Inter,Roboto,Arial,sans-serif',nameSize:'28px',cardTitleSize:'18px'},
+ layout:{maxWidth:'430px',radius:'20px',gap:'9px',bottomNavHeight:'70px'},
+ features:{showScan:false,showAmazonPromo:true,showReferral:true}
+});
+
 var PREMIUM_SHOP=window.AegisShopCatalog||[];var SHOP_CATEGORIES=['All','Electronics','Fashion','Home & Kitchen','Beauty','Sports','Gaming','Office','Books','Outdoor'];var shopSearch='',shopCategory='All';
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
 var saved=null;try{saved=localStorage.getItem('aegispay-language');}catch(e){}
@@ -355,7 +367,7 @@ function homeView(){
  var userName=String(p.name||'Ali Shahid');
  var clientId=String(p.client_id||'AP-CLIENT');
 
- root.innerHTML='<div class="ap-shell ap-premium-home">'+
+ root.innerHTML='<div class="ap-shell ap-premium-home" style="--ui-red:'+AP_UI_SETTINGS.palette.primaryRed+';--ui-light-red:'+AP_UI_SETTINGS.palette.lightRed+';--ui-dark-red:'+AP_UI_SETTINGS.palette.darkRed+';--ui-bg:'+AP_UI_SETTINGS.palette.background+';--ui-navy:'+AP_UI_SETTINGS.palette.navy+';--ui-card:'+AP_UI_SETTINGS.palette.card+';--ui-soft-pink:'+AP_UI_SETTINGS.palette.softPink+';--ui-text:'+AP_UI_SETTINGS.palette.textPrimary+';--ui-muted:'+AP_UI_SETTINGS.palette.textSecondary+';--ui-border:'+AP_UI_SETTINGS.palette.border+';--ui-blue:'+AP_UI_SETTINGS.palette.blue+';--ui-orange:'+AP_UI_SETTINGS.palette.warning+';font-family:'+AP_UI_SETTINGS.typography.family+';">'+
  '<header class="ap-home-header">'+
    '<div class="ap-header-row">'+
      '<div class="ap-brand"><img src="./aegispay-logo.svg" alt="AegisPay"></div>'+
