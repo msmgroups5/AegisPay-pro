@@ -47,8 +47,8 @@ jobs:
           cp admin-auth.js site/admin-auth.js
           cp client.html site/app/index.html
           cp _redirects site/_redirects
-          cp client-ui.css styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/
-          cp client-ui.css styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/app/
+          cp styles.css premium.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg site/
+          cp client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg site/app/
           cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
           cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
           VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
