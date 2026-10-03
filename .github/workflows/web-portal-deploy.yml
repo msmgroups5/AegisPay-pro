@@ -12,7 +12,7 @@ jobs:
   deploy-web:
     runs-on: ubuntu-latest
     env:
-      NETLIFY_SITE_ID: 0aa38615-c9e6-4129-bc08-cd28739606d0
+      NETLIFY_SITE_ID: 80dd262c-dfec-427a-9820-0eb98ec829b5
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
