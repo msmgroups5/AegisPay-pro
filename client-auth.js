@@ -362,28 +362,11 @@ function homeView(){
        '<button class="ap-circle-btn profile" data-action="profile" aria-label="My Profile">'+icon('user')+'</button>'+
      '</div>'+
    '</div>'+
-   '<section class="ap-welcome-card">'+
+   '<section class="ap-welcome-card ap-welcome-card-clean">'+
      '<div class="ap-welcome-copy">'+
        '<div class="ap-welcome-kicker">Welcome,</div>'+
        '<div class="ap-welcome-name">'+esc(userName)+'</div>'+
        '<div class="ap-client-row">Client ID: '+esc(clientId)+'<button class="ap-copy-btn" data-action="copy-client-id" aria-label="Copy Client ID">'+icon('copy')+'</button></div>'+
-     '</div>'+
-     '<div class="ap-building" aria-hidden="true">'+
-       '<svg viewBox="0 0 260 150" focusable="false">'+
-         '<rect x="6" y="52" width="46" height="98" rx="1" fill="#240307" stroke="#7A0A0F" stroke-width="1"/>'+
-         '<rect x="48" y="18" width="56" height="132" rx="1" fill="#120205" stroke="#7A0A0F" stroke-width="1"/>'+
-         '<rect x="99" y="43" width="50" height="107" rx="1" fill="#1A0305" stroke="#7A0A0F" stroke-width="1"/>'+
-         '<rect x="145" y="8" width="67" height="142" rx="1" fill="#0F0103" stroke="#7A0A0F" stroke-width="1"/>'+
-         '<rect x="207" y="37" width="47" height="113" rx="1" fill="#170205" stroke="#7A0A0F" stroke-width="1"/>'+
-         '<g fill="#E5141B">'+
-           '<rect x="15" y="67" width="10" height="8"/><rect x="31" y="67" width="10" height="8"/><rect x="15" y="83" width="10" height="8"/><rect x="31" y="83" width="10" height="8"/><rect x="15" y="99" width="10" height="8"/><rect x="31" y="99" width="10" height="8"/><rect x="15" y="115" width="10" height="8"/><rect x="31" y="115" width="10" height="8"/>'+
-           '<rect x="58" y="32" width="12" height="9"/><rect x="76" y="32" width="12" height="9"/><rect x="58" y="49" width="12" height="9"/><rect x="76" y="49" width="12" height="9"/><rect x="58" y="66" width="12" height="9"/><rect x="76" y="66" width="12" height="9"/><rect x="58" y="83" width="12" height="9"/><rect x="76" y="83" width="12" height="9"/><rect x="58" y="100" width="12" height="9"/><rect x="76" y="100" width="12" height="9"/><rect x="58" y="117" width="12" height="9"/><rect x="76" y="117" width="12" height="9"/>'+
-           '<rect x="110" y="57" width="11" height="8"/><rect x="127" y="57" width="11" height="8"/><rect x="110" y="73" width="11" height="8"/><rect x="127" y="73" width="11" height="8"/><rect x="110" y="89" width="11" height="8"/><rect x="127" y="89" width="11" height="8"/><rect x="110" y="105" width="11" height="8"/><rect x="127" y="105" width="11" height="8"/><rect x="110" y="121" width="11" height="8"/><rect x="127" y="121" width="11" height="8"/>'+
-           '<rect x="157" y="22" width="14" height="9"/><rect x="178" y="22" width="14" height="9"/><rect x="157" y="40" width="14" height="9"/><rect x="178" y="40" width="14" height="9"/><rect x="157" y="58" width="14" height="9"/><rect x="178" y="58" width="14" height="9"/><rect x="157" y="76" width="14" height="9"/><rect x="178" y="76" width="14" height="9"/><rect x="157" y="94" width="14" height="9"/><rect x="178" y="94" width="14" height="9"/><rect x="157" y="112" width="14" height="9"/><rect x="178" y="112" width="14" height="9"/>'+
-           '<rect x="217" y="51" width="10" height="8"/><rect x="234" y="51" width="10" height="8"/><rect x="217" y="67" width="10" height="8"/><rect x="234" y="67" width="10" height="8"/><rect x="217" y="83" width="10" height="8"/><rect x="234" y="83" width="10" height="8"/><rect x="217" y="99" width="10" height="8"/><rect x="234" y="99" width="10" height="8"/><rect x="217" y="115" width="10" height="8"/><rect x="234" y="115" width="10" height="8"/>'+
-         '</g>'+
-         '<text x="151" y="139" fill="#FFFFFF" font-family="Inter,Arial,sans-serif" font-size="7" font-weight="700">Aegis</text><text x="173" y="139" fill="#F01920" font-family="Inter,Arial,sans-serif" font-size="7" font-weight="700">Pay</text>'+
-       '</svg>'+
      '</div>'+
    '</section>'+
  '</header>'+
