@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public String runtimeInfo() {
-            return "{\"framework\":\"UniApp-compatible hybrid\",\"appId\":\"__UNI__D835ED9\",\"hmsCore\":\"6.5.0.300PK\",\"androidX\":true,\"webView\":true}";
+            return "{\"framework\":\"WebView\",\"apiMode\":\"Supabase\",\"androidX\":true,\"webView\":true}";
         }
 
         @JavascriptInterface
