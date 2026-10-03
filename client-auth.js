@@ -363,8 +363,8 @@ async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
  if(a.indexOf('view-')===0 || a==='ai-view' || a==='profile-view' || a==='notifications'){
-  var target=a==='profile-view'||a==='notifications'||a==='ai-view'?'assets':a.replace(/^view-/,'');
-  var ids=['home','referral','topup','shop','assets','crypto'];
+  var target=a==='profile-view'?'assets':(a==='ai-view'?'ai':(a==='notifications'?'notifications':a.replace(/^view-/,'')));
+  var ids=['home','referral','topup','shop','product','assets','crypto','ai','notifications'];
   ids.forEach(function(id){var v=document.getElementById('apView'+id.charAt(0).toUpperCase()+id.slice(1));if(v)v.classList.toggle('hidden',id!==target);});
   root.querySelectorAll('.exact-bottom button').forEach(function(b){b.classList.remove('active');});
   var homeNav=document.getElementById('homeNav'),shopNav=document.getElementById('shopNav');
