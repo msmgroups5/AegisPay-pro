@@ -323,3 +323,87 @@ svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-wi
 .ap-logo-mark{width:45px;height:45px;display:inline-flex;flex:0 0 45px;align-items:center;justify-content:center}
 .ap-logo-mark svg{width:100%;height:100%;display:block}
 .ap-login-logo .ap-logo-mark{width:48px;height:48px;flex-basis:48px}
+
+/* Home Dashboard visual correction — requested reference refinements */
+.ap-login-logo{display:flex;align-items:center;justify-content:flex-start;min-height:54px}
+.ap-login-logo img{width:180px!important;height:auto!important;max-height:none!important;object-fit:contain}
+.ap-brand{width:176px;height:38px;display:flex;align-items:center}
+.ap-brand img{width:176px!important;height:auto!important;max-height:38px;object-fit:contain;object-position:left center}
+.ap-brand-word{display:none!important}
+
+.ap-welcome-card{min-height:176px!important}
+.ap-welcome-copy{max-width:62%!important}
+.ap-welcome-card:before{
+ content:"";
+ position:absolute;right:-3px;bottom:0;width:58%;height:100%;z-index:1;opacity:1;
+ background:
+  linear-gradient(90deg,rgba(16,2,5,.1),rgba(16,2,5,0) 35%),
+  linear-gradient(180deg,transparent 0 48%,rgba(255,33,50,.10) 48% 49%,transparent 49% 72%,rgba(255,33,50,.12) 72% 73%,transparent 73%),
+  linear-gradient(90deg,transparent 0 11%,rgba(0,0,0,.52) 11% 12%,transparent 12% 23%,rgba(0,0,0,.44) 23% 24%,transparent 24% 36%,rgba(0,0,0,.48) 36% 37%,transparent 37% 51%,rgba(0,0,0,.42) 51% 52%,transparent 52% 66%,rgba(0,0,0,.46) 66% 67%,transparent 67% 82%,rgba(0,0,0,.40) 82% 83%,transparent 83%);
+ clip-path:polygon(28% 40%,42% 29%,49% 7%,57% 28%,75% 16%,100% 28%,100% 100%,0 100%,0 56%);
+ background-color:#490910;
+ box-shadow:inset 20px 0 55px rgba(255,19,37,.06),0 -4px 28px rgba(255,21,39,.08);
+ pointer-events:none;
+}
+.ap-welcome-card:after{display:none!important}
+.ap-building{display:block!important;right:-2px!important;bottom:0!important;width:59%!important;height:91%!important;z-index:2!important;opacity:.96!important}
+.ap-building .b1,.ap-building .b2,.ap-building .b3{
+ border:1px solid rgba(255,48,62,.85)!important;
+ background:
+  repeating-linear-gradient(90deg,rgba(255,53,64,.30) 0 5px,rgba(12,1,4,.72) 5px 9px),
+  repeating-linear-gradient(180deg,rgba(255,47,60,.20) 0 6px,rgba(8,1,3,.75) 6px 11px),
+  linear-gradient(180deg,rgba(90,5,13,.72),rgba(9,1,4,.96))!important;
+ box-shadow:0 0 16px rgba(255,22,39,.28),inset 0 0 15px rgba(255,24,39,.12)!important;
+ transform:skewX(-3deg)!important;
+}
+.ap-building .b1{right:0!important;width:55%!important;height:61%!important}
+.ap-building .b2{right:37%!important;width:29%!important;height:82%!important}
+.ap-building .b3{right:55%!important;width:17%!important;height:67%!important}
+.ap-building:after{content:""!important}
+
+.ap-vip{margin-top:8px!important}
+.ap-vip-value{display:none!important}
+.ap-vip-col{min-height:93px!important}
+.ap-vip-label{font-size:14px!important;margin-top:2px}
+.ap-crown{width:31px!important;height:27px!important;margin-bottom:5px!important;filter:drop-shadow(0 3px 5px rgba(232,19,37,.18))}
+
+.ap-action-card{
+ background:linear-gradient(180deg,#fff,#fbfbfd)!important;
+ box-shadow:0 8px 22px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.8)!important;
+}
+.ap-action-icon{
+ width:60px!important;height:60px!important;border-radius:17px!important;
+ color:#fff!important;border:1px solid rgba(255,255,255,.4)!important;
+ box-shadow:0 9px 18px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.28)!important;
+}
+.ap-action-card.blue .ap-action-icon{background:linear-gradient(145deg,#3ea4ff,#1168e9)!important}
+.ap-action-card.red .ap-action-icon{background:linear-gradient(145deg,#ff4152,#d80b20)!important}
+.ap-action-card.green .ap-action-icon{background:linear-gradient(145deg,#35e29b,#08aa6b)!important}
+.ap-action-card.orange .ap-action-icon{background:linear-gradient(145deg,#ffbd3b,#ec7a00)!important}
+.ap-action-icon>.ap-icon{width:32px!important;height:32px!important;flex-basis:32px!important;filter:drop-shadow(0 2px 3px rgba(0,0,0,.12))}
+.ap-plus-badge{background:#126ff2!important;border:2px solid #fff!important;box-shadow:0 3px 8px rgba(18,111,242,.25)}
+
+.ap-referral-card{width:100%!important;min-height:121px!important}
+.ap-promo-card{width:100%!important;min-height:121px!important;height:121px!important;padding:12px 14px!important}
+.ap-promo-copy{max-width:55%!important;display:flex;flex-direction:column;justify-content:center;height:100%}
+.ap-amazon-official{width:86px;height:30px;background:#fff;border-radius:5px;display:flex;align-items:center;padding:3px 6px;box-shadow:0 3px 8px rgba(0,0,0,.14)}
+.ap-amazon-official img{display:block;width:74px;height:auto;object-fit:contain}
+.ap-promo-copy strong{font-size:19px!important;line-height:1.02!important;margin-top:6px!important}
+.ap-promo-copy small{font-size:9px!important;line-height:1.2!important;margin-top:4px!important}
+.ap-promo-copy em{font-style:normal;color:rgba(255,255,255,.54);font-size:4.5px;line-height:1.1;margin-top:5px;max-width:195px}
+.ap-cart-official{position:absolute;right:4px;bottom:3px;width:45%;height:96%;z-index:2;display:flex;align-items:flex-end;justify-content:flex-end}
+.ap-cart-badge-icon{width:74px;height:68px;border-radius:14px;background:rgba(255,255,255,.94);display:grid;place-items:center;box-shadow:0 7px 15px rgba(0,0,0,.16);position:absolute;right:25px;bottom:18px;transform:rotate(-3deg)}
+.ap-cart-badge-icon img{width:55px;height:55px;object-fit:contain}
+.ap-cart-official .ap-box{position:absolute}
+.ap-cart-official .bx1{right:7px;top:2px;width:43px;height:29px;transform:rotate(8deg)}
+.ap-cart-official .bx2{right:44px;top:9px;width:38px;height:26px;transform:rotate(-6deg)}
+.ap-cart-official .bx3{right:21px;top:24px;width:40px;height:27px;transform:rotate(5deg)}
+.ap-cart-official .ap-box:after{font-size:5px}
+
+@media(max-width:365px){
+ .ap-brand{width:158px}.ap-brand img{width:158px!important}
+ .ap-welcome-copy{max-width:64%!important}
+ .ap-promo-card{height:116px!important;min-height:116px!important}
+ .ap-amazon-official{width:78px;height:28px}.ap-amazon-official img{width:68px}
+ .ap-promo-copy strong{font-size:17px!important}.ap-promo-copy small{font-size:8px!important}
+}
