@@ -23,7 +23,7 @@ for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
 }
 assert(client.includes('styles.css')&&client.includes('premium.css')&&client.includes('shop-catalog.js'),'Recovered client workspace assets are not wired to client');
 const clientAuth=fs.readFileSync('client-auth.js','utf8');
-for(const marker of ['function homeView','function signIn','function loadNotifications']) {
+for(const marker of ['function homeView','function handleLogin','function refreshProfile']) {
   assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
 }
 for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','Crypto','Referral','Shop Millions','Assets','My Profile','AI Bot']) {
