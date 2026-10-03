@@ -387,6 +387,7 @@ function homeView(){
    '<button class="ap-referral-card ap-referral-premium" data-action="next-referral">'+
      '<span class="ap-ref-icon">'+icon('gift')+'</span>'+
      '<span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span>'+
+     '<span class="ap-ref-gift-art" aria-hidden="true"><span class="gift-lid"></span><span class="gift-box"></span><span class="gift-ribbon-v"></span><span class="gift-ribbon-h"></span></span>'+
      '<span class="ap-ref-arrow">'+icon('arrow')+'</span>'+
    '</button>'+
    '<button class="ap-promo-card ap-amazon-premium" data-action="next-shop">'+
