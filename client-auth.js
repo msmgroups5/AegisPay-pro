@@ -2,7 +2,7 @@
 'use strict';
 var root=document.getElementById('app');
 var service=window.AegisSupabaseService;
-var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
+var state={phase:'loading',mode:(new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='invite'||new URLSearchParams((location.hash||'').replace(/^#/, '')).get('type')==='recovery')?'password-update':'login',profile:null,data:{deposits:[],withdrawals:[],kyc:null},view:(new URLSearchParams((location.hash||'').replace(/^#/,'')).get('page')||'home'),message:'',messageTone:'error',appEnabled:null,runtimeUnverified:false};
 var busy=false,profileRequest=null,runtimeRequest=null,runtimeTimer=null; var homeScreen=true;
 var PREMIUM_SHOP=window.AegisShopCatalog||[];var SHOP_CATEGORIES=['All','Electronics','Fashion','Home & Kitchen','Beauty','Sports','Gaming','Office','Books','Outdoor'];var shopSearch='',shopCategory='All';
 var detected=/^ur(?:-|$)/i.test((navigator.languages||[navigator.language||'en'])[0]||'en')?'ur':'en';
@@ -104,7 +104,7 @@ async function refreshProfile(){
    if(result.profile.preferred_language==='ur'||result.profile.preferred_language==='en'){
     try{if(!localStorage.getItem('aegispay-language'))locale=result.profile.preferred_language;}catch(e){}
    }
-   await refreshData();state.mode='dashboard';homeScreen=true;state.phase='ready';state.message='';render();
+   await refreshData();state.mode='dashboard';state.view=pageRoute(state.view);homeScreen=state.view==='home';state.phase='ready';state.message='';render();
   }catch(e){state.profile=null;state.phase='ready';state.mode='login';setMessage(authError(e));render();}
   finally{profileRequest=null;}
  })();
@@ -215,6 +215,69 @@ function aiSection(){
 }
 function updateCycleCountdown(){
  var el=document.getElementById('cycleCountdown');if(el)el.textContent=cycleCountdown(el.getAttribute('data-ready')||'');
+}
+
+function pageRoute(v){
+ v=String(v||'home').toLowerCase();
+ return ['home','assets','account','deposit','shop','crypto','referrals','kyc','notifications','ai'].indexOf(v)>=0?v:'home';
+}
+function navigateView(v,replace){
+ state.view=pageRoute(v);homeScreen=state.view==='home';
+ var hash=state.view==='home'?'':'#page='+encodeURIComponent(state.view);
+ try{var url=location.pathname+location.search+hash;(replace?history.replaceState:history.pushState).call(history,null,document.title,url);}catch(e){}
+ render();
+}
+function clientPageNav(active){
+ var tabs=[['home','home','Home'],['assets','check','Assets'],['account','user','My Profile'],['ai','robot','AI Bot']];
+ return '<nav class="ap-bottom-nav">'+tabs.map(function(x){
+   return '<button class="ap-nav-item '+(active===x[0]?'active':'')+'" data-action="'+(x[0]==='home'?'home-dashboard':x[0]==='account'?'profile':x[0]==='assets'?'next-assets':'next-ai')+'">'+icon(x[1])+'<span class="ap-nav-label">'+x[2]+'</span></button>';
+ }).join('')+'</nav>';
+}
+function clientPageFrame(title,subtitle,body,active,backView){
+ return '<div class="ap-shell ap-subpage-shell"><header class="ap-subpage-header"><button class="ap-subpage-back" type="button" data-action="'+(backView==='home'?'home-dashboard':'next-'+backView)+'" aria-label="Back">‹</button><div class="ap-subpage-brand"><img src="./aegispay-logo.svg" alt=""><span class="ap-brand-word">Aegis<span>Pay</span></span></div><button class="ap-circle-btn profile" type="button" data-action="profile" aria-label="Profile">'+icon('user')+'</button></header><section class="ap-subpage-title"><span class="ap-page-kicker">AEGISPAY CLIENT PORTAL</span><h1>'+esc(title)+'</h1><p>'+esc(subtitle||'')+'</p></section><main class="ap-subpage-content">'+body+'</main>'+clientPageNav(active)+'</div>';
+}
+function compactSection(title,body,extra){
+ return '<section class="ap-page-card '+(extra||'')+'"><div class="ap-page-card-head"><h2>'+esc(title)+'</h2></div>'+body+'</section>';
+}
+function kycPageBody(d){
+ var kyc=d.kyc;
+ if(kyc&&kyc.status==='VERIFIED')return compactSection(t('kyc'),'<div class="ap-status-success">'+statusBadge(t('kycDone'))+'</div><p>'+esc(t('kycHelp'))+'</p>','is-success');
+ if(kyc&&(kyc.status==='PENDING_REVIEW'||kyc.status==='MANUAL_REVIEW'))return compactSection(t('kycTitle'),'<p>'+esc(t('kycHelp'))+'</p>'+statusBadge(kyc.status)+'<p>'+esc(kyc.review_reason||t('pending'))+'</p>');
+ return compactSection(t('kycTitle'),'<p>'+esc(t('kycHelp'))+'</p><form id="kycForm"><div class="field"><label>'+t('documentType')+'</label><select id="kycType"><option value="CNIC">'+t('cnic')+'</option><option value="PASSPORT">'+t('passport')+'</option></select></div><div class="field"><label>'+t('front')+'</label><input id="kycFront" type="file" accept="image/jpeg,image/png,image/webp" required></div><div class="field" id="kycBackWrap"><label>'+t('backImage')+'</label><input id="kycBack" type="file" accept="image/jpeg,image/png,image/webp"></div><label class="ap-check-row"><input id="kycConsent" type="checkbox" required><span>'+t('consent')+'</span></label><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submitKyc')+'</button></form>');
+}
+function renderClientView(){
+ var d=state.data||{},p=state.profile||{},v=pageRoute(state.view);
+ state.view=v;homeScreen=v==='home';
+ if(v==='home'){homeView();return;}
+ if(v==='shop'){root.innerHTML=clientPageFrame(t('shopTitle'),'Browse and complete only the Shop tasks assigned to your current cycle.',shopSection(d),'home','home');return;}
+ if(v==='deposit'){
+  var tiers=[['T1',30],['T2',50],['T3',100],['V1',250],['V2',500],['V3',1000]];
+  var tierOptions=tiers.map(function(x){return '<option value="'+x[0]+'">'+x[0]+' — $'+x[1]+'</option>';}).join('');
+  var body=compactSection(t('deposit'),'<p>'+esc(t('depositHelp'))+'</p><div class="notice">'+esc(t('network'))+'</div><form id="depositForm"><div class="field"><label>'+t('tier')+'</label><select id="depositTier">'+tierOptions+'</select></div><div class="field"><label>'+t('amount')+'</label><input id="depositAmount" type="number" min="1" step="0.01" value="30" required></div><div class="field"><label>'+t('txid')+'</label><input id="depositTxid" type="text" minlength="64" maxlength="64" pattern="[A-Fa-f0-9]{64}" required></div><div class="field"><label>'+t('proof')+'</label><input id="depositProof" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="primary" type="submit" '+(busy?'disabled':'')+'>'+t('submit')+'</button></form>')+historyTable(t('deposits'),d.deposits||[],'deposit');
+  root.innerHTML=clientPageFrame(t('deposit'),'Submit a deposit and track your verification status.',body,'assets','home');
+  var tier=document.getElementById('depositTier'),amount=document.getElementById('depositAmount');if(tier&&amount)tier.addEventListener('change',function(){var opt=tier.options[tier.selectedIndex];amount.value=opt.text.match(/\$(\d+(?:\.\d+)?)/)?.[1]||30;});return;
+ }
+ if(v==='assets'){
+  var body=compactSection('Assets','<div class="ap-balance-big">'+money(p.current_platform_balance)+'</div><p class="ap-muted">Available platform balance</p><div class="ap-asset-grid"><div><small>'+t('principal')+'</small><strong>'+money(p.principal_balance)+'</strong></div><div><small>'+t('profit')+'</small><strong>'+money(p.profit_balance)+'</strong></div><div><small>Manual credit</small><strong>'+money(p.manual_credit_balance)+'</strong></div></div>')+historyTable(t('deposits'),d.deposits||[],'deposit')+historyTable(t('withdraw'),d.withdrawals||[],'withdrawal');
+  root.innerHTML=clientPageFrame('Assets','Balances and recent account activity.',body,'assets','home');return;
+ }
+ if(v==='account'){
+  var account=compactSection('Account Details','<div class="ap-detail-grid"><div><small>Name</small><strong>'+esc(p.name||'')+'</strong></div><div><small>Email</small><strong>'+esc(p.email||'')+'</strong></div><div><small>Client ID</small><strong>'+esc(p.client_id||'AP-CLIENT')+'</strong></div><div><small>Account Status</small><strong>'+esc(p.status||'Active')+'</strong></div><div><small>Referral Code</small><strong>'+esc(p.referral_code||'')+'</strong></div></div>')+compactSection('Identity Verification','<p>'+esc(d.kyc&&d.kyc.status?d.kyc.status:t('kycNeeded'))+'</p><button class="tg-button-soft" type="button" data-action="next-kyc">Manage KYC</button>')+'<button class="tg-button-soft ap-wide-btn" type="button" data-action="logout">'+t('logout')+'</button>';
+  root.innerHTML=clientPageFrame('My Profile','Your account details, identity status and secure sign-out.',account,'account','home');return;
+ }
+ if(v==='crypto'){
+  var walletForm=p.destination_address?'<div class="ap-wallet-linked"><small>'+t('wallet')+'</small><code>'+esc(p.destination_address)+'</code></div>':'<div class="field"><label>'+t('wallet')+'</label><input id="walletAddress" autocomplete="off" required></div><div class="field"><label>'+t('walletOwner')+'</label><input id="walletOwner" value="'+esc(p.name||'')+'" required></div><button type="button" class="primary" data-action="link-wallet">'+t('linkWallet')+'</button>';
+  var body=compactSection('Crypto & Withdrawals','<div class="notice">'+esc(!d.kyc||d.kyc.status!=='VERIFIED'?t('withdrawKyc'):'KYC verified — withdrawals available.')+'</div><form id="withdrawForm">'+walletForm+'<div class="field"><label>'+t('withdrawAmount')+'</label><input id="withdrawAmount" type="number" min="50" step="0.01" required></div><button class="primary" type="submit">'+t('requestWithdraw')+'</button></form>')+compactSection('Withdrawal History',historyTable(t('withdraw'),d.withdrawals||[],'withdrawal'));
+  root.innerHTML=clientPageFrame('Crypto','Manage your linked TRON wallet and withdrawal requests.',body,'assets','home');return;
+ }
+ if(v==='referrals'){root.innerHTML=clientPageFrame(t('referralsTitle'),'Invite friends and view your referral rewards.',referralsSection(d),'account','home');return;}
+ if(v==='kyc'){
+  var body=kycPageBody(d);root.innerHTML=clientPageFrame(t('kycTitle'),'Submit identity verification documents securely.',body,'account','account');
+  var type=document.getElementById('kycType'),backWrap=document.getElementById('kycBackWrap');if(type&&backWrap)type.addEventListener('change',function(){backWrap.style.display=type.value==='CNIC'?'block':'none';});return;
+ }
+ if(v==='notifications'){root.innerHTML=clientPageFrame(t('notificationsTitle'),'Your account notifications and recent updates.',notificationsSection(d),'home','home');return;}
+ if(v==='ai'){root.innerHTML=clientPageFrame(t('aiTitle'),'Ask about deposits, Shop, withdrawals, KYC or referrals.',aiSection(),'ai','home');return;}
+ state.view='home';homeScreen=true;navigateView('home',true);
 }
 
 function renderWorkspace(){
@@ -357,7 +420,7 @@ function profileSection(p){p=p||{};return '<section class="section" id="profile-
 function render(){
  if(state.appEnabled===false){
   root.innerHTML=shell('<section class="tg-paused"><span class="tg-paused-icon">⏻</span><span class="tg-kicker">SERVICE STATUS</span><h1>'+t('pausedTitle')+'</h1><p>'+t(state.runtimeUnverified?'runtimeUnknown':'pausedInfo')+'</p><button type="button" class="tg-button tg-button-primary" data-action="retry-runtime">'+t('retryRuntime')+'</button></section>','auth');
- }else if(state.profile&&state.mode==='dashboard'){if(homeScreen)homeView();else renderWorkspace();}else renderAuth();
+ }else if(state.profile&&state.mode==='dashboard'){renderClientView();}
 }
 async function uploadImage(file,area){
  if(!file)throw new Error(t('chooseFile'));
@@ -464,22 +527,16 @@ async function handleWithdraw(e){
 async function action(e){
  var el=e.target.closest('[data-action]');if(!el)return;
  var a=el.getAttribute('data-action');
-  if(a==='home'){homeScreen=true;render();return;}
-  if((a==='next-topup'||a==='next-shop'||a==='next-account'||a==='next-crypto'||a==='next-referral'||a==='next-assets'||a==='next-ai'||a==='profile'||a==='notice')&&homeScreen){
-   homeScreen=false;render();
-   var target=(a==='next-topup')?'deposit-area':(a==='next-shop')?'shop':(a==='next-account'||a==='profile')?'profile-area':(a==='next-crypto')?'withdraw-area':(a==='next-referral')?'referrals-area':(a==='next-assets')?'overview':'ai-area';
-   setTimeout(function(){var n=document.getElementById(target);if(n)n.scrollIntoView({behavior:'smooth',block:'start'});},40);
-   return;
-  }
-  if(a==='home-dashboard'){homeScreen=true;render();return;}
-  if(a==='home'){homeScreen=true;render();return;}
-  if((a==='next-topup'||a==='next-shop'||a==='next-account'||a==='next-crypto'||a==='next-referral'||a==='next-assets'||a==='next-ai'||a==='profile'||a==='notice')&&homeScreen){
-   homeScreen=false; render();
-   var target=(a==='next-topup')?'deposit-area':(a==='next-shop')?'shop':(a==='next-account'||a==='profile')?'profile-area':(a==='next-crypto')?'withdraw-area':(a==='next-referral')?'referrals-area':(a==='next-assets')?'overview':'ai-area';
-   setTimeout(function(){var n=document.getElementById(target);if(n)n.scrollIntoView({behavior:'smooth',block:'start'});},40);
-   return;
-  }
-  if(a==='home-dashboard'){homeScreen=true;render();return;}
+ if(a==='home-dashboard'||a==='home'){navigateView('home');return;}
+ if(a==='next-topup'){navigateView('deposit');return;}
+ if(a==='next-shop'){navigateView('shop');return;}
+ if(a==='next-account'||a==='profile'){navigateView('account');return;}
+ if(a==='next-crypto'){navigateView('crypto');return;}
+ if(a==='next-referral'){navigateView('referrals');return;}
+ if(a==='next-assets'){navigateView('assets');return;}
+ if(a==='next-ai'){navigateView('ai');return;}
+ if(a==='next-kyc'){navigateView('kyc');return;}
+ if(a==='notice'){navigateView('notifications');return;}
  if(a==='language')return;
  if(a==='retry-runtime'){checkRuntime();return;}
   if(a==='complete-task'){
@@ -535,7 +592,7 @@ root.addEventListener('submit',async function(e){
  else if(e.target.id==='kycForm')handleKyc(e);
  else if(e.target.id==='withdrawForm')handleWithdraw(e);
 });
-root.addEventListener('click',action);root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
+root.addEventListener('click',action);window.addEventListener('popstate',function(){state.view=pageRoute((new URLSearchParams((location.hash||'').replace(/^#/,'')).get('page')||'home'));homeScreen=state.view==='home';render();});root.addEventListener('change',function(e){if(e.target.matches('[data-action="language"]'))rememberLanguage(e.target.value);});
 
 async function boot(){
  render();
