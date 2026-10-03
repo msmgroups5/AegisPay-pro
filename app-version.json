@@ -3,7 +3,7 @@
   "versionName": "2.4.2",
   "releaseChannel": "stable",
   "releasedAt": "2026-10-03T00:00:00Z",
-  "clientApkUrl": "https://aegispay-pro.netlify.app/downloads/aegispay-client.apk",
+  "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client.apk",
   "notes": [
     "Canonical AegisPay Client portal source is client.html.",
     "Client and Master Admin share the canonical root web assets and Supabase backend."
