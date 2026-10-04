@@ -80,10 +80,10 @@ function renderOverview(){
 function renderUsers(){
  var rows=state.users.filter(function(u){return u.role==='USER';}).map(function(u){
    var status=String(u.status||'NORMAL').toUpperCase();
-   return '<article style="padding:15px;margin-top:10px;border:1px solid #e2edf4;border-radius:15px;background:#fff"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3 style="margin:0">'+esc(u.name||'Unnamed')+'</h3><p style="margin:5px 0">'+esc(u.email||'')+' · '+esc(status)+'</p><small>Balance: '+Number(u.current_platform_balance||0).toFixed(2)+' USDT · Principal: '+Number(u.principal_balance||0).toFixed(2)+' · Profit: '+Number(u.profit_balance||0).toFixed(2)+'</small></div><div class="tg-admin-actions">'+
+   return '<article style="padding:15px;margin-top:10px;border:1px solid #e2edf4;border-radius:15px;background:#fff"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3 style="margin:0">'+esc(u.name||'Unnamed')+'</h3><p style="margin:5px 0">'+esc(u.email||'')+' · '+esc(status)+'</p><small>Balance: '+Number(u.current_platform_balance||0).toFixed(2)+' USDT · Principal: '+Number(u.principal_balance||0).toFixed(2)+' · Profit: '+Number(u.profit_balance||0).toFixed(2)+'</small><small style="display:block;margin-top:5px">Withdrawal Wallet: '+esc(u.destination_address||'Not linked')+'</small></div><div class="tg-admin-actions">'+
     (status==='FROZEN'?'<button data-action="user-status" data-id="'+esc(u.id)+'" data-status="NORMAL">Unfreeze</button>':'<button data-action="user-status" data-id="'+esc(u.id)+'" data-status="FROZEN">Freeze</button>')+
     '<button data-action="user-status" data-id="'+esc(u.id)+'" data-status="BLOCKED" class="tg-admin-danger">Block</button>'+
-    '<button class="tg-button-soft" data-action="balance-adjust" data-id="'+esc(u.id)+'">Adjust balance</button></div></div></article>';
+    '<button class="tg-button-soft" data-action="balance-adjust" data-id="'+esc(u.id)+'">Adjust balance</button><button class="tg-button-soft" data-action="wallet-change" data-id="'+esc(u.id)+'">Change wallet</button></div></div></article>';
  }).join('');
  root.innerHTML=shell('<section class="tg-admin-content">'+adminNav()+'<div class="tg-admin-heading"><div><span class="tg-kicker">ACCOUNT CONTROL</span><h1>Client users</h1><p>Account status and manual balance changes are recorded server-side.</p></div><button class="tg-button-soft" data-action="refresh">Refresh</button></div>'+(rows||'<div class="tg-empty">No client accounts found.</div>')+'<button class="tg-button-soft" data-action="logout">Sign out</button></section>');
 }
@@ -155,6 +155,17 @@ async function adjustBalance(el){
  state.busy=true;render();
  try{var r=await service.invokeFunction('admin-account-ops',{body:{action:'balance',userId:id,amount:amount,type:type,reason:reason}});if(r.error)throw r.error;await loadOperations();}
  catch(e){state.error=e.message||'Balance adjustment failed.';}
+ finally{state.busy=false;render();}
+}
+async function changeWallet(el){
+ var id=el.getAttribute('data-id');
+ var wallet=window.prompt('Enter new TRC20 withdrawal wallet address','');
+ if(wallet===null)return;
+ wallet=String(wallet).trim().toUpperCase();
+ if(!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(wallet)){state.error='Enter a valid TRC20 wallet address.';render();return;}
+ state.busy=true;render();
+ try{var r=await service.client().rpc('admin_set_withdrawal_wallet',{p_user_id:id,p_wallet:wallet});if(r.error)throw r.error;await loadOperations();state.error='';}
+ catch(e){state.error=e.message||'Withdrawal wallet change failed.';}
  finally{state.busy=false;render();}
 }
 async function toggleOffer(el){
@@ -272,7 +283,8 @@ root.addEventListener('click',function(e){
  if(a==='telegram-check')checkTelegram();
  if(a==='telegram-resend')resendTelegram(el);
   if(a==='user-status')changeUserStatus(el);
-  if(a==='balance-adjust')adjustBalance(el);
+  if(a==='balance-adjust')adjustBalance(el); 
+  if(a==='wallet-change')changeWallet(el);
   if(a==='toggle-offer')toggleOffer(el);
 });
 async function boot(){
