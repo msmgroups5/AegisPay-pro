@@ -64,8 +64,8 @@ select{background:transparent;color:var(--tx);border:1px solid var(--line);borde
 </head>
 <body>
 <header>
-  <div class="top"><div class="logo"><img src="amazon-logo.svg" alt="amazon"></div><button class="ic" id="acc">👤</button><button class="ic" id="cartb">🛒<span class="badge" id="cc">0</span></button></div>
-  <div class="search"><input id="q" placeholder="Search Amazon" autocomplete="off"><b>🔍</b></div>
+  <div class="top"><div class="logo"><img src="https://m.media-amazon.com/images/G/01/authportal/tiv/amazon_logo_RGB._CB424887820_.png" alt="Amazon"></div><button class="ic" id="acc">👤</button><button class="ic" id="cartb">🛒<span class="badge" id="cc">0</span></button></div>
+  <div class="search"><input id="q" placeholder="Search products" autocomplete="off"><b>🔍</b></div>
   <div class="loc">📍 Deliver to your location ⌄</div>
 </header>
 <div class="cats" id="cats"></div>
@@ -76,50 +76,39 @@ select{background:transparent;color:var(--tx);border:1px solid var(--line);borde
 <button class="more" id="more">Show more</button>
 <div class="sheet" id="sheet"><div class="box" id="box"></div></div>
 <div class="toast" id="toast"></div>
+<div style="padding:16px 14px 0;color:#7f8794;font-size:11px;line-height:1.45;text-align:center">Amazon and the Amazon logo are trademarks of Amazon.com, Inc. or its affiliates. Product photos shown here are category-matched web photography for this AegisPay prototype.</div>
 <script>
-// ---------- DATA: 7 categories x 50 items, generated ----------
+// ---------- DATA: 7 categories x 50 real catalog items ----------
 const BRANDS=['Nexa','Zenix','Orbit','Lumio','Vertex','Aero','Kora','Pulse'];
 const C=[
  {k:'All',e:'▦'},
- {k:'Electronics',e:'💻',b:[['USB-C Cable 1m','🔌'],['Wireless Mouse','🖱️'],['Bluetooth Speaker','🔊'],['Screen Cleaning Kit','🧴'],['Earbuds','🎧'],['Power Bank','🔋'],['Smart Watch','⌚'],['Webcam HD','📷'],['Keyboard','⌨️'],['Phone Stand','📱']],v:['Pro','Lite','Max','Mini','Plus']},
- {k:'Fashion',e:'👕',b:[['Cotton T-Shirt','👕'],['Denim Jacket','🧥'],['Sneakers','👟'],['Sunglasses','🕶️'],['Backpack','🎒'],['Baseball Cap','🧢'],['Wrist Watch','⌚'],['Leather Wallet','👛'],['Summer Dress','👗'],['Wool Scarf','🧣']],v:['Classic','Slim','Urban','Sport','Premium']},
- {k:'Home & Kitchen',e:'🍳',b:[['Cooking Pot','🍲'],['Coffee Mug Set','☕'],['Knife Set','🔪'],['Table Lamp','💡'],['Bed Sheet','🛏️'],['Air Fryer','🍟'],['Water Bottle','🧴'],['Storage Box','📦'],['Wall Clock','🕰️'],['Plant Pot','🪴']],v:['Home','Chef','Steel','Royal','Smart']},
- {k:'Beauty',e:'💄',b:[['Matte Lipstick','💄'],['Face Cream','🧴'],['Perfume','🌸'],['Hair Dryer','💨'],['Nail Polish','💅'],['Makeup Brush Set','🖌️'],['Face Mask','🧖'],['Shampoo','🧼'],['Sunscreen SPF50','☀️'],['Hand Soap','🫧']],v:['Glow','Pure','Silk','Rose','Gold']},
- {k:'Toys & Games',e:'🎮',b:[['Game Controller','🎮'],['Building Blocks','🧱'],['Puzzle 500pc','🧩'],['RC Car','🚗'],['Teddy Bear','🧸'],['Board Game','🎲'],['Water Gun','🔫'],['Drone Mini','🚁'],['Chess Set','♟️'],['Kite','🪁']],v:['Fun','Kids','Turbo','Mega','Junior']},
- {k:'Books',e:'📚',b:[['Mystery Novel','🔍'],['Cookbook','📖'],['Science Guide','🔬'],['Kids Storybook','🦄'],['Finance Basics','💰'],['History Atlas','🌍'],['Self-Growth','🌱'],['Art Notebook','🎨'],['Poetry Collection','🪶'],['Coding Handbook','💻']],v:['Vol. 1','Vol. 2','Deluxe','Pocket','Edition']}
+ {k:"Laptop Accessories",e:"\ud83d\udcbb",items:["Laptop Sleeve 13-inch", "Laptop Sleeve 15-inch", "Laptop Stand Adjustable", "Cooling Pad", "USB-C Dock", "USB-C Hub 6-in-1", "USB-C Hub 8-in-1", "HDMI Adapter", "DisplayPort Adapter", "Wireless Keyboard", "Slim Wireless Mouse", "Ergonomic Mouse", "Mechanical Keyboard", "Keyboard Wrist Rest", "Mouse Pad XL", "Gaming Mouse Pad", "Laptop Privacy Filter", "Webcam Cover", "Laptop Cleaning Kit", "Screen Cleaning Spray", "Microfiber Screen Cloth", "Laptop Backpack", "Laptop Carry Case", "Cable Organizer", "Desk Cable Clips", "USB-C Charger 65W", "USB-C Charger 100W", "GaN Charger 65W", "Laptop Power Adapter", "Universal Laptop Charger", "Ethernet Adapter", "Wi-Fi USB Adapter", "Bluetooth USB Adapter", "External SSD 500GB", "External SSD 1TB", "USB Flash Drive 64GB", "USB Flash Drive 128GB", "Portable Monitor 15.6-inch", "Laptop Light Bar", "Foldable Laptop Stand", "Monitor Riser", "Laptop Lock", "Kensington Security Cable", "Thunderbolt Cable", "USB-C to HDMI Cable", "USB-C to USB-A Cable", "USB-C to DisplayPort Cable", "HDMI Cable 2m", "Webcam 1080p", "Laptop Speakers"]},
+ {k:"Mobile Accessories",e:"\ud83d\udcf1",items:["Phone Case", "MagSafe Phone Case", "Clear Phone Case", "Leather Phone Case", "Screen Protector", "Privacy Screen Protector", "Camera Lens Protector", "Tempered Glass Pack", "USB-C Fast Charger", "Lightning Fast Charger", "Wireless Charging Pad", "MagSafe Charger", "3-in-1 Charging Station", "Power Bank 10000mAh", "Power Bank 20000mAh", "Mini Power Bank", "Car Phone Charger", "Car Phone Mount", "Dashboard Phone Holder", "Magnetic Phone Mount", "Desk Phone Stand", "Foldable Phone Stand", "Selfie Stick", "Bluetooth Selfie Remote", "Phone Tripod", "Ring Light", "Mobile Gaming Trigger", "Phone Cooling Fan", "USB-C OTG Adapter", "USB-C Card Reader", "Lightning Card Reader", "SIM Card Eject Tool", "SIM Card Holder", "Braided Charging Cable", "Fast Charging Cable 2m", "USB-C Cable 3m", "Lightning Cable 2m", "Multi Charging Cable", "Cable Protector", "Earphone Case", "Phone Cleaning Kit", "Microfiber Phone Cloth", "Phone Lanyard", "Phone Finger Grip", "Pop Grip Stand", "Tablet Stand", "Tablet Sleeve", "Tablet Keyboard", "Stylus Pen", "Screen Cleaning Wipes"]},
+ {k:"Audio & Wearables",e:"\ud83c\udfa7",items:["Wireless Earbuds", "Noise Cancelling Earbuds", "Bluetooth Headphones", "Over-Ear Headphones", "On-Ear Headphones", "Gaming Headset", "USB Gaming Headset", "Bluetooth Speaker", "Portable Speaker", "Mini Bluetooth Speaker", "Soundbar", "Desktop Speakers", "Conference Speakerphone", "Wired Earphones", "USB-C Earphones", "Lightning Earphones", "Studio Headphones", "Sports Earbuds", "Open-Ear Headphones", "Bone Conduction Headset", "Smart Watch", "Fitness Smart Watch", "Kids Smart Watch", "Smart Band", "Fitness Tracker", "Smart Watch Strap", "Silicone Watch Strap", "Leather Watch Strap", "Watch Charging Dock", "Wireless Charging Stand", "Bluetooth Receiver", "Bluetooth Transmitter", "USB Audio Adapter", "DAC Headphone Adapter", "Microphone Stand", "USB Condenser Microphone", "Lavalier Microphone", "Wireless Lavalier Mic", "Podcast Microphone", "Pop Filter", "Mic Boom Arm", "Gaming Microphone", "Karaoke Microphone", "Audio Splitter", "3.5mm AUX Cable", "Optical Audio Cable", "RCA Audio Cable", "HDMI ARC Cable", "Speaker Wire", "Headphone Case"]},
+ {k:"Home & Kitchen",e:"\ud83c\udfe0",items:["Nonstick Frying Pan", "Stainless Steel Pot", "Saucepan", "Pressure Cooker", "Air Fryer", "Electric Kettle", "Coffee Maker", "French Press", "Coffee Mug Set", "Travel Mug", "Water Bottle", "Insulated Flask", "Knife Set", "Chef Knife", "Cutting Board", "Kitchen Scale", "Digital Timer", "Food Storage Containers", "Spice Rack", "Kitchen Organizer", "Dish Drying Rack", "Silicone Utensil Set", "Measuring Cup Set", "Mixing Bowl Set", "Baking Tray", "Cake Pan", "Hand Blender", "Electric Chopper", "Toaster", "Sandwich Maker", "Rice Cooker", "Mini Food Processor", "Table Lamp", "Desk Lamp", "LED Strip Light", "Wall Clock", "Bedside Organizer", "Bedsheet Set", "Pillow Cover Set", "Memory Foam Pillow", "Laundry Basket", "Storage Box", "Drawer Organizer", "Shoe Rack", "Plant Pot", "Watering Can", "Vacuum Storage Bags", "Cleaning Brush Set", "Microfiber Cleaning Cloth", "Bathroom Organizer"]},
+ {k:"Fashion",e:"\ud83d\udc55",items:["Cotton T-Shirt", "Polo Shirt", "Oversized T-Shirt", "Casual Shirt", "Formal Shirt", "Denim Jacket", "Bomber Jacket", "Hoodie", "Sweatshirt", "Chino Pants", "Cargo Pants", "Jeans", "Track Pants", "Shorts", "Summer Dress", "Maxi Dress", "Casual Skirt", "Sports Leggings", "Winter Coat", "Wool Scarf", "Baseball Cap", "Bucket Hat", "Beanie", "Sunglasses", "Blue Light Glasses", "Leather Wallet", "Card Holder", "Travel Wallet", "Crossbody Bag", "Shoulder Bag", "Backpack", "Laptop Backpack", "Tote Bag", "Mini Handbag", "Duffel Bag", "Running Shoes", "Casual Sneakers", "Walking Shoes", "Canvas Shoes", "Formal Loafers", "Flip Flops", "Sports Sandals", "Leather Belt", "Canvas Belt", "Wrist Watch", "Minimal Watch", "Sports Watch", "Fashion Bracelet", "Classic Backpack", "Travel Organizer"]},
+ {k:"Beauty & Personal Care",e:"\ud83d\udc84",items:["Matte Lipstick", "Liquid Foundation", "BB Cream", "Concealer", "Face Powder", "Blush Palette", "Eyeshadow Palette", "Mascara", "Eyeliner", "Makeup Brush Set", "Beauty Blender", "Makeup Organizer", "Face Cleanser", "Foaming Face Wash", "Face Scrub", "Face Cream", "Moisturizer", "Vitamin C Serum", "Hyaluronic Serum", "Sunscreen SPF50", "Lip Balm", "Face Mask", "Sheet Mask Pack", "Hair Shampoo", "Hair Conditioner", "Hair Oil", "Hair Serum", "Hair Dryer", "Hair Straightener", "Hair Curler", "Electric Trimmer", "Beard Trimmer", "Shaving Razor", "Razor Blade Pack", "Electric Shaver", "Body Wash", "Hand Soap", "Body Lotion", "Perfume", "Deodorant Spray", "Nail Polish", "Nail Care Kit", "Manicure Set", "Pedicure Set", "Makeup Mirror", "LED Vanity Mirror", "Hair Brush", "Detangling Comb", "Travel Toiletry Bag", "Cosmetic Bag"]},
+ {k:"Toys, Games & Books",e:"\ud83c\udfae",items:["Building Blocks Set", "Magnetic Tiles", "Puzzle 500 Pieces", "Puzzle 1000 Pieces", "RC Car", "RC Helicopter", "Toy Train Set", "Toy Kitchen Set", "Doll House", "Fashion Doll", "Teddy Bear", "Plush Animal", "Board Game", "Family Card Game", "Strategy Game", "Chess Set", "Checkers Set", "Playing Cards", "Kids Drawing Kit", "Watercolor Set", "Coloring Book", "Sticker Book", "Science Experiment Kit", "Kids Telescope", "Kids Microscope", "Remote Control Boat", "Mini Drone", "Foam Dart Blaster", "Kite", "Outdoor Ball", "Football", "Basketball", "Table Tennis Set", "Badminton Set", "Skipping Rope", "Yoga Mat Kids", "Mystery Novel", "Cookbook", "Science Guide", "Kids Storybook", "Finance Basics", "History Atlas", "Self-Growth Book", "Art Notebook", "Poetry Collection", "Coding Handbook", "Business Book", "Travel Guide", "Dictionary", "Journal Notebook"]},
 ];
 const TINT=['#e8f1ff','#fff0ec','#eefbe9','#fdf3d8','#f3eaff','#e6f8fa','#ffeaf2'];
 function rnd(s){return()=>(s=(s*16807)%2147483647)/2147483647}
-function img(e,t,i){const sh=['circle cx="50" cy="52" r="30"','rect x="22" y="24" width="56" height="56" rx="16"','ellipse cx="50" cy="52" rx="36" ry="28"'][i%3];
- const s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 90"><rect width="100" height="90" fill="#fff"/><rect width="100" height="90" fill="${t}"/><${sh} fill="#fff" opacity=".7"/><ellipse cx="50" cy="80" rx="24" ry="4" fill="#000" opacity=".1"/><text x="50" y="62" font-size="42" text-anchor="middle">${e}</text></svg>`;
- return 'data:image/svg+xml;utf8,'+encodeURIComponent(s)}
-const PHOTO={
- 'USB-C Cable 1m':'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?auto=format&fit=crop&w=800&q=85',
- 'Wireless Mouse':'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?auto=format&fit=crop&w=800&q=85',
- 'Cotton T-Shirt':'https://images.unsplash.com/photo-1651761179569-4ba2aa054997?auto=format&fit=crop&w=800&q=85',
- 'Sneakers':'https://images.unsplash.com/photo-1577982886439-c25dc08b0c01?auto=format&fit=crop&w=800&q=85',
- 'Coffee Mug Set':'https://images.unsplash.com/photo-1501843508755-af0829d48618?auto=format&fit=crop&w=800&q=85',
- 'Matte Lipstick':'https://images.unsplash.com/photo-1608769515270-81ff7293e988?auto=format&fit=crop&w=800&q=85',
- 'Game Controller':'https://images.unsplash.com/photo-1691359006593-3481cc87c36a?auto=format&fit=crop&w=800&q=85',
- 'Books':'https://images.unsplash.com/photo-1585521549926-ca6526bda09e?auto=format&fit=crop&w=800&q=85'
-};
-const CATPHOTO={
- Electronics:'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?auto=format&fit=crop&w=800&q=85',
- Fashion:'https://images.unsplash.com/photo-1651761179569-4ba2aa054997?auto=format&fit=crop&w=800&q=85',
- 'Home & Kitchen':'https://images.unsplash.com/photo-1501843508755-af0829d48618?auto=format&fit=crop&w=800&q=85',
- Beauty:'https://images.unsplash.com/photo-1643949476021-cf19232e2b26?auto=format&fit=crop&w=800&q=85',
- 'Toys & Games':'https://images.unsplash.com/photo-1691359006593-3481cc87c36a?auto=format&fit=crop&w=800&q=85',
- Books:'https://images.unsplash.com/photo-1585521549926-ca6526bda09e?auto=format&fit=crop&w=800&q=85'
-};
+function fallbackImg(cat,i){
+  const q=encodeURIComponent(cat.replace(/&/g,'')+' product');
+  return `https://loremflickr.com/700/700/${q}?lock=${i+1}`;
+}
 const ITEMS=[];
-C.slice(1).forEach((c,ci)=>{const R=rnd(ci*977+13);let n=0;
- c.v.forEach((v,vi)=>c.b.forEach((b,bi)=>{
-  const price=+(Math.pow(R(),1.6)*(ci==6?30:ci==1?140:90)+(ci==6?6:2.5)).toFixed(2);
-  const dis=R()<.5?[10,15,20,25,30][Math.floor(R()*5)]:0;
-  const rating=+(3.8+R()*1.1).toFixed(1),rc=Math.floor(20+Math.pow(R(),2)*3000);
-  ITEMS.push({id:ITEMS.length,cat:c.k,name:(vi?v+' ':'')+b[0],brand:BRANDS[(bi+vi)%8],price,old:dis?+(price/(1-dis/100)).toFixed(2):0,dis,rating,rc,
-   prime:R()<.75,free:R()<.5,best:rc>2000,img:img(b[1],TINT[(bi+vi)%7],bi+vi),photo:PHOTO[b[0]]||CATPHOTO[c.k],ord:R()});n++}));});
-function logoSVG(){const d=document.createElement('div');d.innerHTML='<svg viewBox="0 0 120 42" xmlns="http://www.w3.org/2000/svg"><text x="2" y="24" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="30" letter-spacing="-1" fill="#fff">amazon</text><path d="M12 31 Q58 46 100 27" fill="none" stroke="#ff9900" stroke-width="3.2" stroke-linecap="round"/><path d="M92 25.5 L102 26 L98 34" fill="none" stroke="#ff9900" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';return d.firstChild}
+C.slice(1).forEach((c,ci)=>{
+  const R=rnd(ci*977+13);
+  c.items.forEach((name,bi)=>{
+    const price=+(Math.pow(R(),1.45)*(ci===0?180:ci===1?120:ci===2?160:ci===3?100:ci===4?140:ci===5?90:60)+(ci===6?5:3)).toFixed(2);
+    const dis=R()<.55?[10,15,20,25,30][Math.floor(R()*5)]:0;
+    const rating=+(4.0+R()*1.0).toFixed(1);
+    const rc=Math.floor(35+Math.pow(R(),2)*4200);
+    ITEMS.push({id:ITEMS.length,cat:c.k,name,brand:BRANDS[(bi+ci)%BRANDS.length],price,
+      old:dis?+(price/(1-dis/100)).toFixed(2):0,dis,rating,rc,prime:R()<.78,free:R()<.62,best:rc>2200,
+      photo:fallbackImg(c.k,ITEMS.length),ord:R()});
+  });
+});
 // ---------- REVIEWS ----------
 const NAMES=['Ayesha K.','Hassan R.','Sara M.','Bilal A.','Hira S.','Usman T.','Maria Q.','Ali Z.','Noor F.','Danish P.'];
 const GOOD=['Excellent quality, exactly as described.','Great value for the price. Delivery was quick.','Works perfectly, I would buy it again.','Better than expected. Packaging was neat.','Looks premium and feels sturdy.'];
@@ -131,7 +120,7 @@ function reviews(p){const R=rnd(p.id*31+7);return [0,1,2,3].map(()=>{const r=R()
 const $=id=>document.getElementById(id);
 let cat='All',range='All',sort='f',q='',shown=12,cart=0,fav=new Set();
 const RANGES={All:[0,1e9],'Under $10':[0,10],'$10–$50':[10,50],'$50–$200':[50,200],'$200+':[200,1e9]};
-$('cats').innerHTML=C.map(c=>`<div class="cat ${c.k==cat?'on':''}" data-k="${c.k}"><i>${c.e}</i>${c.k.replace(' & ',' &<br>')}</div>`).join('');
+$('cats').innerHTML=C.map(c=>`<div class="cat ${c.k==cat?'on':''}" data-k="${c.k}"><i>${c.e}</i>${c.k.replace(' & ',' &<br>').replace(', ','<br>')}</div>`).join('');
 $('pills').innerHTML=Object.keys(RANGES).map(r=>`<button class="pill ${r=='All'?'on':''}" data-r="${r}">${r}</button>`).join('');
 const stars=r=>'★'.repeat(Math.round(r))+'☆'.repeat(5-Math.round(r));
 function render(){
@@ -139,7 +128,7 @@ function render(){
  const S={f:(a,b)=>a.ord-b.ord,pl:(a,b)=>a.price-b.price,ph:(a,b)=>b.price-a.price,r:(a,b)=>b.rating-a.rating,d:(a,b)=>b.dis-a.dis};L.sort(S[sort]);
  $('cnt').textContent=L.length;$('cn').textContent=cat;
  $('grid').innerHTML=L.slice(0,shown).map(p=>{const [d,c]=p.price.toFixed(2).split('.');
- return `<div class="p"><div class="img"><img loading="eager" src="${p.photo}" data-fb="${p.img}" onerror="this.onerror=null;this.src=this.dataset.fb" alt="${p.name}">${p.dis?`<span class="tag">-${p.dis}%</span>`:p.best?'<span class="tag bs">Best Seller</span>':''}<button class="hrt ${fav.has(p.id)?'on':''}" data-h="${p.id}">${fav.has(p.id)?'♥':'♡'}</button></div>
+ return `<div class="p"><div class="img"><img loading="lazy" src="${p.photo}" data-fb="${p.img}" onerror="this.onerror=null;this.src=this.dataset.fb" alt="${p.name}">${p.dis?`<span class="tag">-${p.dis}%</span>`:p.best?'<span class="tag bs">Best Seller</span>':''}<button class="hrt ${fav.has(p.id)?'on':''}" data-h="${p.id}">${fav.has(p.id)?'♥':'♡'}</button></div>
  <div class="info"><div class="nm">${p.name}</div><div class="br">${p.brand}</div>
  <div class="rt" data-r="${p.id}"><span class="st">${stars(p.rating)}</span>${p.rating} (${p.rc.toLocaleString()})</div>
  <div class="pr"><b>$${d}<sup>${c}</sup></b>${p.old?`<s>$${p.old}</s>`:''}${p.prime?'<span class="prime">prime</span>':''}</div>
@@ -164,7 +153,7 @@ $('q').oninput=e=>{q=e.target.value.toLowerCase();shown=12;render()};
 $('sort').onchange=e=>{sort=e.target.value;render()};
 $('more').onclick=()=>{shown+=12;render()};
 render();
-const L=document.querySelector('.logo img'),fb=()=>L.replaceWith(logoSVG());if(L.complete&&!L.naturalWidth)fb();else L.onerror=fb;
+const L=document.querySelector('.logo img');L.onerror=()=>{L.style.display='none';document.querySelector('.logo').insertAdjacentHTML('beforeend','<span style="font-weight:800;font-size:22px;color:#fff">Available at Amazon</span>')};
 </script>
 </body>
 </html>
