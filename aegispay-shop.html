@@ -10,8 +10,7 @@
 body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif;max-width:560px;margin:auto;padding-bottom:40px}
 header{background:linear-gradient(180deg,#0e1a3a,var(--blue));padding:14px 14px 10px;position:sticky;top:0;z-index:5}
 .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.logo{flex:1;height:34px;display:flex;align-items:center}.amazon-lockup{font-size:14px;font-weight:700;color:#fff;display:inline-flex;align-items:flex-end;gap:4px;position:relative;line-height:1}.amazon-lockup strong{font-size:25px;letter-spacing:-1.4px;line-height:.9}.amazon-lockup i{position:absolute;left:62px;bottom:-5px;width:40px;height:9px;border-bottom:3px solid #ffb21e;border-radius:0 0 50% 50%;transform:rotate(2deg)}
-.ic{font-size:22px;position:relative;cursor:pointer;background:none;border:0;color:#fff}
+.logo{flex:1;height:34px;display:flex;align-items:center}.logo img{height:34px;width:auto;max-width:150px;display:block}.ic{font-size:22px;position:relative;cursor:pointer;background:none;border:0;color:#fff}
 .badge{position:absolute;top:-6px;right:-8px;background:var(--gold);color:#111;border-radius:10px;font-size:11px;font-weight:800;padding:1px 6px}
 .search{display:flex;background:#fff;border-radius:10px;overflow:hidden}
 .search input{flex:1;border:0;padding:13px 14px;font-size:15px;outline:0;color:#111}
@@ -64,7 +63,7 @@ select{background:transparent;color:var(--tx);border:1px solid var(--line);borde
 </head>
 <body>
 <header>
-  <div class="top"><div class="logo"><span class="amazon-lockup">available at <strong>amazon</strong><i></i></span></div><button class="ic" id="acc">👤</button><button class="ic" id="cartb">🛒<span class="badge" id="cc">0</span></button></div>
+  <div class="top"><div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/0/06/Amazon_2024.svg" alt="Amazon"></div><button class="ic" id="acc">👤</button><button class="ic" id="cartb">🛒<span class="badge" id="cc">0</span></button></div>
   <div class="search"><input id="q" placeholder="Search products" autocomplete="off"><b>🔍</b></div>
   <div class="loc">📍 Deliver to your location ⌄</div>
 </header>
@@ -92,10 +91,8 @@ const C=[
 ];
 const TINT=['#e8f1ff','#fff0ec','#eefbe9','#fdf3d8','#f3eaff','#e6f8fa','#ffeaf2'];
 function rnd(s){return()=>(s=(s*16807)%2147483647)/2147483647}
-function fallbackImg(cat,i){
-  const q=encodeURIComponent(cat.replace(/&/g,'')+' product');
-  return `https://loremflickr.com/700/700/${q}?lock=${i+1}`;
-}
+const PHOTO_BY_NAME={"USB-C Cable 1m":"https://i.ebayimg.com/images/g/losAAeSwXGRo-71T/S-l400.jpg","Wireless Mouse":"https://www.amazon.com/images/I/61LtuGzT7VL._AC_SL1500_.jpg","Bluetooth Speaker":"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&q=85","Power Bank 10000mAh":"https://www.axonprofil.se/static/items/840/15779_vit.jpg","Wireless Earbuds":"https://www.digitalstore.co.ke/cdn/shop/products/ItelT1NeoKT1WirelessEarphone-i2_1000x.webp?v=1665050434","Smart Watch":"https://percdn.com/f/298540/bzR6WmFuTXorNjQrTm53Z1RvTnE/p/64c1af82acd13-25837-1.webp","Keyboard":"https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=700&q=85","Phone Stand":"https://www.amazon.com/images/I/71lQeQqzq8L._AC_SL1500_.jpg"};
+function productPhoto(name,cat,i){const exact=PHOTO_BY_NAME[name];if(exact)return exact;const q=encodeURIComponent((name+" "+cat).replace(/[^a-zA-Z0-9 -]/g," ").trim());return "https://loremflickr.com/700/700/"+q+"?lock="+(i+1);}
 const ITEMS=[];
 C.slice(1).forEach((c,ci)=>{
   const R=rnd(ci*977+13);
@@ -106,7 +103,7 @@ C.slice(1).forEach((c,ci)=>{
     const rc=Math.floor(35+Math.pow(R(),2)*4200);
     ITEMS.push({id:ITEMS.length,cat:c.k,name,brand:BRANDS[(bi+ci)%BRANDS.length],price,
       old:dis?+(price/(1-dis/100)).toFixed(2):0,dis,rating,rc,prime:R()<.78,free:R()<.62,best:rc>2200,
-      photo:fallbackImg(c.k,ITEMS.length),ord:R()});
+      photo:productPhoto(name,c.k,ITEMS.length),ord:R()});
   });
 });
 // ---------- REVIEWS ----------
@@ -128,7 +125,7 @@ function render(){
  const S={f:(a,b)=>a.ord-b.ord,pl:(a,b)=>a.price-b.price,ph:(a,b)=>b.price-a.price,r:(a,b)=>b.rating-a.rating,d:(a,b)=>b.dis-a.dis};L.sort(S[sort]);
  $('cnt').textContent=L.length;$('cn').textContent=cat;
  $('grid').innerHTML=L.slice(0,shown).map(p=>{const [d,c]=p.price.toFixed(2).split('.');
- return `<div class="p"><div class="img"><img loading="lazy" src="${p.photo}" data-fb="${p.img}" onerror="this.onerror=null;this.src=this.dataset.fb" alt="${p.name}">${p.dis?`<span class="tag">-${p.dis}%</span>`:p.best?'<span class="tag bs">Best Seller</span>':''}<button class="hrt ${fav.has(p.id)?'on':''}" data-h="${p.id}">${fav.has(p.id)?'♥':'♡'}</button></div>
+ return `<div class="p"><div class="img"><img loading="lazy" src="${p.photo}" alt="${p.name}">${p.dis?`<span class="tag">-${p.dis}%</span>`:p.best?'<span class="tag bs">Best Seller</span>':''}<button class="hrt ${fav.has(p.id)?'on':''}" data-h="${p.id}">${fav.has(p.id)?'♥':'♡'}</button></div>
  <div class="info"><div class="nm">${p.name}</div><div class="br">${p.brand}</div>
  <div class="rt" data-r="${p.id}"><span class="st">${stars(p.rating)}</span>${p.rating} (${p.rc.toLocaleString()})</div>
  <div class="pr"><b>$${d}<sup>${c}</sup></b>${p.old?`<s>$${p.old}</s>`:''}${p.prime?'<span class="prime">prime</span>':''}</div>
