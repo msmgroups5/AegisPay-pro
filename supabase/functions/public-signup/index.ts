@@ -118,6 +118,19 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Account setup could not be completed. No usable AegisPay account was created.", code: "PROFILE_LINK_FAILED", requestId }, 500);
     }
 
+    if (referrerId && !linkedProfile.referred_by) {
+      const { error: attributionError } = await admin.from("users")
+        .update({ referred_by: referrerId })
+        .eq("id", linkedProfile.id)
+        .is("referred_by", null);
+      if (attributionError) {
+        console.error("public-signup referral attribution failed", { requestId, authUserId: data.user.id, referrerId, message: attributionError.message, code: attributionError.code });
+        try { await admin.auth.admin.deleteUser(data.user.id); } catch (cleanupError) {}
+        return json({ error: "Referral attribution could not be completed. No usable AegisPay account was created.", code: "REFERRAL_ATTRIBUTION_FAILED", requestId }, 500);
+      }
+      linkedProfile.referred_by = referrerId;
+    }
+
     return json({
       user: { id: data.user.id, email: data.user.email || email },
       profile: { id: linkedProfile.id, role: linkedProfile.role, status: linkedProfile.status, referred_by: linkedProfile.referred_by ?? null },
