@@ -86,7 +86,7 @@ deposit:()=>`${T('Deposit USDT','topup')}<div style="text-align:center"><span cl
  <div class="two"><button class="btn o">${ic('link')} Save Link</button><button class="btn">${ic('share')} Share</button></div>`,
 
 withdraw:()=>`${T('Withdraw','home')}<div class="card" style="text-align:center"><small class="mu">Available balance</small><h2 style="font-size:32px;margin:4px 0">2,480.50 <span class="mu" style="font-size:15px">USDT</span></h2></div>
- <div class="sh">Wallet Address</div><div class="in">${ic('link')}Paste TRC20 address<span style="margin-left:auto;color:var(--c)">Scan</span></div>
+ <div class="sh">Wallet Address (TRC20)</div><div class="in" style="padding:0;overflow:hidden"><span style="padding-left:14px;color:var(--mu)">${ic('link')}</span><input id="withdrawWallet" type="text" placeholder="Enter wallet address" autocomplete="off" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--t);font:500 13px Sora;padding:14px 4px"><button type="button" style="border:0;background:transparent;color:var(--c);font:600 12px Sora;padding:14px 12px">Scan</button></div>
  <div class="sh">Amount</div><div class="in f">250.00<span class="chip w">MAX</span></div>
  <div class="card"><div class="row" style="padding-top:0"><div class="mu">Network</div><em>TRC20</em></div><div class="row"><div class="mu">Fee</div><em>1.00 USDT</em></div><div class="row" style="border:0;padding-bottom:0"><div>Total</div><em class="up">249.00 USDT</em></div></div>
  <button class="btn">Confirm Withdrawal ${ic('arrow')}</button>`,
