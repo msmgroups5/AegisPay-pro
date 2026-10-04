@@ -177,9 +177,37 @@ async function liveWithdraw(){
  wBtn.onclick=async()=>{try{const a=Number(wAmount.value);const x=await db.rpc('request_withdrawal',{p_amount:a});if(x.error)throw x.error;alert('Withdrawal request submitted.');go('home')}catch(e){alert(e.message||'Withdrawal failed')}};
 }
 async function liveActivity(){
- const p=profile,l=await db.from('account_ledger').select('entry_type,amount,description,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(30),w=await db.from('withdrawal_requests').select('amount,status,created_at,net_amount').eq('user_id',p.id).order('created_at',{ascending:false}).limit(10);
- app.innerHTML=top('Activity')+'<div class="sh">Ledger</div><div class="card" style="padding:4px 16px">'+((l.data||[]).map(x=>'<div class="row"><div>'+esc(x.description||x.entry_type)+'<small>'+new Date(x.created_at).toLocaleString()+'</small></div><em>'+((Number(x.amount)>=0)?'+':'')+Number(x.amount).toFixed(2)+'</em></div>').join('')||'<div class="mu" style="padding:14px 0">No ledger activity.</div>')+'</div><div class="sh">Withdrawals</div><div class="card" style="padding:4px 16px">'+((w.data||[]).map(x=>'<div class="row"><div>Withdrawal<small>'+new Date(x.created_at).toLocaleString()+'</small></div><em>'+Number(x.amount).toFixed(2)+'<small>'+esc(x.status)+'</small></em></div>').join('')||'<div class="mu" style="padding:14px 0">No withdrawal requests.</div>')+'</div>'+nav('activity');
+ const p=profile;
+ const l=await db.from('account_ledger').select('entry_type,amount,description,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100);
+ const w=await db.from('withdrawal_requests').select('amount,status,created_at,net_amount').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100);
+ const r=await db.from('referrals').select('referral_level,platform_reward,created_at,referred_user_id').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100);
+ const rows=l.data||[], withdrawals=w.data||[], refs=r.data||[];
+ const sum=(arr)=>arr.reduce((n,x)=>n+Math.abs(Number(x.amount||x.platform_reward||0)),0);
+ const deposits=rows.filter(x=>Number(x.amount)>0 && !/referral|reward|profit|task/i.test((x.description||'')+' '+(x.entry_type||'')));
+ const profits=rows.filter(x=>Number(x.amount)>0 && /profit|task/i.test((x.description||'')+' '+(x.entry_type||'')));
+ const refTotal=sum(refs);
+ const card=(type,title,sub,total,icon,color)=>'<div class="card" onclick="activityHistory(\''+type+'\')" style="cursor:pointer;background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border-color:'+color+'55"><div style="display:flex;align-items:center;gap:14px"><span class="bub" style="background:'+color+'22;color:'+color+'">'+ic(icon)+'</span><div style="flex:1"><h3 style="font-size:15px">'+title+'</h3><small class="mu">'+sub+'</small></div><div style="text-align:right"><b style="font-size:17px">'+Number(total).toFixed(2)+' USDT</b><small class="mu" style="display:block;margin-top:3px">View History '+ic('chev')+'</small></div></div></div>';
+ app.innerHTML=top('Activity')+
+ '<div class="sh">Activity Categories</div>'+
+ card('deposit','Deposit','Credit · Deposit history',sum(deposits),'dl','#2EE6A6')+
+ card('withdrawal','Withdrawal','Debit · Withdrawal history',sum(withdrawals),'up','#FF5C7A')+
+ card('profit','Task Profit','Completed task earnings',sum(profits),'check','#FFB84D')+
+ card('referral','Referral Rewards','Referral earnings history',refTotal,'gift','#7C5CFF')+
+ '<div class="warn" style="margin-top:4px">'+ic('alert')+'<span>Select any category to view its dedicated history.</span></div>'+nav('activity');
 }
+async function activityHistory(type){
+ const p=profile;
+ const l=await db.from('account_ledger').select('entry_type,amount,description,created_at').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100);
+ const w=await db.from('withdrawal_requests').select('amount,status,created_at,net_amount').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100);
+ const r=await db.from('referrals').select('referral_level,platform_reward,created_at,referred_user_id').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100);
+ let title='',items=[];
+ if(type==='deposit'){title='Deposit History';items=(l.data||[]).filter(x=>Number(x.amount)>0&&!/referral|reward|profit|task/i.test((x.description||'')+' '+(x.entry_type||'')).map(x=>({label:x.description||'Deposit · USDT',date:x.created_at,amount:'+'+Number(x.amount).toFixed(2),status:x.entry_type||'Credit'}));}
+ if(type==='withdrawal'){title='Withdrawal History';items=(w.data||[]).map(x=>({label:'Withdrawal · USDT',date:x.created_at,amount:'−'+Number(x.amount).toFixed(2),status:x.status||'Debit'}));}
+ if(type==='profit'){title='Task Profit History';items=(l.data||[]).filter(x=>Number(x.amount)>0&&/profit|task/i.test((x.description||'')+' '+(x.entry_type||'')).map(x=>({label:x.description||'Task Profit',date:x.created_at,amount:'+'+Number(x.amount).toFixed(2),status:'Profit'}));}
+ if(type==='referral'){title='Referral Rewards History';items=(r.data||[]).map(x=>({label:'Referral Reward · Level '+x.referral_level,date:x.created_at,amount:'+'+Number(x.platform_reward||0).toFixed(2),status:'Reward'}));}
+ app.innerHTML=top(title,'activity')+'<div class="card" style="padding:4px 16px">'+(items.length?items.map(x=>'<div class="row"><div>'+esc(x.label)+'<small>'+new Date(x.date).toLocaleString()+'</small></div><em class="up">'+x.amount+'<small>'+esc(x.status)+'</small></em></div>').join(''):'<div class="mu" style="padding:16px 0;text-align:center">No history available yet.</div>')+'</div>'+nav('activity');
+}
+
 async function liveReferral(){
  const p=profile,r=await db.from('referrals').select('referral_level,platform_reward,created_at,referred_user_id').eq('user_id',p.id).order('created_at',{ascending:false});
  app.innerHTML=top('Referral')+'<div class="hero"><h2 style="font-size:25px">Invite friends,<br>earn USDT</h2><p style="margin:8px 0 14px">Your referral code</p><span class="pill">'+esc(p.referral_code||'—')+' '+ic('copy')+'</span></div><div class="card"><div class="lvl"><div>Total<b>'+(r.data?.length||0)+'</b></div><div>Level 1<b>'+(r.data||[]).filter(x=>x.referral_level===1).length+'</b></div><div>Level 2<b>'+(r.data||[]).filter(x=>x.referral_level===2).length+'</b></div></div></div><div class="sh">My Referrals</div><div class="card" style="padding:4px 16px">'+((r.data||[]).map(x=>'<div class="row">'+ic('user')+'<div>Referral User<small>Level '+x.referral_level+'</small></div><em>+'+Number(x.platform_reward||0).toFixed(2)+' USDT</em></div>').join('')||'<div class="mu" style="padding:14px 0">No referrals yet.</div>')+'</div>'+nav('home');
