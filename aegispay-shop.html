@@ -93,8 +93,24 @@ function rnd(s){return()=>(s=(s*16807)%2147483647)/2147483647}
 function img(e,t,i){const sh=['circle cx="50" cy="52" r="30"','rect x="22" y="24" width="56" height="56" rx="16"','ellipse cx="50" cy="52" rx="36" ry="28"'][i%3];
  const s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 90"><rect width="100" height="90" fill="#fff"/><rect width="100" height="90" fill="${t}"/><${sh} fill="#fff" opacity=".7"/><ellipse cx="50" cy="80" rx="24" ry="4" fill="#000" opacity=".1"/><text x="50" y="62" font-size="42" text-anchor="middle">${e}</text></svg>`;
  return 'data:image/svg+xml;utf8,'+encodeURIComponent(s)}
-const KW={'USB-C Cable 1m':'usb cable','Screen Cleaning Kit':'cleaning cloth','Phone Stand':'phone stand','Bluetooth Speaker':'bluetooth speaker','Matte Lipstick':'lipstick','Face Cream':'face cream','Hair Dryer':'hair dryer','Makeup Brush Set':'makeup brushes','Face Mask':'facial mask','Sunscreen SPF50':'sunscreen','Hand Soap':'soap','Mystery Novel':'novel book','Science Guide':'science book','Kids Storybook':'children book','Finance Basics':'finance book','History Atlas':'atlas book','Self-Growth':'self help book','Art Notebook':'notebook','Poetry Collection':'poetry book','Coding Handbook':'programming book','Cooking Pot':'cooking pot','Coffee Mug Set':'coffee mug','Storage Box':'storage box','Plant Pot':'plant pot','Game Controller':'game controller','Building Blocks':'lego','Puzzle 500pc':'jigsaw puzzle','RC Car':'toy car','Board Game':'board game','Water Gun':'water gun','Drone Mini':'drone','Chess Set':'chess','Cotton T-Shirt':'tshirt','Denim Jacket':'denim jacket','Wrist Watch':'wristwatch','Leather Wallet':'wallet','Summer Dress':'dress','Wool Scarf':'scarf','Baseball Cap':'cap','Webcam HD':'webcam','Smart Watch':'smartwatch','Power Bank':'power bank','Wireless Mouse':'computer mouse'};
-const kw=n=>(KW[n]||n).toLowerCase().replace(/[^a-z ]/g,'').trim().split(' ').slice(0,2).join(',');
+const PHOTO={
+ 'USB-C Cable 1m':'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?auto=format&fit=crop&w=800&q=85',
+ 'Wireless Mouse':'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?auto=format&fit=crop&w=800&q=85',
+ 'Cotton T-Shirt':'https://images.unsplash.com/photo-1651761179569-4ba2aa054997?auto=format&fit=crop&w=800&q=85',
+ 'Sneakers':'https://images.unsplash.com/photo-1577982886439-c25dc08b0c01?auto=format&fit=crop&w=800&q=85',
+ 'Coffee Mug Set':'https://images.unsplash.com/photo-1501843508755-af0829d48618?auto=format&fit=crop&w=800&q=85',
+ 'Matte Lipstick':'https://images.unsplash.com/photo-1608769515270-81ff7293e988?auto=format&fit=crop&w=800&q=85',
+ 'Game Controller':'https://images.unsplash.com/photo-1691359006593-3481cc87c36a?auto=format&fit=crop&w=800&q=85',
+ 'Books':'https://images.unsplash.com/photo-1585521549926-ca6526bda09e?auto=format&fit=crop&w=800&q=85'
+};
+const CATPHOTO={
+ Electronics:'https://images.unsplash.com/photo-1595756630452-736bc8ef3693?auto=format&fit=crop&w=800&q=85',
+ Fashion:'https://images.unsplash.com/photo-1651761179569-4ba2aa054997?auto=format&fit=crop&w=800&q=85',
+ 'Home & Kitchen':'https://images.unsplash.com/photo-1501843508755-af0829d48618?auto=format&fit=crop&w=800&q=85',
+ Beauty:'https://images.unsplash.com/photo-1643949476021-cf19232e2b26?auto=format&fit=crop&w=800&q=85',
+ 'Toys & Games':'https://images.unsplash.com/photo-1691359006593-3481cc87c36a?auto=format&fit=crop&w=800&q=85',
+ Books:'https://images.unsplash.com/photo-1585521549926-ca6526bda09e?auto=format&fit=crop&w=800&q=85'
+};
 const ITEMS=[];
 C.slice(1).forEach((c,ci)=>{const R=rnd(ci*977+13);let n=0;
  c.v.forEach((v,vi)=>c.b.forEach((b,bi)=>{
@@ -102,7 +118,7 @@ C.slice(1).forEach((c,ci)=>{const R=rnd(ci*977+13);let n=0;
   const dis=R()<.5?[10,15,20,25,30][Math.floor(R()*5)]:0;
   const rating=+(3.8+R()*1.1).toFixed(1),rc=Math.floor(20+Math.pow(R(),2)*3000);
   ITEMS.push({id:ITEMS.length,cat:c.k,name:(vi?v+' ':'')+b[0],brand:BRANDS[(bi+vi)%8],price,old:dis?+(price/(1-dis/100)).toFixed(2):0,dis,rating,rc,
-   prime:R()<.75,free:R()<.5,best:rc>2000,img:img(b[1],TINT[(bi+vi)%7],bi+vi),photo:`https://loremflickr.com/400/360/${kw(b[0])}?lock=${ITEMS.length+1}`,ord:R()});n++}));});
+   prime:R()<.75,free:R()<.5,best:rc>2000,img:img(b[1],TINT[(bi+vi)%7],bi+vi),photo:PHOTO[b[0]]||CATPHOTO[c.k],ord:R()});n++}));});
 function logoSVG(){const d=document.createElement('div');d.innerHTML='<svg viewBox="0 0 120 42" xmlns="http://www.w3.org/2000/svg"><text x="2" y="24" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="30" letter-spacing="-1" fill="#fff">amazon</text><path d="M12 31 Q58 46 100 27" fill="none" stroke="#ff9900" stroke-width="3.2" stroke-linecap="round"/><path d="M92 25.5 L102 26 L98 34" fill="none" stroke="#ff9900" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';return d.firstChild}
 // ---------- REVIEWS ----------
 const NAMES=['Ayesha K.','Hassan R.','Sara M.','Bilal A.','Hira S.','Usman T.','Maria Q.','Ali Z.','Noor F.','Danish P.'];
