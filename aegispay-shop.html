@@ -139,7 +139,7 @@ function render(){
  const S={f:(a,b)=>a.ord-b.ord,pl:(a,b)=>a.price-b.price,ph:(a,b)=>b.price-a.price,r:(a,b)=>b.rating-a.rating,d:(a,b)=>b.dis-a.dis};L.sort(S[sort]);
  $('cnt').textContent=L.length;$('cn').textContent=cat;
  $('grid').innerHTML=L.slice(0,shown).map(p=>{const [d,c]=p.price.toFixed(2).split('.');
- return `<div class="p"><div class="img"><img loading="lazy" src="${p.photo}" data-fb="${p.img}" onerror="this.onerror=null;this.src=this.dataset.fb" alt="${p.name}">${p.dis?`<span class="tag">-${p.dis}%</span>`:p.best?'<span class="tag bs">Best Seller</span>':''}<button class="hrt ${fav.has(p.id)?'on':''}" data-h="${p.id}">${fav.has(p.id)?'♥':'♡'}</button></div>
+ return `<div class="p"><div class="img"><img loading="eager" src="${p.photo}" data-fb="${p.img}" onerror="this.onerror=null;this.src=this.dataset.fb" alt="${p.name}">${p.dis?`<span class="tag">-${p.dis}%</span>`:p.best?'<span class="tag bs">Best Seller</span>':''}<button class="hrt ${fav.has(p.id)?'on':''}" data-h="${p.id}">${fav.has(p.id)?'♥':'♡'}</button></div>
  <div class="info"><div class="nm">${p.name}</div><div class="br">${p.brand}</div>
  <div class="rt" data-r="${p.id}"><span class="st">${stars(p.rating)}</span>${p.rating} (${p.rc.toLocaleString()})</div>
  <div class="pr"><b>$${d}<sup>${c}</sup></b>${p.old?`<s>$${p.old}</s>`:''}${p.prime?'<span class="prime">prime</span>':''}</div>
