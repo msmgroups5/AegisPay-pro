@@ -1,10 +1,10 @@
 # AegisPay Production Readiness
 
-## Verified deployment state — 2026-10-03
+## Verified deployment state — 2026-10-05
 
 - GitHub repository: `msmgroups5/AegisPay-pro`
 - Production source branch: `main`
-- Netlify project: `aegispay-pro` (site ID `5573011e-3f81-449a-9617-da0c176720d8`)
+- Cloudflare Pages project: `aegispay-pro`
 - Supabase project: `wtcspnrmsoisroavojop`, ACTIVE_HEALTHY
 - Public website route: `/`
 - Client portal route: `/app/`
@@ -16,8 +16,8 @@
 - Client portal source is root `client.html`.
 - Master Admin source is root `master-admin.html`.
 - Shared browser assets are rooted at the repository top level.
-- `site/` is the Netlify publish package; `site/app/index.html` mirrors `client.html`.
-- Netlify workflows copy the canonical root client/admin/runtime assets into the publish package on every build.
+- `site/` is the Cloudflare Pages publish package; `site/app/index.html` mirrors `client.html`.
+- The Cloudflare Pages workflow copies the canonical root client/admin/runtime assets into the publish package on every build.
 - Android client/admin flavors bundle the same canonical root portal files.
 - No alternate React/Vite client, demo REST backend, preview site, or legacy UniApp/Huawei web runtime remains in `main`.
 
@@ -34,7 +34,7 @@
 
 ## Security review
 
-Supabase Security Advisor currently reports 11 authenticated-callable SECURITY DEFINER functions. These functions are intentionally used by authenticated client/admin/RLS workflows and enforce explicit identity, role, ownership and/or runtime checks. They require continued function-by-function review rather than blanket execution revocation.
+Supabase Security Advisor currently reports 8 authenticated-callable SECURITY DEFINER functions. These functions are intentionally used by authenticated client/admin/RLS workflows and enforce explicit identity, role, ownership and/or runtime checks. The stale one-argument `link_withdrawal_wallet(text)` overload is no longer callable by client roles.
 
 Leaked Password Protection is still disabled and is a production prerequisite.
 
@@ -50,8 +50,8 @@ Supabase Performance Advisor reports 12 currently unused indexes. With the prese
 
 ## Current production blockers
 
-1. Enable Leaked Password Protection in Supabase Auth.
-2. Verify Auth redirect/provider/SMTP configuration on the physical client device.
-3. Configure and verify server-side AI, Telegram and controlled Shasta/testnet payout secrets.
-4. Verify deposit evidence review, on-chain deposit confirmation, Shop/task workflow, 18-hour settlement, KYC and withdrawal dual approval end-to-end.
+1. Operator-side: enable Leaked Password Protection in Supabase Auth when available on the current plan.
+2. Configure and verify server-side AI, Telegram and controlled Shasta/testnet payout secrets.
+3. Complete TESTNET_DEMO end-to-end verification for deposit evidence, on-chain confirmation, Shop/tasks, 18-hour settlement, KYC and withdrawal dual approval.
+4. Verify production Auth redirect/provider/SMTP settings on a physical client device.
 5. Configure release signing and perform physical APK update verification.
