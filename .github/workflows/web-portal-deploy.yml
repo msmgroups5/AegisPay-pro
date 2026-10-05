@@ -42,17 +42,17 @@ jobs:
           cp _headers site/_headers
           cp styles.css premium.css shop-catalog.js client-auth.js supabase-sdk.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
           cp styles.css client-home.css supabase-sdk.js client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/app/
+          VERSION_CODE=$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)
+          VERSION_NAME=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)
           VERSIONED_CLIENT="aegispay-client-v${VERSION_NAME}-b${VERSION_CODE}.apk"
           VERSIONED_ADMIN="aegispay-admin-v${VERSION_NAME}-b${VERSION_CODE}.apk"
           cp android/app/build/outputs/apk/client/debug/app-client-debug.apk "site/downloads/${VERSIONED_CLIENT}"
           cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
           cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk "site/downloads/${VERSIONED_ADMIN}"
           cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk site/downloads/aegispay-admin.apk
-          VERSION_CODE=$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)
-          VERSION_NAME=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)
-          CLIENT_SHA256=$(sha256sum "site/downloads/\${VERSIONED_CLIENT}" | awk '{print $1}')
+          CLIENT_SHA256=$(sha256sum "site/downloads/${VERSIONED_CLIENT}" | awk '{print $1}')
           CLIENT_ALIAS_SHA256=$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')
-          ADMIN_SHA256=$(sha256sum "site/downloads/\${VERSIONED_ADMIN}" | awk '{print $1}')
+          ADMIN_SHA256=$(sha256sum "site/downloads/${VERSIONED_ADMIN}" | awk '{print $1}')
           ADMIN_ALIAS_SHA256=$(sha256sum site/downloads/aegispay-admin.apk | awk '{print $1}')
           test "${CLIENT_SHA256}" = "${CLIENT_ALIAS_SHA256}"
           test "${ADMIN_SHA256}" = "${ADMIN_ALIAS_SHA256}"
