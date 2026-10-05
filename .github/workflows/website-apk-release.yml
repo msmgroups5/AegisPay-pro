@@ -13,7 +13,7 @@ permissions:
 jobs:
   publish:
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
@@ -106,7 +106,7 @@ jobs:
 
   publish-aurora-debug-main:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -144,7 +144,7 @@ jobs:
 
   publish-aurora-debug-pr:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
