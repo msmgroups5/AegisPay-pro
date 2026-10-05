@@ -1,5 +1,7 @@
 name: AegisPay Website + Direct APK Release
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 concurrency:
   group: aegispay-production-release
