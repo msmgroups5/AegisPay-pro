@@ -105,7 +105,6 @@ def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', 
         include 'client-home.css'
         include 'styles.css'
         include 'supabase-sdk.js'
-        include 'styles.css'
         include 'client-auth.js'
         include 'supabase-client.js'
         include 'supabase-service.js'
