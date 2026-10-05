@@ -74,8 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webview);
         configureWebView(webView);
-        // Prevent a previously installed APK from reusing stale UI assets.
-        webView.clearCache(true);
         webView.addJavascriptInterface(new AegisBridge(), "AegisNative");
         loadPortal();
         handleIncomingIntent(getIntent());
@@ -95,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         settings.setUseWideViewPort(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setSupportMultipleWindows(false);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
