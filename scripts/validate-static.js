@@ -38,7 +38,7 @@ for(const marker of ['WELCOME BACK','AVAILABLE BALANCE','Top Up','Shop Tasks','A
 }
 const homeCss=fs.readFileSync('client-home.css','utf8');
 assert(homeCss.includes('.ap-v2-home'),'Premium v2 Home stylesheet is missing');
-for(const marker of ['.ap-premium-home','.ap-reference-ui','.ap-amazon-premium','Reference-driven','Uploaded reference home']) {
+for(const marker of ['.ap-premium-home','.ap-reference-ui','.ap-amazon-premium','Reference-driven','Uploaded reference home','COMPLETE CLIENT UI — UPLOADED HTML VISUAL SYSTEM','--ref-']) {
   assert(!homeCss.includes(marker),'Legacy Home CSS marker remains: '+marker);
 }
 assert(clientAuth.length<75000,'Client source unexpectedly exceeded the merged client runtime budget');
