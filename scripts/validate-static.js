@@ -34,6 +34,8 @@ for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','
 }
 assert(clientAuth.length<75000,'Client source unexpectedly exceeded the merged client runtime budget');
 assert(clientAuth.includes("rpc('link_withdrawal_wallet',{p_address:address,p_owner_name:owner})"),'Client withdrawal wallet flow is not aligned with the active two-argument RPC');
+assert(clientAuth.includes("complete-cycle-checkout"),'Client Shop checkout endpoint is not wired');
+assert(!clientAuth.includes("rpc('complete_task'"),'Legacy single-task Shop completion RPC must not be called by the canonical client');
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
