@@ -38,7 +38,7 @@ var copy={
   submitKyc:'Submit identity images',kycHelp:'If an image is blurry or details do not match your profile, upload a clear and correct image again. Withdrawals stay locked until KYC is verified.',
   history:'Recent activity',status:'Status',date:'Date',logout:'Sign out',refCode:'Your referral code',loadingData:'Loading your account…',save:'Save language',
   pending:'Pending review',empty:'No records yet.',network:'Deposits are currently configured for TRON test network. Never send real funds to a test address.',
-  ok:'Request submitted.',shopTitle:'AegisPay Shop',shopReady:'Your assigned Shop tasks are ready.',shopEmpty:'No active Shop cycle yet. A verified deposit will create your task set.',completeTask:'Complete task',taskCompleted:'Completed',cycleOpen:'Tasks open',cycleWaiting:'18-hour settlement',remaining:'Remaining',referralsTitle:'Referrals',level1:'Level 1',level2:'Level 2',referralBonus:'Referral bonus',notificationsTitle:'Notifications',aiTitle:'Aegis AI Help',aiHint:'Ask about deposit, Shop, withdrawal, KYC or referrals.',withdrawTelegramPending:'Withdrawal submitted. Telegram could not be reached, so an administrator must resend the approval request.',chooseFile:'Choose an image file.',fileTooLarge:'Each image must be smaller than 10 MB.',walletLinked:'Wallet linked.',withdrawKyc:'Complete KYC before requesting a withdrawal.',
+  ok:'Request submitted.',shopTitle:'AegisPay Shop',shopReady:'Your assigned Shop tasks are ready.',shopEmpty:'No active Shop cycle yet. A verified deposit will create your task set.',completeTask:'Complete task',taskCompleted:'Completed',cycleOpen:'Tasks open',cycleWaiting:'18-hour settlement',remaining:'Remaining',remainingBalance:'Remaining Balance',taskTotal:'Task Total',exactTaskSet:'Use Exact Task Set',checkout:'Complete Task Set',checkoutReady:'All assigned tasks selected and Remaining Balance is $0.00. You can complete the cycle.',checkoutLocked:'Checkout is locked. Select every assigned task so Task Total equals the full Cycle Balance and Remaining Balance becomes $0.00.',checkoutSuccess:'All assigned Shop tasks are complete. The 18-hour settlement timer has started.',referralsTitle:'Referrals',level1:'Level 1',level2:'Level 2',referralBonus:'Referral bonus',notificationsTitle:'Notifications',aiTitle:'Aegis AI Help',aiHint:'Ask about deposit, Shop, withdrawal, KYC or referrals.',withdrawTelegramPending:'Withdrawal submitted. Telegram could not be reached, so an administrator must resend the approval request.',chooseFile:'Choose an image file.',fileTooLarge:'Each image must be smaller than 10 MB.',walletLinked:'Wallet linked.',withdrawKyc:'Complete KYC before requesting a withdrawal.',
   uploadBusy:'Uploading securely…',error:'Something went wrong. Please try again.',unavailable:'Secure sign-in is unavailable. Refresh and try again.'
  },
  ur:{
@@ -57,7 +57,7 @@ var copy={
   submitKyc:'Identity images bhejein',kycHelp:'Agar image blur ho ya details profile se match na karein to saaf aur durust image dobara upload karein. KYC verify hone tak withdrawal band rahega.',
   history:'Haal ki activity',status:'Status',date:'Tareekh',logout:'Sign out',refCode:'Aapka referral code',loadingData:'Account load ho raha hai…',save:'Zaban save karein',
   pending:'Review pending',empty:'Abhi koi record nahi.',network:'Deposits abhi TRON test network par configured hain. Test address par real funds na bhejein.',
-  ok:'Request submit ho gayi.',shopTitle:'AegisPay Shop',shopReady:'Aapke assigned Shop tasks ready hain.',shopEmpty:'Abhi active Shop cycle nahi hai. Verified deposit ke baad task set create hoga.',completeTask:'Task complete karein',taskCompleted:'Mukammal',cycleOpen:'Tasks open',cycleWaiting:'18 ghante ka settlement',remaining:'Baqi',referralsTitle:'Referrals',level1:'Level 1',level2:'Level 2',referralBonus:'Referral bonus',notificationsTitle:'Notifications',aiTitle:'Aegis AI Help',aiHint:'Deposit, Shop, withdrawal, KYC ya referrals ke bare mein poochein.',withdrawTelegramPending:'Withdrawal submit ho gayi. Telegram se rabta nahi ho saka, is liye Admin ko approval dobara bhejni hogi.',chooseFile:'Image file select karein.',fileTooLarge:'Har image 10 MB se chhoti honi chahiye.',walletLinked:'Wallet link ho gaya.',withdrawKyc:'Withdrawal se pehle KYC mukammal karein.',
+  ok:'Request submit ho gayi.',shopTitle:'AegisPay Shop',shopReady:'Aapke assigned Shop tasks ready hain.',shopEmpty:'Abhi active Shop cycle nahi hai. Verified deposit ke baad task set create hoga.',completeTask:'Task complete karein',taskCompleted:'Mukammal',cycleOpen:'Tasks open',cycleWaiting:'18 ghante ka settlement',remaining:'Baqi',remainingBalance:'Baqi Balance',taskTotal:'Task Total',exactTaskSet:'Exact Task Set lagayein',checkout:'Task Set mukammal karein',checkoutReady:'Tamam assigned tasks select ho gaye hain aur Remaining Balance $0.00 hai. Cycle complete karein.',checkoutLocked:'Checkout locked hai. Har assigned task select karein taa ke Task Total full Cycle Balance ke barabar aur Remaining Balance $0.00 ho.',checkoutSuccess:'Tamam assigned Shop tasks mukammal hain. 18 ghante ka settlement timer shuru ho gaya hai.',referralsTitle:'Referrals',level1:'Level 1',level2:'Level 2',referralBonus:'Referral bonus',notificationsTitle:'Notifications',aiTitle:'Aegis AI Help',aiHint:'Deposit, Shop, withdrawal, KYC ya referrals ke bare mein poochein.',withdrawTelegramPending:'Withdrawal submit ho gayi. Telegram se rabta nahi ho saka, is liye Admin ko approval dobara bhejni hogi.',chooseFile:'Image file select karein.',fileTooLarge:'Har image 10 MB se chhoti honi chahiye.',walletLinked:'Wallet link ho gaya.',withdrawKyc:'Withdrawal se pehle KYC mukammal karein.',
   uploadBusy:'Secure upload ho raha hai…',error:'Masla hua. Dobara koshish karein.',unavailable:'Secure sign-in unavailable hai. Page refresh karke dobara try karein.'
  }
 };
@@ -174,34 +174,71 @@ function shopTaskForProduct(d,id){
   return null;
 }
 function shopProductList(){var q=shopSearch.trim().toLowerCase(),cat=shopCategory.toLowerCase();return PREMIUM_SHOP.filter(function(p){return (cat==='all'||p.category.toLowerCase()===cat)&&(!q||p.title.toLowerCase().indexOf(q)>=0||p.brand.toLowerCase().indexOf(q)>=0||p.category.toLowerCase().indexOf(q)>=0||p.subcategory.toLowerCase().indexOf(q)>=0);});}
-async function completeShopPurchase(productId){
- var d=state.data||{},task=shopTaskForProduct(d,productId);
- if(!task){setMessage('This Shop item is not assigned to your current cycle.','error');render();return;}
- if(task.status==='Completed'){saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));render();return;}
+function assignedShopTaskEntries(d){
+ var tasks=currentShopTasks(d),offers=(d&&d.offers)||[];
+ return tasks.map(function(task){
+   var offer=offers.find(function(x){return String(x.id)===String(task.offer_id);});
+   if(!offer||!offer.product_id)return null;
+   return {task:task,productId:String(offer.product_id)};
+ }).filter(Boolean);
+}
+function exactShopTaskIds(d){
+ return assignedShopTaskEntries(d).map(function(x){return x.task.id;});
+}
+function exactShopCartState(d,cart){
+ var entries=assignedShopTaskEntries(d),required=entries.map(function(x){return x.productId;});
+ if(!entries.length||cart.length!==required.length)return false;
+ return required.every(function(id){return cart.indexOf(id)>=0;});
+}
+async function completeShopCheckout(d){
+ var entries=assignedShopTaskEntries(d),cart=loadShopCart();
+ if(!d||!d.cycle){setMessage(t('shopEmpty'));render();return;}
+ if(!entries.length){setMessage(t('checkoutLocked'));render();return;}
+ if(!exactShopCartState(d,cart)){setMessage(t('checkoutLocked'));render();return;}
  if(busy)return;
  busyStart();render();
  try{
-  var result=await service.client().rpc('complete_task',{p_task_id:task.id});
-  if(result.error)throw result.error;
-  saveShopCart(loadShopCart().filter(function(x){return x!==productId;}));
-  await refreshData();
-  if(result.data&&result.data.status==='WAITING_18H'){
-   setMessage('All assigned Shop tasks are complete. The 18-hour settlement timer has started.','success');
-  }else{
-   setMessage('Shop task completed successfully.','success');
-  }
-  state.messageTone='success';
+   var result=await service.invokeFunction('complete-cycle-checkout',{
+     body:{cycleId:d.cycle.id,taskIds:exactShopTaskIds(d)}
+   });
+   if(result.error)throw result.error;
+   saveShopCart([]);
+   await refreshData();
+   setMessage((result.data&&result.data.status==='WAITING_18H')?t('checkoutSuccess'):t('checkoutSuccess'),'success');
+   state.messageTone='success';
  }catch(err){setMessage(authError(err));}
  finally{busy=false;render();}
 }
+
 function shopSection(d){
- var cart=loadShopCart(),filtered=shopProductList(),tasks=currentShopTasks(d),hasCycle=!!(d&&d.cycle),assignedCount=Math.min(tasks.length,PREMIUM_SHOP.length);
- var chips=SHOP_CATEGORIES.map(function(cat){return '<button type="button" class="aegis-shop-chip '+(shopCategory===cat?'active':'')+'" data-action="shop-category" data-category="'+esc(cat)+'">'+esc(cat)+'</button>';}).join('');
- var products=filtered.map(function(p){var inCart=cart.indexOf(p.id)>=0,task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';return '<article class="aegis-product"><div class="aegis-product-media"><span class="fallback">'+esc(p.emoji)+'</span><img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" onerror="this.classList.add(\'broken\')" loading="lazy"><span class="aegis-product-badge">'+esc(p.badge)+'</span>'+(pending?'<span class="aegis-task-badge">TASK</span>':'')+'</div><div class="aegis-product-body"><div class="aegis-product-brand">'+esc(p.brand)+'</div><div class="aegis-product-title">'+esc(p.title)+'</div><div class="aegis-stars">★★★★★ <span>'+Number(p.rating||4.5).toFixed(1)+'</span></div><div class="aegis-product-price"><strong>$'+Number(p.marketPrice).toFixed(2)+'</strong><small>display</small></div><div class="aegis-task-value '+(pending?'':'browse')+'">'+(pending?'Task '+money(task.task_value)+' assigned':'Browse only · no task')+'</div><button type="button" class="aegis-product-action '+(inCart?'added':(pending?'task':''))+'" data-action="shop-add" data-id="'+esc(p.id)+'">'+(inCart?'✓ Added to Cart':(pending?'Add to Cart':'Preview Item'))+'</button></div></article>';}).join('');
+ var cart=loadShopCart(),filtered=shopProductList(),tasks=currentShopTasks(d),entries=assignedShopTaskEntries(d);
+ var hasCycle=!!(d&&d.cycle),requiredIds=entries.map(function(x){return x.productId;});
+ var exact=exactShopCartState(d,cart);
+ var taskTotal=cart.reduce(function(sum,id){
+   var task=shopTaskForProduct(d,id);
+   return sum+(task?Number(task.task_value||0):0);
+ },0);
+ var cycleBase=Number(d&&d.cycle&&d.cycle.cycle_base||0);
+ var remaining=Math.max(0,cycleBase-taskTotal);
+ var chips=SHOP_CATEGORIES.map(function(cat){
+   return '<button type="button" class="aegis-shop-chip '+(shopCategory===cat?'active':'')+'" data-action="shop-category" data-category="'+esc(cat)+'">'+esc(cat)+'</button>';
+ }).join('');
+ var products=filtered.map(function(p){
+   var inCart=cart.indexOf(p.id)>=0,task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';
+   return '<article class="aegis-product"><div class="aegis-product-media"><span class="fallback">'+esc(p.emoji)+'</span><img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" onerror="this.classList.add(\\'broken\\')" loading="lazy"><span class="aegis-product-badge">'+esc(p.badge)+'</span>'+(pending?'<span class="aegis-task-badge">TASK</span>':'')+'</div><div class="aegis-product-body"><div class="aegis-product-brand">'+esc(p.brand)+'</div><div class="aegis-product-title">'+esc(p.title)+'</div><div class="aegis-stars">★★★★★ <span>'+Number(p.rating||4.5).toFixed(1)+'</span></div><div class="aegis-product-price"><strong>$'+Number(p.marketPrice).toFixed(2)+'</strong><small>display only</small></div><div class="aegis-task-value '+(pending?'':'browse')+'">'+(pending?'Task '+money(task.task_value)+' assigned':'Browse only · no assigned task')+'</div><button type="button" class="aegis-product-action '+(inCart?'added':(pending?'task':''))+'" data-action="shop-add" data-id="'+esc(p.id)+'">'+(inCart?'✓ Added to Cart':(pending?'Add Task to Cart':'Preview Item'))+'</button></div></article>';
+ }).join('');
  var cartProducts=cart.map(function(id){for(var i=0;i<PREMIUM_SHOP.length;i++){if(PREMIUM_SHOP[i].id===id)return PREMIUM_SHOP[i];}return null;}).filter(Boolean);
- var cartRows=cartProducts.map(function(p){var task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';return '<div class="aegis-cart-item"><img class="aegis-cart-thumb" src="'+esc(p.image)+'" alt="" onerror="this.style.display=\'none\'"><div class="aegis-cart-copy"><b>'+esc(p.title)+'</b><small>'+esc(p.category)+' · $'+Number(p.marketPrice).toFixed(2)+' display</small><strong>'+(task?'Task: '+esc(task.title):'Preview item only')+'</strong></div><div class="aegis-cart-actions"><button type="button" class="remove" data-action="shop-remove" data-id="'+esc(p.id)+'">Remove</button>'+(pending?'<button type="button" class="buy" data-action="shop-buy" data-id="'+esc(p.id)+'">Buy</button>':'')+'</div></div>';}).join('');
- var total=cartProducts.reduce(function(a,p){return a+Number(p.marketPrice||0);},0);
- return '<section class="section aegis-shop" id="shop"><div class="aegis-shop-head"><div class="aegis-shop-brand"><span class="aegis-shop-logo">A</span><div><h3>'+t('shopTitle')+'</h3><small>Marketplace-style task center · '+PREMIUM_SHOP.length+' products</small></div></div><button type="button" class="aegis-shop-cart-top" data-action="shop-cart-focus" aria-label="Open cart">🛒<span class="aegis-shop-cart-count">'+cart.length+'</span></button></div><div class="aegis-shop-hero"><span class="kicker">AegisPay Marketplace</span><h4>Browse • Add to Cart • Buy • Complete</h4><p>Familiar shopping-style browsing from $2 to $999. Market prices are display-only; only TASK items are linked to assigned AegisPay tasks.</p><div class="aegis-shop-hero-meta"><span>'+PREMIUM_SHOP.length+' products</span><span>'+assignedCount+' assigned tasks</span><span>'+(hasCycle?'Cycle active':'Activate after verified deposit')+'</span></div></div><div class="aegis-shop-controls"><form id="shopSearchForm" class="aegis-shop-search"><input id="shopSearchInput" value="'+esc(shopSearch)+'" placeholder="Search products, brands or categories"><button type="submit" aria-label="Search">⌕</button></form><div class="aegis-shop-chips">'+chips+'</div></div>'+(products?'<div class="aegis-shop-grid">'+products+'</div>':'<div class="aegis-shop-empty"><b>No matching products</b>Try another search or category.</div>')+'<div class="aegis-cart" id="shop-cart"><div class="aegis-cart-head"><div><h4>Shopping Cart</h4><small>'+cart.length+' item'+(cart.length===1?'':'s')+' · simulated display</small></div><button type="button" class="aegis-shop-chip" data-action="shop-clear">Clear</button></div><div class="aegis-cart-list">'+(cartRows||'<div class="aegis-cart-empty">Your cart is empty. Add a TASK item to continue.</div>')+'</div><div class="aegis-cart-footer"><div><span>Cart display total</span><strong>$'+total.toFixed(2)+'</strong></div><div><span>Task rule</span><strong style="font-size:11px">'+(hasCycle?'Buy mapped tasks to complete them':'Verify deposit to activate tasks')+'</strong></div></div></div><div class="aegis-shop-notice"><div>🛡️</div><div><strong>TESTNET / DEMO SAFEGUARD</strong>This is an AegisPay task interface, not a real marketplace checkout. “Buy” completes the mapped assigned task through the existing secure backend function; no real product order is submitted.</div></div></section>';
+ var cartRows=cartProducts.map(function(p){
+   var task=shopTaskForProduct(d,p.id),pending=task&&task.status!=='Completed';
+   return '<div class="aegis-cart-item"><img class="aegis-cart-thumb" src="'+esc(p.image)+'" alt="" onerror="this.style.display=\\'none\\'"><div class="aegis-cart-copy"><b>'+esc(p.title)+'</b><small>'+esc(p.category)+' · $'+Number(p.marketPrice).toFixed(2)+' display</small><strong>'+(task?'Task value: '+money(task.task_value):'Preview item only — does not count toward checkout')+'</strong></div><div class="aegis-cart-actions"><button type="button" class="remove" data-action="shop-remove" data-id="'+esc(p.id)+'">Remove</button></div></div>';
+ }).join('');
+ var checkoutButton=hasCycle
+   ? '<button type="button" class="aegis-product-action task" data-action="shop-checkout" '+(exact?'':'disabled')+'>'+esc(t('checkout'))+'</button>'
+   : '<button type="button" class="aegis-product-action" disabled>'+esc(t('checkout'))+'</button>';
+ var exactButton=entries.length
+   ? '<button type="button" class="aegis-shop-chip" data-action="shop-exact-set">'+esc(t('exactTaskSet'))+'</button>'
+   : '';
+ return '<section class="section aegis-shop" id="shop"><div class="aegis-shop-head"><div class="aegis-shop-brand"><span class="aegis-shop-logo">A</span><div><h3>'+t('shopTitle')+'</h3><small>Marketplace-style task center · '+PREMIUM_SHOP.length+' products</small></div></div><button type="button" class="aegis-shop-cart-top" data-action="shop-cart-focus" aria-label="Open cart">🛒<span class="aegis-shop-cart-count">'+cart.length+'</span></button></div><div class="aegis-shop-hero"><span class="kicker">AegisPay Marketplace</span><h4>Browse • Add Task Set • Checkout</h4><p>Market prices are display-only. Only assigned TASK values count toward the cycle checkout total.</p><div class="aegis-shop-hero-meta"><span>'+PREMIUM_SHOP.length+' products</span><span>'+entries.length+' assigned tasks</span><span>'+(hasCycle?'Cycle active':'Activate after verified deposit')+'</span></div></div><div class="aegis-shop-controls"><form id="shopSearchForm" class="aegis-shop-search"><input id="shopSearchInput" value="'+esc(shopSearch)+'" placeholder="Search products, brands or categories"><button type="submit" aria-label="Search">⌕</button></form><div class="aegis-shop-chips">'+chips+'</div></div>'+(products?'<div class="aegis-shop-grid">'+products+'</div>':'<div class="aegis-shop-empty"><b>No matching products</b>Try another search or category.</div>')+'<div class="aegis-cart" id="shop-cart"><div class="aegis-cart-head"><div><h4>Task Checkout Cart</h4><small>'+cart.length+' item'+(cart.length===1?'':'s')+' selected</small></div>'+exactButton+'</div><div class="aegis-cart-list">'+(cartRows||'<div class="aegis-cart-empty">Your cart is empty. Use “Exact Task Set” to select every assigned task.</div>')+'</div><div class="aegis-cart-footer"><div><span>'+esc(t('remainingBalance'))+'</span><strong>$'+remaining.toFixed(2)+'</strong></div><div><span>'+esc(t('taskTotal'))+'</span><strong>$'+taskTotal.toFixed(2)+'</strong></div><div><span>Cycle Balance</span><strong>$'+cycleBase.toFixed(2)+'</strong></div>'+checkoutButton+'</div><div class="aegis-shop-checkout-hint">'+(exact?t('checkoutReady'):t('checkoutLocked'))+'</div></div><div class="aegis-shop-notice"><div>🛡️</div><div><strong>TESTNET / DEMO SAFEGUARD</strong>This is an AegisPay task-set interface, not a real marketplace checkout. Checkout is accepted only when every assigned task is selected and the task-value total exactly matches the full cycle balance.</div></div></section>';
 }
 
 function referralsSection(d){
@@ -529,18 +566,16 @@ async function action(e){
  if(a==='copy-client-id'){var idValue=String(state.profile&&state.profile.client_id||'AP-CLIENT');if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(idValue).catch(function(){});return;} if(a==='notice'){navigateView('notifications');return;}
  if(a==='language')return;
  if(a==='retry-runtime'){checkRuntime();return;}
-  if(a==='complete-task'){
-   if(busy)return;busyStart();render();
-   try{var taskResult=await service.client().rpc('complete_task',{p_task_id:el.getAttribute('data-id')});if(taskResult.error)throw taskResult.error;setMessage(t('taskCompleted'),'success');await refreshData();state.messageTone='success';}
-   catch(err){setMessage(authError(err));}
-   finally{busy=false;render();} return;
-  }
   if(a==='shop-category'){shopCategory=el.getAttribute('data-category')||'All';render();return;}
   if(a==='shop-cart-focus'){var cartNode=document.getElementById('shop-cart');if(cartNode)cartNode.scrollIntoView({behavior:'smooth',block:'start'});return;}
   if(a==='shop-add'){var sid=el.getAttribute('data-id'),cart=loadShopCart();if(cart.indexOf(sid)<0){cart.push(sid);saveShopCart(cart);}render();return;}
   if(a==='shop-remove'){saveShopCart(loadShopCart().filter(function(x){return x!==el.getAttribute('data-id');}));render();return;}
   if(a==='shop-clear'){saveShopCart([]);render();return;}
-  if(a==='shop-buy'){await completeShopPurchase(el.getAttribute('data-id'));return;}
+  if(a==='shop-exact-set'){
+   var exactIds=assignedShopTaskEntries(state.data||{}).map(function(x){return x.productId;});
+   saveShopCart(exactIds);render();return;
+  }
+  if(a==='shop-checkout'){completeShopCheckout(state.data||{});return;}
   if(a==='copy-ref'){
    var refCode=state.profile&&state.profile.referral_code||'';
    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(refCode).then(function(){setMessage('Referral code copied.','success');state.messageTone='success';render();}).catch(function(){setMessage(t('error'));render();});
