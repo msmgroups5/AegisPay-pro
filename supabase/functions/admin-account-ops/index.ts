@@ -66,6 +66,34 @@ Deno.serve(async (req: Request) => {
       return json({ status });
     }
 
+    if (action === "wallet") {
+      const userId = String(body?.userId || "");
+      const wallet = String(body?.wallet || "").trim().toUpperCase();
+      if (!isUuid(userId)) return json({ error: "A valid user is required." }, 400);
+      if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(wallet)) return json({ error: "Enter a valid TRC20 wallet address." }, 400);
+
+      const { data: target, error: targetError } = await admin
+        .from("users")
+        .select("id,role,destination_address")
+        .eq("id", userId)
+        .maybeSingle();
+      if (targetError || !target || target.role !== "USER") return json({ error: "Client account not found." }, 404);
+
+      const { error: updateError } = await admin.from("users")
+        .update({ destination_address: wallet })
+        .eq("id", userId);
+      if (updateError) return json({ error: "Withdrawal wallet change failed." }, 400);
+
+      await admin.from("audit_events").insert({
+        actor_user_id: actor.id,
+        target_user_id: userId,
+        event_type: "WITHDRAWAL_WALLET_CHANGED",
+        description: "Master Admin changed the client's withdrawal wallet."
+      });
+
+      return json({ wallet });
+    }
+
     if (action === "balance") {
       const userId = String(body?.userId || "");
       const type = String(body?.type || "").toUpperCase();
