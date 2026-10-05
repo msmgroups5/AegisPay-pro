@@ -1,111 +1,15 @@
-name: AegisPay Website + Direct APK Release
+name: AegisPay Aurora APK Release
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 concurrency:
-  group: aegispay-production-release
+  group: aegispay-aurora-apk
   cancel-in-progress: true
 permissions:
   contents: write
 jobs:
-  publish:
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-22.04
-    env:
-      AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
-      AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
-      AEGIS_RELEASE_KEY_ALIAS: ${{ secrets.AEGIS_RELEASE_KEY_ALIAS }}
-      AEGIS_RELEASE_KEY_PASSWORD: ${{ secrets.AEGIS_RELEASE_KEY_PASSWORD }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: {distribution: temurin, java-version: '17'}
-      - uses: gradle/actions/setup-gradle@v4
-        with: {gradle-version: '8.9'}
-      - name: Require release signing secrets
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "$AEGIS_RELEASE_KEYSTORE_B64"
-          test -n "$AEGIS_RELEASE_STORE_PASSWORD"
-          test -n "$AEGIS_RELEASE_KEY_ALIAS"
-          test -n "$AEGIS_RELEASE_KEY_PASSWORD"
-      - name: Configure release signing
-        run: |
-          echo "$AEGIS_RELEASE_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/aegispay-release.jks"
-          echo "AEGIS_RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/aegispay-release.jks" >> "$GITHUB_ENV"
-      - name: Build production APKs
-        run: gradle -p android :app:assembleClientRelease :app:assembleAdminRelease --no-daemon
-      - name: Assemble canonical website package
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf site/app site/downloads
-          mkdir -p site/app site/downloads
-          cp client.html site/client.html
-          cp client-home.css site/client-home.css
-          cp master-admin.html site/master-admin.html
-          cp admin-auth.js site/admin-auth.js
-          cp client.html site/app/index.html
-          cp client.html site/app/home.html
-          cp _redirects site/_redirects
-          cp _headers site/_headers
-          cp styles.css premium.css shop-catalog.js client-auth.js supabase-sdk.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
-          cp styles.css client-home.css supabase-sdk.js client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/app/
-          VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
-          VERSION_NAME="$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)"
-          VERSIONED_CLIENT="aegispay-client-v${VERSION_NAME}-b${VERSION_CODE}.apk"
-          cp android/app/build/outputs/apk/client/release/app-client-release.apk "site/downloads/${VERSIONED_CLIENT}"
-          cp android/app/build/outputs/apk/client/release/app-client-release.apk site/downloads/aegispay-client.apk
-          cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
-          CLIENT_SHA="$(sha256sum "site/downloads/${VERSIONED_CLIENT}" | awk '{print $1}')"
-          CLIENT_ALIAS_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
-          test "${CLIENT_SHA}" = "${CLIENT_ALIAS_SHA}"
-          cat > site/app-version.json <<EOF
-          {
-            "versionCode": ${VERSION_CODE},
-            "versionName": "${VERSION_NAME}",
-            "releaseChannel": "stable",
-            "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/${VERSIONED_CLIENT}",
-            "legacyClientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client.apk",
-            "clientSha256": "${CLIENT_SHA}",
-            "notes": ["Canonical Client portal source: client.html","Canonical Master Admin source: master-admin.html","Signed release"]
-          }
-          EOF
-          cp site/app-version.json app-version.json
-          test -s site/index.html
-          test -s site/app/index.html
-          test -s site/app/home.html
-          test -s "site/downloads/${VERSIONED_CLIENT}"
-          test -s site/downloads/aegispay-client.apk
-      - name: Upload release artifacts
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: AegisPay-Website-and-Direct-APK-Package
-          path: site/
-          if-no-files-found: error
-      - name: Upload Master Admin APK
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: AegisPay-Master-Admin-Release
-          path: ${{ runner.temp }}/aegispay-admin.apk
-          if-no-files-found: error
-      - name: Deploy canonical release package to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: 6a31dfe877fe64e588b9415265302af4
-          command: pages deploy site --project-name=aegispay-pro --branch=main --commit-hash=${{ github.sha }} --commit-message="AegisPay signed release" --commit-dirty=false
-
-
   publish-aurora-debug-main:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -125,6 +29,7 @@ jobs:
           test -s android/app/build/outputs/apk/client/debug/app-client-debug.apk
           grep -q "versionCode 38" android/app/build.gradle
           grep -q "versionName '2.5.9'" android/app/build.gradle
+          sha256sum android/app/build/outputs/apk/client/debug/app-client-debug.apk
       - name: Publish Aurora Client APK
         env:
           GH_TOKEN: ${{ github.token }}
@@ -134,45 +39,7 @@ jobs:
           APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
           TAG="aurora-apk-2.5.9-b38"
           TITLE="AegisPay Aurora Client 2.5.9 (38)"
-          NOTES="Canonical Aurora Client UI APK. Includes the requested Secure & Verified footer, corrected CNIC/Passport file layout, and automatic Shop task assignment while available balance remains above 0. The client.html source is protected by an Android build blob guard."
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
-          else
-            gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes "$NOTES" --prerelease --target "$GITHUB_SHA"
-          fi
-
-
-  publish-aurora-debug-pr:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-      - name: Build canonical Aurora Client debug APK
-        run: gradle -p android :app:assembleClientDebug --no-daemon
-      - name: Verify canonical Aurora Client
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s android/app/build/outputs/apk/client/debug/app-client-debug.apk
-          grep -q "versionCode 38" android/app/build.gradle
-          grep -q "versionName '2.5.9'" android/app/build.gradle
-      - name: Publish Aurora Client APK
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
-          TAG="aurora-apk-2.5.9-b38"
-          TITLE="AegisPay Aurora Client 2.5.9 (38)"
-          NOTES="Canonical Aurora Client UI APK. Includes Secure & Verified footer, corrected CNIC/Passport file layout, and automatic Shop task assignment while available balance remains above 0. The client.html source is protected by an Android build blob guard."
+          NOTES="Canonical Aurora Client UI APK. Includes username login, Secure & Verified footer, corrected CNIC/Passport file layout, automatic Shop task assignment while balance remains above 0, and the canonical Aurora UI guard."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
           else
