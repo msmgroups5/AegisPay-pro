@@ -24,6 +24,10 @@ Last aligned: 2026-10-05
 - Legacy two-argument `link_withdrawal_wallet` was removed from PUBLIC/anon/authenticated API execution.
 - Security advisor findings decreased accordingly; remaining authenticated SECURITY DEFINER findings require function-by-function review.
 - Leaked-password protection is still disabled and remains a production security gate.
+- Master Admin wallet changes were moved from direct RPC execution to the authenticated `admin-account-ops` Edge Function (v2).
+- `admin_set_withdrawal_wallet(uuid,text)` EXECUTE was revoked from `authenticated`; direct client RPC access is now blocked.
+- Post-change Security Advisor count is 8 authenticated SECURITY DEFINER warnings plus the leaked-password protection warning.
+- Authenticated client smoke-check confirmed the current user resolves to app role `USER`, sees only the expected RLS-scoped user row, and can read the Shop catalog/runtime settings.
 
 ## Pending sequence
 
