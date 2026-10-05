@@ -48,7 +48,7 @@ jobs:
           VERSION_NAME=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)
           CLIENT_SHA256=$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')
           ADMIN_SHA256=$(sha256sum site/downloads/aegispay-admin.apk | awk '{print $1}')
-          python3 -c 'import json,os; json.dump({"versionCode":int(os.environ["VERSION_CODE"]),"versionName":os.environ["VERSION_NAME"],"releaseChannel":"test","clientApkUrl":"https://aegispay-pro.pages.dev/downloads/aegispay-client.apk","adminApkUrl":"https://aegispay-pro.pages.dev/downloads/aegispay-admin.apk","clientSha256":os.environ["CLIENT_SHA256"],"adminSha256":os.environ["ADMIN_SHA256"]},open("site/app-version.json","w"))' 
+          VERSION_CODE="$VERSION_CODE" VERSION_NAME="$VERSION_NAME" CLIENT_SHA256="$CLIENT_SHA256" ADMIN_SHA256="$ADMIN_SHA256" python3 -c 'import json,os; json.dump({"versionCode":int(os.environ["VERSION_CODE"]),"versionName":os.environ["VERSION_NAME"],"releaseChannel":"test","clientApkUrl":"https://aegispay-pro.pages.dev/downloads/aegispay-client.apk","adminApkUrl":"https://aegispay-pro.pages.dev/downloads/aegispay-admin.apk","clientSha256":os.environ["CLIENT_SHA256"],"adminSha256":os.environ["ADMIN_SHA256"]},open("site/app-version.json","w"))'
           test -s site/index.html
           test -s site/client.html
           test -s site/master-admin.html
