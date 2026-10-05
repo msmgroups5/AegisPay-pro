@@ -26,10 +26,10 @@ for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
 assert(client.includes('client-home.css'),'Canonical client stylesheet is not wired to client');
 assert(client.includes('./styles.css'),'Canonical client base stylesheet is not wired to client');
 assert(client.includes('./supabase-sdk.js'),'Android-safe local Supabase SDK fallback is not wired to client');
-assert(clientAuth.includes('ap-premium-home'),'Canonical premium Home UI is not wired to client');
-assert(!clientAuth.includes('ap-reference-ui'),'Legacy reference Home UI must not remain in client runtime');
 assert(client.includes('client-auth.js'),'Canonical client runtime is not wired to client');
 const clientAuth=fs.readFileSync('client-auth.js','utf8');
+assert(clientAuth.includes('ap-premium-home'),'Canonical premium Home UI is not wired to client');
+assert(!clientAuth.includes('ap-reference-ui'),'Legacy reference Home UI must not remain in client runtime');
 for(const marker of ['function homeView','function handleLogin','function refreshProfile']) {
   assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
 }
