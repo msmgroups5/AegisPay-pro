@@ -5,7 +5,7 @@ const exists=p=>fs.existsSync(p);
 const must=[
   'client.html','client-fresh.html','client-home.css','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
-  'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json','netlify.toml',
+   'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json',
   'database/migrations/20261003_private_verification_storage_policies.sql','database/migrations/20261004_restore_baseline_demo_configuration.sql',
   'database/migrations/20261005_align_withdrawal_wallet_rpc_grants.sql',
   'site/index.html','site/site.css','android/app/build.gradle',
@@ -75,3 +75,4 @@ const stale=['index.html','app.js','aegis-core.js','backend','preview','apk-arti
 for(const p of stale)assert(!exists(p),'Legacy path remains in canonical main: '+p);
 
 console.log('AegisPay canonical architecture validation: PASS');
+assert(!fs.existsSync('netlify.toml'),'Obsolete Netlify production configuration must not return to canonical main');
