@@ -75,9 +75,17 @@ window.AegisSupabaseService={
   return result.data;
  },
 
- async signIn(email,password){
+ async signIn(identifier,password){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
+  var raw=String(identifier||'').trim();
+  var email=raw;
+  if(!raw.includes('@')){
+   var resolved=await c.rpc('resolve_login_email',{p_username:raw});
+   if(resolved.error)throw resolved.error;
+   email=resolved.data;
+   if(!email)throw new Error('Invalid login credentials.');
+  }
   var result=await c.auth.signInWithPassword({
    email:String(email||'').trim().toLowerCase(),
    password:String(password||'')
@@ -108,13 +116,14 @@ window.AegisSupabaseService={
   return result;
  },
 
- async signUp(email,password,name,referralCode,preferredLanguage){
+ async signUp(email,password,name,username,referralCode,preferredLanguage){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
   var result=await this.invokeFunction('public-signup',{body:{
     email:String(email||'').trim().toLowerCase(),
     password:String(password||''),
     name:String(name||'').trim(),
+    username:String(username||'').trim().toLowerCase(),
     referralCode:String(referralCode||'').trim().toUpperCase(),
     preferredLanguage:preferredLanguage==='ur'?'ur':'en'
   }});

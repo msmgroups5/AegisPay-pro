@@ -33,6 +33,7 @@ Deno.serve(async (req: Request) => {
     const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body?.password === "string" ? body.password : "";
     const name = typeof body?.name === "string" ? body.name.trim() : "";
+    const username = typeof body?.username === "string" ? body.username.trim().toLowerCase() : "";
     const referralCode = typeof body?.referralCode === "string" ? body.referralCode.trim().toUpperCase() : "";
     const preferredLanguage = body?.preferredLanguage === "ur" ? "ur" : "en";
 
@@ -40,6 +41,7 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Enter a valid email address.", code: "INVALID_EMAIL", requestId }, 400);
     }
     if (name.length < 2 || name.length > 100) return json({ error: "Enter a valid full name.", code: "INVALID_NAME", requestId }, 400);
+    if (!/^[a-z0-9_]{3,32}$/.test(username)) return json({ error: "Username must be 3 to 32 characters using letters, numbers or underscore.", code: "INVALID_USERNAME", requestId }, 400);
     if (password.length < 8 || password.length > 128) return json({ error: "Password must contain 8 to 128 characters.", code: "INVALID_PASSWORD", requestId }, 400);
     if (referralCode.length > 32) return json({ error: "Referral code is too long.", code: "INVALID_REFERRAL", requestId }, 400);
 
@@ -60,6 +62,9 @@ Deno.serve(async (req: Request) => {
       console.error("public-signup profile lookup failed", { requestId, message: existingError.message, code: existingError.code });
       return json({ error: "Unable to check the account right now.", code: "PROFILE_LOOKUP_FAILED", requestId }, 503);
     }
+    const { data: existingUsername, error: usernameError } = await admin.from("users").select("id").ilike("username", username).maybeSingle();
+    if (usernameError) return json({ error: "Unable to check the username right now.", code: "USERNAME_LOOKUP_FAILED", requestId }, 503);
+    if (existingUsername) return json({ error: "This username is already in use.", code: "USERNAME_EXISTS", requestId }, 409);
     if (existingProfile) {
       return json({ error: "This email already has an AegisPay profile. Please sign in.", code: "PROFILE_EXISTS", requestId }, 409);
     }
@@ -83,7 +88,7 @@ Deno.serve(async (req: Request) => {
 
     const { data, error } = await admin.auth.admin.createUser({
       email, password, email_confirm: true,
-      user_metadata: { full_name: name.slice(0, 100), referral_code: referralCode, preferred_language: preferredLanguage },
+      user_metadata: { full_name: name.slice(0, 100), username, referral_code: referralCode, preferred_language: preferredLanguage },
       app_metadata: { aegispay_approved: true, signup_channel: "client_test_mode" },
     });
 
@@ -116,6 +121,12 @@ Deno.serve(async (req: Request) => {
       try { await admin.auth.admin.deleteUser(data.user.id); }
       catch (cleanupError) { console.error("public-signup cleanup failed", { requestId, message: cleanupError instanceof Error ? cleanupError.message : String(cleanupError) }); }
       return json({ error: "Account setup could not be completed. No usable AegisPay account was created.", code: "PROFILE_LINK_FAILED", requestId }, 500);
+    }
+
+    const { error: usernameSetError } = await admin.from("users").update({ username }).eq("id", linkedProfile.id);
+    if (usernameSetError) {
+      try { await admin.auth.admin.deleteUser(data.user.id); } catch (cleanupError) {}
+      return json({ error: "Username could not be saved. No usable AegisPay account was created.", code: "USERNAME_SAVE_FAILED", requestId }, 500);
     }
 
     if (referrerId && !linkedProfile.referred_by) {
