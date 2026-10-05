@@ -105,20 +105,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onReceivedError(WebView v, int errorCode, String description, String failingUrl) {
-                if (!localFallbackLoaded && failingUrl != null && failingUrl.startsWith(REMOTE_APP_BASE)) {
-                    loadLocalPortal();
-                }
-            }
-
-            @Override
-            public void onReceivedHttpError(WebView v, android.webkit.WebResourceRequest request, android.webkit.WebResourceResponse errorResponse) {
-                if (request != null && request.isForMainFrame() && !localFallbackLoaded && request.getUrl().toString().startsWith(REMOTE_APP_BASE)) {
-                    loadLocalPortal();
-                }
-            }
-
-            @Override
             public void onPageFinished(WebView v, String url) {
                 super.onPageFinished(v, url);
                 webReady = true;
