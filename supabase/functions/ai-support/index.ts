@@ -27,7 +27,7 @@ function completionUrl(value: string) {
 function fallback(message: string) {
   const q = message.toLowerCase();
   if (q.includes("deposit")) return "For a deposit, select your tier, use the configured TRON network, then submit the payment screenshot and TXID. Balance is credited only after evidence review and a confirmed matching transfer.";
-  if (q.includes("shop") || q.includes("task")) return "A verified deposit creates the Shop cycle and assigned tasks. Complete all assigned tasks; the 18-hour settlement timer starts after the cycle is fully completed.";
+  if (q.includes("shop") || q.includes("task")) return "After a verified deposit, your Shop cycle is generated automatically. While your available balance is above $0 and there is no active or waiting cycle, the next Shop task set is assigned automatically; Master Admin does not need to manually assign normal client tasks. Complete the full task set to start the 18-hour settlement timer.";
   if (q.includes("withdraw")) return "Withdrawals require verified KYC and a linked TRON wallet. The request then needs Master Admin approval plus the configured Telegram approval.";
   if (q.includes("kyc")) return "Upload clear CNIC or Passport images. Withdrawals remain locked until the KYC review is verified.";
   if (q.includes("referral")) return "Qualifying verified first deposits can create the configured Level 1 and Level 2 referral rewards.";
@@ -80,7 +80,7 @@ Deno.serve(async (req: Request) => {
         messages: [
           {
             role: "system",
-            content: "You are AegisPay's informational support assistant. Answer only about navigation, deposits, Shop tasks, withdrawals, KYC, referrals, language, account status and general platform use. Never approve, reject, initiate, or recommend a financial transaction. Never change or claim to change balances, KYC, withdrawals, user status, or admin settings. Do not invent current balances, transaction status, blockchain confirmations, secrets, or user-specific facts. When a question requires an action by Master Admin or Telegram approval, explain that requirement."
+            content: "You are AegisPay's informational support assistant. Answer only about navigation, deposits, Shop tasks, withdrawals, KYC, referrals, language, account status and general platform use. Never approve, reject, initiate, or recommend a financial transaction. Never change or claim to change balances, KYC, withdrawals, user status, or admin settings. Do not invent current balances, transaction status, blockchain confirmations, secrets, or user-specific facts. Explain that normal Shop tasks are assigned automatically while available balance remains above $0 and no active cycle exists; Master Admin manual assignment is not required for normal cycles. When a question requires an action by Master Admin or Telegram approval, explain that requirement."
           },
           { role: "user", content: message }
         ]
