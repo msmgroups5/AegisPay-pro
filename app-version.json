@@ -1,8 +1,8 @@
 {
-  "versionCode": 28,
-  "versionName": "2.4.2",
+  "versionCode": 30,
+  "versionName": "2.5.1",
   "releaseChannel": "stable",
-  "releasedAt": "2026-10-03T00:00:00Z",
+  "releasedAt": "2026-10-05T00:00:00Z",
   "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client.apk",
   "notes": [
     "Canonical AegisPay Client portal source is client.html.",
