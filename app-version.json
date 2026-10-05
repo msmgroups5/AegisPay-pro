@@ -1,11 +1,11 @@
 {
-  "versionCode": 31,
-  "versionName": "2.5.2",
+  "versionCode": 32,
+  "versionName": "2.5.3",
   "releaseChannel": "test",
-  "releasedAt": "2026-10-05T11:33:00Z",
+  "releasedAt": "2026-10-05T11:55:00Z",
   "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client.apk",
   "notes": [
     "Android WebView client now bundles the pinned Supabase browser SDK locally.",
-    "Client base styles are bundled locally so the sign-in interface renders correctly in the APK."
+    "Premium Client dashboard is now the canonical Home UI for web and Android."
   ]
 }
