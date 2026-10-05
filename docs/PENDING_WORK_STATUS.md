@@ -43,6 +43,11 @@ Last aligned: 2026-10-05
 5. Verify Master Admin queue/review/account-operation paths with a controlled admin session.
 
 ### Phase 2 — Financial workflows
+- Initial financial-path review started: verified-deposit credit, Telegram withdrawal decisions, admin dashboard totals, and cycle settlement functions are service-role-only.
+- Cycle settlement cron is active every minute and `settle_due_cycles()` is not executable by anon/authenticated roles.
+- TESTNET_DEMO is still enforced with live deposits and real payouts disabled.
+- Automatic `monitor-deposits` scheduling remains blocked until its server-side cron authentication secret is securely configured; no live monitoring was enabled during this session.
+
 1. Validate deposit evidence submission and review.
 2. Validate deposit verification/monitoring and ledger crediting in TESTNET_DEMO.
 3. Validate withdrawal request -> dual approval -> payout recovery flow in TESTNET_DEMO.
