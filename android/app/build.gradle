@@ -15,8 +15,8 @@ android {
         applicationId 'com.aegispay.app'
         minSdk 23
         targetSdk 35
-        versionCode 30
-        versionName '2.5.1'
+        versionCode 31
+        versionName '2.5.2'
     }
 
     productFlavors {
@@ -77,11 +77,34 @@ dependencies {
 }
 
 def webRoot = rootProject.projectDir.parentFile
+def supabaseSdkFile = new File(webRoot, 'supabase-sdk.js')
+def ensureSupabaseSdk = tasks.register('ensureSupabaseSdk') {
+    doLast {
+        if (!supabaseSdkFile.exists() || supabaseSdkFile.length() < 50000) {
+            def connection = (new URL('https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js').openConnection())
+            connection.setConnectTimeout(30000)
+            connection.setReadTimeout(60000)
+            connection.setRequestProperty('User-Agent', 'AegisPay-Android-Build')
+            connection.connect()
+            if (connection.responseCode != 200) {
+                throw new GradleException("Unable to download pinned Supabase browser SDK: HTTP " + connection.responseCode)
+            }
+            connection.inputStream.withCloseable { input ->
+                supabaseSdkFile.withOutputStream { output -> input.transferTo(output) }
+            }
+        }
+        if (!supabaseSdkFile.exists() || supabaseSdkFile.length() < 50000) {
+            throw new GradleException('Pinned Supabase browser SDK was not downloaded correctly.')
+        }
+    }
+}
 
 def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', Copy) {
     from(webRoot) {
         include 'client.html'
         include 'client-home.css'
+        include 'styles.css'
+        include 'supabase-sdk.js'
         include 'styles.css'
         include 'client-auth.js'
         include 'supabase-client.js'
@@ -112,6 +135,8 @@ def syncAdminAegisPayWebAssets = tasks.register('syncAdminAegisPayWebAssets', Co
     }
     into(layout.projectDirectory.dir('src/admin/assets/aegispay'))
 }
+
+tasks.named('syncClientAegisPayWebAssets').configure { dependsOn(ensureSupabaseSdk) }
 
 tasks.named('preBuild').configure {
     dependsOn(syncClientAegisPayWebAssets)
