@@ -390,63 +390,54 @@ function icon(type){
 }
 
 
-function actionCard(theme,action,iconHtml,title,subtitle){
- var tone=['blue','red','green','orange'].indexOf(theme)>=0?theme:'blue';
- return '<button type="button" class="ap-action-card '+tone+'" data-action="'+esc(action)+'" aria-label="'+esc(title)+'">'+
-   '<span class="ap-action-icon">'+iconHtml+'</span>'+
-   '<span class="ap-action-copy"><span class="ap-action-title">'+esc(title)+'</span><span class="ap-action-subtitle">'+esc(subtitle)+'</span></span>'+
-   '<span class="ap-action-arrow">'+icon('arrow')+'</span>'+
- '</button>';
-}
-
 function homeView(){
  var p=state.profile||{},d=state.data||{};
  var userName=String(p.name||'Client');
- var clientId=String(p.client_id||'');
+ var clientId=String(p.client_id||'AP-CLIENT');
  var available=Number(p.current_platform_balance||0);
- var dot=Array.isArray(d.notifications)&&d.notifications.some(function(n){return n&&!n.is_read;});
- function useIconRef(id){return '<svg class="ap-icon" aria-hidden="true"><use href="#ap-'+id+'"></use></svg>';}
- root.innerHTML='<div class="ap-premium-home">'+
- '<svg width="0" height="0" style="position:absolute"><defs>'+
- '<symbol id="ap-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 0 1v-4"/></symbol>'+
- '<symbol id="ap-cart" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 2h2l2.7 12.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L22 7H5"/></symbol>'+
- '<symbol id="ap-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>'+
- '<symbol id="ap-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>'+
- '<symbol id="ap-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></symbol>'+
- '<symbol id="ap-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>'+
- '<symbol id="ap-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>'+
- '<symbol id="ap-pie" viewBox="0 0 24 24"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></symbol>'+
- '<symbol id="ap-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V5M9 14v2M15 14v2"/><circle cx="12" cy="4" r="1"/></symbol>'+
- '<symbol id="ap-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>'+
- '<symbol id="ap-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></symbol>'+
- '<symbol id="ap-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></symbol>'+
- '<symbol id="ap-crown" viewBox="0 0 24 24"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7z"/><path d="M5 20h14"/></symbol>'+
- '</defs></svg>'+
- '<header class="ap-home-header"><div class="ap-header-row"><div class="ap-brand"><img src="./aegispay-logo.svg" alt="AegisPay"></div><div class="ap-head-actions">'+
- '<button type="button" class="ap-circle-btn" data-action="notice" aria-label="Notifications">'+useIconRef('ap-bell')+(dot?'<span class="ap-notification-dot"></span>':'')+'</button>'+
- '<button type="button" class="ap-circle-btn profile" data-action="profile" aria-label="My Profile">'+useIconRef('ap-user')+'</button>'+
- '</div></div></header>'+
- '<section class="ap-welcome-premium"><div class="ap-welcome-copy"><div class="ap-welcome-kicker">Welcome,</div><h1 class="ap-welcome-name">'+esc(userName)+'</h1><div class="ap-client-row">Client ID: '+esc(clientId||'—')+' <button type="button" class="ap-copy-btn" data-action="copy-client-id" aria-label="Copy Client ID">'+useIconRef('ap-copy')+'</button></div><div style="margin-top:10px;color:#1a1a1a;font-size:13px;font-weight:800">Available Balance: <strong>'+esc(money(available))+'</strong></div></div></section>'+
- '<section class="ap-vip-premium">'+
- '<div class="ap-vip-col lv1"><span class="ap-crown">'+useIconRef('ap-crown')+'</span><span class="ap-vip-label">LV 1</span><span class="ap-vip-value">VIP</span></div>'+
- '<div class="ap-vip-col lv2"><span class="ap-crown">'+useIconRef('ap-crown')+'</span><span class="ap-vip-label">LV 2</span><span class="ap-vip-value">VIP</span></div>'+
- '<div class="ap-vip-col lv3"><span class="ap-crown">'+useIconRef('ap-crown')+'</span><span class="ap-vip-label">LV 3</span><span class="ap-vip-value">VIP</span></div>'+
- '</section>'+
- '<section class="ap-premium-content"><div class="ap-premium-actions">'+
- actionCard('blue','next-topup',useIconRef('ap-wallet'),'Top Up','Deposit Amount')+
- actionCard('red','next-shop',useIconRef('ap-cart'),'Shop','Automatic Tasks')+
- actionCard('green','next-account',useIconRef('ap-file'),'Account Details','View Your Account')+
- actionCard('orange','next-crypto','₿','Crypto','Buy & Manage')+
- '</div>'+
- '<button type="button" class="ap-referral-premium" data-action="next-referral"><span class="ap-ref-icon">'+useIconRef('ap-users')+'</span><span class="ap-ref-copy"><strong>Referral</strong><small>Invite Friends &amp; Earn Rewards</small></span><span class="ap-ref-arrow">'+useIconRef('ap-gift')+'</span></button>'+
- '<button type="button" class="ap-amazon-premium" data-action="next-shop"><span class="ap-promo-copy"><span class="ap-amazon-wordmark">amazon<span class="ap-amazon-smile-premium"></span></span><strong>Shop Millions<br>of <em>Products</em></strong><small>Everything you need in one place.</small><span class="ap-amazon-cta">Start Shopping <span>→</span></span></span><span class="ap-amazon-art"><span class="ap-mini-phone"><span class="ap-mini-phone-logo">amazon</span><span class="ap-mini-products"><i></i><i></i><i></i><i></i></span></span><span class="ap-mini-cart"><span class="ap-mini-cart-handle"></span><span class="ap-mini-cart-basket"></span><span class="ap-mini-box box-a"></span><span class="ap-mini-box box-b"></span><span class="ap-mini-box box-c"></span><span class="ap-mini-wheel w1"></span><span class="ap-mini-wheel w2"></span></span></span></button>'+
- '</section>'+
- '<nav class="ap-bottom-premium" aria-label="Primary navigation">'+
- '<button type="button" class="ap-nav-item active" data-action="home-dashboard">'+useIconRef('ap-home')+'<span class="ap-nav-label">Home</span></button>'+
- '<button type="button" class="ap-nav-item" data-action="next-assets">'+useIconRef('ap-pie')+'<span class="ap-nav-label">Assets</span></button>'+
- '<button type="button" class="ap-nav-item" data-action="profile">'+useIconRef('ap-user')+'<span class="ap-nav-label">My Profile</span></button>'+
- '<button type="button" class="ap-nav-item" data-action="next-ai">'+useIconRef('ap-bot')+'<span class="ap-nav-label">AI Bot</span></button>'+
- '</nav></div>';
+ var principal=Number(p.principal_balance||0);
+ var profit=Number(p.profit_balance||0);
+ var cycle=d.cycle||null;
+ var tasks=Array.isArray(d.tasks)?d.tasks:[];
+ var openTasks=tasks.filter(function(x){return x&&x.status==='OPEN';}).length;
+ var completedTasks=tasks.filter(function(x){return x&&x.status==='COMPLETED';}).length;
+ var unread=Array.isArray(d.notifications)&&d.notifications.some(function(n){return n&&!n.is_read;});
+ var cycleStatus=cycle?(cycle.status||'TASKS_OPEN'):'READY';
+ var cycleLabel=cycleStatus==='WAITING_18H'?'18H SETTLEMENT':cycleStatus==='SETTLED'?'SETTLED':cycleStatus==='TASKS_OPEN'?'TASKS OPEN':'READY';
+ function icon(name){
+   var paths={
+    wallet:'<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H21v13.5A2.5 2.5 0 0 1 18.5 21h-13A2.5 2.5 0 0 1 3 18.5z"/><path d="M3 8h18v5h-5.2a2.5 2.5 0 0 0 0 5H21"/><circle cx="15.7" cy="15.5" r=".8"/>',
+    cart:'<circle cx="8" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/><path d="M2.5 3H5l2.2 11.5h10.9L21 7H6"/>',
+    user:'<circle cx="12" cy="7.5" r="3.5"/><path d="M5 21c.6-4.3 2.9-6.7 7-6.7s6.4 2.4 7 6.7"/>',
+    coin:'<circle cx="12" cy="12" r="9"/><path d="M9 8.2h3.5a2.2 2.2 0 0 1 0 4.4H9zm0 4.4h4a2.2 2.2 0 0 1 0 4.4H9zm0-4.4V18M7.5 6.2h1M7.5 18h1"/>',
+    gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M12 8v13M7.5 8a2.5 2.5 0 1 1 0-5c2.4 0 4.5 3.8 4.5 5M16.5 8a2.5 2.5 0 1 0 0-5c-2.4 0-4.5 3.8-4.5 5"/>',
+    bell:'<path d="M6 10a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-15S6 16 6 10"/><path d="M10 21h4"/>',
+    arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+    copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V5a2 2 0 0 1 2-2h9"/>',
+    chart:'<path d="M4 19V5M4 19h17"/><path d="m7 15 4-5 3 3 5-7"/>',
+    bot:'<rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M8 16h8"/>'
+   };
+   return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(paths[name]||paths.coin)+'</svg>';
+ }
+ root.innerHTML='<div class="ap-v2-home">'+
+  '<header class="ap-v2-header"><div class="ap-v2-brand"><img src="./aegispay-logo.svg" alt="AegisPay"><span>CLIENT PORTAL</span></div>'+
+  '<div class="ap-v2-head-actions"><button class="ap-v2-icon-btn" type="button" data-action="notice" aria-label="Notifications">'+icon('bell')+(unread?'<i></i>':'')+'</button><button class="ap-v2-avatar" type="button" data-action="profile" aria-label="Profile">'+esc((userName.trim()[0]||'A').toUpperCase())+'</button></div></header>'+
+  '<main class="ap-v2-main">'+
+   '<section class="ap-v2-hero"><div class="ap-v2-hero-glow"></div><div class="ap-v2-hero-top"><div><span class="ap-v2-eyebrow">WELCOME BACK</span><h1>'+esc(userName)+'</h1><div class="ap-v2-client">CLIENT ID <strong>'+esc(clientId)+'</strong><button type="button" data-action="copy-client-id" aria-label="Copy client ID">'+icon('copy')+'</button></div></div><span class="ap-v2-secure">SECURE</span></div>'+
+   '<div class="ap-v2-balance-label">AVAILABLE BALANCE</div><div class="ap-v2-balance">'+esc(money(available))+'</div><div class="ap-v2-hero-bottom"><span>Platform balance</span><button type="button" data-action="next-topup">+ Add Funds <b>'+icon('arrow')+'</b></button></div></section>'+
+   '<section class="ap-v2-stats"><article><span class="ap-v2-stat-icon blue">'+icon('wallet')+'</span><small>PRINCIPAL</small><strong>'+esc(money(principal))+'</strong></article><article><span class="ap-v2-stat-icon green">'+icon('chart')+'</span><small>PROFIT</small><strong>'+esc(money(profit))+'</strong></article><article><span class="ap-v2-stat-icon gold">'+icon('coin')+'</span><small>ACCOUNT</small><strong>ACTIVE</strong></article></section>'+
+   '<section class="ap-v2-section-head"><div><span>QUICK ACCESS</span><h2>Manage your account</h2></div><span class="ap-v2-live">LIVE</span></section>'+
+   '<section class="ap-v2-actions">'+
+    '<button type="button" data-action="next-topup"><span class="ap-v2-action-icon blue">'+icon('wallet')+'</span><span><b>Top Up</b><small>Add funds securely</small></span><em>'+icon('arrow')+'</em></button>'+
+    '<button type="button" data-action="next-shop"><span class="ap-v2-action-icon red">'+icon('cart')+'</span><span><b>Shop Tasks</b><small>Automatic task cycles</small></span><em>'+icon('arrow')+'</em></button>'+
+    '<button type="button" data-action="next-account"><span class="ap-v2-action-icon purple">'+icon('user')+'</span><span><b>Account</b><small>Profile &amp; security</small></span><em>'+icon('arrow')+'</em></button>'+
+    '<button type="button" data-action="next-crypto"><span class="ap-v2-action-icon gold">'+icon('coin')+'</span><span><b>Crypto</b><small>Assets &amp; wallet</small></span><em>'+icon('arrow')+'</em></button>'+
+   '</section>'+
+   '<section class="ap-v2-engine"><div class="ap-v2-engine-icon">'+icon('bot')+'</div><div class="ap-v2-engine-copy"><div><span>AUTO TASK ENGINE</span><strong>'+esc(cycleLabel)+'</strong></div><p>'+(available>0?'Tasks are assigned automatically while your available balance is above 0.':'Add funds to activate automatic Shop task assignment.')+'</p><div class="ap-v2-progress"><i style="width:'+Math.min(100,Math.max(8,cycleStatus==='WAITING_18H'?100:(completedTasks+openTasks?Math.round((completedTasks/(completedTasks+openTasks))*100):8)))+'%"></i></div><small>'+openTasks+' open · '+completedTasks+' completed</small></div><button type="button" data-action="next-shop">'+icon('arrow')+'</button></section>'+
+   '<button type="button" class="ap-v2-referral" data-action="next-referral"><span class="ap-v2-referral-icon">'+icon('gift')+'</span><span><small>GROW WITH AEGISPAY</small><b>Invite friends &amp; earn rewards</b><em>View referral program</em></span><strong>'+icon('arrow')+'</strong></button>'+
+  '</main>'+
+  '<nav class="ap-v2-nav"><button class="active" type="button" data-action="home-dashboard">'+icon('chart')+'<span>Home</span></button><button type="button" data-action="next-assets">'+icon('wallet')+'<span>Assets</span></button><button type="button" data-action="profile">'+icon('user')+'<span>Profile</span></button><button type="button" data-action="next-ai">'+icon('bot')+'<span>AI Bot</span></button></nav>'+
+ '</div>';
 }
 function profileSection(p){p=p||{};return '<section class="section" id="profile-area" style="margin-top:18px"><h3>Account Details</h3><div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"><div class="stat-card"><small>Name</small><strong style="font-size:15px">'+esc(p.name||'')+'</strong></div><div class="stat-card"><small>Email</small><strong style="font-size:13px;word-break:break-word">'+esc(p.email||'')+'</strong></div><div class="stat-card"><small>Client ID</small><strong style="font-size:13px;word-break:break-word">'+esc(p.client_id||'AP-CLIENT')+'</strong></div><div class="stat-card"><small>Account Status</small><strong style="font-size:15px">'+esc(p.status||'Active')+'</strong></div></div></section>';}
 
