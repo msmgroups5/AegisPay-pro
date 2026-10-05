@@ -9,7 +9,7 @@ AegisPay uses one canonical production client/admin web stack with Supabase as t
 - Shared client/runtime code: `client-auth.js`, `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
 - Shared UI assets: `styles.css`, `premium.css`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`, `shop-catalog.js`
 - Public website source: `site/index.html` + `site/site.css`
-- Netlify publish package: generated at deploy time under `site/`
+- Cloudflare Pages publish package: generated at deploy time under `site/`
 - Android source: `android/`; the client flavor bundles `client.html` and shared root web assets
 - Database change tracking: `database/migrations/`
 - Supabase Edge Functions: `supabase/functions/`
@@ -37,11 +37,11 @@ Run:
 npm run check
 ```
 
-The check validates the canonical client/admin source files, Supabase function wiring, storage migration tracking, Android source alignment, and Netlify deployment configuration.
+The check validates the canonical client/admin source files, Supabase function wiring, storage migration tracking, Android source alignment, and Cloudflare Pages deployment wiring.
 
 ## Security
 
-Never put service-role keys, payout private keys, Telegram bot secrets, AI provider keys, or release keystore material in browser assets or Netlify client variables.
+Never put service-role keys, payout private keys, Telegram bot secrets, AI provider keys, or release keystore material in browser assets or Cloudflare Pages client variables.
 
 ## Branch policy
 
@@ -52,6 +52,6 @@ Never put service-role keys, payout private keys, Telegram bot secrets, AI provi
 - Production branch: `main`
 - Client portal: `/app/` from root `client.html`
 - Master Admin: `/admin/` from root `master-admin.html`
-- Netlify: `aegispay-pro`
+- Cloudflare Pages: `aegispay-pro`
 - Supabase: `wtcspnrmsoisroavojop`
 - Android baseline: versionCode 28 / versionName 2.4.2
