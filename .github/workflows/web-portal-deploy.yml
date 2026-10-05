@@ -75,7 +75,7 @@ jobs:
           head -c 2000 /tmp/cf.json
           echo
           test "${HTTP_STATUS}" = "200"
-          grep -q '"success":true' /tmp/cf.json
+          python3 -c 'import json; assert json.load(open("/tmp/cf.json"))["success"] is True'
       - name: Deploy canonical site to Cloudflare Pages
         shell: bash
         run: npx --yes wrangler@4 pages deploy site --project-name=aegispay-pro --branch=main --commit-hash="${GITHUB_SHA}" --commit-message="AegisPay canonical client UI" --commit-dirty=false
