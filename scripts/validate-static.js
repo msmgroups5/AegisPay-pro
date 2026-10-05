@@ -8,6 +8,7 @@ const must=[
    'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json',
   'database/migrations/20261003_private_verification_storage_policies.sql','database/migrations/20261004_restore_baseline_demo_configuration.sql',
   'database/migrations/20261005_align_withdrawal_wallet_rpc_grants.sql',
+  'database/migrations/20261005_retire_client_complete_task_rpc.sql',
   'site/index.html','site/site.css','android/app/build.gradle',
   'android/app/src/main/java/com/aegispay/app/MainActivity.java',
   '.github/workflows/ci.yml','.github/workflows/android-apk.yml',
