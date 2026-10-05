@@ -38,7 +38,7 @@ jobs:
           cp client.html site/app/home.html
           cp _redirects site/_redirects
           cp _headers site/_headers
-          cp styles.css premium.css client-ui-reference.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js              aegis-auth-redirect.js app-update.js service-worker.js              manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
+          cp styles.css premium.css client-ui-reference.css shop-catalog.js client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
           cp client-home.css client-ui-reference.css client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/app/
           cp android/app/build/outputs/apk/client/debug/app-client-debug.apk site/downloads/aegispay-client.apk
           cp android/app/build/outputs/apk/admin/debug/app-admin-debug.apk site/downloads/aegispay-admin.apk
@@ -68,12 +68,14 @@ jobs:
           test -s site/downloads/aegispay-client.apk
           test -s site/_redirects
       - name: Upload web portal artifact
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-Web-Portal
           path: site/
           if-no-files-found: error
       - name: Upload Master Admin APK artifact
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-Master-Admin-Debug
