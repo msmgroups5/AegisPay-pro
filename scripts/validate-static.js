@@ -21,7 +21,8 @@ for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js'
 for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
   assert(client.includes(marker),'Client entry marker missing: '+marker);
 }
-assert(client.includes('styles.css')&&client.includes('premium.css')&&client.includes('shop-catalog.js'),'Recovered client workspace assets are not wired to client');
+assert(client.includes('client-home.css'),'Canonical client stylesheet is not wired to client');
+assert(client.includes('client-auth.js'),'Canonical client runtime is not wired to client');
 const clientAuth=fs.readFileSync('client-auth.js','utf8');
 for(const marker of ['function homeView','function handleLogin','function refreshProfile']) {
   assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
