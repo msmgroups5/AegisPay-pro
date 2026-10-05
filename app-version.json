@@ -1,11 +1,11 @@
 {
-  "versionCode": 30,
-  "versionName": "2.5.1",
-  "releaseChannel": "stable",
-  "releasedAt": "2026-10-05T00:00:00Z",
+  "versionCode": 31,
+  "versionName": "2.5.2",
+  "releaseChannel": "test",
+  "releasedAt": "2026-10-05T11:33:00Z",
   "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client.apk",
   "notes": [
-    "Canonical AegisPay Client portal source is client.html.",
-    "Client and Master Admin share the canonical root web assets and Supabase backend."
+    "Android WebView client now bundles the pinned Supabase browser SDK locally.",
+    "Client base styles are bundled locally so the sign-in interface renders correctly in the APK."
   ]
 }
