@@ -54,4 +54,4 @@ Never put service-role keys, payout private keys, Telegram bot secrets, AI provi
 - Master Admin: `/admin/` from root `master-admin.html`
 - Cloudflare Pages: `aegispay-pro`
 - Supabase: `wtcspnrmsoisroavojop`
-- Android baseline: versionCode 28 / versionName 2.4.2
+- Android baseline: versionCode 30 / versionName 2.5.1
