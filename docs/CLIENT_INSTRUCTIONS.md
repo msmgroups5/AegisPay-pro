@@ -26,11 +26,13 @@
 
 ## Shop / tasks
 1. Open Shop after your deposit is verified.
-2. Complete every assigned offer/task.
-3. When all tasks are complete, the balance enters the cycle settlement state.
-4. The 18-hour settlement timer starts.
-5. After the timer, the configured cycle profit is credited.
-6. The next cycle uses the accumulated amount for compounding.
+2. The system automatically opens a Shop task cycle while your available balance is above $0 and no Shop cycle is currently open or waiting for settlement.
+3. Master Admin does not need to manually assign tasks for the normal cycle flow.
+4. Complete the full assigned offer/task set.
+5. When all tasks are complete, the cycle enters the 18-hour settlement state.
+6. After 18 hours, the configured cycle profit is credited.
+7. The next Shop cycle is automatically opened from the accumulated available balance, so the cycle can continue compounding.
+8. Automatic task assignment stops when the user's available balance reaches $0.
 
 ## Referrals
 - Level 1 direct referral bonus: $5
