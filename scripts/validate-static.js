@@ -7,6 +7,7 @@ const must=[
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
   'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json','netlify.toml',
   'database/migrations/20261003_private_verification_storage_policies.sql','database/migrations/20261004_restore_baseline_demo_configuration.sql',
+  'database/migrations/20261005_align_withdrawal_wallet_rpc_grants.sql',
   'site/index.html','site/site.css','android/app/build.gradle',
   'android/app/src/main/java/com/aegispay/app/MainActivity.java',
   '.github/workflows/ci.yml','.github/workflows/android-apk.yml',
@@ -31,6 +32,7 @@ for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','
   assert(clientAuth.includes(marker),'Home Dashboard UI text missing: '+marker);
 }
 assert(clientAuth.length<75000,'Client source unexpectedly exceeded the merged client runtime budget');
+assert(clientAuth.includes("rpc('link_withdrawal_wallet',{p_address:address,p_owner_name:owner})"),'Client withdrawal wallet flow is not aligned with the active two-argument RPC');
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
