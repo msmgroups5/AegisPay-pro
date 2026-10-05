@@ -28,13 +28,18 @@ assert(client.includes('./styles.css'),'Canonical client base stylesheet is not 
 assert(client.includes('./supabase-sdk.js'),'Android-safe local Supabase SDK fallback is not wired to client');
 assert(client.includes('client-auth.js'),'Canonical client runtime is not wired to client');
 const clientAuth=fs.readFileSync('client-auth.js','utf8');
-assert(clientAuth.includes('ap-premium-home'),'Canonical premium Home UI is not wired to client');
-assert(!clientAuth.includes('ap-reference-ui'),'Legacy reference Home UI must not remain in client runtime');
+assert(clientAuth.includes('ap-v2-home'),'Canonical Premium v2 Home UI is not wired to client');
+assert(!clientAuth.includes('ap-premium-home')&&!clientAuth.includes('ap-reference-ui')&&!clientAuth.includes('ap-amazon-premium'),'Legacy Home UI markers must not remain in client runtime');
 for(const marker of ['function homeView','function handleLogin','function refreshProfile']) {
   assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
 }
-for(const marker of ['Welcome,','Client ID:','Top Up','Shop','Account Details','Crypto','Referral','Shop Millions','Assets','My Profile','AI Bot']) {
-  assert(clientAuth.includes(marker),'Home Dashboard UI text missing: '+marker);
+for(const marker of ['WELCOME BACK','AVAILABLE BALANCE','Top Up','Shop Tasks','Account','Crypto','AUTO TASK ENGINE','Invite friends &amp; earn rewards','Home','Assets','Profile','AI Bot']) {
+  assert(clientAuth.includes(marker),'Premium v2 Home UI marker missing: '+marker);
+}
+const homeCss=fs.readFileSync('client-home.css','utf8');
+assert(homeCss.includes('.ap-v2-home'),'Premium v2 Home stylesheet is missing');
+for(const marker of ['.ap-premium-home','.ap-reference-ui','.ap-amazon-premium','Reference-driven','Uploaded reference home']) {
+  assert(!homeCss.includes(marker),'Legacy Home CSS marker remains: '+marker);
 }
 assert(clientAuth.length<75000,'Client source unexpectedly exceeded the merged client runtime budget');
 assert(clientAuth.includes("rpc('link_withdrawal_wallet',{p_address:address,p_owner_name:owner})"),'Client withdrawal wallet flow is not aligned with the active two-argument RPC');
