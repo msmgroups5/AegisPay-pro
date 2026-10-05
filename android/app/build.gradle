@@ -24,7 +24,7 @@ android {
             dimension 'portal'
             applicationIdSuffix '.client'
             resValue 'string', 'app_name', 'AegisPay'
-            resValue 'string', 'entry_html', 'client-fresh.html'
+            resValue 'string', 'entry_html', 'client.html'
             resValue 'string', 'auth_scheme', 'com.aegispay.app.client'
         }
         admin {
@@ -81,7 +81,6 @@ def webRoot = rootProject.projectDir.parentFile
 def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', Copy) {
     from(webRoot) {
         include 'client.html'
-        include 'client-fresh.html'
         include 'client-home.css'
         include 'client-auth.js'
         include 'supabase-client.js'
