@@ -31,6 +31,7 @@ Last aligned: 2026-10-05
 - Function-by-function review found the remaining 8 authenticated SECURITY DEFINER findings are intentionally used by client/admin workflows and have explicit role/authentication gates; no unauthenticated execution was retained for those reviewed functions.
 - RPC/RLS privilege smoke-check confirmed: anonymous users cannot select client users or execute protected RPCs; authenticated users cannot directly insert into deposit/KYC/withdrawal tables; client task/withdrawal/profile helper RPCs remain available only to authenticated users.
 - Read-only financial integrity audit confirmed zero unexplained balance for the two current profiles; the live financial tables are empty, so no state-transition E2E can truthfully be marked passed yet.
+- Shop checkout business-rule bug was fixed: the canonical client now requires the exact assigned task set, calculates totals from `task_value`, and uses a server-side `complete-cycle-checkout` endpoint; direct client execution of the legacy single-task completion RPC was retired.
 - Controlled Master Admin session check resolved the actor as MASTER ADMIN with admin-scoped row visibility. The operational queues are currently empty, so live KYC/deposit/withdrawal end-to-end state transitions still require TESTNET_DEMO fixture records or real test submissions before they can be marked passed.
 
 ## Pending sequence
@@ -50,7 +51,7 @@ Last aligned: 2026-10-05
 1. Validate deposit evidence submission and review.
 2. Validate deposit verification/monitoring and ledger crediting in TESTNET_DEMO.
 3. Validate withdrawal request -> dual approval -> payout recovery flow in TESTNET_DEMO.
-4. Validate referral and task settlement calculations.
+4. Validate referral and exact Shop task-set settlement calculations.
 
 ### Phase 3 — Production configuration
 1. Replace TESTNET_DEMO configuration only after security gates pass.
