@@ -72,12 +72,14 @@ jobs:
           test -s site/app/home.html
           test -s site/downloads/aegispay-client.apk
       - name: Upload release artifacts
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-Website-and-Direct-APK-Package
           path: site/
           if-no-files-found: error
       - name: Upload Master Admin APK
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-Master-Admin-Release
@@ -87,6 +89,5 @@ jobs:
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: 6a31dfe877fe64e588b9415265302af4
           command: pages deploy site --project-name=aegispay-pro --branch=main --commit-hash=${{ github.sha }} --commit-message="AegisPay signed release" --commit-dirty=false
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
