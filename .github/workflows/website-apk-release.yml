@@ -56,7 +56,9 @@ jobs:
           cp android/app/build/outputs/apk/admin/release/app-admin-release.apk "$RUNNER_TEMP/aegispay-admin.apk"
           VERSION_CODE="$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)"
           VERSION_NAME="$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)"
-          CLIENT_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
+          CLIENT_SHA="$(sha256sum "site/downloads/\${VERSIONED_CLIENT}" | awk '{print $1}')"
+          CLIENT_ALIAS_SHA="$(sha256sum site/downloads/aegispay-client.apk | awk '{print $1}')"
+          test "${CLIENT_SHA}" = "${CLIENT_ALIAS_SHA}"
           cat > site/app-version.json <<EOF
           {
             "versionCode": ${VERSION_CODE},
