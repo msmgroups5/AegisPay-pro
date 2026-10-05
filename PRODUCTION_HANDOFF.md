@@ -12,7 +12,7 @@
 - Master Admin entry: `https://aegispay-pro.pages.dev/admin/`
 - Client APK: `https://aegispay-pro.pages.dev/downloads/aegispay-client.apk`
 - Update manifest: `https://aegispay-pro.pages.dev/app-version.json`
-- Android client baseline: versionCode 32 / versionName 2.5.3
+- Android client baseline: versionCode 33 / versionName 2.5.4
 
 ## Source-of-truth rules
 
