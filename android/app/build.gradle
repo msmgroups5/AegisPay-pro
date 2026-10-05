@@ -15,8 +15,8 @@ android {
         applicationId 'com.aegispay.app'
         minSdk 23
         targetSdk 35
-        versionCode 34
-        versionName '2.5.5'
+        versionCode 36
+        versionName '2.5.7'
     }
 
     productFlavors {
@@ -99,20 +99,38 @@ def ensureSupabaseSdk = tasks.register('ensureSupabaseSdk') {
     }
 }
 
+def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientUi') {
+    doLast {
+        def clientFile = new File(webRoot, 'client.html')
+        if (!clientFile.exists()) {
+            throw new GradleException('Canonical Aurora client.html is missing.')
+        }
+        byte[] bytes = clientFile.bytes
+        def digest = java.security.MessageDigest.getInstance('SHA-1')
+        def header = ("blob " + bytes.length + "\u0000").getBytes('UTF-8')
+        digest.update(header)
+        digest.update(bytes)
+        def blobSha = digest.digest().collect { String.format('%02x', it & 0xff) }.join()
+        if (blobSha != '4743c5dd7189cff046c067cd8bb2ce2201667071') {
+            throw new GradleException("Client UI guard failed: client.html is not the canonical Aurora UI (got " + blobSha + ").")
+        }
+        def html = new String(bytes, 'UTF-8')
+        if (!html.contains('<title>AegisPay – Aurora UI</title>') ||
+            !html.contains('Choose Deposit Tier') ||
+            !html.contains('Submit Deposit') ||
+            !html.contains('link_withdrawal_wallet') ||
+            !html.contains('Identity Verification')) {
+            throw new GradleException('Client UI guard failed: required Aurora UI markers are missing.')
+        }
+    }
+}
+
 def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', Copy) {
+    doFirst {
+        delete(layout.projectDirectory.dir('src/client/assets/aegispay'))
+    }
     from(webRoot) {
         include 'client.html'
-        include 'client-home.css'
-        include 'styles.css'
-        include 'supabase-sdk.js'
-        include 'client-auth.js'
-        include 'supabase-client.js'
-        include 'supabase-service.js'
-        include 'aegis-auth-redirect.js'
-        include 'app-update.js'
-        include 'service-worker.js'
-        include 'manifest.webmanifest'
-        include 'aegispay-logo.svg'
     }
     into(layout.projectDirectory.dir('src/client/assets/aegispay'))
 }
@@ -135,9 +153,10 @@ def syncAdminAegisPayWebAssets = tasks.register('syncAdminAegisPayWebAssets', Co
     into(layout.projectDirectory.dir('src/admin/assets/aegispay'))
 }
 
-tasks.named('syncClientAegisPayWebAssets').configure { dependsOn(ensureSupabaseSdk) }
+tasks.named('syncClientAegisPayWebAssets').configure { dependsOn(verifyCanonicalAuroraClientUi) }
 
 tasks.named('preBuild').configure {
+    dependsOn(verifyCanonicalAuroraClientUi)
     dependsOn(syncClientAegisPayWebAssets)
     dependsOn(syncAdminAegisPayWebAssets)
 }
