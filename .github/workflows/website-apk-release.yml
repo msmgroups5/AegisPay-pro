@@ -123,8 +123,8 @@ jobs:
         run: |
           set -euo pipefail
           test -s android/app/build/outputs/apk/client/debug/app-client-debug.apk
-          grep -q "versionCode 37" android/app/build.gradle
-          grep -q "versionName '2.5.8'" android/app/build.gradle
+          grep -q "versionCode 38" android/app/build.gradle
+          grep -q "versionName '2.5.9'" android/app/build.gradle
       - name: Publish Aurora Client APK
         env:
           GH_TOKEN: ${{ github.token }}
@@ -132,8 +132,8 @@ jobs:
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
-          TAG="aurora-apk-2.5.8-b37"
-          TITLE="AegisPay Aurora Client 2.5.8 (37)"
+          TAG="aurora-apk-2.5.9-b38"
+          TITLE="AegisPay Aurora Client 2.5.9 (38)"
           NOTES="Canonical Aurora Client UI APK. Includes the requested Secure & Verified footer, corrected CNIC/Passport file layout, and automatic Shop task assignment while available balance remains above 0. The client.html source is protected by an Android build blob guard."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
@@ -161,8 +161,8 @@ jobs:
         run: |
           set -euo pipefail
           test -s android/app/build/outputs/apk/client/debug/app-client-debug.apk
-          grep -q "versionCode 37" android/app/build.gradle
-          grep -q "versionName '2.5.8'" android/app/build.gradle
+          grep -q "versionCode 38" android/app/build.gradle
+          grep -q "versionName '2.5.9'" android/app/build.gradle
       - name: Publish Aurora Client APK
         env:
           GH_TOKEN: ${{ github.token }}
@@ -170,8 +170,8 @@ jobs:
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
-          TAG="aurora-apk-2.5.8-b37"
-          TITLE="AegisPay Aurora Client 2.5.8 (37)"
+          TAG="aurora-apk-2.5.9-b38"
+          TITLE="AegisPay Aurora Client 2.5.9 (38)"
           NOTES="Canonical Aurora Client UI APK. Includes Secure & Verified footer, corrected CNIC/Passport file layout, and automatic Shop task assignment while available balance remains above 0. The client.html source is protected by an Android build blob guard."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
