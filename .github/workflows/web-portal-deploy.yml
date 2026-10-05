@@ -71,18 +71,9 @@ jobs:
           test -n "${CLOUDFLARE_API_TOKEN}"
           HTTP_STATUS=$(curl --silent --show-error -o /tmp/cf.json -w "%{http_code}" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/aegispay-pro")
           echo "Cloudflare API HTTP status: ${HTTP_STATUS}"
-          python3 - <<'PY'
-import json
-from pathlib import Path
-p=Path("/tmp/cf.json")
-try:
-    data=json.loads(p.read_text())
-    print("Cloudflare API success:", data.get("success"))
-    if not data.get("success"):
-        print("Cloudflare API errors:", json.dumps(data.get("errors", []), separators=(",", ":")))
-except Exception:
-    print("Cloudflare API response:", p.read_text()[:2000])
-PY
+          echo "Cloudflare API response:"
+          head -c 2000 /tmp/cf.json
+          echo
           test "${HTTP_STATUS}" = "200"
           grep -q '"success":true' /tmp/cf.json
       - name: Deploy canonical site to Cloudflare Pages
