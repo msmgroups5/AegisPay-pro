@@ -31,7 +31,7 @@ This document is the source-of-truth map for the public website, Client Portal, 
 - Build destination: `site/master-admin.html` and `site/admin-auth.js`
 - Master Admin access is determined by the protected AegisPay profile role, not by client-side labels.
 
-## Netlify routing
+## Cloudflare Pages routing
 
 `site/_redirects` is the routing source:
 
