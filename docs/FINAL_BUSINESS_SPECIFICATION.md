@@ -52,17 +52,23 @@ Configured cycle rate is the initial profit divided by the tier gross deposit.
 After verified deposit and tier selection, the client receives an internal AegisPay Shop interface inspired by modern Amazon-style shopping UX. It is not directly linked to Amazon.
 - Products are filtered by the selected tier and the user's current cycle balance.
 - Each assigned product/task shows a task value and task profit.
-- The client can add items to a cart, review the remaining balance, and use an exact-task-set action.
+- Tasks are generated automatically; Master Admin task assignment is not required for the normal client cycle flow.
+- A new Shop cycle is automatically opened whenever an active client has available balance above $0 and no existing TASKS_OPEN or WAITING_18H cycle.
+- Available balance for automatic task assignment is the user's current platform balance minus any amount held for pending withdrawal, floored at $0.00.
+- The automatic cycle base equals the available balance at assignment time.
+- The automatic task set is built from active Shop offers available to the user's selected tier.
+- The task values always sum to the full automatic cycle base.
 - The cycle checkout is locked until the cart total equals the full cycle balance and Remaining Balance is exactly $0.00.
 - Completing checkout marks the assigned tasks complete and moves the cycle to 18-hour settlement.
 - Shop orders/tasks are retained in activity and order history.
+- Automatic task assignment stops when available balance reaches $0.00.
 
 ## 7. 18-hour settlement
 The completed cycle stores its cycle base.
 After 18 hours, the system settles:
 new amount = cycle base + cycle base × tier rate.
 
-The next cycle can use the accumulated amount as its next base, giving the requested compounding behavior.
+After settlement, the system automatically opens the next Shop cycle from the user's new available balance whenever that balance is above $0 and no active cycle exists. This is the normal compounding flow; Master Admin does not need to assign the next task set manually.
 
 ## 8. Referral
 Two levels:
@@ -100,6 +106,8 @@ Master Admin can search by Unique User ID and:
 - Change platform settings
 
 Credits and reversals are fully audited.
+
+Manual task/offer controls may remain available to Master Admin for operational exceptions, but the normal client cycle does not depend on manual task assignment.
 
 ## 11. Liquidity settlement
 For the prototype's backend accounting model, an approved withdrawal records the withdrawing user's own principal portion first. Any remaining simulated settlement requirement can be represented as internal liquidity/principal adjustment ledger entries against non-withdrawing users. This is an internal backend record and is not exposed as a separate client-side action.
@@ -147,6 +155,7 @@ Every critical workflow includes on-screen instructions:
 - Wallet locking warning
 - Withdrawal minimum/fee calculation
 - 18-hour cycle explanation
+- Automatic task assignment explanation
 - Referral bonus trigger explanation
 - Password reset security freeze
 - AI authority limitation
