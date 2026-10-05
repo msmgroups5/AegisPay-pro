@@ -15,8 +15,8 @@ android {
         applicationId 'com.aegispay.app'
         minSdk 23
         targetSdk 35
-        versionCode 36
-        versionName '2.5.7'
+        versionCode 37
+        versionName '2.5.8'
     }
 
     productFlavors {
@@ -111,7 +111,7 @@ def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientU
         digest.update(header)
         digest.update(bytes)
         def blobSha = digest.digest().collect { String.format('%02x', it & 0xff) }.join()
-        if (blobSha != '4743c5dd7189cff046c067cd8bb2ce2201667071') {
+        if (blobSha != '100d8e4cb17b363f49599c0c9ca3164067f0aded') {
             throw new GradleException("Client UI guard failed: client.html is not the canonical Aurora UI (got " + blobSha + ").")
         }
         def html = new String(bytes, 'UTF-8')
@@ -119,7 +119,9 @@ def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientU
             !html.contains('Choose Deposit Tier') ||
             !html.contains('Submit Deposit') ||
             !html.contains('link_withdrawal_wallet') ||
-            !html.contains('Identity Verification')) {
+            !html.contains('Identity Verification') ||
+            !html.contains('Secure &amp; Verified') ||
+            !html.contains('© 2023–2026 AegisPay')) {
             throw new GradleException('Client UI guard failed: required Aurora UI markers are missing.')
         }
     }
