@@ -52,7 +52,7 @@ assert(gradle.includes("include 'client.html'")&&!gradle.includes("include 'clie
 assert(!gradle.includes('syncBlueprintRuntime')&&!gradle.includes('aegis-core.js')&&!gradle.includes('app.js'),'Legacy Android runtime remains wired');
 
 const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainActivity.java','utf8');
-assert(native.includes('aegispay-pro-web.aegispay.workers.dev')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android remote/legacy identity is stale');
+assert(!native.includes('aegispay-pro-web.aegispay.workers.dev')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android stale remote/legacy identity remains');
 assert(native.includes('aegispay-pro.pages.dev')&&native.includes('UPDATE_HOST'),'Android update endpoint must remain explicitly allowlisted for Cloudflare Pages');
 
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
@@ -69,7 +69,7 @@ assert(fs.readFileSync('app-update.js','utf8').includes('/app-version.json'),'Up
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
-  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits',
+  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','complete-cycle-checkout',
   'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit'
 ];
 for(const f of functions)assert(exists('supabase/functions/'+f+'/index.ts'),'Missing Edge Function source: '+f);
