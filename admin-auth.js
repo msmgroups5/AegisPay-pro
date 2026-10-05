@@ -164,7 +164,7 @@ async function changeWallet(el){
  wallet=String(wallet).trim().toUpperCase();
  if(!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(wallet)){state.error='Enter a valid TRC20 wallet address.';render();return;}
  state.busy=true;render();
- try{var r=await service.client().rpc('admin_set_withdrawal_wallet',{p_user_id:id,p_wallet:wallet});if(r.error)throw r.error;await loadOperations();state.error='';}
+ try{var r=await service.invokeFunction('admin-account-ops',{body:{action:'wallet',userId:id,wallet:wallet}});if(r.error)throw r.error;await loadOperations();state.error='';}
  catch(e){state.error=e.message||'Withdrawal wallet change failed.';}
  finally{state.busy=false;render();}
 }
