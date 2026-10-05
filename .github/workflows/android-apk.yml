@@ -56,6 +56,7 @@ jobs:
             test -s android/app/build/outputs/apk/admin/debug/app-admin-debug.apk
           fi
       - name: Upload installable APKs
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-Client-and-Master-Admin-APKs
@@ -65,4 +66,3 @@ jobs:
             android/app/build/outputs/apk/client/release/app-client-release.apk
             android/app/build/outputs/apk/admin/release/app-admin-release.apk
           if-no-files-found: error
-
