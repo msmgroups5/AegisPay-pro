@@ -25,7 +25,7 @@
 - Supabase database changes are forward-only migrations under `database/migrations/`.
 - Supabase Edge Function source is under `supabase/functions/`.
 
-## Verified Supabase state on 2026-10-03
+## Verified Supabase state on 2026-10-05
 
 - Project status: ACTIVE_HEALTHY.
 - Two Auth users exist and both are email-confirmed.
@@ -35,11 +35,13 @@
 - One active pg_cron job runs `public.settle_due_cycles()` every minute.
 - Current system mode is `TESTNET_DEMO`, with real payouts disabled and live deposits disabled.
 - No Supabase development branches currently exist.
+- `monitor-deposits` is deployed but its automatic cron is intentionally not enabled until the server-side cron secret is configured.
 
 ## Security review
 
 Supabase Security Advisor currently reports:
-- 11 authenticated SECURITY DEFINER RPCs. These are intentionally used by the client/admin/RLS workflow and contain explicit role/ownership/runtime gates; they require function-by-function review rather than blanket disabling.
+- 8 authenticated SECURITY DEFINER RPCs. The remaining findings are intentionally used by the client/admin/RLS workflow and contain explicit role/ownership/runtime gates; they require function-by-function review rather than blanket disabling.
+- The stale one-argument `link_withdrawal_wallet(text)` overload is no longer executable by `authenticated`; the canonical two-argument wallet RPC is the authenticated client path.
 - Leaked Password Protection is disabled and should be enabled before real production use.
 
 Supabase Performance Advisor currently reports 12 unused indexes. These are review candidates and should not be deleted solely because the current dataset is small.
