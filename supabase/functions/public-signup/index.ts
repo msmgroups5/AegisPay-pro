@@ -92,12 +92,20 @@ Deno.serve(async (req: Request) => {
     }
 
     const emailRedirectTo = typeof body?.redirectTo === "string" ? body.redirectTo.trim() : "";
-    const allowedRedirect = emailRedirectTo && (
-      emailRedirectTo.startsWith("https://aegispay-web.") ||
-      emailRedirectTo.startsWith("https://aegispay-client1.netlify.app") ||
-      emailRedirectTo.startsWith("https://aegispay-ali-archive.netlify.app") ||
-      emailRedirectTo.startsWith("http://localhost")
-    ) ? emailRedirectTo : undefined;
+    const allowedRedirect = (() => {
+      if (!emailRedirectTo) return undefined;
+      try {
+        const u = new URL(emailRedirectTo);
+        const allowed =
+          (u.protocol === "https:" && u.hostname === "aegispay-web.aegispay.workers.dev") ||
+          (u.protocol === "https:" && u.hostname === "aegispay-client1.netlify.app") ||
+          (u.protocol === "https:" && u.hostname === "aegispay-ali-archive.netlify.app") ||
+          (u.protocol === "http:" && (u.hostname === "localhost" || u.hostname === "127.0.0.1"));
+        return allowed ? u.toString() : undefined;
+      } catch {
+        return undefined;
+      }
+    })();
 
     const publicClient = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data, error } = await publicClient.auth.signUp({
@@ -146,23 +154,6 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Account security setup could not be completed. Please try again.", code: "APP_METADATA_FAILED", requestId }, 500);
     }
 
-    if (error || !data?.user) {
-      const rawMessage = String(error?.message || "AegisPay could not create the account.");
-      const lower = rawMessage.toLowerCase();
-      console.error("public-signup createUser failed", { requestId, status: error?.status ?? null, code: error?.code ?? null, message: rawMessage });
-
-      let status = Number(error?.status || 0);
-      if (!Number.isFinite(status) || status < 400 || status > 599) status = 500;
-      if (/already registered|already exists|duplicate|23505/.test(lower)) status = 409;
-      else if (/invalid|validation|password|email|referral/.test(lower) && status >= 500) status = 400;
-
-      return json({
-        error: status >= 500 ? "AegisPay could not create the account right now. Please try again." : rawMessage,
-        code: status >= 500 ? "SIGNUP_SERVER_ERROR" : (error?.code || "SIGNUP_VALIDATION_ERROR"),
-        requestId
-      }, status);
-    }
-
     const { data: linkedProfile, error: profileError } = await admin
       .from("users").select("id,role,status,referred_by").eq("auth_user_id", data.user.id).maybeSingle();
 
@@ -175,12 +166,6 @@ Deno.serve(async (req: Request) => {
       try { await admin.auth.admin.deleteUser(data.user.id); }
       catch (cleanupError) { console.error("public-signup cleanup failed", { requestId, message: cleanupError instanceof Error ? cleanupError.message : String(cleanupError) }); }
       return json({ error: "Account setup could not be completed. No usable AegisPay account was created.", code: "PROFILE_LINK_FAILED", requestId }, 500);
-    }
-
-    const { error: usernameSetError } = await admin.from("users").update({ username }).eq("id", linkedProfile.id);
-    if (usernameSetError) {
-      try { await admin.auth.admin.deleteUser(data.user.id); } catch (cleanupError) {}
-      return json({ error: "Username could not be saved. No usable AegisPay account was created.", code: "USERNAME_SAVE_FAILED", requestId }, 500);
     }
 
     if (referrerId && !linkedProfile.referred_by) {
