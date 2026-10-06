@@ -274,7 +274,11 @@ function bindAuthForms(){
         }});
         if(rr.error){
           const serverMessage=rr.data && typeof rr.data==='object' && rr.data.error ? rr.data.error : '';
-          throw Error(serverMessage || rr.error.message || 'Signup failed. Please try again.');
+          const msg=serverMessage || rr.error.message || 'Signup failed. Please try again.';
+          if(/non-2xx|email verification service|confirmation email|email delivery/i.test(msg)){
+            throw Error('Email verification service is temporarily unavailable. Please try again after the email service is fixed.');
+          }
+          throw Error(msg);
         }
         app.innerHTML=SC.verifyPending(email);
         bindAuthForms();
