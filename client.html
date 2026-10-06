@@ -273,9 +273,20 @@ function bindAuthForms(){
           preferredLanguage:'en',redirectTo:location.origin+location.pathname+'?verified=1'
         }});
         if(rr.error){
-          const serverMessage=rr.data && typeof rr.data==='object' && rr.data.error ? rr.data.error : '';
+          let serverMessage=rr.data && typeof rr.data==='object' && rr.data.error ? rr.data.error : '';
+          const serverCode=rr.data && typeof rr.data==='object' && rr.data.code ? rr.data.code : '';
+          if(!serverMessage && rr.error && rr.error.context && typeof rr.error.context.json==='function'){
+            try{
+              const body=await rr.error.context.clone().json();
+              serverMessage=body && body.error ? body.error : '';
+            }catch(_){}
+          }
+          const status=Number(rr.error && (rr.error.status || rr.error.context && rr.error.context.status) || 0);
+          if(status===409 || serverCode==='PROFILE_EXISTS' || serverCode==='USERNAME_EXISTS'){
+            throw Error(serverMessage || 'This email or username is already registered. Please use a different email or username.');
+          }
           const msg=serverMessage || rr.error.message || 'Signup failed. Please try again.';
-          if(/non-2xx|email verification service|confirmation email|email delivery/i.test(msg)){
+          if(serverCode==='EMAIL_DELIVERY_FAILED' || /email verification service|confirmation email|email delivery/i.test(msg)){
             throw Error('Email verification service is temporarily unavailable. Please try again after the email service is fixed.');
           }
           throw Error(msg);
