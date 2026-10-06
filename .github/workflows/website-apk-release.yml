@@ -30,6 +30,13 @@ jobs:
           grep -q "versionCode 38" android/app/build.gradle
           grep -q "versionName '2.5.9'" android/app/build.gradle
           sha256sum android/app/build/outputs/apk/client/debug/app-client-debug.apk
+      - name: Upload APK as Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aegispay-client-v2.5.9-build-38
+          path: android/app/build/outputs/apk/client/debug/app-client-debug.apk
+          if-no-files-found: error
+          retention-days: 30
       - name: Publish Aurora Client APK
         env:
           GH_TOKEN: ${{ github.token }}
