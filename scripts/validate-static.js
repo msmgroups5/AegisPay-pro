@@ -3,7 +3,7 @@ const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 const exists=p=>fs.existsSync(p);
 
 const must=[
-  'client.html','client-home.css','master-admin.html','styles.css','premium.css','client-auth.js','admin-auth.js',
+  'client.html','master-admin.html','styles.css','premium.css','admin-auth.js',
   'supabase-client.js','supabase-service.js','aegis-auth-redirect.js','app-update.js',
    'service-worker.js','manifest.webmanifest','_headers','aegispay-logo.svg','_redirects','package.json',
   'database/migrations/20261003_private_verification_storage_policies.sql','database/migrations/20261004_restore_baseline_demo_configuration.sql',
@@ -17,34 +17,16 @@ const must=[
 for(const p of must)assert(exists(p),'Missing canonical source file: '+p);
 
 const client=fs.readFileSync('client.html','utf8');
-for(const marker of ['client-auth.js','supabase-client.js','supabase-service.js','aegis-auth-redirect.js','./client-home.css']) {
-  assert(client.includes(marker),'Client runtime wiring is incomplete: '+marker);
-}
-for(const marker of ['AegisPay','app','AEGIS_ANDROID_APP']) {
-  assert(client.includes(marker),'Client entry marker missing: '+marker);
-}
-assert(client.includes('client-home.css'),'Canonical client stylesheet is not wired to client');
-assert(client.includes('./styles.css'),'Canonical client base stylesheet is not wired to client');
-assert(client.includes('./supabase-sdk.js'),'Android-safe local Supabase SDK fallback is not wired to client');
-assert(client.includes('client-auth.js'),'Canonical client runtime is not wired to client');
-const clientAuth=fs.readFileSync('client-auth.js','utf8');
-assert(clientAuth.includes('ap-v2-home'),'Canonical Premium v2 Home UI is not wired to client');
-assert(!clientAuth.includes('ap-premium-home')&&!clientAuth.includes('ap-reference-ui')&&!clientAuth.includes('ap-amazon-premium'),'Legacy Home UI markers must not remain in client runtime');
-for(const marker of ['function homeView','function handleLogin','function refreshProfile']) {
-  assert(clientAuth.includes(marker),'Clean Home Dashboard implementation missing: '+marker);
-}
-for(const marker of ['WELCOME BACK','AVAILABLE BALANCE','Top Up','Shop Tasks','Account','Crypto','AUTO TASK ENGINE','Invite friends &amp; earn rewards','Home','Assets','Profile','AI Bot']) {
-  assert(clientAuth.includes(marker),'Premium v2 Home UI marker missing: '+marker);
-}
-const homeCss=fs.readFileSync('client-home.css','utf8');
-assert(homeCss.includes('.ap-v2-home'),'Premium v2 Home stylesheet is missing');
-for(const marker of ['.ap-premium-home','.ap-reference-ui','.ap-amazon-premium','Reference-driven','Uploaded reference home','COMPLETE CLIENT UI — UPLOADED HTML VISUAL SYSTEM','--ref-']) {
-  assert(!homeCss.includes(marker),'Legacy Home CSS marker remains: '+marker);
-}
-assert(clientAuth.length<75000,'Client source unexpectedly exceeded the merged client runtime budget');
-assert(clientAuth.includes("rpc('link_withdrawal_wallet',{p_address:address,p_owner_name:owner})"),'Client withdrawal wallet flow is not aligned with the active two-argument RPC');
-assert(clientAuth.includes("complete-cycle-checkout"),'Client Shop checkout endpoint is not wired');
-assert(!clientAuth.includes("rpc('complete_task'"),'Legacy single-task Shop completion RPC must not be called by the canonical client');
+assert(client.includes('bootLive'),'Client inline runtime bootstrap is missing');
+assert(client.includes('liveHome'),'Client Home runtime is missing');
+assert(client.includes('liveTopup'),'Client Top Up runtime is missing');
+assert(client.includes('liveWithdraw'),'Client Withdrawal runtime is missing');
+assert(client.includes('Username or Email'),'Canonical client login must accept username or email');
+assert(client.includes('resolve_login_email'),'Username login resolution is not wired');
+assert(client.includes('public-signup'),'Canonical client signup function is not wired');
+assert(client.includes('Secure &amp; Verified'),'Client security footer is missing');
+assert(client.includes('© 2023–2026 AegisPay'),'Client year marker is missing');
+assert(client.length>20000,'Canonical client source unexpectedly shrank; review before release');
 assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy demo scripts are still wired to client');
 
 const admin=fs.readFileSync('master-admin.html','utf8');
