@@ -30,6 +30,8 @@ assert(client.includes('exchangeCodeForSession'),'PKCE password reset handling i
 assert(client.includes("setSession({access_token:accessToken,refresh_token:refreshToken})"),'Implicit password recovery token handling is missing');
 assert(client.includes("https://aegispay-web.aegispay.workers.dev/?reset=1"),'Password reset must target the canonical Worker');
 assert(client.includes("db.rpc('link_withdrawal_wallet',{p_address:wallet,p_owner_name:profile.name})"),'Client wallet-link flow must use the owner-name protected RPC');
+assert(client.includes("complete-cycle-checkout"),'Client Shop checkout endpoint is not wired');
+assert(client.includes("qs.get('reset')==='1'"),'Client password reset route is missing');
 assert(!client.includes("db.rpc('link_withdrawal_wallet',{p_wallet:wallet})"),'Legacy one-argument wallet RPC must not be called by the client');
 assert(!client.includes('aegispay-client1.netlify.app')&&!client.includes('aegispay-ali-archive.netlify.app'),'Legacy Netlify production redirect remains in client source');
 assert(client.includes('Secure &amp; Verified'),'Client security footer is missing');
@@ -72,8 +74,8 @@ assert(fs.readFileSync('app-update.js','utf8').includes('/app-version.json'),'Up
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
-  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','complete-cycle-checkout',
-  'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit'
+  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','complete-cycle-checkout','complete-password-reset',
+  'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit','complete-password-reset'
 ];
 for(const f of functions)assert(exists('supabase/functions/'+f+'/index.ts'),'Missing Edge Function source: '+f);
 
