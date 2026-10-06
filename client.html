@@ -360,9 +360,13 @@ if(qs.get('reset')==='1' || hashParams.get('type')==='recovery'){
       try{
         const password=document.getElementById('rp').value;
         if(password.length<8)throw Error('Password must contain at least 8 characters.');
-        const rr=await db.auth.updateUser({password});
-        if(rr.error)throw rr.error;
-        alert('Password updated successfully. You can now sign in.');
+        const rr=await db.functions.invoke('complete-password-reset',{body:{password}});
+        if(rr.error){
+          let detail=null;try{if(rr.error.context&&typeof rr.error.context.clone==='function')detail=await rr.error.context.clone().json();}catch(_){}
+          throw Error((detail&&detail.error)||rr.error.message||'Unable to complete password reset.');
+        }
+        if(!rr.data||rr.data.status!=='PASSWORD_RESET_COMPLETE')throw Error('Password reset could not be completed.');
+        alert('Password updated successfully. Your account is temporarily frozen for security.');
         history.replaceState({},document.title,location.pathname);
         await db.auth.signOut();
         window.go('login');
