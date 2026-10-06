@@ -6,8 +6,9 @@ AegisPay uses one canonical production client/admin web stack with Supabase as t
 
 - Client portal source: `client.html`
 - Master Admin source: `master-admin.html`
-- Shared client/runtime code: `client-auth.js`, `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
-- Shared UI assets: `styles.css`, `premium.css`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`, `shop-catalog.js`
+- Client runtime: root `client.html` (self-contained)
+- Master Admin/runtime helpers: `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
+- Admin/shared UI assets: `styles.css`, `premium.css`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`, `shop-catalog.js`
 - Public website source: `site/index.html` + `site/site.css`
 - Cloudflare Pages publish package: generated at deploy time under `site/`
 - Android source: `android/`; the client flavor bundles `client.html` and shared root web assets
@@ -54,4 +55,4 @@ Never put service-role keys, payout private keys, Telegram bot secrets, AI provi
 - Master Admin: `/admin/` from root `master-admin.html`
 - Cloudflare Pages: `aegispay-pro`
 - Supabase: `wtcspnrmsoisroavojop`
-- Android baseline: versionCode 33 / versionName 2.5.4
+- Android current baseline: versionCode 38 / versionName 2.5.9
