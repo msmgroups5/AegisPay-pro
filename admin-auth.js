@@ -11,8 +11,8 @@ function shell(body){
 }
 function renderLogin(){
  var content=state.busy
-  ?'<section class="tg-admin-content tg-loading"><span class="tg-spinner" aria-hidden="true"></span><h1>Signing in securely</h1><p>Checking your Master Admin access…</p></section>'
-  :'<section class="tg-admin-content tg-admin-login"><span class="tg-kicker">OWNER ACCESS</span><h1>Welcome back</h1><p>Sign in with the Master Admin account provisioned for this project.</p><form id="adminLogin"><label>Email<input id="adminEmail" type="email" autocomplete="username" required></label><label>Password<input id="adminPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in securely</button></form><small>Access is checked against the protected AegisPay role.</small></section>';
+  ?'<section class="tg-admin-content tg-loading ap-admin-login"><div class="ap-admin-logo">A</div><h1>Signing in securely</h1><p>Checking your Master Admin access…</p><span class="ap-admin-spinner" aria-hidden="true"></span></section>'
+  :'<section class="tg-admin-content tg-admin-login ap-admin-login"><div class="ap-admin-logo">A</div><span class="tg-kicker">MASTER ADMIN</span><h1>Welcome back</h1><p>Secure Aurora control center access.</p><form id="adminLogin"><div class="ap-admin-field"><label for="adminUsername">Username</label><input id="adminUsername" type="text" inputmode="text" autocomplete="username" placeholder="Enter admin username" pattern="[A-Za-z0-9_]{3,32}" required></div><div class="ap-admin-field"><label for="adminPassword">Password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Enter password" required></div><button class="ap-admin-primary" type="submit">Sign in securely <span>→</span></button></form><div class="ap-admin-secure"><strong>Secure &amp; Verified</strong><small>256-bit encrypted · Protected Master Admin access</small></div></section>'
  root.innerHTML=shell(content);
 }
 function powerPanel(){
@@ -196,10 +196,11 @@ async function saveSettings(e){
 
 function render(){if(!state.profile)return renderLogin();if(state.tab==='overview')return renderOverview();if(state.tab==='users')return renderUsers();if(state.tab==='shop')return renderShop();if(state.tab==='settings')return renderSettings();if(state.tab==='referrals')return renderReferrals();if(state.tab==='audit')return renderAudit();if(state.tab==='deposits'||state.tab==='kyc'||state.tab==='withdrawals')return renderQueues();if(state.tab==='telegram'){state.tab='withdrawals';return renderQueues();}return renderOverview();}
 async function login(e){
- e.preventDefault();var email=document.getElementById('adminEmail').value,password=document.getElementById('adminPassword').value;
+ e.preventDefault();var identifier=document.getElementById('adminUsername').value.trim().toLowerCase(),password=document.getElementById('adminPassword').value;
  state.busy=true;state.error='';render();
  try{
-  await service.signIn(email,password);
+  if(!/^[a-z0-9_]{3,32}$/.test(identifier))throw new Error('Enter a valid admin username (3–32 lowercase letters, numbers, or underscores).');
+  await service.signIn(identifier,password);
   var result=await service.claimAegisPayProfile();
   if(!result.profile||result.profile.role!=='MASTER ADMIN')throw new Error('This account does not have Master Admin access.');
   state.profile=result.profile;await syncRuntime();
