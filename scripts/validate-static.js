@@ -55,7 +55,7 @@ assert(deploy.includes('rm -rf site/app site/downloads'),'Generated deploy direc
 assert(!deploy.includes('netlify-cli deploy'),'Legacy Netlify production deployment must stay disabled during Cloudflare migration');
 
 const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
-assert(rel.includes('cp client.html site/app/index.html'),'Release workflow source is not client.html');
+assert(rel.includes(':app:assembleClientDebug'),'Aurora APK release workflow must build the canonical client flavor');
 assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Netlify production deployment');
 
 assert(fs.readFileSync('app-update.js','utf8').includes('/app-version.json'),'Updater manifest endpoint missing');
