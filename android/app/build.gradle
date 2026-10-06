@@ -158,6 +158,7 @@ def syncAdminAegisPayWebAssets = tasks.register('syncAdminAegisPayWebAssets', Co
 tasks.named('syncClientAegisPayWebAssets').configure { dependsOn(verifyCanonicalAuroraClientUi) }
 
 tasks.named('preBuild').configure {
+    dependsOn(ensureSupabaseSdk)
     dependsOn(verifyCanonicalAuroraClientUi)
     dependsOn(syncClientAegisPayWebAssets)
     dependsOn(syncAdminAegisPayWebAssets)
