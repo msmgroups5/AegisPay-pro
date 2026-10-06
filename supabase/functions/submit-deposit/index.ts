@@ -31,11 +31,14 @@ Deno.serve(async (req: Request) => {
     if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
 
     const { data: profile, error: profileError } = await admin.from("users")
-      .select("id,auth_user_id,role,status,first_deposit_done")
+      .select("id,auth_user_id,role,status,first_deposit_done,frozen_until")
       .eq("auth_user_id", auth.user.id).maybeSingle();
     if (profileError || !profile) return json({ error: "AegisPay profile not found." }, 404);
     if (profile.role !== "USER" || ["BLOCKED","SUSPENDED","DELETED"].includes(String(profile.status).toUpperCase())) {
       return json({ error: "This account cannot submit deposits." }, 403);
+    }
+    if (profile.frozen_until && new Date(profile.frozen_until).getTime() > Date.now()) {
+      return json({ error: "Account is temporarily frozen for security. Please try again after the freeze expires." }, 423);
     }
 
     const body = await req.json().catch(() => null);
