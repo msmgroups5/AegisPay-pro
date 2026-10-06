@@ -8,7 +8,7 @@ AegisPay uses one canonical production client/admin web stack with Supabase as t
 - Master Admin source: `master-admin.html`
 - Client runtime: root `client.html` (self-contained)
 - Master Admin/runtime helpers: `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
-- Admin/shared UI assets: `styles.css`, `premium.css`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`, `shop-catalog.js`
+- Admin/shared UI assets: `shop-catalog.js`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`
 - Public website source: `site/index.html` + `site/site.css`
 - Cloudflare Pages publish package: generated at deploy time under `site/`
 - Android source: `android/`; the client flavor bundles `client.html` and shared root web assets
