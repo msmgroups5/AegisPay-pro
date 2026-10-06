@@ -40,7 +40,8 @@ for(const m of [
 
 const gradle=fs.readFileSync('android/app/build.gradle','utf8');
 assert(gradle.includes("include 'client.html'")&&!gradle.includes("include 'client-fresh.html'")&&gradle.includes("include 'master-admin.html'"),'Android canonical entries missing');
-assert(gradle.includes("include 'styles.css'")&&gradle.includes("include 'supabase-sdk.js'")&&gradle.includes('ensureSupabaseSdk'),'Android client must bundle base styles and the pinned Supabase SDK');
+assert(gradle.includes('ensureSupabaseSdk'),'Build must provision the pinned Supabase SDK for web packaging');
+assert(!gradle.includes("include 'client-auth.js'")&&!gradle.includes("include 'client-home.css'"),'Retired client runtime assets must not be bundled into Android client builds');
 assert(!gradle.includes('syncBlueprintRuntime')&&!gradle.includes('aegis-core.js')&&!gradle.includes('app.js'),'Legacy Android runtime remains wired');
 
 const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainActivity.java','utf8');
