@@ -33,15 +33,14 @@ jobs:
           rm -rf site/app site/downloads
           mkdir -p site/app site/downloads
           cp client.html site/client.html
-          cp client-home.css site/client-home.css
           cp master-admin.html site/master-admin.html
           cp admin-auth.js site/admin-auth.js
           cp client.html site/app/index.html
           cp client.html site/app/home.html
           cp _redirects site/_redirects
           cp _headers site/_headers
-          cp styles.css premium.css shop-catalog.js client-auth.js supabase-sdk.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
-          cp styles.css client-home.css supabase-sdk.js client-auth.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/app/
+          cp styles.css premium.css shop-catalog.js supabase-sdk.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/
+          cp styles.css supabase-sdk.js supabase-client.js supabase-service.js aegis-auth-redirect.js app-update.js service-worker.js manifest.webmanifest aegispay-logo.svg aegispay-logo-light.svg site/app/
           VERSION_CODE=$(sed -n "s/.*versionCode \([0-9][0-9]*\).*/\1/p" android/app/build.gradle | head -1)
           VERSION_NAME=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)
           VERSIONED_CLIENT="aegispay-client-v${VERSION_NAME}-b${VERSION_CODE}.apk"
@@ -62,7 +61,6 @@ jobs:
           test -s site/master-admin.html
           test -s site/app/index.html
           test -s site/app/home.html
-          test -s site/app/client-auth.js
           test -s "site/downloads/${VERSIONED_CLIENT}"
           test -s site/downloads/aegispay-client.apk
           test -s site/_redirects
