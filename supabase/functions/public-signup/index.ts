@@ -86,11 +86,65 @@ Deno.serve(async (req: Request) => {
       referrerId = referrer.id;
     }
 
-    const { data, error } = await admin.auth.admin.createUser({
-      email, password, email_confirm: true,
-      user_metadata: { full_name: name.slice(0, 100), username, referral_code: referralCode, preferred_language: preferredLanguage },
-      app_metadata: { aegispay_approved: true, signup_channel: "client_test_mode" },
+    const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
+    if (!ANON_KEY) {
+      return json({ error: "Signup email service is not configured.", code: "SIGNUP_EMAIL_NOT_CONFIGURED", requestId }, 503);
+    }
+
+    const emailRedirectTo = typeof body?.redirectTo === "string" ? body.redirectTo.trim() : "";
+    const allowedRedirect = emailRedirectTo && (
+      emailRedirectTo.startsWith("https://aegispay-web.") ||
+      emailRedirectTo.startsWith("https://aegispay-client1.netlify.app") ||
+      emailRedirectTo.startsWith("https://aegispay-ali-archive.netlify.app") ||
+      emailRedirectTo.startsWith("http://localhost")
+    ) ? emailRedirectTo : undefined;
+
+    const publicClient = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data, error } = await publicClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name.slice(0, 100),
+          username,
+          referral_code: referralCode,
+          preferred_language: preferredLanguage
+        },
+        ...(allowedRedirect ? { emailRedirectTo: allowedRedirect } : {})
+      }
     });
+
+    if (error || !data?.user) {
+      const rawMessage = String(error?.message || "AegisPay could not create the account.");
+      const lower = rawMessage.toLowerCase();
+      console.error("public-signup auth signup failed", { requestId, status: error?.status ?? null, code: error?.code ?? null, message: rawMessage });
+      let status = Number(error?.status || 0);
+      if (!Number.isFinite(status) || status < 400 || status > 599) status = 500;
+      if (/already registered|already exists|duplicate|23505/.test(lower)) status = 409;
+      else if (/invalid|validation|password|email|referral/.test(lower) && status >= 500) status = 400;
+      return json({
+        error: status >= 500 ? "AegisPay could not create the account right now. Please try again." : rawMessage,
+        code: status >= 500 ? "SIGNUP_SERVER_ERROR" : (error?.code || "SIGNUP_VALIDATION_ERROR"),
+        requestId
+      }, status);
+    }
+
+    // The signup email must be confirmed before a session is allowed.
+    // If Supabase is misconfigured with Confirm Email OFF, fail closed instead of
+    // silently creating an immediately usable account.
+    if (data.session) {
+      try { await admin.auth.admin.deleteUser(data.user.id); } catch (_) {}
+      return json({ error: "Email verification is not enabled yet. Please enable Confirm Email in Supabase Authentication settings.", code: "EMAIL_CONFIRMATION_REQUIRED", requestId }, 503);
+    }
+
+    const { error: appMetaError } = await admin.auth.admin.updateUserById(data.user.id, {
+      app_metadata: { aegispay_approved: true, signup_channel: "client_email_verification" }
+    });
+    if (appMetaError) {
+      console.error("public-signup app metadata update failed", { requestId, authUserId: data.user.id, message: appMetaError.message });
+      try { await admin.auth.admin.deleteUser(data.user.id); } catch (_) {}
+      return json({ error: "Account security setup could not be completed. Please try again.", code: "APP_METADATA_FAILED", requestId }, 500);
+    }
 
     if (error || !data?.user) {
       const rawMessage = String(error?.message || "AegisPay could not create the account.");
@@ -145,7 +199,7 @@ Deno.serve(async (req: Request) => {
     return json({
       user: { id: data.user.id, email: data.user.email || email },
       profile: { id: linkedProfile.id, role: linkedProfile.role, status: linkedProfile.status, referred_by: linkedProfile.referred_by ?? null },
-      message: "Account created successfully.", requestId
+      message: "Account created. Please check your email and verify your email address before signing in.", requestId
     }, 201);
   } catch (error) {
     console.error("public-signup unexpected failure", { requestId, message: error instanceof Error ? error.message : String(error) });
