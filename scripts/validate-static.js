@@ -24,6 +24,12 @@ assert(client.includes('liveWithdraw'),'Client Withdrawal runtime is missing');
 assert(client.includes('Username or Email'),'Canonical client login must accept username or email');
 assert(client.includes('resolve_login_email'),'Username login resolution is not wired');
 assert(client.includes('public-signup'),'Canonical client signup function is not wired');
+assert(client.includes('resetPasswordForEmail'),'Client password reset request is not wired');
+assert(client.includes("reset=1"),'Client password reset redirect marker is missing');
+assert(client.includes('exchangeCodeForSession'),'PKCE password reset handling is missing');
+assert(client.includes("setSession({access_token:accessToken,refresh_token:refreshToken})"),'Implicit password recovery token handling is missing');
+assert(client.includes("https://aegispay-web.aegispay.workers.dev/?reset=1"),'Password reset must target the canonical Worker');
+assert(!client.includes('aegispay-client1.netlify.app')&&!client.includes('aegispay-ali-archive.netlify.app'),'Legacy Netlify production redirect remains in client source');
 assert(client.includes('Secure &amp; Verified'),'Client security footer is missing');
 assert(client.includes('© 2023–2026 AegisPay'),'Client year marker is missing');
 assert(client.length>20000,'Canonical client source unexpectedly shrank; review before release');
@@ -37,6 +43,7 @@ for(const m of [
   'claim_aegispay_profile','public-signup','signInWithPassword','resetPasswordForEmail',
   'request_withdrawal','app_runtime_enabled','set_app_runtime_enabled'
 ])assert(service.includes(m),'Supabase marker missing: '+m);
+assert(service.includes('https://aegispay-web.aegispay.workers.dev/?reset=1'),'Shared password reset redirect must target the canonical Worker');
 
 const gradle=fs.readFileSync('android/app/build.gradle','utf8');
 assert(gradle.includes("include 'client.html'")&&!gradle.includes("include 'client-fresh.html'")&&gradle.includes("include 'master-admin.html'"),'Android canonical entries missing');
