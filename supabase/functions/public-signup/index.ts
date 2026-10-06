@@ -128,8 +128,27 @@ Deno.serve(async (req: Request) => {
       console.error("public-signup auth signup failed", { requestId, status: error?.status ?? null, code: error?.code ?? null, message: rawMessage });
       let status = Number(error?.status || 0);
       if (!Number.isFinite(status) || status < 400 || status > 599) status = 500;
+
+      // Supabase Auth returns a 500 when the configured SMTP provider rejects
+      // the confirmation email. Do not expose the provider's raw SMTP details
+      // to the client, but make the failure actionable and distinguishable.
+      if (/error sending confirmation email|could not send email|smtp|gomail/i.test(lower)) {
+        console.error("public-signup confirmation email delivery failed", {
+          requestId,
+          status: error?.status ?? null,
+          code: error?.code ?? null,
+          message: rawMessage
+        });
+        return json({
+          error: "Email verification service is temporarily unavailable. The account was not created. Please try again after the email service is fixed.",
+          code: "EMAIL_DELIVERY_FAILED",
+          requestId
+        }, 503);
+      }
+
       if (/already registered|already exists|duplicate|23505/.test(lower)) status = 409;
       else if (/invalid|validation|password|email|referral/.test(lower) && status >= 500) status = 400;
+
       return json({
         error: status >= 500 ? "AegisPay could not create the account right now. Please try again." : rawMessage,
         code: status >= 500 ? "SIGNUP_SERVER_ERROR" : (error?.code || "SIGNUP_VALIDATION_ERROR"),
