@@ -264,7 +264,7 @@ function bindAuthForms(){
       const email=document.getElementById('fe').value.trim().toLowerCase();
       if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.textContent='Sending...'}
       try{
-        if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))throw Error('Please enter a valid registered email address.');
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error('Please enter a valid registered email address.');
         const r=await db.auth.resetPasswordForEmail(email,{
           redirectTo:'https://aegispay-web.aegispay.workers.dev/?reset=1'
         });
