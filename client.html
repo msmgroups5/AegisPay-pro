@@ -272,7 +272,10 @@ function bindAuthForms(){
           username,referralCode:document.getElementById('sr').value.trim().toUpperCase(),
           preferredLanguage:'en',redirectTo:location.origin+location.pathname+'?verified=1'
         }});
-        if(rr.error)throw rr.error;
+        if(rr.error){
+          const serverMessage=rr.data && typeof rr.data==='object' && rr.data.error ? rr.data.error : '';
+          throw Error(serverMessage || rr.error.message || 'Signup failed. Please try again.');
+        }
         app.innerHTML=SC.verifyPending(email);
         bindAuthForms();
         const rb=document.getElementById('resendVerify');
