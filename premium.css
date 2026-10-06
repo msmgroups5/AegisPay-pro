@@ -245,3 +245,119 @@
 .tg-power-switch.is-on{background:#161b24!important}
 .tg-review-card code{color:#dbe1ea!important}
 .tg-empty,.tg-paused-admin,.tg-review-link{color:#b9c0ca!important}
+
+
+/* 2026-10-06 AURORA MASTER ADMIN
+   Master Admin keeps the operational layout but uses the canonical Aurora
+   midnight + violet/cyan visual language instead of the legacy red palette. */
+.tg-admin-page{
+  min-height:100vh!important;
+  padding:0!important;
+  background:
+    radial-gradient(90% 38% at 0 0,rgba(124,92,255,.30),transparent 55%),
+    radial-gradient(70% 34% at 100% 100%,rgba(34,211,238,.18),transparent 55%),
+    #03050C!important;
+  color:#EAF0FF!important;
+}
+.tg-admin-card{
+  width:min(100%,1180px)!important;
+  min-height:100vh;
+  margin:0 auto!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:0!important;
+  background:#070A16!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+.tg-admin-topbar{
+  padding:18px 22px!important;
+  min-height:76px!important;
+  background:linear-gradient(135deg,#0A0D20,#11153A 58%,#172D52)!important;
+  border-bottom:1px solid rgba(255,255,255,.09)!important;
+}
+.tg-admin-brand{display:flex;align-items:center;gap:12px}.tg-admin-brand img{border-radius:14px;box-shadow:0 10px 24px rgba(124,92,255,.25)}
+.tg-admin-brand b{color:#EAF0FF!important;font-size:20px!important}.tg-admin-brand em{color:#22D3EE!important;font-style:normal}.tg-admin-brand small{color:#8D97BD!important}
+.tg-admin-session{
+  margin-left:auto;padding:8px 11px;border:1px solid rgba(46,230,166,.22);border-radius:999px;
+  background:rgba(46,230,166,.08);color:#2EE6A6!important;font-size:10px;font-weight:700;
+}
+.tg-admin-content{
+  padding:20px!important;
+  background:
+    radial-gradient(70% 30% at 100% 0,rgba(124,92,255,.12),transparent 60%),
+    #070A16!important;
+  color:#EAF0FF!important;
+}
+.tg-admin-content h1,.tg-admin-content h2,.tg-admin-content h3{color:#EAF0FF!important}
+.tg-admin-content p,.tg-admin-content small{color:#8D97BD!important}
+.tg-admin-content form,.tg-admin-content article,.tg-admin-stats article,.tg-power-panel,.tg-paused-admin{
+  border:1px solid rgba(255,255,255,.09)!important;
+  background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025))!important;
+  color:#EAF0FF!important;
+  box-shadow:0 18px 40px -28px rgba(124,92,255,.65)!important;
+}
+.tg-admin-content input,.tg-admin-content select,.tg-admin-content textarea{
+  background:rgba(255,255,255,.04)!important;
+  color:#EAF0FF!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:16px!important;
+}
+.tg-admin-content input::placeholder,.tg-admin-content textarea::placeholder{color:#667197!important}
+.tg-admin-content input:focus,.tg-admin-content select:focus,.tg-admin-content textarea:focus{
+  outline:3px solid rgba(34,211,238,.08)!important;
+  border-color:rgba(34,211,238,.65)!important;
+}
+.tg-admin-content button{
+  border-radius:16px!important;
+  background:linear-gradient(135deg,#7C5CFF,#22D3EE)!important;
+  color:#fff!important;
+  box-shadow:0 14px 28px -12px rgba(124,92,255,.75)!important;
+}
+.tg-admin-content .tg-button-soft,.tg-admin-content .tg-admin-nav button{
+  background:rgba(255,255,255,.04)!important;
+  color:#C7D2FE!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+}
+.tg-admin-content .tg-admin-nav button[aria-pressed=true]{
+  background:linear-gradient(135deg,#7C5CFF,#22D3EE)!important;
+  color:#fff!important;border-color:transparent!important;
+}
+.tg-admin-content .tg-admin-danger{
+  background:rgba(255,92,122,.12)!important;
+  color:#FF8CA2!important;
+  border:1px solid rgba(255,92,122,.28)!important;
+  box-shadow:none!important;
+}
+.tg-admin-content code{color:#B8C4FF!important}
+.tg-admin-content a{color:#22D3EE!important}
+.tg-admin-stats{gap:12px!important}.tg-admin-stats article strong{color:#EAF0FF!important}
+.tg-power-panel{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px!important}
+.tg-power-copy{display:flex;align-items:center;gap:12px}.tg-power-copy strong{color:#EAF0FF!important}.tg-power-icon{background:rgba(124,92,255,.13)!important;color:#22D3EE!important}
+.tg-power-switch{min-height:44px!important;padding:0 16px!important}.tg-power-switch.is-on{background:rgba(255,255,255,.06)!important}
+.tg-empty,.tg-paused-admin,.tg-review-link{color:#8D97BD!important}
+.ap-admin-login{max-width:430px!important;margin:30px auto!important;padding:24px 18px 28px!important;text-align:center}
+.ap-admin-logo{
+  width:84px;height:84px;margin:8px auto 16px;border-radius:26px;
+  display:grid;place-items:center;font-size:42px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,#7C5CFF,#22D3EE);
+  box-shadow:0 24px 50px -22px #7C5CFF;
+}
+.ap-admin-login .tg-kicker{display:inline-block;color:#22D3EE!important;font-size:10px;letter-spacing:1.8px;font-weight:800}
+.ap-admin-login h1{margin:8px 0 6px!important;font-size:30px!important;letter-spacing:-1px}
+.ap-admin-login>p{font-size:13px!important;margin:0 0 20px!important}
+.ap-admin-field{text-align:left;margin-bottom:12px}
+.ap-admin-field label{display:block;margin:0 0 7px 4px;font-size:11px;color:#8D97BD!important}
+.ap-admin-field input{width:100%;min-height:50px;padding:0 14px;border-radius:16px}
+.ap-admin-primary{width:100%;min-height:52px!important;margin-top:4px;font-weight:700}
+.ap-admin-primary span{font-size:18px;margin-left:4px}
+.ap-admin-secure{margin-top:18px;padding:12px 10px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09)}
+.ap-admin-secure strong{display:block;color:#EAF0FF;font-size:12px}.ap-admin-secure small{display:block;margin-top:3px;color:#8D97BD!important;font-size:10px}
+.ap-admin-spinner{width:24px;height:24px;margin:16px auto 0;border-radius:50%;border:2px solid rgba(255,255,255,.13);border-top-color:#22D3EE;display:block;animation:apAdminSpin .8s linear infinite}
+@keyframes apAdminSpin{to{transform:rotate(360deg)}}
+@media(max-width:640px){
+  .tg-admin-topbar{padding:14px 15px!important}
+  .tg-admin-content{padding:14px!important}
+  .tg-admin-session{display:none}
+  .ap-admin-login{margin:18px auto!important}
+}
