@@ -20,14 +20,14 @@ This document is the source-of-truth map for the public website, Client Portal, 
 - Source of truth: root `client.html`
 - Build destination: `site/app/index.html`
 - Local relative assets are copied into `site/app/` during every Cloudflare Pages deployment build.
-- Browser business/auth code: `supabase-client.js`, `supabase-service.js`, `client-auth.js`, `aegis-auth-redirect.js`.
+- Client browser business/auth/runtime: root `client.html` (self-contained).
 - Client portal uses Supabase-backed account, deposit, KYC, Shop/task, referral, notification and withdrawal workflows.
 
 ### Master Admin Portal
 
 - Production route: `/admin/`
 - Cloudflare Pages redirect target: `/master-admin.html`
-- Source of truth: root `master-admin.html` and `admin-auth.js`
+- Source of truth: root `master-admin.html` and `admin-auth.js` plus shared Supabase/auth helpers
 - Build destination: `site/master-admin.html` and `site/admin-auth.js`
 - Master Admin access is determined by the protected AegisPay profile role, not by client-side labels.
 
