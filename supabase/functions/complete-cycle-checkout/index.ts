@@ -26,12 +26,15 @@ Deno.serve(async (req: Request) => {
     if (authError || !auth.user) return json({ error: "Invalid authentication token." }, 401);
 
     const { data: profile, error: profileError } = await admin.from("users")
-      .select("id,role,status")
+      .select("id,role,status,frozen_until")
       .eq("auth_user_id", auth.user.id)
       .maybeSingle();
     if (profileError || !profile) return json({ error: "AegisPay profile not found." }, 404);
     if (profile.role !== "USER" || !["ACTIVE","NORMAL"].includes(String(profile.status || "").toUpperCase())) {
       return json({ error: "Active client access is required." }, 403);
+    }
+    if (profile.frozen_until && new Date(profile.frozen_until).getTime() > Date.now()) {
+      return json({ error: "Account is temporarily frozen for security. Shop checkout is unavailable until the freeze expires." }, 423);
     }
 
     const { data: enabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
