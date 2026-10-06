@@ -232,8 +232,69 @@ SC.reset=()=>'<div class="ap-auth">'+logo(84)+'<h1>Aegis<span style="background:
 SC.signup=()=>'<div class="ap-auth">'+logo(84)+'<h1>Aegis<span style="background:var(--g);-webkit-background-clip:text;color:transparent">Pay</span></h1><p>Create your AegisPay account</p><form class="card" id="liveSignup"><div class="ap-field"><label>Full Name</label><input id="sn" type="text" autocomplete="name" required></div><div class="ap-field"><label>Username</label><input id="su" type="text" autocomplete="username" maxlength="32" pattern="[A-Za-z0-9_]{3,32}" placeholder="letters, numbers, underscore" required></div><div class="ap-field"><label>Email</label><input id="se" type="email" autocomplete="email" required></div><div class="ap-field"><label>Password</label><input id="sp" type="password" autocomplete="new-password" minlength="8" required></div><div class="ap-field"><label>Referral Code</label><input id="sr" type="text" placeholder="Enter referral code (optional)" autocomplete="off"></div><button class="btn">Sign Up '+ic('arrow')+'</button><div style="text-align:center;margin-top:14px;font-size:13px;color:var(--c);cursor:pointer" onclick="go(\'login\')">Already have an account? Sign In</div></form></div>';
 SC.verifyPending=(email)=>'<div class="ap-auth">'+logo(84)+'<h1>Verify your <span style="background:var(--g);-webkit-background-clip:text;color:transparent">Email</span></h1><p>One final step before you can sign in</p><div class="card"><div style="text-align:center;font-size:42px;margin:4px 0 12px">✉️</div><h2 style="font-size:21px;text-align:center">Check your Gmail</h2><p class="mu" style="font-size:13px;line-height:1.6;text-align:center;margin:10px 0 18px">We sent a verification link to <b style="color:var(--t)">'+esc(email)+'</b>. Open your email and tap <b style="color:var(--c)">Verify Email</b>. You must verify your email before signing in.</p><button class="btn" id="resendVerify">Resend Verification Email</button><button class="btn o" style="margin-top:10px" onclick="go(\'login\')">I\'ve Verified — Sign In</button></div><div class="ap-secure"><div class="copy">Check your Spam/Promotions folder if you do not see the email.</div></div></div>';
 const originalGo=window.go;
-window.go=async function(id){try{if(id==='login'||id==='signup'||id==='forgot'||id==='reset')return originalGo(id);if(!profile)return originalGo('login');if(id==='home')return liveHome();if(id==='topup')return liveTopup();if(id==='withdraw')return liveWithdraw();if(id==='referral')return liveReferral();if(id==='assets')return liveAssets();if(id==='activity')return liveActivity();if(id==='account')return liveAccount();if(id==='tasks')return liveTasks();return originalGo(id)}catch(e){app.innerHTML='<div class="card" style="margin-top:30px"><h3>Unable to load</h3><p class="mu" style="margin-top:8px">'+esc(e.message)+'</p></div>'}};
-async function bootLive(){try{if(new URLSearchParams(location.search).get('verified')==='1'){history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login');setTimeout(()=>alert('Email verified successfully. You can now sign in.'),80);return}if((location.hash||'').includes('type=recovery')){window.go('reset');setTimeout(()=>{const f=document.getElementById('resetForm');if(f)f.onsubmit=async e=>{e.preventDefault();try{const rr=await db.auth.updateUser({password:rp.value});if(rr.error)throw rr.error;alert('Password updated successfully.');history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login')}catch(x){alert(x.message||'Unable to reset password')}}},0);return}const s=await db.auth.getSession();if(s.data.session){await initData();if(profile.role==='USER')return liveHome()}window.go('login');setTimeout(()=>{const f=document.getElementById('liveLogin');if(f)f.onsubmit=async e=>{e.preventDefault();try{const identifier=document.getElementById('le').value.trim(); const resolved=identifier.includes('@')?{data:identifier.toLowerCase(),error:null}:await db.rpc('resolve_login_email',{p_username:identifier.toLowerCase()}); if(resolved.error)throw resolved.error; const loginEmail=identifier.includes('@')?identifier.toLowerCase():resolved.data; if(!loginEmail)throw Error('Invalid login credentials.'); const r=await db.auth.signInWithPassword({email:loginEmail,password:document.getElementById('lp').value}); if(r.error)throw r.error;await initData();if(profile.role!=='USER')throw Error('This account does not have client access.');await liveHome()}catch(x){const msg=x.message||'Login failed';alert(/email not confirmed|email.*confirm|not verified/i.test(msg)?'Please verify your email first. Check your Gmail/Spam folder.':(/invalid login credentials/i.test(msg)?'Invalid username/email or password.':msg))}};const s=document.getElementById('liveSignup');if(s)s.onsubmit=async e=>{e.preventDefault();try{const email=document.getElementById('se').value.trim().toLowerCase();const username=document.getElementById('su').value.trim().toLowerCase();if(!/^[a-z0-9_]{3,32}$/.test(username))throw Error('Username must be 3–32 characters using letters, numbers, or underscore.');const rr=await db.functions.invoke('public-signup',{body:{email,password:document.getElementById('sp').value,name:formatName(document.getElementById('sn').value),username,referralCode:document.getElementById('sr').value.trim().toUpperCase(),preferredLanguage:'en',redirectTo:location.origin+location.pathname+'?verified=1'}});if(rr.error)throw rr.error;app.innerHTML=SC.verifyPending(email);const rb=document.getElementById('resendVerify');if(rb)rb.onclick=async()=>{try{rb.disabled=true;rb.textContent='Sending...';const r=await db.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+location.pathname+'?verified=1'}});if(r.error)throw r.error;alert('A new verification email has been sent.');rb.textContent='Resend Verification Email';rb.disabled=false}catch(x){rb.disabled=false;rb.textContent='Resend Verification Email';alert(x.message||'Unable to resend verification email.')}}}catch(x){alert(x.message||'Signup failed')}};const fp=document.getElementById('forgotForm');if(fp)fp.onsubmit=async e=>{e.preventDefault();try{const rr=await db.auth.resetPasswordForEmail(fe.value.trim().toLowerCase(),{redirectTo:location.origin+location.pathname});if(rr.error)throw rr.error;alert('Password reset link sent to your email.');window.go('login')}catch(x){alert(x.message||'Unable to send reset link')}}},0)}catch(e){window.go('login')}}window.liveLogout=liveLogout;bootLive();
+function bindAuthForms(){
+  const login=document.getElementById('liveLogin');
+  if(login && !login.dataset.bound){
+    login.dataset.bound='1';
+    login.addEventListener('submit',async e=>{
+      e.preventDefault();e.stopPropagation();
+      try{
+        const identifier=document.getElementById('le').value.trim();
+        const resolved=identifier.includes('@')?{data:identifier.toLowerCase(),error:null}:await db.rpc('resolve_login_email',{p_username:identifier.toLowerCase()});
+        if(resolved.error)throw resolved.error;
+        const loginEmail=identifier.includes('@')?identifier.toLowerCase():resolved.data;
+        if(!loginEmail)throw Error('Invalid login credentials.');
+        const r=await db.auth.signInWithPassword({email:loginEmail,password:document.getElementById('lp').value});
+        if(r.error)throw r.error;
+        await initData();
+        if(profile.role!=='USER')throw Error('This account does not have client access.');
+        await liveHome();
+      }catch(x){
+        const msg=x.message||'Login failed';
+        alert(/email not confirmed|email.*confirm|not verified/i.test(msg)?'Please verify your email first. Check your Gmail/Spam folder.':(/invalid login credentials/i.test(msg)?'Invalid username/email or password.':msg));
+      }
+    },true);
+  }
+  const signup=document.getElementById('liveSignup');
+  if(signup && !signup.dataset.bound){
+    signup.dataset.bound='1';
+    signup.addEventListener('submit',async e=>{
+      e.preventDefault();e.stopPropagation();
+      const button=signup.querySelector('button[type="submit"],button');
+      if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.textContent='Creating Account...'}
+      try{
+        const email=document.getElementById('se').value.trim().toLowerCase();
+        const username=document.getElementById('su').value.trim().toLowerCase();
+        if(!/^[a-z0-9_]{3,32}$/.test(username))throw Error('Username must be 3–32 characters using letters, numbers, or underscore.');
+        const rr=await db.functions.invoke('public-signup',{body:{
+          email,password:document.getElementById('sp').value,
+          name:formatName(document.getElementById('sn').value),
+          username,referralCode:document.getElementById('sr').value.trim().toUpperCase(),
+          preferredLanguage:'en',redirectTo:location.origin+location.pathname+'?verified=1'
+        }});
+        if(rr.error)throw rr.error;
+        app.innerHTML=SC.verifyPending(email);
+        bindAuthForms();
+        const rb=document.getElementById('resendVerify');
+        if(rb)rb.onclick=async()=>{
+          try{
+            rb.disabled=true;rb.textContent='Sending...';
+            const r=await db.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+location.pathname+'?verified=1'}});
+            if(r.error)throw r.error;
+            alert('A new verification email has been sent.');
+            rb.textContent='Resend Verification Email';rb.disabled=false;
+          }catch(x){rb.disabled=false;rb.textContent='Resend Verification Email';alert(x.message||'Unable to resend verification email.')}
+        };
+      }catch(x){
+        alert(x.message||'Signup failed');
+        if(button){button.disabled=false;button.textContent=button.dataset.originalText||'Sign Up'}
+      }
+    },true);
+  }
+}
+window.go=async function(id){try{if(id==='login'||id==='signup'||id==='forgot'||id==='reset'){const r=originalGo(id);setTimeout(bindAuthForms,0);return r}if(!profile)return originalGo('login');if(id==='home')return liveHome();if(id==='topup')return liveTopup();if(id==='withdraw')return liveWithdraw();if(id==='referral')return liveReferral();if(id==='assets')return liveAssets();if(id==='activity')return liveActivity();if(id==='account')return liveAccount();if(id==='tasks')return liveTasks();return originalGo(id)}catch(e){app.innerHTML='<div class="card" style="margin-top:30px"><h3>Unable to load</h3><p class="mu" style="margin-top:8px">'+esc(e.message)+'</p></div>'}};
+async function bootLive(){try{if(new URLSearchParams(location.search).get('verified')==='1'){history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login');setTimeout(()=>alert('Email verified successfully. You can now sign in.'),80);return}if((location.hash||'').includes('type=recovery')){window.go('reset');setTimeout(()=>{const f=document.getElementById('resetForm');if(f)f.onsubmit=async e=>{e.preventDefault();try{const rr=await db.auth.updateUser({password:document.getElementById('rp').value});if(rr.error)throw rr.error;alert('Password updated successfully.');history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login')}catch(x){alert(x.message||'Unable to reset password')}}},0);return}const s=await db.auth.getSession();if(s.data.session){await initData();if(profile.role==='USER')return liveHome()}window.go('login')}catch(e){window.go('login')}}
+window.liveLogout=liveLogout;bootLive();
 })();
 </script>
 </body>
