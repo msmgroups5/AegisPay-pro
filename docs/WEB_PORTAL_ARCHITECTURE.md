@@ -19,7 +19,7 @@ This document is the source-of-truth map for the public website, Client Portal, 
 - Production route: `/app/`
 - Source of truth: root `client.html`
 - Build destination: `site/app/index.html`
-- Local relative assets are copied into `site/app/` during every Cloudflare Pages deployment build.
+- The client source is self-contained; only required helper assets are copied into `site/app/` during deployment.
 - Client browser business/auth/runtime: root `client.html` (self-contained).
 - Client portal uses Supabase-backed account, deposit, KYC, Shop/task, referral, notification and withdrawal workflows.
 
