@@ -12,14 +12,15 @@
 - Master Admin entry: `https://aegispay-pro.pages.dev/admin/`
 - Client APK: `https://aegispay-pro.pages.dev/downloads/aegispay-client.apk`
 - Update manifest: `https://aegispay-pro.pages.dev/app-version.json`
-- Android client baseline: versionCode 33 / versionName 2.5.4
+- Android client current baseline: versionCode 38 / versionName 2.5.9
 
 ## Source-of-truth rules
 
 - Client source: root `client.html`
 - Master Admin source: root `master-admin.html`
-- Shared web runtime: root `client-auth.js`, `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
-- Shared styles/assets: root `styles.css`, `premium.css`, `shop-catalog.js`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`
+- Client source/runtime: root `client.html` (self-contained)
+- Master Admin/shared runtime: `admin-auth.js`, `supabase-client.js`, `supabase-service.js`, `aegis-auth-redirect.js`, `app-update.js`
+- Admin/shared styles/assets: root `styles.css`, `premium.css`, `shop-catalog.js`, `aegispay-logo.svg`, `manifest.webmanifest`, `service-worker.js`
 - Cloudflare Pages `site/` files are deployment artifacts generated from these canonical sources; they are not independent application sources.
 - Android client/admin flavors bundle the canonical root portals and shared assets.
 - Supabase database changes are forward-only migrations under `database/migrations/`.
