@@ -157,9 +157,10 @@ window.AegisSupabaseService={
  async updatePassword(password){
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
-  var result=await c.auth.updateUser({password:String(password||'')});
+  var result=await c.functions.invoke('complete-password-reset',{body:{password:String(password||'')}});
   if(result.error)throw result.error;
-  return result.data&&result.data.user||true;
+  if(!result.data||result.data.status!=='PASSWORD_RESET_COMPLETE')throw new Error('Password reset could not be completed.');
+  return result.data;
  },
 
  async setPreferredLanguage(language){
