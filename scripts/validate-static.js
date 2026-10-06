@@ -29,6 +29,8 @@ assert(client.includes("reset=1"),'Client password reset redirect marker is miss
 assert(client.includes('exchangeCodeForSession'),'PKCE password reset handling is missing');
 assert(client.includes("setSession({access_token:accessToken,refresh_token:refreshToken})"),'Implicit password recovery token handling is missing');
 assert(client.includes("https://aegispay-web.aegispay.workers.dev/?reset=1"),'Password reset must target the canonical Worker');
+assert(client.includes("db.rpc('link_withdrawal_wallet',{p_address:wallet,p_owner_name:profile.name})"),'Client wallet-link flow must use the owner-name protected RPC');
+assert(!client.includes("db.rpc('link_withdrawal_wallet',{p_wallet:wallet})"),'Legacy one-argument wallet RPC must not be called by the client');
 assert(!client.includes('aegispay-client1.netlify.app')&&!client.includes('aegispay-ali-archive.netlify.app'),'Legacy Netlify production redirect remains in client source');
 assert(client.includes('Secure &amp; Verified'),'Client security footer is missing');
 assert(client.includes('© 2023–2026 AegisPay'),'Client year marker is missing');
