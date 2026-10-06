@@ -75,7 +75,7 @@ assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readF
 
 const functions=[
   'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','complete-cycle-checkout','complete-password-reset',
-  'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit','complete-password-reset'
+  'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit'
 ];
 for(const f of functions)assert(exists('supabase/functions/'+f+'/index.ts'),'Missing Edge Function source: '+f);
 
