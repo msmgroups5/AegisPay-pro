@@ -71,8 +71,8 @@ Deno.serve(async (req: Request) => {
     } else if (network === "TRON MAINNET") {
       const { data: modeRow } = await admin.from("platform_settings").select("value_json").eq("key", "system_mode").maybeSingle();
       const mode = modeRow?.value_json || {};
-      if (mode.mode !== "MAINNET" || mode.real_payouts !== true) {
-        return json({ error: "Mainnet monitoring is disabled while the platform is in test mode." }, 403);
+      if (mode.mode !== "MAINNET" || mode.live_deposits !== true) {
+        return json({ error: "Mainnet deposit monitoring is disabled while live deposits are off." }, 403);
       }
       if (!TRONGRID_KEY) return json({ error: "TRONGRID_API_KEY is not configured." }, 503);
       baseUrl = "https://api.trongrid.io";
