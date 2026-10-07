@@ -45,7 +45,7 @@ Deno.serve(async (req: Request) => {
     const amount = Number(body?.amount);
     const txid = typeof body?.txid === "string" ? body.txid.trim() : "";
     const screenshotPath = typeof body?.screenshotPath === "string" ? body.screenshotPath : "";
-    if (!Number.isFinite(amount) || amount <= 0) return json({ error: "Enter a deposit amount greater than 0." }, 400);
+    if (!Number.isFinite(amount) || amount < 10) return json({ error: "Minimum deposit amount is 10 USDT." }, 400);
     if (!/^[a-f\d]{64}$/i.test(txid)) return json({ error: "Enter the 64-character TRON transaction ID." }, 400);
     if (!screenshotPath.startsWith(auth.user.id + "/deposits/")) return json({ error: "Upload the deposit screenshot first." }, 400);
 
