@@ -15,21 +15,23 @@
 
 ## Deposit
 1. Open Deposit.
-2. Enter any positive USDT amount; no fixed client-side tier or maximum/minimum is required.
+2. Enter any USDT amount from the $10 minimum upward; there is no fixed maximum.
 3. Use the displayed TRON receiving address and correct network.
 4. Send the amount entered in the deposit screen.
 5. Upload a clear transaction screenshot.
 6. Make sure the TXID is visible.
-7. Paste or scan the TXID.
+7. Enter the TXID.
 8. Submit for verification.
 9. Only verified deposits appear in your dashboard.
+10. After the deposit is verified, choose one of the six available tiers. Profit-bearing Shop tasks are not assigned until a tier is selected.
 
 ## Shop / tasks
-1. Open Shop after your deposit is verified.
-2. The system automatically opens a Shop task cycle while your available balance is above $0 and no Shop cycle is currently open or waiting for settlement.
-3. Master Admin does not need to manually assign tasks for the normal cycle flow.
-4. Complete the full assigned offer/task set.
-5. When all tasks are complete, the cycle enters the 18-hour settlement state.
+1. Select one of the six available tiers after your verified balance is credited.
+2. The selected tier must be covered by your available balance.
+3. The system automatically assigns a Shop task cycle after tier selection when eligible.
+4. Master Admin does not need to manually assign tasks for the normal cycle flow.
+5. Complete each assigned task individually using its Complete button.
+6. When the final task is completed, the cycle automatically enters the 18-hour settlement state.
 6. After 18 hours, the configured cycle profit is credited.
 7. The next Shop cycle is automatically opened from the accumulated available balance, so the cycle can continue compounding.
 8. Automatic task assignment stops when the user's available balance reaches $0.
