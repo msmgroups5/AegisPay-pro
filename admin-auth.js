@@ -53,17 +53,17 @@ function money(v){return Number(v||0).toLocaleString('en-US',{minimumFractionDig
 function date(v){try{return new Date(v).toLocaleString();}catch(e){return v||'—';}}
 function initials(name){return String(name||'A').trim().slice(0,1).toUpperCase()||'A';}
 function aegisLogo(size){
-  const w=Number(size||270), h=Math.round(w*0.78);
-  return '<svg class="aa-aegis-logo" width="'+w+'" height="'+h+'" viewBox="0 0 360 280" role="img" aria-label="AegisPay" xmlns="http://www.w3.org/2000/svg">'+
-    '<defs>'+
-      '<linearGradient id="aegisShield" x1="70" y1="20" x2="285" y2="250" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#815DFF"/><stop offset=".52" stop-color="#4967C9"/><stop offset="1" stop-color="#18BFD0"/></linearGradient>'+
-      '<linearGradient id="aegisWord" x1="60" y1="160" x2="305" y2="205" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E7D7BE"/><stop offset=".48" stop-color="#D7C9B4"/><stop offset=".66" stop-color="#7C64C9"/><stop offset="1" stop-color="#1FBBD0"/></linearGradient>'+
-    '</defs>'+
-    '<path d="M180 12 286 57v69c0 67-42 111-106 133C116 237 74 193 74 126V57z" fill="url(#aegisShield)"/>'+
-    '<path d="M180 58 232 184h-34l-18-41-18 41h-34z" fill="#070A12"/>'+
-    '<text x="180" y="214" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="700" letter-spacing="-2.5" fill="url(#aegisWord)">Aegis<tspan fill="#6B64C9">P</tspan><tspan fill="#3F78C8">a</tspan><tspan fill="#1FBBD0">y</tspan></text>'+
-    '<text x="180" y="248" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#B9B7C4">Your Payments, Your Way</text>'+
-  '</svg>';
+  const w=Number(size||188);
+  const mark=Math.max(52,Math.round(w*.30));
+  const gradId='aaG'+String(w).replace(/\\W/g,'');
+  return '<div class="aa-logo-lockup" style="--aa-logo-width:'+w+'px">'+
+    '<svg class="aa-logo-mark" width="'+mark+'" height="'+mark+'" viewBox="0 0 48 48" role="img" aria-label="AegisPay" xmlns="http://www.w3.org/2000/svg">'+
+      '<defs><linearGradient id="'+gradId+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C5CFF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs>'+
+      '<path d="M24 3 6 11v12c0 11 8 19 18 22 10-3 18-11 18-22V11z" fill="url(#'+gradId+')"/>'+
+      '<path d="M24 14 33 34h-6l-3-7-3 7h-6z" fill="#070A16" opacity=".9"/>'+
+    '</svg>'+
+    '<div class="aa-logo-copy"><div>Aegis<span>Pay</span></div><small>Your Payments, Your Way</small></div>'+
+  '</div>';
 }
 function shell(body){
   return '<div class="aa-shell">'+
@@ -191,16 +191,18 @@ function mini(label,value,meta){
 }
 
 function users(){
-  const rows=state.users.filter(u=>u.role==='USER').map(u=>{
+  const rows=state.users.filter(u=>u.role==='USER' && String(u.status||'').toUpperCase()!=='DELETED').map(u=>{
     const st=String(u.status||'NORMAL').toUpperCase();
     return '<article class="aa-user-card"><div class="aa-user-main"><div class="aa-avatar">'+esc(initials(u.name))+'</div><div><strong>'+esc(u.name||'Unnamed')+'</strong><small>'+esc(u.username||'—')+' · '+esc(u.email||'—')+'</small><small>Balance '+money(u.current_platform_balance)+' USDT · '+esc(st)+'</small></div></div>'+
       '<div class="aa-user-meta"><span>Principal <b>'+money(u.principal_balance)+'</b></span><span>Profit <b>'+money(u.profit_balance)+'</b></span><span>Wallet <b>'+esc(u.destination_address||'Not linked')+'</b></span></div>'+
       '<div class="aa-actions">'+
-      (st==='FROZEN'?'<button class="aa-secondary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="NORMAL">Unfreeze</button>':'<button class="aa-secondary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="FROZEN">Freeze</button>')+
-      '<button class="aa-danger" data-action="user-status" data-id="'+esc(u.id)+'" data-status="BLOCKED">Block</button>'+
+      (st==='FROZEN'?'<button class="aa-primary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="NORMAL">Unfreeze</button>':'<button class="aa-primary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="FROZEN">Freeze</button>')+
+      '<button class="aa-primary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="BLOCKED">Block</button>'+
       '<button class="aa-primary" data-action="balance-adjust" data-type="CREDIT" data-id="'+esc(u.id)+'">+ Add Credit</button>'+
-      '<button class="aa-secondary" data-action="balance-adjust" data-type="REVERSAL" data-id="'+esc(u.id)+'">− Remove Credit</button>'+
-      '<button class="aa-secondary" data-action="wallet-change" data-id="'+esc(u.id)+'">Change Wallet</button>'+
+      '<button class="aa-primary" data-action="balance-adjust" data-type="REVERSAL" data-id="'+esc(u.id)+'">− Remove Credit</button>'+
+      '<button class="aa-primary" data-action="wallet-change" data-id="'+esc(u.id)+'">Change Wallet</button>'+
+      '<button class="aa-primary" data-action="profile-edit" data-id="'+esc(u.id)+'">Edit Profile</button>'+
+      '<button class="aa-primary" data-action="user-remove" data-id="'+esc(u.id)+'">Remove User</button>'+
       '</div></article>';
   }).join('');
   return '<main class="aa-main">'+pageHeader('ACCOUNT CONTROL','Client Users','Manage account status, balances and locked withdrawal wallets.')+
@@ -469,14 +471,41 @@ async function userStatus(el){
 async function balanceAdjust(el){
   const type=String(el.dataset.type||'CREDIT').toUpperCase();
   const label=type==='CREDIT'?'Add Credit':'Remove Credit';
-  const defaultReason=type==='CREDIT'?'TEST CREDIT':'TEST CREDIT REVERSAL';
   const amount=Number(window.prompt(label+' — amount in USDT','55'));
   if(!Number.isFinite(amount)||amount<=0){state.error='Enter a positive USDT amount.';render();return;}
-  const reason=window.prompt('Reason',defaultReason)||defaultReason;
   await setBusy(async function(){
+    const reason=type==='CREDIT'?'MASTER ADMIN CREDIT':'MASTER ADMIN REVERSAL';
     const r=await service.invokeFunction('admin-account-ops',{body:{action:'balance',userId:el.dataset.id,amount,type,reason}});
     if(r.error)throw r.error;
-    await refreshData();
+    const u=state.users.find(function(x){return x.id===el.dataset.id;});
+    if(u){
+      u.current_platform_balance=Number(r.data?.balance??u.current_platform_balance??0);
+      if(r.data?.manualCreditBalance!=null)u.manual_credit_balance=Number(r.data.manualCreditBalance);
+    }
+  });
+}
+async function profileEdit(el){
+  const u=state.users.find(function(x){return x.id===el.dataset.id;});
+  if(!u)return;
+  const name=window.prompt('Full name',u.name||'');
+  if(name===null)return;
+  const username=window.prompt('Username',u.username||'');
+  if(username===null)return;
+  await setBusy(async function(){
+    const r=await service.invokeFunction('admin-account-ops',{body:{action:'profile',userId:el.dataset.id,name:name.trim(),username:username.trim().toLowerCase()}});
+    if(r.error)throw r.error;
+    const target=state.users.find(function(x){return x.id===el.dataset.id;});
+    if(target){target.name=r.data?.name??name.trim();target.username=r.data?.username??username.trim().toLowerCase();}
+  });
+}
+async function userRemove(el){
+  const u=state.users.find(function(x){return x.id===el.dataset.id;});
+  if(!u)return;
+  if(!window.confirm('Remove '+(u.name||'this user')+' from active client accounts?'))return;
+  await setBusy(async function(){
+    const r=await service.invokeFunction('admin-account-ops',{body:{action:'remove',userId:el.dataset.id}});
+    if(r.error)throw r.error;
+    state.users=state.users.filter(function(x){return x.id!==el.dataset.id;});
   });
 }
 async function walletChange(el){
@@ -555,6 +584,8 @@ root.addEventListener('click',function(e){
   if(action==='user-status'){userStatus(el);return;}
   if(action==='balance-adjust'){balanceAdjust(el);return;}
   if(action==='wallet-change'){walletChange(el);return;}
+  if(action==='profile-edit'){profileEdit(el);return;}
+  if(action==='user-remove'){userRemove(el);return;}
   if(action==='toggle-offer'){toggleOffer(el);return;}
 });
 
