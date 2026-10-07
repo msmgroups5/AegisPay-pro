@@ -279,6 +279,10 @@ function bindAuthForms(){
         if(r.error)throw r.error;
         await initData();
         if(profile.role!=='USER')throw Error('This account does not have client access.');
+        if(!['ACTIVE','NORMAL'].includes(String(profile.status||'').toUpperCase())){
+          await db.auth.signOut();
+          throw Error('This account is not active.');
+        }
         await liveHome();
       }catch(x){
         const msg=x.message||'Login failed';
@@ -406,7 +410,7 @@ if(qs.get('reset')==='1' || qs.has('code') || qs.get('type')==='recovery' || has
   },0);
   return;
 }
-const s=await db.auth.getSession();if(s.data.session){await initData();if(profile.role==='USER')return liveHome()}window.go('login')}catch(e){window.go('login')}}
+const s=await db.auth.getSession();if(s.data.session){await initData();if(profile.role==='USER'){if(!['ACTIVE','NORMAL'].includes(String(profile.status||'').toUpperCase())){await db.auth.signOut();throw Error('This account is not active.');}return liveHome()}}window.go('login')}catch(e){window.go('login')}}
 window.liveLogout=liveLogout;bootLive();
 })();
 </script>
