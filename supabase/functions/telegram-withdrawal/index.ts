@@ -130,13 +130,28 @@ async function sendWithdrawal(admin: ReturnType<typeof client>, withdrawalId: st
   if (!["PENDING_APPROVAL", "APPROVED"].includes(w.status) || w.telegram_decision !== "PENDING") {
     throw new Error("This withdrawal is no longer awaiting Telegram approval.");
   }
-  const { data: u } = await admin.from("users").select("name,email").eq("id", w.user_id).maybeSingle();
+  const { data: u } = await admin.from("users")
+    .select("name,email,status,current_platform_balance,withdrawal_held,destination_address")
+    .eq("id", w.user_id).maybeSingle();
+  const { data: kyc } = await admin.from("kyc_verifications")
+    .select("status").eq("user_id", w.user_id).eq("status", "VERIFIED").limit(1).maybeSingle();
+  if (!u || !["ACTIVE","NORMAL"].includes(String(u.status || "").toUpperCase())) {
+    throw new Error("Client account is not active.");
+  }
+  if (!u.destination_address || String(u.destination_address) !== String(w.destination_address)) {
+    throw new Error("Withdrawal wallet validation failed.");
+  }
+  if (!kyc) throw new Error("KYC is not verified.");
+  if (!Number.isFinite(Number(w.amount)) || Number(w.amount) <= 0) {
+    throw new Error("Withdrawal amount validation failed.");
+  }
   const text = "AegisPay withdrawal approval\n\nRequest: " + w.id +
     "\nClient: " + String(u?.name || "Unknown client").slice(0, 120) +
     "\nAmount: " + Number(w.amount).toFixed(2) + " USDT" +
     "\nFee: " + Number(w.fee_amount).toFixed(2) + " USDT" +
     "\nNet payout: " + Number(w.net_amount).toFixed(2) + " USDT" +
     "\nTRON wallet: " + String(w.destination_address).slice(0, 60) +
+    "\nValidation: PASSED" +
     "\nMaster Admin: " + String(w.panel_decision || "PENDING");
   const sent = await telegram("sendMessage", {
     chat_id: CHAT, text,
