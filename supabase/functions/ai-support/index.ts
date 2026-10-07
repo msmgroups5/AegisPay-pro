@@ -153,46 +153,150 @@ async function loadSupportContext(admin: ReturnType<typeof createClient>, profil
   return normalizeContext(user, tier, cycleR.data, taskR.data || [], kycR.data, withdrawalR.data, referralR.data || []);
 }
 
-function fallback(message: string, ctx: SupportContext) {
-  const q = message.toLowerCase();
+function fallback(message: string, ctx: SupportContext, history: Array<{role:string;content:string}> = []) {
+  const q = message.toLowerCase().trim();
   const money = (v: number) => v.toFixed(2) + " USDT";
+  const hasUrduScript = /[\u0600-\u06ff]/.test(message);
+  const roman = (en: string, ru: string, ur: string) => hasUrduScript ? ur : /\b(mera|meri|mujhe|kaise|kyun|kahan|kitna|batao|hai|hain|kr|kar|karo|chahiye|nahi|apka|aap)\b/i.test(message) ? ru : en;
+
+  // Lightweight intent router used when the external LLM provider is unavailable.
+  // It deliberately answers the user's actual intent instead of returning a generic capability list.
+  if (/\b(change|edit|update|modify)\b/.test(q) && /\b(name|profile name|username|display name)\b/.test(q)) {
+    return roman(
+      "Your profile name cannot currently be changed from the client portal. Open Profile to review your account details; for an authorized name change, contact Master Admin/support.",
+      "Abhi client portal mein profile name direct change nahi hota. Profile open karke account details check kar sakte hain; authorized name change ke liye Master Admin/support se contact karein.",
+      "فی الحال کلائنٹ پورٹل سے پروفائل نام براہِ راست تبدیل نہیں کیا جا سکتا۔ Profile میں اپنی details دیکھیں، اور نام تبدیل کروانے کے لیے Master Admin/support سے رابطہ کریں۔"
+    );
+  }
+
+  if (/\b(change|edit|update|modify)\b/.test(q) && /\b(username|client id|id)\b/.test(q)) {
+    return roman(
+      "Your username is used as your memorable Client ID where available. Client IDs are not changed from the client portal; please contact Master Admin/support for an authorized change.",
+      "Aapka username hi memorable Client ID ke taur par use hota hai. Client ID client portal se change nahi hoti; authorized change ke liye Master Admin/support se contact karein.",
+      "آپ کا username ہی دستیاب ہونے کی صورت میں آپ کی یاد رہنے والی Client ID کے طور پر استعمال ہوتا ہے۔ Client ID کلائنٹ پورٹل سے تبدیل نہیں کی جا سکتی؛ authorized change کے لیے Master Admin/support سے رابطہ کریں۔"
+    );
+  }
+
+  if (/\b(profile|account|personal details|account details)\b/.test(q) && !/\b(change|edit|update|modify)\b/.test(q)) {
+    return roman(
+      "Open Profile from the bottom navigation. You can review your name, Client ID, email, referral code and linked withdrawal wallet there.",
+      "Neeche Profile par jaa kar apna name, Client ID, email, referral code aur linked withdrawal wallet dekh sakte hain.",
+      "نیچے Profile کھول کر اپنا نام، Client ID، ای میل، referral code اور linked withdrawal wallet دیکھ سکتے ہیں۔"
+    );
+  }
 
   if (/\b(balance|available|kitna|kitni|paisa|funds|wallet)\b/.test(q)) {
-    return "Your current total balance is " + money(ctx.account.total_balance_usdt) +
+    return roman(
+      "Your current total balance is " + money(ctx.account.total_balance_usdt) +
       ", and your available balance is " + money(ctx.account.available_balance_usdt) +
-      ". " + (ctx.account.withdrawal_held_usdt > 0 ? money(ctx.account.withdrawal_held_usdt) + " is currently held for a pending withdrawal." : "There is no withdrawal hold on the balance.");
+      ". " + (ctx.account.withdrawal_held_usdt > 0 ? money(ctx.account.withdrawal_held_usdt) + " is currently held for a pending withdrawal." : "There is no withdrawal hold on the balance."),
+      "Aapka total balance " + money(ctx.account.total_balance_usdt) +
+      " hai aur available balance " + money(ctx.account.available_balance_usdt) +
+      " hai. " + (ctx.account.withdrawal_held_usdt > 0 ? money(ctx.account.withdrawal_held_usdt) + " pending withdrawal ke liye hold hai." : "Balance par koi withdrawal hold nahi hai."),
+      "آپ کا کل بیلنس " + money(ctx.account.total_balance_usdt) +
+      " ہے اور available balance " + money(ctx.account.available_balance_usdt) +
+      " ہے۔ " + (ctx.account.withdrawal_held_usdt > 0 ? money(ctx.account.withdrawal_held_usdt) + " pending withdrawal کے لیے hold ہے۔" : "بیلنس پر کوئی withdrawal hold نہیں ہے۔")
+    );
   }
-  if (/\b(deposit|top.?up|jama|add funds|fund add)\b/.test(q)) {
-    return "For a deposit, open Top Up, select the required tier, use the configured TRON network (TRC20), then submit the payment screenshot and TXID. Balance is credited only after evidence review and a confirmed matching transfer.";
+
+  if (/\b(deposit|top.?up|jama|add funds|fund add|pay in)\b/.test(q)) {
+    return roman(
+      "To deposit, open Top Up, enter the amount you want to send, use the displayed TRON receiving address, then submit the TXID and payment screenshot for verification. There is no fixed client-side tier selection.",
+      "Deposit ke liye Top Up open karein, jitni amount deposit karni hai enter karein, displayed TRON address par payment bhejein, phir TXID aur screenshot verification ke liye submit karein. Fixed tier select karne ki zaroorat nahi.",
+      "Deposit کے لیے Top Up کھولیں، جتنی رقم جمع کرنی ہے وہ درج کریں، دکھائے گئے TRON address پر payment بھیجیں، پھر TXID اور screenshot verification کے لیے submit کریں۔ Fixed tier select کرنے کی ضرورت نہیں۔"
+    );
   }
+
   if (/\b(shop|task|tasks|checkout|cycle|settlement|18.?h|18 hours)\b/.test(q)) {
     const cycle = ctx.shop.cycle_status
       ? "Your current Shop cycle is " + ctx.shop.cycle_status + " with a base of " + money(ctx.shop.cycle_base_usdt) + "."
       : "You do not currently have an active Shop cycle.";
-    return cycle + " You have " + ctx.shop.pending_tasks + " pending task(s) and " + ctx.shop.completed_tasks + " completed. Complete the full task set to start the 18-hour settlement timer.";
+    const detail = " You have " + ctx.shop.pending_tasks + " pending task(s) and " + ctx.shop.completed_tasks + " completed.";
+    const next = ctx.shop.pending_tasks > 0
+      ? " Complete the remaining tasks, then use checkout to start the 18-hour settlement timer."
+      : ctx.shop.completed_tasks > 0 && ctx.shop.cycle_status === "WAITING_18H"
+        ? " All tasks are complete; the 18-hour settlement timer is already running."
+        : "";
+    return roman(
+      cycle + detail + next,
+      (ctx.shop.cycle_status ? "Aapka current Shop cycle " + ctx.shop.cycle_status + " hai aur base " + money(ctx.shop.cycle_base_usdt) + " hai." : "Abhi koi active Shop cycle nahi hai.")
+        + detail.replace("pending task(s)","pending task(s)").replace("completed.","complete hue hain.")
+        + next.replace("Complete the remaining tasks, then use checkout to start the 18-hour settlement timer.","Baaki tasks complete karein, phir checkout karein taa-ke 18-hour settlement timer start ho.")
+          .replace("All tasks are complete; the 18-hour settlement timer is already running.","Saare tasks complete hain; 18-hour settlement timer already chal raha hai."),
+      (ctx.shop.cycle_status ? "آپ کا موجودہ Shop cycle " + ctx.shop.cycle_status + " ہے اور base " + money(ctx.shop.cycle_base_usdt) + " ہے۔" : "اس وقت کوئی active Shop cycle نہیں ہے۔")
+        + " " + ctx.shop.pending_tasks + " pending task(s) اور " + ctx.shop.completed_tasks + " completed ہیں۔"
+        + (ctx.shop.pending_tasks > 0 ? " باقی tasks complete کرکے checkout کریں تاکہ 18-hour settlement timer start ہو۔" : ctx.shop.cycle_status === "WAITING_18H" ? " تمام tasks مکمل ہیں اور 18-hour settlement timer چل رہا ہے۔" : "")
+    );
   }
-  if (/\b(withdraw|withdrawal|cash.?out|payout|nikal|fee)\b/.test(q)) {
-    if (ctx.withdrawal.status) {
-      return "Your latest withdrawal is " + String(ctx.withdrawal.status) + " for " + money(ctx.withdrawal.amount_usdt) +
-        ". The fee is " + money(ctx.withdrawal.fee_usdt) + " and the net amount is " + money(ctx.withdrawal.net_usdt) + ".";
-    }
-    return "Withdrawals require verified KYC and a linked TRON wallet. The request then needs Master Admin approval plus the configured Telegram approval.";
-  }
-  if (/\b(kyc|cnic|passport|verification|verify)\b/.test(q)) {
-    return ctx.kyc.status
-      ? "Your latest KYC status is " + ctx.kyc.status + (ctx.kyc.ai_review_status ? " (AI review: " + ctx.kyc.ai_review_status + ")." : ".")
-      : "No KYC submission is currently recorded. Upload clear CNIC or Passport images to start verification.";
-  }
-  if (/\b(referr|invite|bonus|reward)\b/.test(q)) {
-    return "You currently have " + ctx.referrals.total + " referral record(s): " + ctx.referrals.level_1 +
-      " at Level 1 and " + ctx.referrals.level_2 + " at Level 2, with recorded referral rewards of " + money(ctx.referrals.reward_usdt) + ".";
-  }
-  if (/\b(password|forgot|reset|login|sign.?in|account locked)\b/.test(q)) {
-    return "For password help, use Forgot Password on the login screen. The reset link is sent to your registered email. After a successful reset, the account is temporarily frozen for security.";
-  }
-  return "I can understand and answer AegisPay questions about deposits, Shop/tasks, withdrawals, KYC, referrals, login/password help, account status and navigation. You can ask in English, Urdu or Roman Urdu. I cannot approve transactions or change balances.";
-}
 
+  if (/\b(withdraw|withdrawal|cash.?out|payout|nikal|nikalne|fee|fees|withdrawl)\b/.test(q)) {
+    if (ctx.withdrawal.status) {
+      return roman(
+        "Your latest withdrawal is " + String(ctx.withdrawal.status) + " for " + money(ctx.withdrawal.amount_usdt) +
+        ". The recorded fee is " + money(ctx.withdrawal.fee_usdt) + " and the net amount is " + money(ctx.withdrawal.net_usdt) + ".",
+        "Aapki latest withdrawal " + String(ctx.withdrawal.status) + " hai, amount " + money(ctx.withdrawal.amount_usdt) +
+        ". Recorded fee " + money(ctx.withdrawal.fee_usdt) + " hai aur net " + money(ctx.withdrawal.net_usdt) + ".",
+        "آپ کی تازہ ترین withdrawal " + String(ctx.withdrawal.status) + " ہے، رقم " + money(ctx.withdrawal.amount_usdt) +
+        " ہے۔ Recorded fee " + money(ctx.withdrawal.fee_usdt) + " ہے اور net amount " + money(ctx.withdrawal.net_usdt) + " ہے۔"
+      );
+    }
+    return roman(
+      "Withdrawals require verified KYC and a linked TRON wallet. After submission, the request follows the configured approval workflow.",
+      "Withdrawal ke liye verified KYC aur linked TRON wallet zaroori hai. Submit karne ke baad request configured approval workflow mein jati hai.",
+      "Withdrawal کے لیے verified KYC اور linked TRON wallet ضروری ہے۔ Submit کرنے کے بعد request configured approval workflow میں جاتی ہے۔"
+    );
+  }
+
+  if (/\b(kyc|cnic|passport|verification|verify)\b/.test(q)) {
+    return roman(
+      ctx.kyc.status
+        ? "Your latest KYC status is " + ctx.kyc.status + (ctx.kyc.ai_review_status ? " (AI review: " + ctx.kyc.ai_review_status + ")." : ".")
+        : "No KYC submission is currently recorded. Upload clear CNIC or Passport images to start verification.",
+      ctx.kyc.status
+        ? "Aapki latest KYC status " + ctx.kyc.status + (ctx.kyc.ai_review_status ? " hai (AI review: " + ctx.kyc.ai_review_status + ")." : ".")
+        : "Abhi koi KYC submission record nahi hai. Clear CNIC ya Passport images upload karke verification start karein.",
+      ctx.kyc.status
+        ? "آپ کی تازہ ترین KYC status " + ctx.kyc.status + (ctx.kyc.ai_review_status ? " ہے (AI review: " + ctx.kyc.ai_review_status + ")" : "۔")
+        : "اس وقت کوئی KYC submission record نہیں ہے۔ واضح CNIC یا Passport images upload کرکے verification شروع کریں۔"
+    );
+  }
+
+  if (/\b(referr|invite|bonus|reward)\b/.test(q)) {
+    return roman(
+      "You currently have " + ctx.referrals.total + " referral record(s): " + ctx.referrals.level_1 +
+      " at Level 1 and " + ctx.referrals.level_2 + " at Level 2, with recorded referral rewards of " + money(ctx.referrals.reward_usdt) + ".",
+      "Aapke " + ctx.referrals.total + " referral record(s) hain: Level 1 mein " + ctx.referrals.level_1 +
+      " aur Level 2 mein " + ctx.referrals.level_2 + ". Recorded referral rewards " + money(ctx.referrals.reward_usdt) + " hain.",
+      "آپ کے " + ctx.referrals.total + " referral record(s) ہیں: Level 1 میں " + ctx.referrals.level_1 +
+      " اور Level 2 میں " + ctx.referrals.level_2 + "۔ Recorded referral rewards " + money(ctx.referrals.reward_usdt) + " ہیں۔"
+    );
+  }
+
+  if (/\b(password|forgot|reset|login|sign.?in|account locked)\b/.test(q)) {
+    return roman(
+      "For password help, use Forgot Password on the login screen. The reset link is sent to your registered email. A successful password reset temporarily freezes the account for security.",
+      "Password help ke liye login screen par Forgot Password use karein. Reset link registered email par aata hai. Successful password reset ke baad security ke liye account temporarily freeze hota hai.",
+      "Password help کے لیے login screen پر Forgot Password استعمال کریں۔ Reset link آپ کی registered email پر بھیجا جاتا ہے۔ Password reset کے بعد security کے لیے account عارضی طور پر freeze ہو جاتا ہے۔"
+    );
+  }
+
+  if (/\b(help|how do i|how to|kaise|kese|what is|what does|where is|where can|can i|can you|why|kyun|reason|issue|problem|not working)\b/.test(q) && history.length) {
+    const prev = history.filter(x => x.role === "user").slice(-1)[0]?.content || "";
+    if (prev) {
+      return roman(
+        "I understand you're asking for help with: " + prev + ". Please tell me the exact step or screen where you are stuck, and I'll guide you from there.",
+        "Samajh gaya — aap is maslay mein help chahte hain: " + prev + ". Batayein kis exact step ya screen par ruk rahe hain, main wahin se guide karta hoon.",
+        "سمجھ گیا — آپ اس مسئلے میں مدد چاہتے ہیں: " + prev + "۔ بتائیں آپ کس exact step یا screen پر رکے ہوئے ہیں، میں وہیں سے guide کرتا ہوں۔"
+      );
+    }
+  }
+
+  return roman(
+    "I understand AegisPay support questions and will answer based on your account and platform rules. Tell me what you are trying to do or what is not working, and I will guide you step by step.",
+    "Main AegisPay support questions samajh kar aapke account aur platform rules ke mutabiq guide kar sakta hoon. Batayein aap kya karna chahte hain ya kis jagah problem aa rahi hai, main step by step help karta hoon.",
+    "میں AegisPay support کے سوالات آپ کے account اور platform rules کے مطابق سمجھ کر guide کر سکتا ہوں۔ بتائیں آپ کیا کرنا چاہتے ہیں یا کہاں مسئلہ آ رہا ہے، میں step by step مدد کرتا ہوں۔"
+  );
+}
 async function actor(req: Request, admin: ReturnType<typeof createClient>) {
   const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   if (!token) throw new Response("Authorization required.", { status: 401 });
@@ -234,7 +338,7 @@ Deno.serve(async (req: Request) => {
     const context = await loadSupportContext(admin, profile);
 
     if (!AI_ENDPOINT || !AI_KEY || !AI_MODEL) {
-      return json({ configured: false, answer: fallback(message, context), degraded: true });
+      return json({ configured: false, answer: fallback(message, context, history), degraded: true });
     }
 
     const systemPrompt = [
