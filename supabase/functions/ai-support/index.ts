@@ -27,6 +27,7 @@ function completionUrl(value: string) {
 type SupportContext = {
   account: {
     name: string;
+    display_name: string;
     status: string;
     total_balance_usdt: number;
     available_balance_usdt: number;
