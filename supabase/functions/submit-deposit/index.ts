@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
       .select("id,name,deposit_amount,enabled").eq("id", tierId).maybeSingle();
     if (tierError || !tier || !tier.enabled) return json({ error: "Selected deposit tier is unavailable." }, 400);
     if (amount !== Number(tier.deposit_amount)) return json({ error: "Deposit amount must match the selected tier." }, 400);
-    const minimum = profile.first_deposit_done ? 10 : 30;
+    const minimum = 5;
     if (amount < minimum) return json({ error: "The minimum deposit for this account is $" + minimum + "." }, 400);
 
     const settings = await admin.from("platform_settings").select("value_json").eq("key", "deposit_rules").maybeSingle();
