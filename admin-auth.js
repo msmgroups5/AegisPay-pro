@@ -53,17 +53,18 @@ function money(v){return Number(v||0).toLocaleString('en-US',{minimumFractionDig
 function date(v){try{return new Date(v).toLocaleString();}catch(e){return v||'—';}}
 function initials(name){return String(name||'A').trim().slice(0,1).toUpperCase()||'A';}
 function aegisLogo(size){
-  const w=Number(size||240),h=Math.round(w*0.36);
-  return '<svg class="aa-aegis-logo" width="'+w+'" height="'+h+'" viewBox="0 0 300 108" role="img" aria-label="AegisPay" xmlns="http://www.w3.org/2000/svg">'+
-    '<defs><linearGradient id="aaLG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C5CFF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient><linearGradient id="aaTG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EAF0FF"/><stop offset=".55" stop-color="#8D97BD"/><stop offset="1" stop-color="#6D789F"/></linearGradient></defs>'+
-    '<path d="M150 4 104 24v28c0 24 18 43 46 51 28-8 46-27 46-51V24z" fill="url(#aaLG)"/>'+
-    '<path d="M150 17 173 67h-15l-8-18-8 18h-15z" fill="#070A16" opacity=".88"/>'+
-    '<text x="82" y="82" text-anchor="end" font-family="Poppins,Arial,sans-serif" font-size="41" font-weight="700" font-style="italic" fill="#EAF0FF">Aegis</text>'+
-    '<text x="160" y="82" font-family="Poppins,Arial,sans-serif" font-size="41" font-weight="700" font-style="italic" fill="#FF6B7A">Pay</text>'+
-    '<text x="150" y="101" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9.5" font-weight="500" letter-spacing=".35" fill="url(#aaTG)">Your Payments, Your Way</text>'+
+  const w=Number(size||270), h=Math.round(w*0.78);
+  return '<svg class="aa-aegis-logo" width="'+w+'" height="'+h+'" viewBox="0 0 360 280" role="img" aria-label="AegisPay" xmlns="http://www.w3.org/2000/svg">'+
+    '<defs>'+
+      '<linearGradient id="aegisShield" x1="70" y1="20" x2="285" y2="250" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#815DFF"/><stop offset=".52" stop-color="#4967C9"/><stop offset="1" stop-color="#18BFD0"/></linearGradient>'+
+      '<linearGradient id="aegisWord" x1="60" y1="160" x2="305" y2="205" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E7D7BE"/><stop offset=".48" stop-color="#D7C9B4"/><stop offset=".66" stop-color="#7C64C9"/><stop offset="1" stop-color="#1FBBD0"/></linearGradient>'+
+    '</defs>'+
+    '<path d="M180 12 286 57v69c0 67-42 111-106 133C116 237 74 193 74 126V57z" fill="url(#aegisShield)"/>'+
+    '<path d="M180 58 232 184h-34l-18-41-18 41h-34z" fill="#070A12"/>'+
+    '<text x="180" y="214" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="700" letter-spacing="-2.5" fill="url(#aegisWord)">Aegis<tspan fill="#6B64C9">P</tspan><tspan fill="#3F78C8">a</tspan><tspan fill="#1FBBD0">y</tspan></text>'+
+    '<text x="180" y="248" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#B9B7C4">Your Payments, Your Way</text>'+
   '</svg>';
 }
-
 function shell(body){
   return '<div class="aa-shell">'+
     '<header class="aa-top">'+
