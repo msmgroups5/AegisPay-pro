@@ -125,7 +125,9 @@ Deno.serve(async (req: Request) => {
       status = "REJECTED";
       aiStatus = "REJECTED";
     } else if (completeMatch) {
-      status = "VERIFIED";
+      // AI may complete the document precheck, but final identity verification
+      // remains a human-admin decision.
+      status = "MANUAL_REVIEW";
       aiStatus = "APPROVED";
     }
 
@@ -149,6 +151,8 @@ Deno.serve(async (req: Request) => {
         ? "KYC verified. Withdrawals are now enabled."
         : status === "REJECTED"
         ? "The uploaded images were unclear or did not match the profile. Upload correct images to apply again."
+        : aiStatus === "APPROVED"
+        ? "AI precheck passed. Your identity documents are waiting for final Master Admin approval."
         : "KYC is awaiting a secure review. Withdrawals remain locked until verification is complete.",
     }, status === "VERIFIED" ? 200 : 202);
   } catch {
