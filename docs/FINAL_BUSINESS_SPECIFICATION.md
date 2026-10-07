@@ -12,7 +12,7 @@ The previous Nodes and separate Admin UI concepts are retired.
 
 ## 2. Client account
 Client signup creates:
-- Unique User ID
+- Username-based Client ID (with a stable 6-digit fallback where needed)
 - Name
 - Email
 - Password/authentication state
@@ -29,7 +29,8 @@ Only Master Admin can change it.
 The prototype also requires the wallet owner name to match the signup name.
 
 ## 4. Deposit
-Client selects one of six tiers and submits a USDT deposit on TRON.
+Client enters any positive USDT deposit amount; the client does not select a fixed deposit tier or see a client-side minimum, maximum, or fixed deposit fee.
+The backend associates the deposit with an internal enabled tier for accounting/cycle compatibility.
 The prototype is configured for TRON TESTNET only.
 Transaction screenshot is mandatory.
 The TXID must be available for the verification workflow.
@@ -140,6 +141,7 @@ Live payout execution is disabled in the prototype.
 ## 15. UI
 Client:
 Dashboard, Deposit, Shop, Referrals, Withdraw, Activity, Notifications, AI Assistant, Profile.
+The client notification bell opens an in-app notifications view with unread/read state; workflow notices are rendered inside the UI rather than browser alert popups.
 
 Master Admin:
 Overview, Users, Withdrawals, Credits, Settings, Telegram.
