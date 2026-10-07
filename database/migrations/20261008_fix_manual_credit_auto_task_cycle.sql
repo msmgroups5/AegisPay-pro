@@ -66,6 +66,7 @@ BEGIN
   FROM public.vip_tiers
   WHERE id = u.selected_tier_id
     AND enabled = true
+    AND COALESCE(deposit_amount,0) <= available_balance
   FOR SHARE;
 
   IF t.id IS NULL THEN
@@ -73,6 +74,8 @@ BEGIN
     FROM public.cycle_runs cr
     JOIN public.vip_tiers vt ON vt.id = cr.tier_id
     WHERE cr.user_id = u.id
+      AND vt.enabled = true
+      AND COALESCE(vt.deposit_amount,0) <= available_balance
     ORDER BY cr.created_at DESC
     LIMIT 1
     FOR SHARE;
