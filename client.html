@@ -244,7 +244,7 @@ async function completeShopCycle(cycleId){try{
 
 async function liveShop(){const p=profile;const [cr,tr]=await Promise.all([
  db.from('cycle_runs').select('id,status,cycle_base,task_completed_at,ready_at,settled_at,profit_amount,created_at').eq('user_id',p.id).in('status',['TASKS_OPEN','WAITING_18H']).order('created_at',{ascending:false}).limit(1).maybeSingle(),
- db.from('tasks').select('id,cycle_id,title,description,status,progress,reward,task_value,due_date').eq('user_id',p.id).order('created_at',{ascending:false}).limit(100)
+ db.from('tasks').select('id,cycle_id,title,description,status,progress,reward,task_value,due_date').eq('user_id',p.id).order('id',{ascending:false}).limit(100)
 ]);if(cr.error)throw cr.error;if(tr.error)throw tr.error;
  const cycle=cr.data||null;const rows=(tr.data||[]).filter(x=>!cycle||x.cycle_id===cycle.id);const taskTotal=rows.reduce((n,x)=>n+Number(x.task_value||0),0);const remaining=Math.max(0,Number(cycle?.cycle_base||0)-taskTotal);const allPending=rows.length>0&&rows.every(x=>String(x.status)!=='Completed');
  const waiting=cycle?.status==='WAITING_18H';const ready=waiting&&cycle.ready_at;const readyText=ready?new Date(ready).toLocaleString():'';const openCheckout=cycle?.status==='TASKS_OPEN'&&rows.length>0&&allPending&&Math.abs(taskTotal-Number(cycle.cycle_base||0))<=0.01;
