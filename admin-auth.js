@@ -333,9 +333,9 @@ function render(){
 
 async function login(e){
   e.preventDefault();
+  const identifier=String(document.getElementById('aaUsername')?.value||'').trim().toLowerCase();
+  const password=String(document.getElementById('aaPassword')?.value||'');
   state.busy=true;state.error='';render();
-  const identifier=document.getElementById('aaUsername').value.trim().toLowerCase();
-  const password=document.getElementById('aaPassword').value;
   const withTimeout=function(p,label,ms){
     return Promise.race([
       p,
