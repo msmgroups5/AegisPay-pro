@@ -103,47 +103,17 @@ Deno.serve(async (req: Request) => {
       if (!["CREDIT","REVERSAL"].includes(type)) return json({ error: "Invalid adjustment type." }, 400);
       if (!Number.isFinite(amount) || amount <= 0) return json({ error: "Amount must be positive." }, 400);
 
-      const { data: target, error: targetError } = await admin
-        .from("users")
-        .select("id,current_platform_balance,manual_credit_balance")
-        .eq("id", userId)
-        .maybeSingle();
-      if (targetError || !target) return json({ error: "User not found." }, 404);
-
-      const current = Number(target.current_platform_balance || 0);
-      const manual = Number(target.manual_credit_balance || 0);
-      const nextBalance = type === "CREDIT" ? current + amount : Math.max(0, current - amount);
-      const nextManual = type === "CREDIT" ? manual + amount : Math.max(0, manual - amount);
-
-      const { error: updateError } = await admin.from("users")
-        .update({ current_platform_balance: nextBalance, manual_credit_balance: nextManual })
-        .eq("id", userId);
-      if (updateError) return json({ error: "Balance adjustment failed." }, 400);
-
-      await admin.from("admin_adjustments").insert({
-        user_id: userId,
-        admin_user_id: actor.id,
-        adjustment_type: type,
-        amount,
-        reason,
+      const { data: newBalance, error: rpcError } = await admin.rpc("master_admin_adjust_balance", {
+        p_user_id: userId,
+        p_amount: amount,
+        p_type: type,
+        p_reason: reason,
       });
+      if (rpcError) {
+        return json({ error: rpcError.message || "Balance adjustment failed." }, 400);
+      }
 
-      await admin.from("account_ledger").insert({
-        user_id: userId,
-        entry_type: "MASTER_ADMIN_" + type,
-        amount: type === "CREDIT" ? amount : -amount,
-        description: reason,
-        actor_user_id: actor.id,
-      });
-
-      await admin.from("audit_events").insert({
-        actor_user_id: actor.id,
-        target_user_id: userId,
-        event_type: "BALANCE_ADJUSTMENT",
-        description: type + " of " + amount.toFixed(2) + " USDT. " + reason,
-      });
-
-      return json({ balance: nextBalance });
+      return json({ balance: Number(newBalance || 0), type, amount, reason });
     }
 
     return json({ error: "Unsupported admin operation." }, 400);
