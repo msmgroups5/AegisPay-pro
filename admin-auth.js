@@ -57,7 +57,7 @@ function shell(body){
   return '<div class="aa-shell">'+
     '<header class="aa-top">'+
       '<div class="aa-brand">'+
-        '<div class="aa-brand-mark"><img src="./aegispay-logo.svg" alt="" width="34" height="34"></div>'+
+        '<div class="aa-brand-mark"><img src="./aegispay-mark.svg" alt="" width="34" height="34"></div>'+
         '<div><strong>Aegis<span>Pay</span></strong><small>MASTER ADMIN · AURORA CONTROL</small></div>'+
       '</div>'+
       '<div class="aa-top-actions">'+
@@ -75,7 +75,7 @@ function loginView(){
   return shell('<main class="aa-login">'+
     '<div class="aa-login-glow"></div>'+
     '<section class="aa-auth-card">'+
-      '<div class="aa-auth-mark"><img src="./aegispay-logo.svg" alt="" width="52" height="52"></div>'+
+      '<div class="aa-auth-mark"><img src="./aegispay-mark.svg" alt="" width="52" height="52"></div>'+
       '<div class="aa-eyebrow">MASTER ADMIN</div>'+
       '<h1>Welcome back</h1>'+
       '<p class="aa-auth-sub">Secure Aurora control center for platform operations.</p>'+
