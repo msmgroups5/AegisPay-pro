@@ -42,25 +42,34 @@ Deno.serve(async (req: Request) => {
     }
 
     const body = await req.json().catch(() => null);
-    const tierId = typeof body?.tierId === "string" ? body.tierId.trim() : "";
     const amount = Number(body?.amount);
     const txid = typeof body?.txid === "string" ? body.txid.trim() : "";
     const screenshotPath = typeof body?.screenshotPath === "string" ? body.screenshotPath : "";
-    if (!tierId || !Number.isFinite(amount) || amount <= 0) return json({ error: "Choose a valid deposit tier and amount." }, 400);
+    if (!Number.isFinite(amount) || amount <= 0) return json({ error: "Enter a deposit amount greater than 0." }, 400);
     if (!/^[a-f\d]{64}$/i.test(txid)) return json({ error: "Enter the 64-character TRON transaction ID." }, 400);
     if (!screenshotPath.startsWith(auth.user.id + "/deposits/")) return json({ error: "Upload the deposit screenshot first." }, 400);
 
-    const { data: tier, error: tierError } = await admin.from("vip_tiers")
-      .select("id,name,deposit_amount,enabled").eq("id", tierId).maybeSingle();
-    if (tierError || !tier || !tier.enabled) return json({ error: "Selected deposit tier is unavailable." }, 400);
-    if (amount !== Number(tier.deposit_amount)) return json({ error: "Deposit amount must match the selected tier." }, 400);
-    const minimum = 5;
-    if (amount < minimum) return json({ error: "The minimum deposit for this account is $" + minimum + "." }, 400);
+    const tierQuery = await admin.from("vip_tiers")
+      .select("id,name,deposit_amount,enabled")
+      .eq("enabled", true)
+      .lte("deposit_amount", amount)
+      .order("deposit_amount", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const fallbackTier = !tierQuery.data
+      ? await admin.from("vip_tiers")
+          .select("id,name,deposit_amount,enabled")
+          .eq("enabled", true)
+          .order("deposit_amount", { ascending: true })
+          .limit(1)
+          .maybeSingle()
+      : { data: tierQuery.data, error: null };
+    const tier = fallbackTier.data;
+    if (!tier) return json({ error: "No active AegisPay tier is available for deposit processing." }, 503);
 
     const settings = await admin.from("platform_settings").select("value_json").eq("key", "deposit_rules").maybeSingle();
     const rules = settings.data?.value_json || {};
-    const fee = Number(rules.fee ?? 2);
-    if (!Number.isFinite(fee) || fee < 0 || fee >= amount) return json({ error: "Deposit fee is not configured correctly." }, 503);
+    const fee = 0;
 
     const { data: deposit, error: insertError } = await admin.from("deposit_submissions").insert({
       user_id: profile.id,
