@@ -368,7 +368,7 @@ async function bootLive(){try{const qs=new URLSearchParams(location.search);cons
 // Email verification does not need a persistent recovery session; it only confirms the address and returns the client to sign-in.
 if(qs.get('verified')==='1'){history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login');setTimeout(()=>alert('Email verified successfully. You can now sign in.'),80);return}
 // Password recovery supports both Supabase PKCE (?code=...) and implicit (#access_token...&type=recovery) return formats.
-if(qs.get('reset')==='1' || hashParams.get('type')==='recovery'){
+if(qs.get('reset')==='1' || qs.has('code') || qs.get('type')==='recovery' || hashParams.get('type')==='recovery'){
   const code=qs.get('code');
   if(code){
     const ex=await db.auth.exchangeCodeForSession(code);
