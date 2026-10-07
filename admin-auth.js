@@ -83,7 +83,7 @@ function loginView(){
       (loading?
         '<div class="aa-loading"><span class="aa-spinner"></span><strong>Signing in securely</strong><small>Verifying protected admin access…</small></div>':
         '<form id="aaLoginForm">'+
-          '<label class="aa-field"><span>Username</span><input id="aaUsername" type="text" inputmode="text" autocomplete="username" placeholder="Enter admin username" pattern="[a-z0-9_]{3,32}" required></label>'+
+          '<label class="aa-field"><span>Username</span><input id="aaUsername" type="text" inputmode="text" autocomplete="username" placeholder="Admin username or email" required></label>'+
           '<label class="aa-field"><span>Password</span><input id="aaPassword" type="password" autocomplete="current-password" placeholder="Enter password" required></label>'+
           '<button class="aa-primary aa-wide" type="submit">'+ico('shield',17)+' Sign in securely <span class="aa-arrow">→</span></button>'+
         '</form>')+
@@ -322,13 +322,22 @@ async function login(e){
   state.busy=true;state.error='';render();
   const identifier=document.getElementById('aaUsername').value.trim().toLowerCase();
   const password=document.getElementById('aaPassword').value;
+  const withTimeout=function(p,label,ms){
+    return Promise.race([
+      p,
+      new Promise(function(_,reject){setTimeout(function(){reject(new Error(label+' timed out. Please try again.'));},ms||12000);})
+    ]);
+  };
   try{
-    if(!/^[a-z0-9_]{3,32}$/.test(identifier))throw new Error('Enter a valid admin username (3–32 lowercase letters, numbers, or underscores).');
-    await service.signIn(identifier,password);
-    const result=await service.claimAegisPayProfile();
-    if(!result.profile||result.profile.role!=='MASTER ADMIN')throw new Error('This account does not have Master Admin access.');
+    if(!identifier)throw new Error('Enter your admin username or email.');
+    if(!password)throw new Error('Enter your password.');
+    await withTimeout(service.signIn(identifier,password),'Admin sign-in',12000);
+    const result=await withTimeout(service.claimAegisPayProfile(),'Master Admin profile verification',12000);
+    if(!result.profile||result.profile.role!=='MASTER ADMIN'){
+      throw new Error('This account is not provisioned as Master Admin. Use the dedicated Master Admin account.');
+    }
     state.profile=result.profile;
-    await refreshData();
+    await withTimeout(refreshData(),'Admin data loading',15000);
   }catch(err){
     await service.signOut().catch(function(){});
     state.profile=null;
