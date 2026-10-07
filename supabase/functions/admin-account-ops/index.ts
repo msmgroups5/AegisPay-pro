@@ -2,6 +2,15 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL=Deno.env.get("SUPABASE_URL")||"";
 const SERVICE_KEY=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
+const PUBLISHABLE_KEY=(()=>{
+ try{
+  const legacy=Deno.env.get("SUPABASE_PUBLISHABLE_KEY")||Deno.env.get("SUPABASE_ANON_KEY")||"";
+  if(legacy)return legacy;
+  const raw=Deno.env.get("SUPABASE_PUBLISHABLE_KEYS")||"";
+  const parsed=raw?JSON.parse(raw):{};
+  return parsed.default||"";
+ }catch{return "";}
+})();
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS","Content-Type":"application/json"};
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:cors});
 const isUuid=(v:string)=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
@@ -102,26 +111,36 @@ Deno.serve(async(req:Request)=>{
 
    const {data:target,error:targetError}=await admin.from("users").select("id,role,current_platform_balance,manual_credit_balance").eq("id",userId).maybeSingle();
    if(targetError||!target||String(target.role||"").toUpperCase()!=="USER")return json({error:"Client account not found."},404);
-   const current=Number(target.current_platform_balance||0), manual=Number(target.manual_credit_balance||0);
-   const nextBalance=type==="CREDIT"?current+amount:Math.max(0,current-amount);
-   const nextManual=type==="CREDIT"?manual+amount:Math.max(0,manual-amount);
+   if(!PUBLISHABLE_KEY)return json({error:"Supabase publishable key is not available for the authenticated balance operation."},503);
 
-   const {data:updated,error:updateError}=await admin.from("users").update({current_platform_balance:nextBalance,manual_credit_balance:nextManual}).eq("id",userId).select("current_platform_balance").maybeSingle();
-   if(updateError||!updated)return json({error:updateError?.message||"Balance adjustment failed."},400);
+   // Execute the audited balance RPC as the verified Master Admin identity.
+   // The RPC is SECURITY DEFINER and records the balance adjustment + ledger entry.
+   const userScoped=createClient(SUPABASE_URL,PUBLISHABLE_KEY,{
+    auth:{persistSession:false,autoRefreshToken:false},
+    global:{headers:{Authorization:"Bearer "+token}}
+   });
+   const {data:newBalance,error:rpcError}=await userScoped.rpc("master_admin_adjust_balance",{
+    p_user_id:userId,
+    p_amount:amount,
+    p_type:type,
+    p_reason:reason
+   });
+   if(rpcError)return json({error:rpcError.message||"Balance adjustment failed."},400);
 
-   const {error:adjustmentError}=await admin.from("admin_adjustments").insert({user_id:userId,admin_user_id:actor.id,adjustment_type:type,amount,reason});
-   if(adjustmentError){
-    await admin.from("users").update({current_platform_balance:current,manual_credit_balance:manual}).eq("id",userId);
-    return json({error:"Balance adjustment rolled back because the audit record could not be saved."},500);
-   }
-   const {error:ledgerError}=await admin.from("account_ledger").insert({user_id:userId,entry_type:"MASTER_ADMIN_"+type,amount:type==="CREDIT"?amount:-amount,description:reason,actor_user_id:actor.id,reference_id:null});
-   if(ledgerError){
-    await admin.from("users").update({current_platform_balance:current,manual_credit_balance:manual}).eq("id",userId);
-    await admin.from("admin_adjustments").delete().eq("user_id",userId).eq("admin_user_id",actor.id).eq("adjustment_type",type).eq("amount",amount).eq("reason",reason);
-    return json({error:"Balance adjustment rolled back because the ledger record could not be saved."},500);
-   }
-   await admin.from("audit_events").insert({actor_user_id:actor.id,target_user_id:userId,event_type:type==="CREDIT"?"MASTER_ADMIN_CREDIT":"MASTER_ADMIN_REVERSAL",description:reason});
-   return json({balance:Number(updated.current_platform_balance||0),manualCreditBalance:Number(updated.manual_credit_balance||0),type,amount,reason});
+   // The database trigger normally creates the Shop cycle automatically.
+   // Call the idempotent service-role helper as a second safety net.
+   await admin.rpc("ensure_auto_task_cycle",{p_user_id:userId});
+
+   const {data:updated,error:updateError}=await admin.from("users")
+    .select("current_platform_balance,manual_credit_balance")
+    .eq("id",userId).maybeSingle();
+   if(updateError||!updated)return json({error:"Balance adjustment succeeded, but the updated balance could not be verified."},500);
+
+   return json({
+    balance:Number(updated.current_platform_balance||newBalance||0),
+    manualCreditBalance:Number(updated.manual_credit_balance||0),
+    type,amount,reason
+   });
   }
   return json({error:"Unsupported admin operation."},400);
  }catch{return json({error:"Admin operation could not be completed."},500);}
