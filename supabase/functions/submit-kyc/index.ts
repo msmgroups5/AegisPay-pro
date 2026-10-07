@@ -17,11 +17,23 @@ function json(body: unknown, status = 200) {
 function reasonFor(result: Record<string, unknown>, confidence: number, configured: boolean) {
   if (!configured) return "AI_REVIEW_UNAVAILABLE";
   if (result.front_blurry === true || result.back_blurry === true) return "BLURRY_IMAGE";
-  if (result.name_matches_profile === false) return "PROFILE_NAME_MISMATCH";
-  if (result.document_type_matches === false) return "DOCUMENT_TYPE_MISMATCH";
   if (result.front_readable !== true || result.back_readable === false) return "DOCUMENT_UNREADABLE";
+  if (result.document_type_matches === false) return "DOCUMENT_TYPE_MISMATCH";
+  if (result.name_matches_profile === false) return "PROFILE_NAME_MISMATCH";
   if (confidence < 0.95) return "LOW_CONFIDENCE";
   return "MANUAL_REVIEW_REQUIRED";
+}
+function reasonMessage(reason: string, documentType: string) {
+  const messages: Record<string,string> = {
+    BLURRY_IMAGE: "Your " + documentType + " image is blurry. Please upload a sharp, well-lit photo with all text clearly readable.",
+    DOCUMENT_UNREADABLE: "Your " + documentType + " image could not be read clearly. Please upload a complete, high-resolution image without cropping any edge.",
+    DOCUMENT_TYPE_MISMATCH: "The uploaded document could not be confidently identified as the selected document type. Please upload the correct " + documentType + ".",
+    PROFILE_NAME_MISMATCH: "The name on the uploaded document does not sufficiently match your AegisPay profile name. Please upload the correct document or contact support if your legal name has changed.",
+    LOW_CONFIDENCE: "The document review was inconclusive. Please upload clearer images with the full document visible.",
+    AI_REVIEW_UNAVAILABLE: "The identity review service is temporarily unavailable. Please try again later.",
+    MANUAL_REVIEW_REQUIRED: "Your document requires additional verification before it can be approved."
+  };
+  return messages[reason] || messages.MANUAL_REVIEW_REQUIRED;
 }
 
 Deno.serve(async (req: Request) => {
@@ -143,17 +155,28 @@ Deno.serve(async (req: Request) => {
       .eq("id", record.id);
     if (updateError) return json({ error: "KYC review could not be saved." }, 500);
 
+    const clientMessage = status === "VERIFIED"
+      ? "Your identity verification is complete. Withdrawals are now enabled."
+      : status === "REJECTED"
+      ? reasonMessage(reason, documentType)
+      : aiStatus === "APPROVED"
+      ? "Your identity images passed the AI quality and consistency precheck. Additional verification is still required before KYC can be marked verified."
+      : reasonMessage(reason, documentType);
+
+    await admin.from("notifications").insert({
+      user_id: profile.id,
+      notification_type: status === "REJECTED" ? "KYC_ACTION_REQUIRED" : "KYC_UPDATE",
+      title: status === "REJECTED" ? "KYC needs attention" : "KYC review update",
+      body: clientMessage,
+      is_read: false
+    });
+
     return json({
       verificationId: record.id,
       status,
       aiReviewStatus: aiStatus,
-      message: status === "VERIFIED"
-        ? "KYC verified. Withdrawals are now enabled."
-        : status === "REJECTED"
-        ? "The uploaded images were unclear or did not match the profile. Upload correct images to apply again."
-        : aiStatus === "APPROVED"
-        ? "AI precheck passed. Your identity documents are waiting for final Master Admin approval."
-        : "KYC is awaiting a secure review. Withdrawals remain locked until verification is complete.",
+      message: clientMessage,
+      reviewReason: status === "VERIFIED" ? null : reason,
     }, status === "VERIFIED" ? 200 : 202);
   } catch {
     return json({ error: "Unable to process KYC submission." }, 500);
