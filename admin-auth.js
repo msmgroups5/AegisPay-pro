@@ -198,7 +198,8 @@ function users(){
       '<div class="aa-actions">'+
       (st==='FROZEN'?'<button class="aa-secondary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="NORMAL">Unfreeze</button>':'<button class="aa-secondary" data-action="user-status" data-id="'+esc(u.id)+'" data-status="FROZEN">Freeze</button>')+
       '<button class="aa-danger" data-action="user-status" data-id="'+esc(u.id)+'" data-status="BLOCKED">Block</button>'+
-      '<button class="aa-secondary" data-action="balance-adjust" data-id="'+esc(u.id)+'">Adjust Balance</button>'+
+      '<button class="aa-primary" data-action="balance-adjust" data-type="CREDIT" data-id="'+esc(u.id)+'">+ Add Credit</button>'+
+      '<button class="aa-secondary" data-action="balance-adjust" data-type="REVERSAL" data-id="'+esc(u.id)+'">− Remove Credit</button>'+
       '<button class="aa-secondary" data-action="wallet-change" data-id="'+esc(u.id)+'">Change Wallet</button>'+
       '</div></article>';
   }).join('');
@@ -466,11 +467,12 @@ async function userStatus(el){
   });
 }
 async function balanceAdjust(el){
-  const type=String(window.prompt('Adjustment type: CREDIT or REVERSAL','CREDIT')||'').toUpperCase();
-  if(!['CREDIT','REVERSAL'].includes(type))return;
-  const amount=Number(window.prompt('Amount in USDT','5'));
-  if(!Number.isFinite(amount)||amount<=0){state.error='Enter a positive amount.';render();return;}
-  const reason=window.prompt('Reason','Master Admin balance adjustment')||'Master Admin balance adjustment';
+  const type=String(el.dataset.type||'CREDIT').toUpperCase();
+  const label=type==='CREDIT'?'Add Credit':'Remove Credit';
+  const defaultReason=type==='CREDIT'?'TEST CREDIT':'TEST CREDIT REVERSAL';
+  const amount=Number(window.prompt(label+' — amount in USDT','55'));
+  if(!Number.isFinite(amount)||amount<=0){state.error='Enter a positive USDT amount.';render();return;}
+  const reason=window.prompt('Reason',defaultReason)||defaultReason;
   await setBusy(async function(){
     const r=await service.invokeFunction('admin-account-ops',{body:{action:'balance',userId:el.dataset.id,amount,type,reason}});
     if(r.error)throw r.error;
