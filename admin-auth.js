@@ -334,16 +334,22 @@ async function login(e){
     await withTimeout(service.signIn(identifier,password),'Admin sign-in',12000);
     const result=await withTimeout(service.claimAegisPayProfile(),'Master Admin profile verification',12000);
     if(!result.profile||result.profile.role!=='MASTER ADMIN'){
-      throw new Error('This account is not provisioned as Master Admin. Use the dedicated Master Admin account.');
+      throw new Error('This account is not provisioned as Master Admin.');
     }
     state.profile=result.profile;
-    await withTimeout(refreshData(),'Admin data loading',15000);
+    state.busy=false;
+    state.error='';
+    render();
+    refreshData().catch(function(err){
+      state.error=err&&err.message?err.message:'Admin data loading failed.';
+      render();
+    });
   }catch(err){
     await service.signOut().catch(function(){});
     state.profile=null;
     state.error=err.message||'Sign-in failed.';
-  }finally{
-    state.busy=false;render();
+    state.busy=false;
+    render();
   }
 }
 
