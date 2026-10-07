@@ -4,7 +4,7 @@
 1. Enter your full signup name carefully.
 2. Enter your email and password.
 3. Add a referral code when provided.
-4. Your Unique User ID and referral link are created automatically.
+4. Your username is used as the memorable Client ID (with a 6-digit fallback where needed), and your referral link is created automatically.
 
 ## Withdrawal wallet
 1. Open Profile.
@@ -15,9 +15,9 @@
 
 ## Deposit
 1. Open Deposit.
-2. Select your VIP tier.
-3. Use the displayed TRON testnet receiving address.
-4. Send the required USDT on the correct network.
+2. Enter any positive USDT amount; no fixed client-side tier or maximum/minimum is required.
+3. Use the displayed TRON receiving address and correct network.
+4. Send the amount entered in the deposit screen.
 5. Upload a clear transaction screenshot.
 6. Make sure the TXID is visible.
 7. Paste or scan the TXID.
@@ -40,10 +40,9 @@
 - Bonus triggers after the referred client's verified qualifying first deposit.
 
 ## Withdrawal
-1. Minimum request is $50.
-2. Fee is 10%.
-3. Example: $100 request → $10 fee → $90 net.
-4. Submit the request.
+1. Enter the withdrawal amount you want to request.
+2. The request is checked against the account's current withdrawal rules and available balance.
+3. Submit the request.
 5. It moves to Pending Approval.
 6. Master Admin approves or rejects it.
 7. In this prototype, payout processing is simulated and no live blockchain transfer is executed.
@@ -53,7 +52,7 @@ Use AI for instructions, troubleshooting, password reset guidance, deposit/TXID 
 AI cannot approve withdrawals or independently change balances.
 
 ## Password reset
-Resetting the password triggers a temporary account freeze for security.
+Resetting the password triggers a temporary account freeze for security. Workflow messages and errors are shown inside the client UI rather than browser alert popups.
 
 ## Support
 The AI Assistant is the first support layer. Master Admin handles restricted account and financial actions.
