@@ -578,14 +578,16 @@ function openTaskMarketplace(taskId){
  location.href=u;
 }
 function openTaskProduct(taskId){
- const x=taskProductData[String(taskId)]||{},task=x.task||{},offer=x.offer||{},product=x.product||{};
+ const x=taskProductData[String(taskId)]||{},task=x.task||{},offer=x.offer||{};
+ let product=x.product||null;
  if(!product){
   const fallbackId=String(offer?.product_id||'');
-  const fallback=(window.AegisShopCatalog||[]).find(p=>String(p.id)===fallbackId)||null;
-  if(fallback)x.product=fallback;
-  product=x.product||{};
-}
-if(!product.id){uiNotice('The assigned Shop product could not be loaded. Please refresh Shop Tasks.','error');return}
+  product=(window.AegisShopCatalog||[]).find(p=>String(p.id)===fallbackId)||null;
+ }
+ if(!product||!product.id){
+  uiNotice('The assigned Shop product could not be loaded. Please refresh Shop Tasks.','error');
+  return;
+ }
  const modal=document.getElementById('taskProductModal'),box=document.getElementById('taskProductContent');if(!modal||!box)return;
  const rating=Number(product.rating||0),reviews=taskReviewList(product);
  const base=product.image||'',rawGallery=(Array.isArray(product.gallery)&&product.gallery.length?product.gallery:[base]).filter(Boolean).slice(0,7),gallery=rawGallery.map(taskImageUrl).filter(Boolean);
