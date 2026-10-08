@@ -61,7 +61,7 @@ The canonical GitHub repository, Supabase production project, Cloudflare Workers
 2. Active Shop offers are mapped into the cycle as individual tasks.
 3. The client now loads the active cycle and exact assigned task set.
 4. Checkout is exposed only when the complete task set is present and the task values equal the cycle base.
-5. Browser completion goes through `complete-cycle-checkout`; the old single-task browser RPC is no longer executable by the authenticated role.
+5. Browser completion goes through `complete-cycle-checkout`; the current single-task browser RPC remains intentionally executable only to authenticated clients with ownership checks; the separate full-cycle checkout path is independently service-role protected.
 6. The server rechecks ownership, exact task IDs, duplicate IDs, total task value, active cycle state and runtime.
 7. All tasks move to Completed atomically enough to roll back task state if the cycle transition fails.
 8. The cycle moves to `WAITING_18H` and the settlement timestamp is set.
