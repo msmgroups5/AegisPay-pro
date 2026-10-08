@@ -111,7 +111,7 @@ def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientU
         digest.update(header)
         digest.update(bytes)
         def blobSha = digest.digest().collect { String.format('%02x', it & 0xff) }.join()
-        if (blobSha != '8a4b994e65be519b5265c1322c6c671ad8115432') {
+        if (blobSha != 'abe26b0431881ed28036509c49c85236d24430fa') {
             throw new GradleException("Client UI guard failed: client.html is not the canonical Aurora UI (got " + blobSha + ").")
         }
         def html = new String(bytes, 'UTF-8')
