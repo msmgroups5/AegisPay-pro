@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
       stats,
     });
 
-    const [depositResult, kycResult, withdrawalResult] = await Promise.all([
+    const [depositResult, kycResult, withdrawalResult, depositHistoryResult, kycHistoryResult] = await Promise.all([
       admin.from("deposit_submissions")
         .select("id,user_id,tier_id,gross_amount,credited_amount,txid,status,ai_review_status,ai_review_reason,verification_note,screenshot_path,created_at")
         .eq("status", "PENDING_VERIFICATION").order("created_at", { ascending: true }).limit(50),
@@ -58,18 +58,28 @@ Deno.serve(async (req: Request) => {
       admin.from("withdrawal_requests")
         .select("id,user_id,amount,fee_amount,net_amount,destination_address,status,created_at,payout_error,payout_txid,panel_decision,panel_decided_at,telegram_decision,telegram_decided_at,telegram_status,telegram_message_id")
         .in("status", ["PENDING_APPROVAL","APPROVED"]).order("created_at", { ascending: true }).limit(50),
+      admin.from("deposit_submissions")
+        .select("id,user_id,tier_id,gross_amount,credited_amount,txid,status,ai_review_status,ai_review_reason,verification_note,screenshot_path,created_at")
+        .neq("status", "PENDING_VERIFICATION").order("created_at", { ascending: false }).limit(100),
+      admin.from("kyc_verifications")
+        .select("id,user_id,document_type,status,ai_review_status,ai_confidence,review_reason,front_storage_path,back_storage_path,submitted_at")
+        .not("status", "in", '("PENDING_REVIEW","MANUAL_REVIEW")').order("submitted_at", { ascending: false }).limit(100),
     ]);
-    if (depositResult.error || kycResult.error || withdrawalResult.error) {
+    if (depositResult.error || kycResult.error || withdrawalResult.error || depositHistoryResult.error || kycHistoryResult.error) {
       return json({ error: "Unable to load review queues." }, 500);
     }
 
     const deposits = depositResult.data || [];
     const kyc = kycResult.data || [];
     const withdrawals = withdrawalResult.data || [];
+    const depositHistory = depositHistoryResult.data || [];
+    const kycHistory = kycHistoryResult.data || [];
     const userIds = Array.from(new Set([
       ...deposits.map((x: any) => x.user_id),
       ...kyc.map((x: any) => x.user_id),
       ...withdrawals.map((x: any) => x.user_id),
+      ...depositHistory.map((x: any) => x.user_id),
+      ...kycHistory.map((x: any) => x.user_id),
     ]));
     const usersResult = userIds.length
       ? await admin.from("users").select("id,name,email").in("id", userIds)
@@ -84,7 +94,20 @@ Deno.serve(async (req: Request) => {
         aiReviewReason: x.ai_review_reason, note: x.verification_note, submittedAt: x.created_at,
         user: users.get(x.user_id) || null, screenshotUrl: await signedUrl(admin, x.screenshot_path),
       }))),
+      depositHistory: await Promise.all(depositHistory.map(async (x: any) => ({
+        id: x.id, tierId: x.tier_id, grossAmount: x.gross_amount, creditedAmount: x.credited_amount,
+        txid: x.txid, status: x.status, aiReviewStatus: x.ai_review_status,
+        aiReviewReason: x.ai_review_reason, note: x.verification_note, submittedAt: x.created_at,
+        user: users.get(x.user_id) || null, screenshotUrl: await signedUrl(admin, x.screenshot_path),
+      }))),
       kyc: await Promise.all(kyc.map(async (x: any) => ({
+        id: x.id, documentType: x.document_type, status: x.status,
+        aiReviewStatus: x.ai_review_status, confidence: x.ai_confidence, reason: x.review_reason,
+        submittedAt: x.submitted_at, user: users.get(x.user_id) || null,
+        frontUrl: await signedUrl(admin, x.front_storage_path),
+        backUrl: await signedUrl(admin, x.back_storage_path),
+      }))),
+      kycHistory: await Promise.all(kycHistory.map(async (x: any) => ({
         id: x.id, documentType: x.document_type, status: x.status,
         aiReviewStatus: x.ai_review_status, confidence: x.ai_confidence, reason: x.review_reason,
         submittedAt: x.submitted_at, user: users.get(x.user_id) || null,
