@@ -40,14 +40,6 @@ Deno.serve(async (req: Request) => {
     if (statsError) return json({ error: "Unable to load confirmed platform totals." }, 500);
     const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
     if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
-    if (appEnabled !== true) return json({
-      appEnabled: false,
-      deposits: [],
-      kyc: [],
-      withdrawals: [],
-      stats,
-    });
-
     const [depositResult, kycResult, withdrawalResult, depositHistoryResult, kycHistoryResult] = await Promise.all([
       admin.from("deposit_submissions")
         .select("id,user_id,tier_id,gross_amount,credited_amount,txid,status,ai_review_status,ai_review_reason,verification_note,screenshot_path,created_at")
