@@ -21,13 +21,15 @@ jobs:
         with:
           gradle-version: '8.9'
       - name: Build canonical Aurora Client debug APK
-        run: gradle -p android :app:assembleClientDebug --no-daemon
+        run: gradle -p android :app:assembleClientDebug :app:bundleClientDebug --no-daemon
       - name: Verify canonical Aurora Client
         shell: bash
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
+          AAB="android/app/build/outputs/bundle/clientDebug/app-client-debug.aab"
           test -s "$APK"
+          test -s "$AAB"
           grep -q "versionCode 38" android/app/build.gradle
           grep -q "versionName '2.5.9'" android/app/build.gradle
           sha256sum "$APK"
@@ -42,7 +44,7 @@ jobs:
           TITLE="AegisPay Aurora Client 2.5.9 (38)"
           NOTES="Canonical Aurora Client UI APK. Includes username login, Secure & Verified footer, corrected CNIC/Passport file layout, automatic Shop task assignment while balance remains above 0, and the canonical Aurora UI guard."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
           else
             gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes "$NOTES" --prerelease --target "$GITHUB_SHA"
           fi
