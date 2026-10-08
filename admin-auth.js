@@ -310,7 +310,7 @@ function productionReadiness(){
       '<span>Cron Secret<b>'+esc(secretMark(secrets.cron_secret))+'</b></span>'+
       '<span>Mainnet Payout Key<b>'+esc(secretMark(secrets.mainnet_payout_key))+'</b></span>'+
       '<span>AI Review Config<b>'+esc(secretMark(secrets.ai_review_endpoint&&secrets.ai_review_api_key&&secrets.ai_review_model))+'</b></span>'+
-      '<span>Monitoring Gate<b>'+esc(d.mainnet_monitoring_ready?'READY':'NOT READY')+'</b></span>'+\
+      '<span>Monitoring Gate<b>'+esc(d.mainnet_monitoring_ready?'READY':'NOT READY')+'</b></span>'+
       '<span>Payout Ops Gate<b>'+esc(d.mainnet_payout_operational?'READY':'LOCKED')+'</b></span>'+
     '</div>'+
     '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Phase 3 Safety Gate</strong><small>Real payouts can only be enabled by an active Master Admin when MAINNET, the TRON MAINNET configuration, runtime, go-live approval, payout unlock, and required server-side secrets are all ready.</small></div></div>'+
