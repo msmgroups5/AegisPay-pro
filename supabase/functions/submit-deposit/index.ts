@@ -24,6 +24,8 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
     const { data: auth, error: authError } = await admin.auth.getUser(token);
     if (authError || !auth.user) return json({ error: "Invalid authentication token." }, 401);
+    const { data: aiSetting } = await admin.from("platform_settings").select("value_json").eq("key","ai_review").maybeSingle();
+    const aiEnabled = aiSetting?.value_json?.enabled !== false;
     const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
     if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
     if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
@@ -86,11 +88,11 @@ Deno.serve(async (req: Request) => {
       result.amount_matches === false || result.recipient_matches === false || result.receipt_visible === false
     );
     const tampering = Array.isArray(result.tamper_indicators) && result.tamper_indicators.length > 0;
-    const aiApproved = review.configured && validConfidence && confidence >= 0.95
+    const aiApproved = aiEnabled && review.configured && validConfidence && confidence >= 0.95
       && result.receipt_visible === true && result.txid_matches === true && result.amount_matches === true
       && result.recipient_matches === true && result.legible === true && result.blurry === false && !tampering;
-    const aiStatus = !review.configured ? "UNAVAILABLE" : hardFailure ? "REJECTED" : aiApproved ? "APPROVED" : "MANUAL_REVIEW";
-    const reason = !review.configured ? "AI_REVIEW_UNAVAILABLE"
+    const aiStatus = !aiEnabled ? "MANUAL_REVIEW" : !review.configured ? "UNAVAILABLE" : hardFailure ? "REJECTED" : aiApproved ? "APPROVED" : "MANUAL_REVIEW";
+    const reason = !aiEnabled ? "AI_BOT_DISABLED" : !review.configured ? "AI_REVIEW_UNAVAILABLE"
       : hardFailure ? "SCREENSHOT_UNCLEAR_OR_MISMATCHED"
       : tampering ? "POTENTIAL_TAMPERING"
       : aiApproved ? "AI_PRECHECK_PASSED"
@@ -129,7 +131,7 @@ Deno.serve(async (req: Request) => {
     return json({
       depositId: deposit.id, status: depositStatus, aiReviewStatus: aiStatus,
       aiConfidence: normalizedConfidence, reviewReason: reason,
-      message: aiStatus === "APPROVED"
+      message: aiStatus === "MANUAL_REVIEW" && reason === "AI_BOT_DISABLED" ? "AI approval bot is currently OFF. Your deposit proof has been sent to Master Admin for manual review." : aiStatus === "APPROVED"
         ? "Screenshot check passed. A confirmed matching TRON transfer is still required before your balance is credited."
         : aiStatus === "REJECTED"
         ? "The screenshot is blurry or does not match the submitted transaction. Submit a clear, correct proof."
