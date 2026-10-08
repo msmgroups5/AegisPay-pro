@@ -93,6 +93,8 @@ assert(!deploy.includes('netlify-cli deploy'),'Legacy Netlify production deploym
 
 const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
 assert(rel.includes(':app:assembleClientDebug'),'Aurora APK release workflow must build the canonical client flavor');
+assert(rel.includes(':app:bundleClientDebug'),'Aurora APK release workflow must build the canonical client AAB');
+assert(rel.includes('outputs/bundle/clientDebug/app-client-debug.aab'),'Aurora AAB output verification is missing');
 assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Netlify production deployment');
 
 const updater=fs.readFileSync('app-update.js','utf8');
