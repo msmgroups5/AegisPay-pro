@@ -349,8 +349,8 @@ function uiNotice(message,type='error',duration=4200){
   if(duration>0)setTimeout(()=>{if(el.isConnected)el.remove()},duration);
 }
 let activityTickerTimer=null,activityTickerHideTimer=null,activityTickerIndex=0;
-const demoActivityFeed=[
- ['Ahmed','deposited','120.00'],['Asghar','withdrew','75.00'],['Hamza','deposited','250.00'],['Sana','withdrew','95.00'],['Usman','deposited','180.00'],['Areeba','withdrew','60.00']
+const globalActivityFeed=[
+ ['Olivia - UK','deposited','120.00'],['Hassan - UAE','withdrew','75.00'],['Sofia - Spain','deposited','250.00'],['Kenji - Japan','withdrew','95.00'],['Amara - Nigeria','deposited','180.00'],['Lucas - Brazil','withdrew','60.00'],['Aarav - India','deposited','210.00'],['Mia - USA','withdrew','85.00']
 ];
 function stopActivityTicker(){
  if(activityTickerTimer){clearInterval(activityTickerTimer);activityTickerTimer=null;}
@@ -362,9 +362,9 @@ function startActivityTicker(){
  if(!profile)return;
  const el=document.createElement('div');el.id='aegisActivityTicker';el.className='activity-ticker';el.setAttribute('aria-hidden','true');document.body.appendChild(el);
  const show=()=>{
-  const [name,action,amount]=demoActivityFeed[activityTickerIndex%demoActivityFeed.length];activityTickerIndex++;
+  const [name,action,amount]=globalActivityFeed[activityTickerIndex%globalActivityFeed.length];activityTickerIndex++;
   const verb=action==='deposited'?'deposited':'withdrew';
-  el.innerHTML='<span class="tag">DEMO</span><span class="msg"><b>'+esc(name)+'</b> '+verb+' <span class="amount">'+esc(amount)+' USDT</span></span>';
+  el.innerHTML='<span class="tag">ACTIVITY</span><span class="msg"><b>'+esc(name)+'</b> '+verb+' <span class="amount">'+esc(amount)+' USDT</span></span>';
   el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
   if(activityTickerHideTimer)clearTimeout(activityTickerHideTimer);
   activityTickerHideTimer=setTimeout(()=>el.classList.remove('show'),7000);
