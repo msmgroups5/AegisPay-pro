@@ -85,20 +85,22 @@ Deno.serve(async (req: Request) => {
     if (insertError || !record) return json({ error: insertError?.message || "Unable to create KYC review." }, 400);
 
     let review: { configured: boolean; result?: Record<string, unknown> } = { configured: false, result: {} };
-    try {
-      const images = [await loadPrivateImage(admin.storage, frontPath)];
-      if (documentType === "CNIC") images.push(await loadPrivateImage(admin.storage, backPath));
-      review = await runVisionReview([
-        "Perform an AI precheck of the attached government identity document for AegisPay KYC.",
-        "Expected document type: " + documentType + ".",
-        "Profile display name to compare with the document: " + JSON.stringify(profile.name) + ".",
-        "Check only visible evidence: document type, image quality, readability, whether the document appears complete, name consistency, and visible signs of alteration/tampering.",
-        "Do not claim official government/NADRA verification. Do not return or store document number, date of birth, address, or other extracted personal values.",
-        "Return ONLY JSON: document_type_matches boolean; front_readable boolean; back_readable boolean|null; front_blurry boolean; back_blurry boolean; name_matches_profile boolean; tamper_indicators array of short codes; confidence number 0..1.",
-        "Use false when a required fact is clearly contradicted. Use conservative confidence when anything is cropped, obscured, ambiguous, or inconsistent.",
-      ].join("\n"), images);
-    } catch {
-      review = { configured: false, result: {} };
+    if (aiEnabled) {
+      try {
+        const images = [await loadPrivateImage(admin.storage, frontPath)];
+        if (documentType === "CNIC") images.push(await loadPrivateImage(admin.storage, backPath));
+        review = await runVisionReview([
+          "Perform an AI precheck of the attached government identity document for AegisPay KYC.",
+          "Expected document type: " + documentType + ".",
+          "Profile display name to compare with the document: " + JSON.stringify(profile.name) + ".",
+          "Check only visible evidence: document type, image quality, readability, whether the document appears complete, name consistency, and visible signs of alteration/tampering.",
+          "Do not claim official government/NADRA verification. Do not return or store document number, date of birth, address, or other extracted personal values.",
+          "Return ONLY JSON: document_type_matches boolean; front_readable boolean; back_readable boolean|null; front_blurry boolean; back_blurry boolean; name_matches_profile boolean; tamper_indicators array of short codes; confidence number 0..1.",
+          "Use false when a required fact is clearly contradicted. Use conservative confidence when anything is cropped, obscured, ambiguous, or inconsistent.",
+        ].join("\n"), images);
+      } catch {
+        review = { configured: false, result: {} };
+      }
     }
 
     const result = review.result || {};
@@ -135,7 +137,7 @@ Deno.serve(async (req: Request) => {
       aiStatus = "APPROVED";
     }
 
-    const reason = reasonFor(result, hasConfidence ? confidence : 0, review.configured);
+    const reason = !aiEnabled ? "AI_BOT_DISABLED" : reasonFor(result, hasConfidence ? confidence : 0, review.configured);
     const checks = {
       document_type_matches: result.document_type_matches === true,
       front_readable: result.front_readable === true,
