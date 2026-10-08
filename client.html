@@ -45,7 +45,212 @@ nav{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transfo
  .ap-auth{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:28px 0 36px}.ap-auth>svg{display:block;margin:0 auto}.ap-auth>h1{text-align:center;font-size:34px!important;margin-top:14px!important;letter-spacing:-1px}.ap-auth>p{text-align:center;color:var(--mu);font-size:14px;margin:6px 0 22px}.ap-auth .card{padding:22px 18px;margin-bottom:12px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid var(--ln);border-radius:22px;box-shadow:0 24px 50px -30px rgba(124,92,255,.7)}.ap-auth .card h2{font-size:22px}.ap-auth .ap-field{margin-bottom:12px}.ap-auth .ap-field label{display:block;font-size:11px;color:var(--mu);margin:0 0 7px 4px}.ap-auth .ap-field input{width:100%;min-height:50px;padding:0 14px;border-radius:16px;background:rgba(255,255,255,.04)!important;background-color:transparent!important;border:1px solid var(--ln);outline:0;color:var(--t);-webkit-text-fill-color:var(--t);font:500 14px Sora}.ap-auth .ap-field input::placeholder{color:#667197;opacity:1}.ap-auth .ap-field input:focus{border-color:rgba(34,211,238,.65);box-shadow:0 0 0 3px rgba(34,211,238,.08)}.ap-auth .btn{margin-top:2px}.ap-auth .btn.o{margin-top:0}.ap-auth .card+ .btn.o{background:rgba(255,255,255,.035);border:1px solid var(--ln);box-shadow:none}.ap-auth .card>div:last-child{color:var(--c)!important}.ap-auth input:-webkit-autofill,.ap-auth input:-webkit-autofill:hover,.ap-auth input:-webkit-autofill:focus{-webkit-text-fill-color:var(--t);-webkit-box-shadow:0 0 0 1000px #0b1022 inset;box-shadow:0 0 0 1000px #0b1022 inset;transition:background-color 9999s ease-out 0s}.ap-field{margin-bottom:12px}.ap-field label{display:block;font-size:11px;color:var(--mu);margin:0 0 7px 4px}.ap-field input,.ap-field select,.ap-field textarea{width:100%;min-height:50px;padding:0 14px;border-radius:16px;background:rgba(255,255,255,.04)!important;background-color:rgba(255,255,255,.04)!important;border:1px solid var(--ln);outline:0;color:var(--t);-webkit-text-fill-color:var(--t);font:500 14px Sora}.ap-field input::placeholder{color:#667197;opacity:1}.ap-field input:focus{border-color:rgba(34,211,238,.65);box-shadow:0 0 0 3px rgba(34,211,238,.08)}.filepick{display:flex;flex-direction:column;gap:8px;width:100%;padding:12px 0;color:var(--t);font-size:13px;line-height:1.35}.filepick input[type=file]{display:block;width:100%;min-width:0;max-width:100%;padding:10px 0;color:var(--mu);font:500 12px Sora}.filepick input[type=file]::file-selector-button{margin-right:10px;padding:9px 13px;border:1px solid var(--ln);border-radius:12px;background:rgba(255,255,255,.06);color:var(--t);font:600 12px Sora;cursor:pointer}.ap-secure{display:flex;flex-direction:column;align-items:center;gap:8px;margin:22px 0 8px;text-align:center;color:var(--mu)}.ap-secure .badge{display:inline-flex;align-items:center;gap:9px;padding:9px 13px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--ln);box-shadow:0 10px 28px -18px rgba(124,92,255,.9)}.ap-secure .badge strong{display:block;color:var(--t);font-size:12px;font-weight:600}.ap-secure .badge small{display:block;margin-top:2px;color:var(--mu);font-size:10.5px}.ap-secure .copy{font-size:10.5px;color:#667197;letter-spacing:.15px}.ai-page{height:calc(100vh - 52px);min-height:0;padding:0;display:flex;flex-direction:column;overflow:hidden}.ai-page .tb{flex:0 0 auto;padding-top:22px}.ai-chat{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:9px;margin:0;padding:8px 0 118px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scrollbar-width:none;-ms-overflow-style:none}.ai-chat::-webkit-scrollbar{width:0;height:0;display:none}.ai-composer{position:fixed;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(398px,calc(100vw - 32px));z-index:60;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;margin:0;border-radius:20px;background:rgba(14,19,40,.98);backdrop-filter:blur(18px);border:1px solid var(--ln);box-shadow:0 16px 34px -16px #000}.ai-composer input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--t);font:500 12.5px Sora}.ai-composer input::placeholder{color:var(--mu)}.ai-composer button{flex:0 0 40px;width:40px;height:40px;border:0;border-radius:13px;background:var(--g);display:grid;place-items:center;color:#fff;cursor:pointer;box-shadow:0 8px 18px -8px rgba(34,211,238,.75)}.ai-suggestions{display:none!important}.ai-msg{max-width:84%;font-size:12.5px;line-height:1.5;padding:10px 12px}.ai-msg.m1,.ai-msg.m2{font-size:12.5px}.ai-msg.ai-loading{font-size:12px}@media(max-width:430px){.ai-page{height:calc(100dvh - 52px)}}</style>
 </head>
 <body>
-<div id="app"></div><script src="./shop-catalog.js"></script>
+<div id="app"></div><script>
+(function(){
+'use strict';
+var rows=[
+['Mini USB Fan','Aegis Home','Home & Kitchen','Cooling',2.99,4.4,'Deal','🌀',1],
+['Cable Organizer Kit','Aegis Office','Office','Desk',4.99,4.5,'New','🧷',2],
+['Pocket Notebook Set','Aegis Paper','Books','Stationery',7.49,4.6,'Popular','📓',3],
+['Phone Grip Stand','Aegis Mobile','Electronics','Accessories',9.99,4.5,'Best Seller','📱',4],
+['Travel Water Bottle','Aegis Active','Outdoor','Hydration',12.99,4.7,'Popular','🥤',5],
+['Classic Sunglasses','Aegis Style','Fashion','Accessories',15.99,4.6,'New','🕶️',6],
+['LED Desk Light','Aegis Home','Office','Lighting',18.99,4.6,'Deal','💡',7],
+['Wireless Mouse','Aegis Tech','Electronics','Computer Accessories',21.99,4.7,'Top Rated','🖱️',8],
+['Kitchen Storage Set','Aegis Home','Home & Kitchen','Storage',24.99,4.6,'Featured','🫙',9],
+['Compact Travel Pouch','Aegis Style','Fashion','Travel',29.99,4.5,'Popular','👜',10],
+['Fitness Resistance Bands','Aegis Active','Sports','Training',34.99,4.7,'Best Seller','🏋️',11],
+['Ceramic Coffee Mug','Aegis Home','Home & Kitchen','Drinkware',39.99,4.6,'New','☕',12],
+['Desk Mat Pro','Aegis Office','Office','Desk Accessories',44.99,4.7,'Top Rated','🖥️',13],
+['Glow Skin Care Set','Aegis Beauty','Beauty','Skin Care',49.99,4.8,'Best Seller','🧴',14],
+['Everyday Backpack','Aegis Style','Fashion','Bags',54.99,4.7,'Featured','🎒',15],
+['Smart Tracker Tag','Aegis Tech','Electronics','Smart Devices',59.99,4.4,'New','🏷️',16],
+['Portable Blender','Aegis Home','Home & Kitchen','Appliances',69.99,4.6,'Deal','🥤',17],
+['Gaming Mouse Pro','Aegis Game','Gaming','PC Gaming',79.99,4.8,'Top Rated','🖱️',18],
+['Running Shoes Lite','Aegis Sport','Sports','Footwear',89.99,4.7,'Popular','👟',19],
+['Travel Duffel Bag','Aegis Style','Fashion','Travel',99.99,4.6,'Featured','🧳',20],
+['Mechanical Keyboard','Aegis Tech','Gaming','PC Gaming',109,4.8,'Best Seller','⌨️',21],
+['Fitness Smart Band','Aegis Active','Sports','Wearables',119,4.6,'New','⌚',22],
+['Stainless Cookware Set','Aegis Home','Home & Kitchen','Cookware',129,4.8,'Top Rated','🍳',23],
+['Noise Cancel Earbuds','Aegis Audio','Electronics','Headphones',139,4.7,'Featured','🎧',24],
+['Polarized Eyewear','Aegis Style','Fashion','Accessories',149,4.6,'Deal','🕶️',25],
+['Office Backpack Pro','Aegis Office','Office','Bags',159,4.7,'Popular','🎒',26],
+['Beauty Vanity Kit','Aegis Beauty','Beauty','Cosmetics',169,4.7,'Best Seller','💄',27],
+['Air Fryer Compact','Aegis Home','Home & Kitchen','Appliances',179,4.8,'Hot','🍟',28],
+['Smart Home Camera','Aegis Tech','Electronics','Smart Home',199,4.5,'New','📷',29],
+['Premium Sports Watch','Aegis Active','Sports','Wearables',219,4.7,'Featured','⌚',30],
+['Ultralight Tent','Aegis Outdoor','Outdoor','Camping',239,4.8,'Top Rated','⛺',31],
+['Gaming Headset Elite','Aegis Game','Gaming','PC Gaming',249,4.8,'Best Seller','🎮',32],
+['Robot Vacuum Mini','Aegis Home','Home & Kitchen','Appliances',269,4.6,'Deal','🧹',33],
+['Leather Weekender','Aegis Style','Fashion','Travel',289,4.7,'Featured','👜',34],
+['4K Streaming Box','Aegis Tech','Electronics','Entertainment',299,4.5,'Popular','📺',35],
+['Ergonomic Office Chair','Aegis Office','Office','Furniture',329,4.7,'Top Rated','🪑',36],
+['Pro Makeup Case','Aegis Beauty','Beauty','Accessories',349,4.8,'New','💼',37],
+['Performance Running Kit','Aegis Active','Sports','Training',379,4.8,'Featured','🏃',38],
+['Mirrorless Camera Body','Aegis Tech','Electronics','Cameras',399,4.7,'Best Seller','📷',39],
+['Travel Smart Luggage','Aegis Outdoor','Outdoor','Travel',429,4.7,'New','🧳',40],
+['Premium Coffee Machine','Aegis Home','Home & Kitchen','Coffee',449,4.8,'Top Rated','☕',41],
+['Ultra Gaming Monitor','Aegis Game','Gaming','PC Gaming',499,4.8,'Hot','🖥️',42],
+['Business Laptop Air','Aegis Tech','Electronics','Laptops',549,4.7,'Featured','💻',43],
+['Designer Carry-On','Aegis Style','Fashion','Travel',599,4.7,'Popular','🧳',44],
+['Smart Fitness Station','Aegis Active','Sports','Training',649,4.9,'Top Rated','🏋️',45],
+['Home Theater System','Aegis Tech','Electronics','Entertainment',699,4.6,'Best Seller','📺',46],
+['Premium Espresso Bar','Aegis Home','Home & Kitchen','Coffee',749,4.8,'Featured','☕',47],
+['Creator Laptop Pro','Aegis Tech','Electronics','Laptops',799,4.8,'Top Rated','💻',48],
+['Luxury Outdoor Set','Aegis Outdoor','Outdoor','Furniture',849,4.7,'New','🪵',49],
+['Studio Camera Kit','Aegis Tech','Electronics','Cameras',899,4.8,'Featured','📷',50],
+['Executive Workspace','Aegis Office','Office','Furniture',929,4.7,'Premium','🪑',51],
+['Flagship Smart Device','Aegis Tech','Electronics','Smart Devices',949,4.6,'Premium','📱',52],
+['Luxury Travel Trunk','Aegis Style','Fashion','Luggage',959,4.8,'Premium','🧳',53],
+['Home Wellness Suite','Aegis Home','Home & Kitchen','Wellness',969,4.7,'Premium','🛁',54],
+['Pro Creator Bundle','Aegis Tech','Gaming','Creator Gear',979,4.9,'Premium','🎥',55],
+['Elite Fitness Bundle','Aegis Active','Sports','Training',989,4.8,'Premium','🏆',56],
+['Aegis Signature Collection','Aegis Style','Fashion','Signature',999,4.9,'Signature','👑',57],
+['Wireless Charging Hub','Aegis Tech','Electronics','Charging',31.99,4.5,'New','🔋',58],
+['Smart Kitchen Scale','Aegis Home','Home & Kitchen','Kitchen Tools',36.99,4.6,'Popular','⚖️',59],
+['Portable Projector','Aegis Tech','Electronics','Projectors',189,4.6,'Featured','📽️',60]
+];
+var PRODUCT_IMAGES={
+  tech:'https://images.unsplash.com/photo-1769689268229-3e9c9ddaf1ee?auto=format&fit=crop&w=900&q=82',
+  laptop:'https://images.unsplash.com/photo-1610006330187-5f0c6ec0f9aa?auto=format&fit=crop&w=900&q=82',
+  bag:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=82',
+  camera:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=82',
+  shoes:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82',
+  watch:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=82',
+  headphones:'https://images.unsplash.com/photo-1674658556545-f18d4080ab6c?auto=format&fit=crop&w=900&q=82',
+  coffee:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=82',
+  chair:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=82',
+  home:'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=82'
+};
+
+var ACTIVE_PRODUCT_OVERRIDES={
+  'SP-4':{title:'Phone Grip Stand',brand:'PopSockets'},
+  'SP-8':{title:'Logitech M220 Silent Wireless Mouse',brand:'Logitech'},
+  'SP-16':{title:'Smart Bluetooth Tracker Tag',brand:'Tile'},
+  'SP-19':{title:'adidas Response 2 Running Shoes',brand:'adidas'},
+  'SP-21':{title:'Keychron K8 Pro Mechanical Keyboard',brand:'Keychron'},
+  'SP-24':{title:'Liberty 4 Pro Noise Cancelling Earbuds',brand:'soundcore'},
+  'SP-32':{title:'Wireless Gaming Headset Elite',brand:'Aegis Game'},
+  'SP-40':{title:'Heys SmartLuggage 26"',brand:'Heys'},
+  'SP-42':{title:'AOC 27" Curved Gaming Monitor',brand:'AOC'},
+  'SP-44':{title:'Designer Carry-On',brand:'Travel Collection'},
+  'SP-52':{title:'Flagship Smartphone',brand:'Aegis Tech'},
+  'SP-57':{title:'Premium Signature Crossbody Bag',brand:'Aegis Signature'}
+};
+var GALLERY_BY_ID={
+  'SP-4':[
+    'https://arqoob.com/uploads/img/pi/175/175411768300/medium_1754117683.webp',
+    'https://brave.ae/assets/images/1762178278_5769ff322d287431.png',
+    'https://simplecellbulk.com/cdn/shop/products/t84581-1__1_5e5a5f79-9631-41f8-8636-54af371941af.jpg?v=1681993849',
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=88',
+    'https://images.unsplash.com/photo-1546054454-aa26e2b734c7?auto=format&fit=crop&w=900&q=88'
+  ],
+  'SP-8':[
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_1_20260525094106_b1bcd4eba880.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_2_20260525094106_1075ce0dac61.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_3_20260525094106_f7303a8dffdb.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_4_20260525094106_d0ce338d6f56.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_5_20260525094106_a040ff5c6b0d.png'
+  ],
+  'SP-16':[
+    'https://images-na.ssl-images-amazon.com/images/I/610OXBcjEzL.jpg',
+    'https://s.alicdn.com/%40sc04/kf/H2439dcae96f94640aedea5300067648fA/Custom-Logo-Android-Smart-Phone-Tag-for-Google-Sony-Xiaomi-Smart-Phones-Key-Finder-Anti-Lost-Pet-Bike-Tracker.jpg',
+    'https://shop.letstrack.com/cdn/shop/files/smart-tag-ios.jpg?v=1757070065&width=1024',
+    'https://www.vimeltech.com.au/image/cache/catalog/2026/VIM-TAG-A1/tracker-tag-keyring-hand-held-550x550.jpg',
+    'https://images.unsplash.com/photo-1577598629456-7f4f7b3adf6e?auto=format&fit=crop&w=900&q=88'
+  ],
+  'SP-19':[
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/8a03725e19834c7c914202a7c6ac8f5e_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_01_00_standard.jpg',
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/be4dc1a6a8c24988bd5d3f9931cc9dc8_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_02_standard_hover.jpg',
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/38d6fbfc88fb47b9ad6356c5d6a601a1_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_03_standard.jpg',
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/7def225541b744e2985a9e4a82f12687_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_04_standard.jpg',
+    'https://contents.mediadecathlon.com/p1567822/k%24192043c18a8a8cacb793c158042bd4c7/laufschuhe-run-support-herren-rot.jpg'
+  ],
+  'SP-21':[
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/t/5/assets/keychronk8proqmkviawirelessmechanicalkeyboardformacwindowsosaprofilepbtkeycapspcbscrewinstabilizerwithhotswappablegaterongpromechanicalswitchcompatiblewithmxcherrypandakailhwithrgbbacklightaluminumframe-1645094681965.jpg?v=1645094684',
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/files/K8-Pro-White.jpg?v=1688090606',
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/files/K8-Pro-non-hot-swappable-version.jpg?v=1692007807',
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/t/5/assets/keychronk8proqmkviawirelessmechanicalkeyboardformacwindowsosaprofilepbtkeycapspcbscrewinstabilizerwithhotswappablegaterongpromechanicalswitchcompatiblewithmxcherrypandakailhwithrgbbacklightaluminumframe-1646107816821.jpg?v=1646107819',
+    'https://www.jib.co.th/img_master/product/original/20180809174303_30351_24_1.png',
+    'https://mechanicalkeyboards.com/cdn/shop/files/24061-9M62T-Keychron-K8-V2-Aluminum-Hotswap-RGB-Keyboard.jpg?v=1734988025&width=750'
+  ],
+  'SP-24':[
+    'https://m.media-amazon.com/images/S/aplus-media-library-service-media/2b8278d7-02c3-490e-94e0-e33e9f84400b.__CR0%2C0%2C1464%2C600_PT0_SX1464_V1___.jpg',
+    'https://m.media-amazon.com/images/S/aplus-media-library-service-media/f20411e3-e7f3-451e-804d-7caa78b4e72f.__CR0%2C0%2C1464%2C600_PT0_SX1464_V1___.jpg',
+    'https://m.media-amazon.com/images/S/aplus-media-library-service-media/735f982f-ae74-4310-b1fc-b9e56631cafd.__CR0%2C0%2C1464%2C600_PT0_SX1464_V1___.jpg',
+    'https://images-na.ssl-images-amazon.com/images/I/61loiB6QjoL.jpg',
+    'https://img.joomcdn.net/b216d373a5a6c4a7272d4eec42ad543262f7cedf_1024_1024.jpeg',
+    'https://www.segment.com.tr/images/productimages/SL_TWS04_B_02.jpg',
+    'https://image.made-in-china.com/2f0j00sfZkUHQzuToR/Tws-Charging-in-Ear-Wireless-Game-Headset-Cheap-Bluetooth-5-2-Noise-Cancellation-Headphone.webp'
+  ],
+  'SP-32':[
+    'https://resource.logitechg.com/w_544%2Ch_466%2Car_7%3A6%2Cc_pad%2Cq_auto%2Cf_auto%2Cdpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g733/gallery/g733-lilac-gallery-2.png',
+    'https://resource.logitechg.com/w_544%2Ch_466%2Car_7%3A6%2Cc_pad%2Cq_auto%2Cf_auto%2Cdpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g733/gallery/g733-lilac-gallery-3.png',
+    'https://resource.logitechg.com/w_544%2Ch_544%2Car_1%2Cc_fill%2Cq_auto%2Cf_auto%2Cdpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g733/g733-hpb-desktop.png',
+    'https://media.ldlc.com/r705/mktp/product/productImage/240702/92/bed9a292e52e4d41a6c288b5236791e6.webp',
+    'https://dubsnatch.com/cdn/shop/products/neon-rgb-black-gaming-headset-microphone-jack-usb-dubsnatch_600x.jpg?v=1673069964'
+  ],
+  'SP-40':[
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_26_frontqrt_black_Hand.jpg?v=1557326945&width=750',
+    'https://eu.heys.com/cdn/shop/files/SmartLuggage-Black-26-Inch-heys-luggage-lifestyle-image-1_ff13c23e-577f-4005-9019-8691fe5c3cd2.jpg?v=1746115566&width=500',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_features_5batteries.jpg?v=1746115566&width=750',
+    'https://eu.heys.com/cdn/shop/files/SmartLuggage-Black-26-Inch-heys-luggage-lifestyle-image-2_97c51421-c868-4be2-8cbc-4650f15c16d6.jpg?v=1746115566&width=500',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_26_open_1ba1375b-5724-4d2c-bfb6-db27196d0237.jpg?v=1746115566&width=750',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_26_isometric_front-icons_05856bf1-1223-4190-8f4b-646e2b00467b.jpg?v=1746115566&width=750',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_features_2proximity_e405073e-14c7-471d-be77-c8764a0864d7.jpg?v=1746115566&width=750'
+  ],
+  'SP-42':[
+    'https://cdn.sanity.io/images/hf5b3axp/production/250e10d12e65d14cecb1a834b735b7b531329cb4-1500x1500.png?auto=format&fit=max&w=800',
+    'https://cdn.sanity.io/images/hf5b3axp/production/63476a1cd86fda14d7b8f01ec30dea0be9e3d891-1920x1920.png?auto=format&fit=max&w=800',
+    'https://cdn.sanity.io/images/hf5b3axp/production/ba93d21a74c18eaf8c0514d48d524e0a89d66a55-1500x1500.png?auto=format&fit=max&w=800',
+    'https://cdn.sanity.io/images/hf5b3axp/production/7b9f6d384c6dee65e2dd8f167f45334067c8ab7c-3840x1500.png?auto=format&fit=max&w=800',
+    'https://www.laptopsdirect.co.uk/Images/C27G4ZXE_1_Supersize.jpg?v=3'
+  ],
+  'SP-44':[
+    'https://assets.target.com.au/transform/f6c96a96-ea6e-461b-a267-a01baea60a2a/43114962-8?io=transform%3Afit%2Cwidth%3A1400%2Cheight%3A1600&output=webp&quality=90',
+    'https://cdn.mos.cms.futurecdn.net/whowhatwear/posts/278107/designer-luggage-sets-278107-1551672255228-product.png',
+    'https://urbantravellerco.id/cdn/shop/files/thecarryonpro-greychocolate.webp?v=1702287221&width=1445',
+    'https://brain-images-ssl.cdn.dixons.com/3/5/10146753/l_10146753_006.jpg',
+    'https://www.n-sport.net/UserFiles/products/big/05/06/zenska-torba-karl-lagerfeld-k-signature-shoulderbag-201W3100-783.jpg',
+    'https://www.cocoon.club/cdn/shop/products/GUCCI_GG-Marmont-Matelasse-Mini-Crossbody_Black_Leather_FRONT_grande.jpg?v=1621332282'
+  ],
+  'SP-52':[
+    'https://image01-eu.oneplus.net/shop/202104/27/1-M00-24-8B-rB8bwmCICVmAWJYwAAb0g1C5KSs370.png',
+    'https://static.wixstatic.com/media/c2b8f0_4036c43680524933b8d1a071d97da1ae~mv2.jpg/v1/fill/w_780%2Ch_480%2Cal_c%2Clg_1%2Cq_85/c2b8f0_4036c43680524933b8d1a071d97da1ae~mv2.jpg',
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=88',
+    'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=88',
+    'https://images.unsplash.com/photo-1546054454-aa26e2b734c7?auto=format&fit=crop&w=900&q=88'
+  ],
+  'SP-57':[
+    'https://urbantravellerco.id/cdn/shop/files/thecarryonpro-greychocolate.webp?v=1702287221&width=1445',
+    'https://www.cocoon.club/cdn/shop/products/GUCCI_GG-Marmont-Matelasse-Mini-Crossbody_Black_Leather_FRONT_grande.jpg?v=1621332282',
+    'https://www.n-sport.net/UserFiles/products/big/05/06/zenska-torba-karl-lagerfeld-k-signature-shoulderbag-201W3100-783.jpg',
+    'https://assets.target.com.au/transform/f6c96a96-ea6e-461b-a267-a01baea60a2a/43114962-8?io=transform%3Afit%2Cwidth%3A1400%2Cheight%3A1600&output=webp&quality=90',
+    'https://cdn.mos.cms.futurecdn.net/whowhatwear/posts/278107/designer-luggage-sets-278107-1551672255228-product.png',
+    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=88'
+  ]
+};
+function productImage(x){
+  var s=(x[0]+' '+x[1]+' '+x[2]+' '+x[3]).toLowerCase();
+  if(/camera|creator|streaming|photo/.test(s))return PRODUCT_IMAGES.camera;
+  if(/laptop|keyboard|monitor|mouse|computer/.test(s))return PRODUCT_IMAGES.laptop;
+  if(/headphone|earbud|audio/.test(s))return PRODUCT_IMAGES.headphones;
+  if(/phone|smart device|charger|charging/.test(s))return PRODUCT_IMAGES.tech;
+  if(/shoe|running|fitness|sport|training|gym/.test(s))return PRODUCT_IMAGES.shoes;
+  if(/watch|wearable/.test(s))return PRODUCT_IMAGES.watch;
+  if(/backpack|bag|luggage|travel|pouch|makeup case/.test(s))return PRODUCT_IMAGES.bag;
+  if(/chair|furniture|office/.test(s))return PRODUCT_IMAGES.chair;
+  if(/coffee|mug|espresso/.test(s))return PRODUCT_IMAGES.coffee;
+  if(/home|kitchen|cook|air fryer|blender|vacuum/.test(s))return PRODUCT_IMAGES.home;
+  return PRODUCT_IMAGES.tech;
+}
+window.AegisShopCatalog=rows.map(function(x){
+  var id='SP-'+x[8],g=GALLERY_BY_ID[id]||[],ov=ACTIVE_PRODUCT_OVERRIDES[id]||{};
+  return{id:id,title:ov.title||x[0],brand:ov.brand||x[1],category:ov.category||x[2],subcategory:x[3],marketPrice:x[4],rating:x[5],badge:x[6],emoji:x[7],image:g[0]||productImage(x),gallery:g};
+});
+})();
+
+</script>
 <script>
 const P={home:'m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z',pie:'M21 12A9 9 0 1 1 12 3v9z',clock:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2',bot:'M12 8V4M8 8h8a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3M9 14v1M15 14v1',user:'M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',bell:'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a2 2 0 0 0 3.4 0',back:'M19 12H5m7-7-7 7 7 7',chev:'m9 18 6-6-6-6',copy:'M9 9h11v11H9zM5 15H4V4h11v1',share:'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6M8.6 13.5l6.8 4M15.4 6.5l-6.8 4',search:'m21 21-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14',cart:'M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.5L22 7H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2M18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2',shield:'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z',lock:'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6',check:'m5 12 5 5L20 7',gift:'M3 8h18v4H3zM12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5',set:'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6',send:'m22 2-11 11M22 2l-7 20-4-9-9-4z',link:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1',alert:'M12 3 2 20h20zM12 10v4M12 17.5v.5',arrow:'M5 12h14m-7-7 7 7-7 7',out:'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',dl:'M17 7 7 17M16 17H7V8',up:'M7 17 17 7M8 7h9v9',usd:'M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',chart:'M3 3v18h18M7 14l4-4 3 3 5-6',card:'M2 6h20v12H2zM2 10h20',phone:'M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1M11 18h2',shirt:'M8 3 3 6l2 4 3-1v12h8V9l3 1 2-4-5-3a4 4 0 0 1-8 0',cook:'M6 13h12v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM4 13h16M9 9a2 2 0 0 1 0-4 3 3 0 0 1 6 0 2 2 0 0 1 0 4',spark:'M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z',game:'M6 12h4M8 10v4M15 13h.01M18 11h.01M17 6H7a5 5 0 0 0-5 5v3a3 3 0 0 0 5.5 1.7L8.5 14h7l1 1.7A3 3 0 0 0 22 14v-3a5 5 0 0 0-5-5',book:'M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2M4 19a2 2 0 0 0 2 2h13'};
 const ic=n=>`<svg class="i" viewBox="0 0 24 24"><path d="${P[n]}"/></svg>`;
@@ -345,6 +550,25 @@ function taskReviewList(product){
  const names=['Aiden','Amelia','Arjun','Aisha','Daniel'];
  return taskReviewSamples.slice(0,3).map((t,i)=>({name:names[(base+i)%names.length],text:t,d:(3+i*5)+' days ago'}));
 }
+function taskImageUrl(url){
+  const raw=String(url||'').trim();
+  if(!raw)return '';
+  return location.origin+'/product-image?url='+encodeURIComponent(raw);
+}
+function bindTaskDelegation(){
+  if(window.__aegisTaskDelegationBound)return;
+  window.__aegisTaskDelegationBound=true;
+  document.addEventListener('click',function(e){
+    const view=e.target.closest('[data-open-task-product]');
+    if(view){e.preventDefault();e.stopPropagation();openTaskProduct(view.getAttribute('data-open-task-product')||'');return;}
+    const done=e.target.closest('[data-complete-task]');
+    if(done){e.preventDefault();e.stopPropagation();completeShopTask(done.getAttribute('data-complete-task')||'');return;}
+    const close=e.target.closest('[data-close-task-product]');
+    if(close){e.preventDefault();e.stopPropagation();closeTaskProduct();return;}
+    const buy=e.target.closest('[data-buy-task-product]');
+    if(buy){e.preventDefault();e.stopPropagation();openTaskMarketplace(buy.getAttribute('data-buy-task-product')||'');return;}
+  },true);
+}
 function closeTaskProduct(){const m=document.getElementById('taskProductModal');if(m)m.classList.remove('show');}
 function openTaskMarketplace(taskId){
  const x=taskProductData[String(taskId)]||{},product=x.product;
@@ -355,10 +579,16 @@ function openTaskMarketplace(taskId){
 }
 function openTaskProduct(taskId){
  const x=taskProductData[String(taskId)]||{},task=x.task||{},offer=x.offer||{},product=x.product||{};
- if(!product){uiNotice('Product details are not available for this task yet. Please refresh the Shop Tasks page.','error');return}
+ if(!product){
+  const fallbackId=String(offer?.product_id||'');
+  const fallback=(window.AegisShopCatalog||[]).find(p=>String(p.id)===fallbackId)||null;
+  if(fallback)x.product=fallback;
+  product=x.product||{};
+}
+if(!product.id){uiNotice('The assigned Shop product could not be loaded. Please refresh Shop Tasks.','error');return}
  const modal=document.getElementById('taskProductModal'),box=document.getElementById('taskProductContent');if(!modal||!box)return;
  const rating=Number(product.rating||0),reviews=taskReviewList(product);
- const base=product.image||'',gallery=(Array.isArray(product.gallery)&&product.gallery.length?product.gallery:[base,base+'&h=900&crop=left',base+'&h=900&crop=right',base+'&h=900&crop=top',base+'&h=900&crop=bottom',base+'&h=900&crop=entropy']).filter(Boolean).slice(0,7);
+ const base=product.image||'',rawGallery=(Array.isArray(product.gallery)&&product.gallery.length?product.gallery:[base]).filter(Boolean).slice(0,7),gallery=rawGallery.map(taskImageUrl).filter(Boolean);
  box.innerHTML='<div class="task-modal-head"><div><small class="mu">Assigned Shop Product</small><h2 style="font-size:19px;margin-top:2px">'+esc(product.title||task.title||'Product')+'</h2></div><button type="button" class="task-modal-close" data-close-task-product>×</button></div>'+
    '<div class="task-gallery"><div class="task-gallery-main"><img id="taskGalleryMain" src="'+esc(gallery[0]||'')+'" alt="'+esc(product.title||'Product')+'"><span class="task-gallery-count" id="taskGalleryCount">1 / '+gallery.length+'</span></div><div class="task-gallery-thumbs">'+gallery.map((im,i)=>'<button type="button" style="padding:0;border:0;background:transparent" data-gallery-index="'+i+'"><img class="task-gallery-thumb '+(i===0?'on':'')+'" src="'+esc(im)+'" alt="Product image '+(i+1)+'"></button>').join('')+'</div></div>'+
    '<div style="margin-top:11px;font-size:12px;color:var(--mu)">'+esc(product.brand||offer.subtitle||'AegisPay Shop')+' · '+esc(product.category||'Shop Product')+'</div>'+
@@ -367,7 +597,7 @@ function openTaskProduct(taskId){
    '<div class="sh" style="margin-top:16px"><span>Customer Reviews</span><span>'+rating.toFixed(1)+' / 5</span></div>'+
    reviews.map(r=>'<div class="task-review"><div class="who">'+esc(r.name)+' <span class="mu">· '+esc(r.d)+'</span></div><p>'+esc(r.text)+'</p></div>').join('')+
    '<div class="task-modal-actions"><button type="button" class="btn o" data-close-task-product>Close</button><button type="button" class="btn" data-buy-task-product="'+esc(taskId)+'">Purchase / Open Shop '+ic('arrow')+'</button></div>'+
-   '<div class="task-purchase-note">Review previews are illustrative product feedback for this prototype Shop task.</div>';
+   '<div class="task-purchase-note">Product images are served from the assigned Shop catalog. Review Preview is illustrative; the marketplace contains the live listing information.</div>';
  modal.classList.add('show');
  const main=document.getElementById('taskGalleryMain'),count=document.getElementById('taskGalleryCount'),thumbs=box.querySelectorAll('[data-gallery-index]');let idx=0;
  const show=()=>{if(main)main.src=gallery[idx]||'';if(count)count.textContent=(idx+1)+' / '+gallery.length;thumbs.forEach((b,i)=>{const im=b.querySelector('img');if(im)im.classList.toggle('on',i===idx)})};
@@ -416,7 +646,7 @@ async function liveShop(){
   const offer=offerMap.get(String(x.offer_id||''))||null;
   const product=(window.AegisShopCatalog||[]).find(p=>String(p.id)===String(offer?.product_id||''))||null;
   taskProductData[String(x.id)]={task:x,offer,product};
-  const image=product?.image||'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0);
+  const image=product?.image?taskImageUrl(product.image):'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0);
   return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(image)+'" alt="'+esc(title)+'">':'<div class="task-product-img" style="display:grid;place-items:center;font-size:24px">🛍️</div>')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div>';
 }).join(''):'<div class="mu" style="padding:16px 0;text-align:center">No assigned Shop tasks yet.</div>';
 
@@ -433,7 +663,7 @@ async function liveShop(){
    statusCard='<div class="card"><div class="sh" style="margin-top:0">Active Shop Cycle <span>'+Number(cycle.cycle_base||0).toFixed(2)+' USDT</span></div><div class="two"><div><small class="mu">Tasks</small><h3>'+completedCount+'/'+rows.length+'</h3></div><div><small class="mu">Remaining Balance</small><h3>'+remaining.toFixed(2)+' USDT</h3></div></div><div class="warn" style="margin-top:12px"><span>Complete each assigned task individually. When the final task is completed, the 18-hour settlement starts automatically.</span></div></div>';
  }
  app.innerHTML=top('Shop & Tasks','home')+statusCard+'<div class="sh">Assigned Task Set <span>'+rows.length+' tasks</span></div><div class="card" style="padding:4px 16px">'+taskHtml+'</div><button class="btn o" style="margin-bottom:14px" onclick="location.href=\'https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&return=\'+encodeURIComponent(location.href)">Browse Shop Marketplace</button><div class="card"><div class="sh" style="margin-top:0">How the cycle works</div><div class="mu" style="font-size:11.5px;line-height:1.6">Open an assigned product to view its picture, rating and review previews. Purchase it through Shop, return here, then complete the task. After the final task, the 18-hour settlement timer starts automatically.</div></div><div id="taskProductModal" class="task-modal" aria-hidden="true"><div class="task-modal-box"><div id="taskProductContent"></div></div></div>'+nav('home');
- document.querySelectorAll('[data-complete-task]').forEach(el=>el.onclick=()=>completeShopTask(el.getAttribute('data-complete-task')||''));document.querySelectorAll('[data-open-task-product]').forEach(el=>el.onclick=()=>openTaskProduct(el.getAttribute('data-open-task-product')||''));
+ bindTaskDelegation();
 }
 
 async function liveTasks(){return liveShop()}
@@ -684,7 +914,7 @@ if(qs.get('reset')==='1' || qs.has('code') || qs.get('type')==='recovery' || has
   return;
 }
 const s=await db.auth.getSession();if(s.data.session){await initData();if(profile.role==='USER'){if(!['ACTIVE','NORMAL'].includes(String(profile.status||'').toUpperCase())){await db.auth.signOut();throw Error('This account is not active.');}return liveHome()}}window.go('login')}catch(e){window.go('login')}}
-window.liveLogout=liveLogout;updateNotificationBadge();bootLive();
+bindTaskDelegation();window.liveLogout=liveLogout;updateNotificationBadge();bootLive();
 })();
 </script>
 </body>
