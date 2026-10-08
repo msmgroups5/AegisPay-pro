@@ -34,7 +34,7 @@
 - Private `private-verification` Storage bucket exists, public access is disabled, max size is 10 MB, and allowed MIME types are JPEG/PNG/WebP.
 - Storage policies are owner-scoped and guarded by the application runtime switch.
 - One active pg_cron job runs `public.settle_due_cycles()` every minute.
-- Current system mode is `TESTNET_DEMO`, with real payouts disabled and live deposits disabled.
+- Current system mode is `MAINNET / LIVE_DEPOSIT_TEST`; controlled live-deposit testing is enabled, while real payouts remain disabled and the Phase 3 production payout gate is locked.
 - No Supabase development branches currently exist.
 - `monitor-deposits` is deployed but its automatic cron is intentionally not enabled until the server-side cron secret is configured.
 
