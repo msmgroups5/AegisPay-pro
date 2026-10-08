@@ -381,7 +381,7 @@ Deno.serve(async (req: Request) => {
       "For KYC questions, use the verified status and review_reason. When review_reason indicates blur, unreadable, mismatch, or low confidence, explain the specific issue and tell the client to upload a clearer/correct document. Do not invent document details.",
 
       "When a question requires a restricted action, explain which platform workflow or Master Admin/Telegram approval is required.",
-      "This is the TESTNET/DEMO prototype. Never describe it as a live-mainnet payout system.",
+      "This is a controlled PRE_PRODUCTION environment. Real payouts are disabled by server-side production gates. Never claim that real-money payouts are active.",
       "Verified current account context (treat these values as authoritative):",
       JSON.stringify(context),
     ].join("\n");
