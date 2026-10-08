@@ -20,6 +20,10 @@ Deno.serve(async(req:Request)=>{
   const {data:profile,error:profileError}=await admin.from("users").select("id,role,status").eq("auth_user_id",authResult.user.id).maybeSingle();
   if(profileError||!profile)return json({error:"AegisPay profile not found."},404);
   if(profile.role!=="MASTER ADMIN"||!["ACTIVE","NORMAL"].includes(String(profile.status||"").toUpperCase()))return json({error:"Active Master Admin access is required."},403);
+
+  const body=await req.json().catch(()=>({})) as Record<string,unknown>;
+  const action=String(body.action||"read").toLowerCase();
+
   const [{data:systemRow},{data:depositRow},{data:prodRow},{data:runtimeRow}]=await Promise.all([
    admin.from("platform_settings").select("value_json").eq("key","system_mode").maybeSingle(),
    admin.from("platform_settings").select("value_json").eq("key","deposit_rules").maybeSingle(),
@@ -41,7 +45,37 @@ Deno.serve(async(req:Request)=>{
   const mainnetBaseConfigOk=system.mode==="MAINNET"&&network==="TRON MAINNET"&&Boolean(receiving);
   const mainnetMonitoringReady=mainnetBaseConfigOk&&liveDeposits&&productionLiveDeposits&&secrets.trongrid_api&&secrets.cron_secret;
   const mainnetPayoutGateOk=mainnetBaseConfigOk&&realPayouts&&productionRealPayouts&&goLive&&productionGoLive&&!payoutsLocked&&runtimeEnabled;
-  const mainnetPayoutOperational=mainnetPayoutGateOk&&secrets.trongrid_api&&secrets.mainnet_payout_key;
+  const mainnetPayoutOperational=mainnetPayoutGateOk&&secrets.trongrid_api&&secrets.mainnet_payout_key&&secrets.telegram_bot_token;
+
+  if(action==="update"){
+    const env=String(body.environment||"PRE_PRODUCTION").toUpperCase();
+    const live=body.liveDepositsEnabled===true;
+    const payouts=body.realPayoutsEnabled===true;
+    const approved=body.goLiveApproved===true;
+    const locked=body.payoutsLocked!==false;
+
+    if(payouts && (!mainnetPayoutOperational || !runtimeEnabled)){
+      return json({error:"Production payout operations are not ready. Configure the required server-side payout, TRONGrid and Telegram secrets and complete the readiness checks first.",code:"PRODUCTION_PAYOUT_NOT_READY"},409);
+    }
+    if(live && env==="PRODUCTION" && (!mainnetMonitoringReady || !runtimeEnabled)){
+      return json({error:"Production live-deposit monitoring is not ready. Configure TRONGrid and cron authentication before enabling production live deposits.",code:"PRODUCTION_DEPOSIT_MONITORING_NOT_READY"},409);
+    }
+
+    const userScoped=createClient(SUPABASE_URL,SERVICE_KEY,{
+      auth:{persistSession:false,autoRefreshToken:false},
+      global:{headers:{Authorization:"Bearer "+token}}
+    });
+    const {data:updated,error:updateError}=await userScoped.rpc("set_production_config",{
+      p_environment:env,
+      p_live_deposits_enabled:live,
+      p_real_payouts_enabled:payouts,
+      p_go_live_approved:approved,
+      p_payouts_locked:locked
+    });
+    if(updateError)return json({error:String(updateError.message||"Production configuration could not be saved."),code:"PRODUCTION_CONFIG_UPDATE_FAILED"},409);
+    return json({status:"PRODUCTION_CONFIG_UPDATED",readiness:updated||null},200);
+  }
+
   const readiness={
    environment,system_mode:String(system.mode||"").toUpperCase(),system_status:String(system.status||""),network,
    receiving_address_configured:Boolean(receiving),live_deposits:liveDeposits,real_payouts:realPayouts,production_go_live_approved:goLive,payouts_locked:payoutsLocked,
