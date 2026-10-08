@@ -97,7 +97,7 @@ Sensitive balance mutations, task completion, wallet linking and withdrawal requ
 - `admin-review`: Master Admin review actions.
 - `telegram-withdrawal`: internal withdrawal approval communication.
 - `execute-payout`: guarded payout path; testnet/mainnet behavior depends on server-side mode and secrets.
-- `complete-cycle-checkout`: server-side exact assigned-task-set checkout; client task-level completion RPC is retired from the browser API.
+- `complete-cycle-checkout`: separately hardened server-side exact assigned-task-set checkout endpoint. The current client UI completes assigned tasks individually through the authenticated `complete_shop_task` RPC; the final task moves the cycle to `WAITING_18H`. The legacy one-argument withdrawal-wallet RPC remains retired.
 
 Service-role keys, payout keys, Telegram credentials and other secrets must remain server-side.
 
