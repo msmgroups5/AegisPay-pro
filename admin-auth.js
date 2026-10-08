@@ -18,6 +18,7 @@ const state={
   referrals:[],
   audit:[],
   settings:{},
+  production:null,
   telegram:null
 };
 
@@ -275,6 +276,25 @@ function audit(){
   return '<main class="aa-main">'+pageHeader('SECURITY','Audit Log','Administrative and workflow history from Supabase.')+'<section class="aa-panel">'+(rows||empty('No audit events.','New administrative activity will be recorded here.'))+'</section></main>';
 }
 
+function productionReadiness(){
+  const p=state.production||{};
+  const depositOn=Boolean(p.live_deposits);
+  const payoutOn=Boolean(p.real_payouts);
+  const locked=p.payouts_locked!==false;
+  const approved=Boolean(p.production_go_live_approved);
+  const payoutReady=Boolean(p.mainnet_payout_gate_ok);
+  return '<section class="aa-panel"><div class="aa-panel-head"><div><h2>Production Readiness</h2><p>Controlled Phase 3 configuration. Secrets are never shown here.</p></div><span class="aa-count">'+(payoutReady?'READY':'LOCKED')+'</span></div>'+
+    '<div class="aa-detail-grid">'+
+      '<span>Environment<b>'+esc(p.environment||'PRE_PRODUCTION')+'</b></span>'+
+      '<span>Network<b>'+esc(p.network||'—')+'</b></span>'+
+      '<span>Live Deposits<b>'+esc(depositOn?'ON':'OFF')+'</b></span>'+
+      '<span>Real Payouts<b>'+esc(payoutOn?'ON':'OFF')+'</b></span>'+
+      '<span>Go-Live Approval<b>'+esc(approved?'APPROVED':'NOT APPROVED')+'</b></span>'+
+      '<span>Payout Lock<b>'+esc(locked?'LOCKED':'OPEN')+'</b></span>'+
+    '</div>'+
+    '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Phase 3 Safety Gate</strong><small>Real payouts stay disabled until server-side payout secrets, monitoring configuration, operator approval and final smoke tests are complete.</small></div></div>'+
+    '</section>';
+}
 function settings(){
   const s=state.settings||{},dr=s.deposit_rules||{},cr=s.cycle_rules||{},rr=s.referral_rules||{},wr=s.withdrawal_rules||{},sm=s.system_mode||{};
   return '<main class="aa-main">'+pageHeader('CONFIGURATION','Platform Settings','Rules that control future client workflows.')+
@@ -290,6 +310,7 @@ function settings(){
       '<div class="aa-span-2 aa-ai-control"><div><strong>AI Approval Bot</strong><small>Controls AI precheck for KYC and deposit evidence. OFF means new submissions go to manual review; it never auto-approves.</small></div><button type="button" class="aa-system-toggle '+((s.ai_review||{}).enabled!==false?'on':'off')+'" data-action="ai-toggle">'+((s.ai_review||{}).enabled!==false?'AI BOT ON':'AI BOT OFF')+'</button></div>'+
       '<div class="aa-span-2"><button class="aa-primary" type="submit">Save Platform Rules</button></div>'+
     '</form></section>'+
+    productionReadiness()+
     '<section class="aa-panel"><div class="aa-panel-head"><div><h2>Runtime</h2><p>Current backend mode.</p></div><span class="aa-badge aa-badge-amber">'+esc(sm.mode||'TESTNET_DEMO')+'</span></div>'+
       '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Production safeguards remain active.</strong><small>Mainnet payout execution stays disabled until server-side production configuration is explicitly enabled.</small></div></div>'+
     '</section></main>';
@@ -403,6 +424,10 @@ async function refreshData(){
     const runtime=await service.appRuntimeEnabled();
     state.enabled=runtime;
   }catch(e){}
+  try{
+    const pr=await c.rpc('get_production_readiness');
+    if(!pr.error)state.production=pr.data||null;
+  }catch(e){state.production=null;}
   try{
     const q=await service.invokeFunction('admin-queues',{body:{}});
     state.queues={deposits:q.data?.deposits||[],kyc:q.data?.kyc||[],withdrawals:q.data?.withdrawals||[],kycHistory:q.data?.kycHistory||[],depositHistory:q.data?.depositHistory||[],stats:q.data?.stats||{}};
