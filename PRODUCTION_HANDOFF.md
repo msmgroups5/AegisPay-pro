@@ -41,9 +41,9 @@
 ## Security review
 
 Supabase Security Advisor currently reports:
-- 8 authenticated SECURITY DEFINER RPCs. The remaining findings are intentionally used by the client/admin/RLS workflow and contain explicit role/ownership/runtime gates; they require function-by-function review rather than blanket disabling.
+- 14 authenticated-callable SECURITY DEFINER RPCs plus 1 pre-auth anonymous `resolve_login_email` lookup remain visible to Security Advisor. The reviewed functions have explicit role/identity/ownership/runtime gates where required; these are function-by-function hardening candidates, not a blanket revoke target.
 - The stale one-argument `link_withdrawal_wallet(text)` overload is no longer executable by `authenticated`; the canonical two-argument wallet RPC is the authenticated client path.
-- Leaked Password Protection is disabled and should be enabled before real production use.
+- Leaked Password Protection is disabled and remains a production security prerequisite.
 
 Supabase Performance Advisor currently reports 12 unused indexes. These are review candidates and should not be deleted solely because the current dataset is small.
 
