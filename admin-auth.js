@@ -10,7 +10,7 @@ const state={
   busy:false,
   error:'',
   enabled:true,
-  queues:{deposits:[],kyc:[],withdrawals:[],stats:{}},
+  queues:{deposits:[],kyc:[],withdrawals:[],kycHistory:[],depositHistory:[],stats:{}},
   users:[],
   offers:[],
   tiers:[],
@@ -244,8 +244,14 @@ function reviewCard(kind,item){
 
 function queuePage(tab,title,sub,kind){
   const items=state.queues[kind]||[];
+  const history=kind==='kyc'?(state.queues.kycHistory||[]):(kind==='deposits'?(state.queues.depositHistory||[]):[]);
+  const historyHtml=history.length?history.map(x=>reviewCard(kind,x)).join(''):empty('No previous records.','Approved, rejected and completed records will appear here.');
   return '<main class="aa-main">'+pageHeader(title,title==='Deposits'?'Review deposits and verify transaction evidence.':title==='Identity Verification'?'Review private identity documents securely.':'Review client payout requests and approval states.',sub)+
-    '<section class="aa-list">'+(items.length?items.map(x=>reviewCard(kind,x)).join(''):empty('Queue is clear.','There are no items waiting for review.'))+'</section></main>';
+    '<section class="aa-panel"><div class="aa-panel-head"><div><h2>Pending Review</h2><p>Items currently waiting for manual review.</p></div><span class="aa-count">'+items.length+'</span></div>'+
+    '<section class="aa-list">'+(items.length?items.map(x=>reviewCard(kind,x)).join(''):empty('Queue is clear.','There are no items waiting for review.'))+'</section></section>'+
+    ((kind==='kyc'||kind==='deposits')?'<section class="aa-panel" style="margin-top:14px"><div class="aa-panel-head"><div><h2>Verification History</h2><p>AI-approved and manually reviewed records remain available for later inspection.</p></div><span class="aa-count">'+history.length+'</span></div>'+
+    '<section class="aa-list">'+historyHtml+'</section></section>':'')+
+    '</main>';
 }
 
 function shop(){
@@ -399,7 +405,7 @@ async function refreshData(){
   }catch(e){}
   try{
     const q=await service.invokeFunction('admin-queues',{body:{}});
-    state.queues={deposits:q.data?.deposits||[],kyc:q.data?.kyc||[],withdrawals:q.data?.withdrawals||[],stats:q.data?.stats||{}};
+    state.queues={deposits:q.data?.deposits||[],kyc:q.data?.kyc||[],withdrawals:q.data?.withdrawals||[],kycHistory:q.data?.kycHistory||[],depositHistory:q.data?.depositHistory||[],stats:q.data?.stats||{}};
     if(typeof q.data?.appEnabled==='boolean')state.enabled=q.data.appEnabled;
   }catch(e){
     state.error=state.error||'Operational queues are temporarily unavailable.';
@@ -575,7 +581,7 @@ root.addEventListener('click',function(e){
   const action=el.dataset.action;
   if(action==='tab'){state.tab=el.dataset.tab;state.error='';render();return;}
   if(action==='refresh'){setBusy(refreshData);return;}
-  if(action==='logout'){service.signOut().finally(function(){state.profile=null;state.queues={deposits:[],kyc:[],withdrawals:[],stats:{}};render();});return;}
+  if(action==='logout'){service.signOut().finally(function(){state.profile=null;state.queues={deposits:[],kyc:[],withdrawals:[],kycHistory:[],depositHistory:[],stats:{}};render();});return;}
   if(action==='runtime'){runtime();return;}
   if(action==='review'){review(el);return;}
   if(action==='payout'){payout(el);return;}
