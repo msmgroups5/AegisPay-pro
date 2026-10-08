@@ -214,20 +214,18 @@ function reviewCard(kind,item){
   const user=item.user?item.user.name+' · '+item.user.email:'Unknown account';
   if(kind==='deposits'){
     return '<article class="aa-review-card"><div class="aa-review-top"><div><span class="aa-badge aa-badge-cyan">DEPOSIT</span><h3>'+money(item.grossAmount)+' USDT</h3><p>'+esc(user)+'</p></div><span class="aa-status">'+esc(item.status||'PENDING')+'</span></div>'+
-      '<div class="aa-detail-grid"><span>Tier<b>'+esc(item.tierId||'—')+'</b></span><span>TXID<b class="aa-mono">'+esc(item.txid||'—')+'</b></span><span>AI Review<b>'+esc(item.aiReviewStatus||'—')+'</b></span><span>Submitted<b>'+esc(date(item.createdAt||item.submittedAt))+'</b></span></div>'+
+      '<div class="aa-detail-grid"><span>Tier<b>'+esc(item.tierId||'—')+'</b></span><span>TXID<b class="aa-mono">'+esc(item.txid||'—')+'</b></span><span>AI Review<b>'+esc(item.aiReviewStatus||'—')+'</b></span><span>AI Confidence<b>'+esc(item.aiConfidence==null?'n/a':item.aiConfidence)+'</b></span><span>AI Reason<b>'+esc(item.aiReviewReason||'—')+'</b></span><span>Policy<b>'+esc(item.aiPolicyVersion||'—')+'</b></span><span>Submitted<b>'+esc(date(item.createdAt||item.submittedAt))+'</b></span></div>'+
       '<div class="aa-review-actions">'+
         (item.screenshotUrl?'<a class="aa-secondary" href="'+esc(item.screenshotUrl)+'" target="_blank" rel="noopener">'+ico('eye',15)+' Open Evidence</a>':'<span class="aa-muted">Evidence unavailable</span>')+
-        '<button class="aa-primary" data-action="review" data-kind="deposit" data-id="'+esc(item.id)+'" data-decision="approve">Approve &amp; Verify</button>'+
-        '<button class="aa-danger" data-action="review" data-kind="deposit" data-id="'+esc(item.id)+'" data-decision="reject">Reject</button>'+
+        (item.status==='PENDING_VERIFICATION'?'<button class="aa-primary" data-action="review" data-kind="deposit" data-id="'+esc(item.id)+'" data-decision="approve">Approve &amp; Verify</button><button class="aa-danger" data-action="review" data-kind="deposit" data-id="'+esc(item.id)+'" data-decision="reject">Reject</button>':'<span class="aa-muted">Historical record · review only</span>')+
       '</div></article>';
   }
   if(kind==='kyc'){
     return '<article class="aa-review-card"><div class="aa-review-top"><div><span class="aa-badge aa-badge-violet">IDENTITY</span><h3>'+esc(item.documentType||'KYC')+'</h3><p>'+esc(user)+'</p></div><span class="aa-status">'+esc(item.status||'PENDING')+'</span></div>'+
-      '<div class="aa-detail-grid"><span>AI Review<b>'+esc(item.aiReviewStatus||'—')+'</b></span><span>Confidence<b>'+esc(item.confidence||'n/a')+'</b></span><span>Reason<b>'+esc(item.reason||'No issue')+'</b></span></div>'+
+      '<div class="aa-detail-grid"><span>AI Review<b>'+esc(item.aiReviewStatus||'—')+'</b></span><span>Confidence<b>'+esc(item.confidence==null?'n/a':item.confidence)+'</b></span><span>Reason<b>'+esc(item.reason||'No issue')+'</b></span><span>Policy<b>'+esc(item.aiPolicyVersion||'—')+'</b></span><span>AI Checks<b>'+esc(JSON.stringify(item.aiChecks||{}))+'</b></span></div>'+
       '<div class="aa-review-actions">'+
         '<div class="aa-file-links">'+(item.frontUrl?'<a class="aa-secondary" href="'+esc(item.frontUrl)+'" target="_blank" rel="noopener">Front / Passport</a>':'')+(item.backUrl?'<a class="aa-secondary" href="'+esc(item.backUrl)+'" target="_blank" rel="noopener">Back</a>':'')+'</div>'+
-        '<button class="aa-primary" data-action="review" data-kind="kyc" data-id="'+esc(item.id)+'" data-decision="approve">Approve KYC</button>'+
-        '<button class="aa-danger" data-action="review" data-kind="kyc" data-id="'+esc(item.id)+'" data-decision="reject">Reject</button>'+
+        (item.status==='PENDING_REVIEW'||item.status==='MANUAL_REVIEW'?'<button class="aa-primary" data-action="review" data-kind="kyc" data-id="'+esc(item.id)+'" data-decision="approve">Approve KYC</button><button class="aa-danger" data-action="review" data-kind="kyc" data-id="'+esc(item.id)+'" data-decision="reject">Reject</button>':'<span class="aa-muted">Historical record · review only</span>')+
       '</div></article>';
   }
   return '<article class="aa-review-card"><div class="aa-review-top"><div><span class="aa-badge aa-badge-green">WITHDRAWAL</span><h3>'+money(item.amount)+' USDT</h3><p>'+esc(user)+'</p></div><span class="aa-status">'+esc(item.status||'PENDING')+'</span></div>'+
