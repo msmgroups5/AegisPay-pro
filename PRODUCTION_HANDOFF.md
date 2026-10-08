@@ -36,7 +36,7 @@
 - One active pg_cron job runs `public.settle_due_cycles()` every minute.
 - Current system mode is `MAINNET / LIVE_DEPOSIT_TEST`; controlled live-deposit testing is enabled, while real payouts remain disabled and the Phase 3 production payout gate is locked.
 - No Supabase development branches currently exist.
-- `monitor-deposits` is deployed but its automatic cron is intentionally not enabled until the server-side cron secret is configured.
+- `monitor-deposits` is deployed, but automatic chain monitoring remains intentionally disabled until the server-side cron authentication secret is securely configured.
 
 ## Security review
 
