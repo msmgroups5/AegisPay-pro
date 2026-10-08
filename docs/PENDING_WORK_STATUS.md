@@ -61,7 +61,7 @@ Last aligned: 2026-10-08
 - Mainnet payout execution now enforces the Phase 3 production gate server-side; testnet payout behavior remains unchanged.
 - Production go-live remains intentionally disabled until the required server-side secrets, monitoring, operator approval and final end-to-end smoke tests are completed.
 
-### Phase 3 — Production configuration
+### Post-Phase 3 go-live requirements
 1. Replace TESTNET_DEMO configuration only after security gates pass.
 2. Configure production TRON/USDT receiving address and payout secrets server-side.
 3. Keep real payouts disabled until operator configuration and final smoke tests pass.
