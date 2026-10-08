@@ -571,10 +571,11 @@ function bindTaskDelegation(){
 }
 function closeTaskProduct(){const m=document.getElementById('taskProductModal');if(m)m.classList.remove('show');}
 function openTaskMarketplace(taskId){
- const x=taskProductData[String(taskId)]||{},product=x.product;
+ const x=taskProductData[String(taskId)]||{},product=x.product,offer=x.offer;
  if(!product){uiNotice('Product details are not available for this task yet.','error');return}
  const returnUrl=location.href;
- const u='https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&task='+encodeURIComponent(taskId)+'&q='+encodeURIComponent(product.title||'')+'&return='+encodeURIComponent(returnUrl);
+ const shopQuery=String(offer?.title||product.title||'').trim();
+ const u='https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&task='+encodeURIComponent(taskId)+'&q='+encodeURIComponent(shopQuery)+'&return='+encodeURIComponent(returnUrl);
  location.href=u;
 }
 function openTaskProduct(taskId){
@@ -596,7 +597,7 @@ function openTaskProduct(taskId){
    '<div style="margin-top:11px;font-size:12px;color:var(--mu)">'+esc(product.brand||offer.subtitle||'AegisPay Shop')+' · '+esc(product.category||'Shop Product')+'</div>'+
    '<div class="task-modal-rating"><span class="task-stars">'+taskStars(rating)+'</span><b>'+rating.toFixed(1)+'/5</b><span class="mu">Customer rating</span></div>'+
    '<div class="card" style="margin-top:13px;margin-bottom:0;padding:13px"><div class="sh" style="margin:0"><span>Task Purchase Value</span><b style="color:var(--t)">'+Number(task.task_value||0).toFixed(2)+' USDT</b></div><small class="mu">Review the assigned item first, purchase it through Shop, then return here and complete the task.</small></div>'+
-   '<div class="sh" style="margin-top:16px"><span>Customer Reviews</span><span>'+rating.toFixed(1)+' / 5</span></div>'+
+   '<div class="sh" style="margin-top:16px"><span>Review Preview</span><span>'+rating.toFixed(1)+' / 5</span></div>'+
    reviews.map(r=>'<div class="task-review"><div class="who">'+esc(r.name)+' <span class="mu">· '+esc(r.d)+'</span></div><p>'+esc(r.text)+'</p></div>').join('')+
    '<div class="task-modal-actions"><button type="button" class="btn o" data-close-task-product>Close</button><button type="button" class="btn" data-buy-task-product="'+esc(taskId)+'">Purchase / Open Shop '+ic('arrow')+'</button></div>'+
    '<div class="task-purchase-note">Product images are served from the assigned Shop catalog. Review Preview is illustrative; the marketplace contains the live listing information.</div>';
