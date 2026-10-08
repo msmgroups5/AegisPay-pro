@@ -1,0 +1,32 @@
+name: AegisPay Complete Backup
+
+on:
+  push:
+    branches:
+      - 'backup/**'
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact repository state
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create complete source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git archive --format=zip --output=AegisPay-complete-backup-2026-10-08.zip HEAD
+          sha256sum AegisPay-complete-backup-2026-10-08.zip > AegisPay-complete-backup-2026-10-08.sha256
+      - name: Upload complete backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: AegisPay-complete-backup-2026-10-08
+          path: |
+            AegisPay-complete-backup-2026-10-08.zip
+            AegisPay-complete-backup-2026-10-08.sha256
+          if-no-files-found: error
