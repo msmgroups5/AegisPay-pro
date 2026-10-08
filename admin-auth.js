@@ -621,11 +621,13 @@ async function saveProductionConfig(e){
     const payouts=document.getElementById('prodRealPayouts').value==='true';
     const goLive=document.getElementById('prodGoLive').value==='true';
     const locked=document.getElementById('prodPayoutLock').value==='true';
-    if(payouts||(!locked&&goLive)){
+    if(payouts){
       if(!(state.productionDiag&&state.productionDiag.mainnet_payout_operational===true)){
-        throw new Error('Production payout operations are not ready. Complete the server-side secret and monitoring checks before opening real payouts.');
+        throw new Error('Production payout operations are not ready. Configure the required server-side secrets and complete the readiness checks before enabling real payouts.');
       }
       if(!window.confirm('You are changing a production payout control. Continue only after server-side payout secrets and operational smoke tests are verified.'))return;
+    } else if(!locked&&goLive){
+      if(!window.confirm('You are opening the production payout lock or approving go-live. Real payout execution will remain server-gated until the full readiness check passes. Continue?'))return;
     }
     if(payouts&&!window.confirm('FINAL CONFIRMATION: enable REAL PAYOUT execution?'))return;
     const r=await service.invokeFunction('production-readiness',{body:{
