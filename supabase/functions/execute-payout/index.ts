@@ -91,6 +91,7 @@ let payoutMayHaveBeenBroadcast = false;
     const testnet = systemMode.mode === "TESTNET_DEMO" && systemMode.testnet_payouts === true && network === "TRON TESTNET";
     const mainnet = systemMode.mode === "MAINNET"
       && systemMode.real_payouts === true
+      && systemMode.production_go_live_approved === true
       && network === "TRON MAINNET"
       && productionConfig.go_live_approved === true
       && productionConfig.real_payouts_enabled === true
@@ -157,11 +158,45 @@ let payoutMayHaveBeenBroadcast = false;
     });
     const contract = await tron.contract().at(usdtContract);
 
-    // Recheck immediately before network broadcast. If maintenance began after
-    // the claim, the catch path restores the held balance before returning.
-    const { data: stillEnabled, error: finalRuntimeError } = await admin.rpc("app_runtime_enabled");
-    if (finalRuntimeError || stillEnabled !== true) {
-      throw new Error("AegisPay is paused by Master Admin; payout was not broadcast.");
+    // Recheck the complete production gate immediately before network broadcast.
+    // This closes the race where an operator locks production after the request is claimed
+    // but before the transfer is submitted. Any failed gate exits through the safe refund path.
+    if (mainnet) {
+      const [{ data: finalModeRow, error: finalModeError },
+        { data: finalNetworkRow, error: finalNetworkError },
+        { data: finalProductionRow, error: finalProductionError },
+        { data: finalRuntimeRow, error: finalRuntimeError }] = await Promise.all([
+          admin.from("platform_settings").select("value_json").eq("key", "system_mode").maybeSingle(),
+          admin.from("platform_settings").select("value_json").eq("key", "deposit_rules").maybeSingle(),
+          admin.from("platform_settings").select("value_json").eq("key", "production_config").maybeSingle(),
+          admin.from("platform_settings").select("value_json").eq("key", "app_runtime").maybeSingle(),
+        ]);
+      if (finalModeError || finalNetworkError || finalProductionError || finalRuntimeError) {
+        throw new Error("Unable to revalidate the production payout gate.");
+      }
+      const finalSystem = finalModeRow?.value_json || {};
+      const finalNetworkConfig = finalNetworkRow?.value_json || {};
+      const finalProduction = finalProductionRow?.value_json || {};
+      const finalNetwork = String(finalNetworkConfig.network || "").toUpperCase();
+      const finalRuntimeEnabled = finalRuntimeRow?.value_json?.enabled === true;
+      const finalGateOpen =
+        finalSystem.mode === "MAINNET" &&
+        finalSystem.real_payouts === true &&
+        finalSystem.production_go_live_approved === true &&
+        finalNetwork === "TRON MAINNET" &&
+        String(finalProduction.environment || "").toUpperCase() === "PRODUCTION" &&
+        finalProduction.go_live_approved === true &&
+        finalProduction.real_payouts_enabled === true &&
+        finalProduction.payouts_locked === false &&
+        finalRuntimeEnabled === true;
+      if (!finalGateOpen) {
+        throw new Error("Production payout gate was closed before broadcast.");
+      }
+    } else {
+      const { data: stillEnabled, error: finalRuntimeError } = await admin.rpc("app_runtime_enabled");
+      if (finalRuntimeError || stillEnabled !== true) {
+        throw new Error("AegisPay is paused by Master Admin; payout was not broadcast.");
+      }
     }
 
     // From this point onward a transport error can mean the chain accepted the transfer.
