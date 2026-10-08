@@ -82,7 +82,11 @@ const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
 assert(rel.includes(':app:assembleClientDebug'),'Aurora APK release workflow must build the canonical client flavor');
 assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Netlify production deployment');
 
-assert(fs.readFileSync('app-update.js','utf8').includes('/app-version.json'),'Updater manifest endpoint missing');
+const updater=fs.readFileSync('app-update.js','utf8');
+assert(updater.includes('/app-version.json'),'Updater web manifest endpoint missing');
+assert(updater.includes('/assets/aegispay/app-version.json'),'Android updater must use the bundled asset manifest path');
+const gradleSource=fs.readFileSync('android/app/build.gradle','utf8');
+assert(gradleSource.includes("include 'app-version.json'"),'Android client build must bundle app-version.json');
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
