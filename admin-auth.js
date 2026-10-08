@@ -622,6 +622,9 @@ async function saveProductionConfig(e){
     const goLive=document.getElementById('prodGoLive').value==='true';
     const locked=document.getElementById('prodPayoutLock').value==='true';
     if(payouts||(!locked&&goLive)){
+      if(!(state.productionDiag&&state.productionDiag.mainnet_payout_operational===true)){
+        throw new Error('Production payout operations are not ready. Complete the server-side secret and monitoring checks before opening real payouts.');
+      }
       if(!window.confirm('You are changing a production payout control. Continue only after server-side payout secrets and operational smoke tests are verified.'))return;
     }
     if(payouts&&!window.confirm('FINAL CONFIRMATION: enable REAL PAYOUT execution?'))return;
