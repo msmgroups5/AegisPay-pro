@@ -28,7 +28,7 @@ The `site/` portal copies are deployment artifacts. They are never independent a
 
 Supabase project: `wtcspnrmsoisroavojop`.
 
-The current project is configured for TESTNET/DEMO operation. Financial state changes stay behind Supabase RPCs/Edge Functions and authenticated role checks. Deposit evidence is stored in the private `private-verification` bucket.
+The current project is running in a controlled PRE_PRODUCTION / LIVE_DEPOSIT_TEST state. Real payouts remain disabled behind the Phase 3 server-side production gate. Financial state changes stay behind Supabase RPCs/Edge Functions and authenticated role checks. Deposit evidence is stored in the private `private-verification` bucket.
 
 ## Verification
 
