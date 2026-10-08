@@ -53,7 +53,7 @@ Supabase Performance Advisor reports 12 currently unused indexes. With the prese
 ## Current production blockers
 
 1. Operator-side: enable Leaked Password Protection in Supabase Auth when available on the current plan.
-2. Configure and verify server-side AI, Telegram and controlled Shasta/testnet payout secrets.
-3. Complete TESTNET_DEMO end-to-end verification for deposit evidence, on-chain confirmation, Shop/tasks, 18-hour settlement, KYC and withdrawal dual approval.
+2. Configure and verify the required server-side TRONGrid, monitoring, AI, Telegram and payout secrets for the intended production network.
+3. Complete controlled end-to-end verification for deposit evidence, on-chain confirmation, Shop/tasks, 18-hour settlement, KYC and withdrawal dual approval before changing the Phase 3 environment to PRODUCTION.
 4. Verify production Auth redirect/provider/SMTP settings on a physical client device.
 5. Configure release signing and perform physical APK update verification.
