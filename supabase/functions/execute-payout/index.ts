@@ -87,11 +87,6 @@ let payoutMayHaveBeenBroadcast = false;
       .select("value_json").eq("key", "production_config").maybeSingle();
     if (productionError) return json({ error: "Unable to confirm production payout gate." }, 503);
     const productionConfig = productionRow?.value_json || {};
-    const productionGateOpen =
-      String(productionConfig.environment || "").toUpperCase() === "PRODUCTION" &&
-      productionConfig.go_live_approved === true &&
-      productionConfig.real_payouts_enabled === true &&
-      productionConfig.payouts_locked !== false;
 
     const testnet = systemMode.mode === "TESTNET_DEMO" && systemMode.testnet_payouts === true && network === "TRON TESTNET";
     const mainnet = systemMode.mode === "MAINNET"
