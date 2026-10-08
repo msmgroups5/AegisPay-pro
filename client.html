@@ -604,7 +604,7 @@ function taskImageFallbackUrl(title,variant){
 function taskImageUrl(url){
  const raw=String(url||'').trim();
  if(!raw)return '';
- if(/^data:image\\//i.test(raw)||/^blob:/i.test(raw)||raw.startsWith(location.origin))return raw;
+ if(/^data:image\//i.test(raw)||/^blob:/i.test(raw)||raw.startsWith(location.origin))return raw;
  return location.origin+'/product-image?url='+encodeURIComponent(raw);
 }
 function bindTaskImageFallback(root){
