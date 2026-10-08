@@ -31,11 +31,12 @@
 - One active cycle-settlement cron runs every minute.
 - Current system mode is `MAINNET / LIVE_DEPOSIT_TEST`.
 - Controlled live-deposit testing is enabled; real payouts remain disabled by the Phase 3 server-side payout gate.
+- Master Admin Production Readiness diagnostics and configuration controls are live.
 - No Supabase development branches exist.
 
 ## Security review
 
-Supabase Security Advisor currently reports 8 authenticated-callable SECURITY DEFINER functions. These functions are intentionally used by authenticated client/admin/RLS workflows and enforce explicit identity, role, ownership and/or runtime checks. The stale one-argument `link_withdrawal_wallet(text)` overload is no longer callable by client roles.
+Supabase Security Advisor currently reports 14 authenticated-callable SECURITY DEFINER functions plus 1 intentionally pre-auth anonymous username lookup (`resolve_login_email`). The reviewed authenticated functions enforce explicit identity, role, ownership and/or runtime checks; `get_production_readiness` and `set_production_config` are Master Admin-gated despite being callable by the authenticated role. The stale one-argument `link_withdrawal_wallet(text)` overload is no longer callable by client roles.
 
 Leaked Password Protection is still disabled and is a production prerequisite.
 
