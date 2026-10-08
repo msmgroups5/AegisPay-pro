@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-var CHECK_URL=(window.AEGIS_UPDATE_MANIFEST_URL||(window.AEGIS_ANDROID_APP?'/app-version.json':'/app-version.json'));
+var CHECK_URL=(window.AEGIS_UPDATE_MANIFEST_URL||(window.AEGIS_ANDROID_APP?'/assets/aegispay/app-version.json':'/app-version.json'));
 var checking=false,downloaded=false;
 function nativeReady(){return !!(window.AegisNative&&window.AegisNative.startApkUpdate&&window.AegisNative.appVersionCode);}
 function currentCode(){if(!nativeReady())return 0;try{return Number(window.AegisNative.appVersionCode()||0);}catch(e){return 0;}}
