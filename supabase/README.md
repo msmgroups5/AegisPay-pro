@@ -25,7 +25,7 @@ The canonical repository tracks this policy in `database/migrations/20261003_pri
 
 ## Runtime boundary
 
-Current `platform_settings.system_mode` is `TESTNET_DEMO` with real payouts disabled and live deposits disabled.
+Current `platform_settings.system_mode` is `MAINNET / LIVE_DEPOSIT_TEST` with controlled live-deposit testing enabled and real payouts disabled behind the Phase 3 production gate.
 
 One active pg_cron job, `aegispay-cycle-settlement`, runs every minute.
 
