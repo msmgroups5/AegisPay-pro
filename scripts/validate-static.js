@@ -9,6 +9,10 @@ const must=[
   'database/migrations/20261003_private_verification_storage_policies.sql','database/migrations/20261004_restore_baseline_demo_configuration.sql',
   'database/migrations/20261005_align_withdrawal_wallet_rpc_grants.sql',
   'database/migrations/20261005_retire_client_complete_task_rpc.sql',
+  'database/migrations/20261008_complete_phase3_production_controls.sql',
+  'database/migrations/20261008_phase3_production_gate_hardening.sql',
+  'database/migrations/20261008_phase3_readiness_response_alignment.sql',
+  'supabase/functions/production-readiness/index.ts',
   'site/index.html','site/site.css','android/app/build.gradle',
   'android/app/src/main/java/com/aegispay/app/MainActivity.java',
   '.github/workflows/ci.yml','.github/workflows/android-apk.yml',
@@ -41,6 +45,12 @@ assert(!client.includes('aegis-core.js')&&!client.includes('app.js'),'Legacy dem
 
 const admin=fs.readFileSync('master-admin.html','utf8');
 assert(admin.includes('./admin-auth.js')&&!admin.includes('aegis-core.js')&&!admin.includes('app.js'),'Admin entry wiring incomplete');
+
+const adminAuth=fs.readFileSync('admin-auth.js','utf8');
+assert(adminAuth.includes('Production Readiness')&&adminAuth.includes('aaProductionForm')&&adminAuth.includes('set_production_config')&&adminAuth.includes('get_production_readiness'),'Phase 3 Master Admin readiness controls are missing');
+
+const payout=fs.readFileSync('supabase/functions/execute-payout/index.ts','utf8');
+assert(payout.includes('production_config')&&payout.includes('Production payout gate is locked'),'Phase 3 payout gate is missing');
 
 const service=fs.readFileSync('supabase-service.js','utf8');
 for(const m of [
