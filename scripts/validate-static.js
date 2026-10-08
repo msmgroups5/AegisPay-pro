@@ -94,8 +94,9 @@ assert(!deploy.includes('netlify-cli deploy'),'Legacy Netlify production deploym
 const rel=fs.readFileSync('.github/workflows/website-apk-release.yml','utf8');
 assert(rel.includes(':app:assembleClientDebug'),'Aurora APK release workflow must build the canonical client flavor');
 assert(rel.includes(':app:bundleClientDebug'),'Aurora APK release workflow must build the canonical client AAB');
-assert(!/versionCode 38/.test(rel)&&!/"versionCode 38"/.test(rel),'Aurora release workflow must not pin an obsolete Android version code');
-assert(!rel.includes('aurora-apk-2.5.9-b38'),'Aurora release workflow must derive its release tag from the current Android version');
+assert(rel.includes('VERSION_CODE=$(sed'),'Aurora release workflow must derive the Android version code from build.gradle');
+assert(rel.includes('VERSION_NAME=$(sed'),'Aurora release workflow must derive the Android version name from build.gradle');
+assert(!rel.includes('aurora-apk-2.5.9-b38'),'Aurora release workflow must not pin the obsolete Build 38 release tag');
 assert(rel.includes('outputs/bundle/clientDebug/app-client-debug.aab'),'Aurora AAB output verification is missing');
 assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Netlify production deployment');
 
