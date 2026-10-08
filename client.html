@@ -646,7 +646,7 @@ function openTaskMarketplace(taskId){
  if(!product){uiNotice('Product details are not available for this task yet.','error');return}
  const returnUrl=location.href;
  const shopQuery=String(offer?.title||product.title||'').trim();
- const u='https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&task='+encodeURIComponent(taskId)+'&q='+encodeURIComponent(shopQuery)+'&return='+encodeURIComponent(returnUrl);
+ const u='https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&task='+encodeURIComponent(taskId)+'&product='+encodeURIComponent(product.id)+'&q='+encodeURIComponent(shopQuery)+'&return='+encodeURIComponent(returnUrl);
  location.href=u;
 }
 function openTaskProduct(taskId){
@@ -948,6 +948,26 @@ async function liveBot(){
 
 window.go=async function(id){try{if(id==='login'||id==='signup'||id==='forgot'||id==='reset'){const r=originalGo(id);setTimeout(bindAuthForms,0);return r}if(!profile)return originalGo('login');if(id==='bot')return liveBot();if(id==='home')return liveHome();if(id==='topup')return liveTopup();if(id==='withdraw')return liveWithdraw();if(id==='referral')return liveReferral();if(id==='assets')return liveAssets();if(id==='activity')return liveActivity();if(id==='account')return liveAccount();if(id==='notifications')return liveNotifications();if(id==='tasks'||id==='shop')return liveShop();return originalGo(id)}catch(e){app.innerHTML='<div class="card" style="margin-top:30px"><h3>Unable to load</h3><p class="mu" style="margin-top:8px">'+esc(e.message)+'</p></div>'}finally{setTimeout(updateNotificationBadge,0)}};
 async function bootLive(){try{const qs=new URLSearchParams(location.search);const hashParams=new URLSearchParams((location.hash||'').replace(/^#/,''));
+if(qs.get('shop_purchase')==='confirmed'){
+  const shopTaskId=String(qs.get('task')||'').trim();
+  const shopProductId=String(qs.get('product')||'').trim();
+  history.replaceState({},document.title,location.pathname);
+  const shopSession=await db.auth.getSession();
+  if(!shopSession.data.session){window.go('login');return;}
+  try{
+    await initData();
+    if(profile.role!=='USER' || !['ACTIVE','NORMAL'].includes(String(profile.status||'').toUpperCase())) throw Error('This account is not active.');
+    if(!shopTaskId||!shopProductId) throw Error('Shop purchase confirmation is missing the assigned task or product.');
+    const purchase=await db.rpc('record_shop_task_purchase',{p_task_id:shopTaskId,p_product_id:shopProductId});
+    if(purchase.error)throw purchase.error;
+    await liveShop();
+    setTimeout(()=>uiNotice('Shop purchase confirmed. The assigned task is now ready to complete.','success'),0);
+  }catch(shopError){
+    try{await liveShop();}catch(_){}
+    setTimeout(()=>uiNotice(shopError.message||'Shop purchase confirmation could not be recorded.','error'),0);
+  }
+  return;
+
 // Email verification does not need a persistent recovery session; it only confirms the address and returns the client to sign-in.
 if(qs.get('verified')==='1'){window.__emailVerified=true;history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login');return}
 // Password recovery supports both Supabase PKCE (?code=...) and implicit (#access_token...&type=recovery) return formats.
