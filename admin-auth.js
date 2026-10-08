@@ -19,6 +19,7 @@ const state={
   audit:[],
   settings:{},
   production:null,
+  productionDiag:null,
   telegram:null
 };
 
@@ -277,13 +278,16 @@ function audit(){
 }
 
 function productionReadiness(){
-  const p=state.production||{};
-  const depositOn=Boolean(p.live_deposits);
-  const payoutOn=Boolean(p.real_payouts);
+  const p=state.production||{},d=state.productionDiag||{};
+  const depositOn=Boolean(p.production_config_live_deposits);
+  const payoutOn=Boolean(p.production_config_real_payouts);
   const locked=p.payouts_locked!==false;
-  const approved=Boolean(p.production_go_live_approved);
+  const approved=Boolean(p.production_config_go_live_approved);
   const payoutReady=Boolean(p.mainnet_payout_gate_ok);
-  return '<section class="aa-panel"><div class="aa-panel-head"><div><h2>Production Readiness</h2><p>Controlled Phase 3 configuration. Secrets are never shown here.</p></div><span class="aa-count">'+(payoutReady?'READY':'LOCKED')+'</span></div>'+
+  const secrets=d.secrets||{};
+  const secretMark=function(v){return v?'READY':'MISSING';};
+  return '<section class="aa-panel">'+
+    '<div class="aa-panel-head"><div><h2>Production Readiness</h2><p>Phase 3 controls are enforced server-side. Secret values are never exposed.</p></div><span class="aa-count">'+(payoutReady?'READY':'LOCKED')+'</span></div>'+
     '<div class="aa-detail-grid">'+
       '<span>Environment<b>'+esc(p.environment||'PRE_PRODUCTION')+'</b></span>'+
       '<span>Network<b>'+esc(p.network||'—')+'</b></span>'+
@@ -292,7 +296,23 @@ function productionReadiness(){
       '<span>Go-Live Approval<b>'+esc(approved?'APPROVED':'NOT APPROVED')+'</b></span>'+
       '<span>Payout Lock<b>'+esc(locked?'LOCKED':'OPEN')+'</b></span>'+
     '</div>'+
-    '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Phase 3 Safety Gate</strong><small>Real payouts stay disabled until server-side payout secrets, monitoring configuration, operator approval and final smoke tests are complete.</small></div></div>'+
+    '<form id="aaProductionForm" class="aa-form-grid" style="margin-top:16px">'+
+      '<label class="aa-field"><span>Environment</span><select id="prodEnvironment"><option value="PRE_PRODUCTION" '+((p.environment||'PRE_PRODUCTION')==='PRE_PRODUCTION'?'selected':'')+'>PRE-PRODUCTION</option><option value="PRODUCTION" '+(p.environment==='PRODUCTION'?'selected':'')+'>PRODUCTION</option></select></label>'+
+      '<label class="aa-field"><span>Live Deposits</span><select id="prodLiveDeposits"><option value="false" '+(!depositOn?'selected':'')+'>OFF</option><option value="true" '+(depositOn?'selected':'')+'>ON</option></select></label>'+
+      '<label class="aa-field"><span>Real Payouts</span><select id="prodRealPayouts"><option value="false" '+(!payoutOn?'selected':'')+'>OFF</option><option value="true" '+(payoutOn?'selected':'')+'>ON</option></select></label>'+
+      '<label class="aa-field"><span>Go-Live Approval</span><select id="prodGoLive"><option value="false" '+(!approved?'selected':'')+'>NOT APPROVED</option><option value="true" '+(approved?'selected':'')+'>APPROVED</option></select></label>'+
+      '<label class="aa-field"><span>Payout Lock</span><select id="prodPayoutLock"><option value="true" '+(locked?'selected':'')+'>LOCKED</option><option value="false" '+(!locked?'selected':'')+'>OPEN</option></select></label>'+
+      '<div class="aa-span-2"><button class="aa-primary" type="submit">Save Production Configuration</button></div>'+
+    '</form>'+
+    '<div class="aa-detail-grid" style="margin-top:12px">'+
+      '<span>Config Sync<b>'+esc(p.configuration_consistent?'CONSISTENT':'REVIEW')+'</b></span>'+
+      '<span>TRONGrid API<b>'+esc(secretMark(secrets.trongrid_api))+'</b></span>'+
+      '<span>Cron Secret<b>'+esc(secretMark(secrets.cron_secret))+'</b></span>'+
+      '<span>Mainnet Payout Key<b>'+esc(secretMark(secrets.mainnet_payout_key))+'</b></span>'+
+      '<span>AI Review Config<b>'+esc(secretMark(secrets.ai_review_endpoint&&secrets.ai_review_api_key&&secrets.ai_review_model))+'</b></span>'+
+      '<span>Monitoring Gate<b>'+esc(d.mainnet_monitoring_ready?'READY':'NOT READY')+'</b></span>'+
+    '</div>'+
+    '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Phase 3 Safety Gate</strong><small>Real payouts can only be enabled by an active Master Admin when MAINNET, the TRON MAINNET configuration, runtime, go-live approval, payout unlock, and required server-side secrets are all ready.</small></div></div>'+
     '</section>';
 }
 function settings(){
@@ -428,6 +448,10 @@ async function refreshData(){
     const pr=await c.rpc('get_production_readiness');
     if(!pr.error)state.production=pr.data||null;
   }catch(e){state.production=null;}
+  try{
+    const prd=await service.invokeFunction('production-readiness',{body:{}});
+    if(!prd.error)state.productionDiag=prd.data||null;
+  }catch(e){state.productionDiag=null;}
   try{
     const q=await service.invokeFunction('admin-queues',{body:{}});
     state.queues={deposits:q.data?.deposits||[],kyc:q.data?.kyc||[],withdrawals:q.data?.withdrawals||[],kycHistory:q.data?.kycHistory||[],depositHistory:q.data?.depositHistory||[],stats:q.data?.stats||{}};
@@ -587,6 +611,31 @@ async function toggleAiBot(){
     await refreshData();
   });
 }
+async function saveProductionConfig(e){
+  e.preventDefault();
+  await setBusy(async function(){
+    const c=service.client();
+    const env=String(document.getElementById('prodEnvironment').value||'PRE_PRODUCTION');
+    const live=document.getElementById('prodLiveDeposits').value==='true';
+    const payouts=document.getElementById('prodRealPayouts').value==='true';
+    const goLive=document.getElementById('prodGoLive').value==='true';
+    const locked=document.getElementById('prodPayoutLock').value==='true';
+    if(payouts||(!locked&&goLive)){
+      if(!window.confirm('You are changing a production payout control. Continue only after server-side payout secrets and operational smoke tests are verified.'))return;
+    }
+    if(payouts&&!window.confirm('FINAL CONFIRMATION: enable REAL PAYOUT execution?'))return;
+    const r=await c.rpc('set_production_config',{
+      p_environment:env,
+      p_live_deposits_enabled:live,
+      p_real_payouts_enabled:payouts,
+      p_go_live_approved:goLive,
+      p_payouts_locked:locked
+    });
+    if(r.error)throw r.error;
+    await refreshData();
+  });
+}
+
 async function saveSettings(e){
   e.preventDefault();
   await setBusy(async function(){
@@ -615,6 +664,7 @@ root.addEventListener('submit',function(e){
   if(e.target.id==='aaLoginForm')login(e);
   else if(e.target.id==='aaOfferForm')createOffer(e);
   else if(e.target.id==='aaSettingsForm')saveSettings(e);
+  else if(e.target.id==='aaProductionForm')saveProductionConfig(e);
 });
 root.addEventListener('click',function(e){
   const el=e.target.closest('[data-action]');if(!el)return;
