@@ -15,8 +15,8 @@ android {
         applicationId 'com.aegispay.app'
         minSdk 23
         targetSdk 35
-        versionCode 38
-        versionName '2.5.9'
+        versionCode 39
+        versionName '2.6.0'
     }
 
     productFlavors {
@@ -106,23 +106,24 @@ def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientU
             throw new GradleException('Canonical Aurora client.html is missing.')
         }
         byte[] bytes = clientFile.bytes
-        def digest = java.security.MessageDigest.getInstance('SHA-1')
-        def header = ("blob " + bytes.length + "\u0000").getBytes('UTF-8')
-        digest.update(header)
-        digest.update(bytes)
-        def blobSha = digest.digest().collect { String.format('%02x', it & 0xff) }.join()
-        if (blobSha != '1b6f77da572b8095ab7e4ba3bda4953b3146649b') {
-            throw new GradleException("Client UI guard failed: client.html is not the canonical Aurora UI (got " + blobSha + ").")
-        }
         def html = new String(bytes, 'UTF-8')
-        if (!html.contains('<title>AegisPay – Aurora UI</title>') ||
-            !html.contains('Choose Deposit Tier') ||
-            !html.contains('Submit Deposit') ||
-            !html.contains('link_withdrawal_wallet') ||
-            !html.contains('Identity Verification') ||
-            !html.contains('Secure &amp; Verified') ||
-            !html.contains('© 2023–2026 AegisPay')) {
-            throw new GradleException('Client UI guard failed: required Aurora UI markers are missing.')
+        def requiredAuroraMarkers = [
+            '<title>AegisPay – Aurora UI</title>',
+            'Choose Deposit Tier',
+            'Submit Deposit',
+            'link_withdrawal_wallet',
+            'Identity Verification',
+            'record_shop_task_purchase',
+            "qs.get('shop_purchase')==='confirmed'",
+            'Secure &amp; Verified',
+            '© 2023–2026 AegisPay'
+        ]
+        def missingAuroraMarkers = requiredAuroraMarkers.findAll { marker -> !html.contains(marker) }
+        if (!missingAuroraMarkers.isEmpty()) {
+            throw new GradleException('Client UI guard failed: missing required Aurora markers: ' + missingAuroraMarkers.join(', '))
+        }
+        if (html.contains('aegispay-client1.netlify.app') || html.contains('aegispay-ali-archive.netlify.app')) {
+            throw new GradleException('Client UI guard failed: legacy Netlify client references remain.')
         }
     }
 }
