@@ -180,7 +180,7 @@ function dashboard(){
           mini('Assigned Tasks',state.tasks.length, 'tasks')+
           mini('Referrals',state.referrals.length, 'records')+
         '</div>'+
-        '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>TESTNET / DEMO environment</strong><small>Mainnet payout execution stays disabled until production infrastructure is configured.</small></div></div>'+
+        '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>CONTROLLED PRE-PRODUCTION environment</strong><small>Real payouts stay disabled until the Phase 3 production gate and final go-live requirements are satisfied.</small></div></div>'+
       '</section>'+
     '</div>'+
   '</main>';
@@ -332,7 +332,7 @@ function settings(){
     '</form></section>'+
     productionReadiness()+
     '<section class="aa-panel"><div class="aa-panel-head"><div><h2>Runtime</h2><p>Current backend mode.</p></div><span class="aa-badge aa-badge-amber">'+esc(sm.mode||'TESTNET_DEMO')+'</span></div>'+
-      '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Production safeguards remain active.</strong><small>Mainnet payout execution stays disabled until server-side production configuration is explicitly enabled.</small></div></div>'+
+      '<div class="aa-callout"><div class="aa-callout-dot"></div><div><strong>Production safeguards remain active.</strong><small>Real payout execution stays disabled while the Phase 3 production gate is locked.</small></div></div>'+
     '</section></main>';
 }
 function field(id,label,value,type='text'){
