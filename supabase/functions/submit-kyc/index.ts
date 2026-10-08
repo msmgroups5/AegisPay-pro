@@ -49,6 +49,8 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
     const { data: auth, error: authError } = await admin.auth.getUser(token);
     if (authError || !auth.user) return json({ error: "Invalid authentication token." }, 401);
+    const { data: aiSetting } = await admin.from("platform_settings").select("value_json").eq("key","ai_review").maybeSingle();
+    const aiEnabled = aiSetting?.value_json?.enabled !== false;
     const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
     if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
     if (appEnabled !== true) return json({ error: "AegisPay is paused by Master Admin." }, 423);
@@ -109,7 +111,7 @@ Deno.serve(async (req: Request) => {
       result.document_type_matches === false || result.name_matches_profile === false
     );
     const potentialTampering = Array.isArray(result.tamper_indicators) && result.tamper_indicators.length > 0;
-    const aiApproved = review.configured && hasConfidence && confidence >= 0.95
+    const aiApproved = aiEnabled && review.configured && hasConfidence && confidence >= 0.95
       && result.document_type_matches === true
       && result.front_readable === true
       && (documentType === "PASSPORT" || result.back_readable === true)
@@ -120,7 +122,9 @@ Deno.serve(async (req: Request) => {
 
     let status: "REJECTED" | "MANUAL_REVIEW" = "MANUAL_REVIEW";
     let aiStatus: "APPROVED" | "REJECTED" | "MANUAL_REVIEW" | "UNAVAILABLE" = "MANUAL_REVIEW";
-    if (!review.configured) {
+    if (!aiEnabled) {
+      aiStatus = "MANUAL_REVIEW";
+    } else if (!review.configured) {
       aiStatus = "UNAVAILABLE";
     } else if (hardFailure) {
       status = "REJECTED";
@@ -152,7 +156,9 @@ Deno.serve(async (req: Request) => {
     }).eq("id", record.id);
     if (updateError) return json({ error: "KYC review could not be saved." }, 500);
 
-    const clientMessage = status === "REJECTED"
+    const clientMessage = !aiEnabled
+      ? "AI approval bot is currently OFF. Your KYC has been sent to Master Admin for manual review."
+      : status === "REJECTED"
       ? reasonMessage(reason, documentType)
       : aiStatus === "APPROVED"
       ? "Your identity images passed the AI quality and consistency precheck. Final KYC verification is pending Master Admin review."
