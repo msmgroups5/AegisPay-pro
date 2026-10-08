@@ -74,6 +74,114 @@ var PRODUCT_IMAGES={
   chair:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=82',
   home:'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=900&q=82'
 };
+
+var ACTIVE_PRODUCT_OVERRIDES={
+  'SP-4':{title:'Phone Grip Stand',brand:'PopSockets'},
+  'SP-8':{title:'Logitech M220 Silent Wireless Mouse',brand:'Logitech'},
+  'SP-16':{title:'Smart Bluetooth Tracker Tag',brand:'Tile'},
+  'SP-19':{title:'adidas Response 2 Running Shoes',brand:'adidas'},
+  'SP-21':{title:'Keychron K8 Pro Mechanical Keyboard',brand:'Keychron'},
+  'SP-24':{title:'Liberty 4 Pro Noise Cancelling Earbuds',brand:'soundcore'},
+  'SP-32':{title:'Wireless Gaming Headset Elite',brand:'Aegis Game'},
+  'SP-40':{title:'Heys SmartLuggage 26"',brand:'Heys'},
+  'SP-42':{title:'AOC 27" Curved Gaming Monitor',brand:'AOC'},
+  'SP-44':{title:'Designer Carry-On',brand:'Travel Collection'},
+  'SP-52':{title:'Flagship Smartphone',brand:'Aegis Tech'},
+  'SP-57':{title:'Premium Signature Crossbody Bag',brand:'Aegis Signature'}
+};
+var GALLERY_BY_ID={
+  'SP-4':[
+    'https://arqoob.com/uploads/img/pi/175/175411768300/medium_1754117683.webp',
+    'https://brave.ae/assets/images/1762178278_5769ff322d287431.png',
+    'https://simplecellbulk.com/cdn/shop/products/t84581-1__1_5e5a5f79-9631-41f8-8636-54af371941af.jpg?v=1681993849',
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=88',
+    'https://images.unsplash.com/photo-1546054454-aa26e2b734c7?auto=format&fit=crop&w=900&q=88'
+  ],
+  'SP-8':[
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_1_20260525094106_b1bcd4eba880.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_2_20260525094106_1075ce0dac61.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_3_20260525094106_f7303a8dffdb.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_4_20260525094106_d0ce338d6f56.png',
+    'https://images.tcdn.com.br/img/img_prod/571937/mouse_sem_fio_logitech_m220_silent_preto_5_20260525094106_a040ff5c6b0d.png'
+  ],
+  'SP-16':[
+    'https://images-na.ssl-images-amazon.com/images/I/610OXBcjEzL.jpg',
+    'https://s.alicdn.com/%40sc04/kf/H2439dcae96f94640aedea5300067648fA/Custom-Logo-Android-Smart-Phone-Tag-for-Google-Sony-Xiaomi-Smart-Phones-Key-Finder-Anti-Lost-Pet-Bike-Tracker.jpg',
+    'https://shop.letstrack.com/cdn/shop/files/smart-tag-ios.jpg?v=1757070065&width=1024',
+    'https://www.vimeltech.com.au/image/cache/catalog/2026/VIM-TAG-A1/tracker-tag-keyring-hand-held-550x550.jpg',
+    'https://images.unsplash.com/photo-1577598629456-7f4f7b3adf6e?auto=format&fit=crop&w=900&q=88'
+  ],
+  'SP-19':[
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/8a03725e19834c7c914202a7c6ac8f5e_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_01_00_standard.jpg',
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/be4dc1a6a8c24988bd5d3f9931cc9dc8_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_02_standard_hover.jpg',
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/38d6fbfc88fb47b9ad6356c5d6a601a1_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_03_standard.jpg',
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/7def225541b744e2985a9e4a82f12687_9366/RESPONSE_2_RUNNING_SHOES_Red_KJ1752_04_standard.jpg',
+    'https://contents.mediadecathlon.com/p1567822/k%24192043c18a8a8cacb793c158042bd4c7/laufschuhe-run-support-herren-rot.jpg'
+  ],
+  'SP-21':[
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/t/5/assets/keychronk8proqmkviawirelessmechanicalkeyboardformacwindowsosaprofilepbtkeycapspcbscrewinstabilizerwithhotswappablegaterongpromechanicalswitchcompatiblewithmxcherrypandakailhwithrgbbacklightaluminumframe-1645094681965.jpg?v=1645094684',
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/files/K8-Pro-White.jpg?v=1688090606',
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/files/K8-Pro-non-hot-swappable-version.jpg?v=1692007807',
+    'https://cdn.shopify.com/s/files/1/0059/0630/1017/t/5/assets/keychronk8proqmkviawirelessmechanicalkeyboardformacwindowsosaprofilepbtkeycapspcbscrewinstabilizerwithhotswappablegaterongpromechanicalswitchcompatiblewithmxcherrypandakailhwithrgbbacklightaluminumframe-1646107816821.jpg?v=1646107819',
+    'https://www.jib.co.th/img_master/product/original/20180809174303_30351_24_1.png',
+    'https://mechanicalkeyboards.com/cdn/shop/files/24061-9M62T-Keychron-K8-V2-Aluminum-Hotswap-RGB-Keyboard.jpg?v=1734988025&width=750'
+  ],
+  'SP-24':[
+    'https://m.media-amazon.com/images/S/aplus-media-library-service-media/2b8278d7-02c3-490e-94e0-e33e9f84400b.__CR0%2C0%2C1464%2C600_PT0_SX1464_V1___.jpg',
+    'https://m.media-amazon.com/images/S/aplus-media-library-service-media/f20411e3-e7f3-451e-804d-7caa78b4e72f.__CR0%2C0%2C1464%2C600_PT0_SX1464_V1___.jpg',
+    'https://m.media-amazon.com/images/S/aplus-media-library-service-media/735f982f-ae74-4310-b1fc-b9e56631cafd.__CR0%2C0%2C1464%2C600_PT0_SX1464_V1___.jpg',
+    'https://images-na.ssl-images-amazon.com/images/I/61loiB6QjoL.jpg',
+    'https://img.joomcdn.net/b216d373a5a6c4a7272d4eec42ad543262f7cedf_1024_1024.jpeg',
+    'https://www.segment.com.tr/images/productimages/SL_TWS04_B_02.jpg',
+    'https://image.made-in-china.com/2f0j00sfZkUHQzuToR/Tws-Charging-in-Ear-Wireless-Game-Headset-Cheap-Bluetooth-5-2-Noise-Cancellation-Headphone.webp'
+  ],
+  'SP-32':[
+    'https://resource.logitechg.com/w_544%2Ch_466%2Car_7%3A6%2Cc_pad%2Cq_auto%2Cf_auto%2Cdpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g733/gallery/g733-lilac-gallery-2.png',
+    'https://resource.logitechg.com/w_544%2Ch_466%2Car_7%3A6%2Cc_pad%2Cq_auto%2Cf_auto%2Cdpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g733/gallery/g733-lilac-gallery-3.png',
+    'https://resource.logitechg.com/w_544%2Ch_544%2Car_1%2Cc_fill%2Cq_auto%2Cf_auto%2Cdpr_1.0/d_transparent.gif/content/dam/gaming/en/products/g733/g733-hpb-desktop.png',
+    'https://media.ldlc.com/r705/mktp/product/productImage/240702/92/bed9a292e52e4d41a6c288b5236791e6.webp',
+    'https://dubsnatch.com/cdn/shop/products/neon-rgb-black-gaming-headset-microphone-jack-usb-dubsnatch_600x.jpg?v=1673069964'
+  ],
+  'SP-40':[
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_26_frontqrt_black_Hand.jpg?v=1557326945&width=750',
+    'https://eu.heys.com/cdn/shop/files/SmartLuggage-Black-26-Inch-heys-luggage-lifestyle-image-1_ff13c23e-577f-4005-9019-8691fe5c3cd2.jpg?v=1746115566&width=500',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_features_5batteries.jpg?v=1746115566&width=750',
+    'https://eu.heys.com/cdn/shop/files/SmartLuggage-Black-26-Inch-heys-luggage-lifestyle-image-2_97c51421-c868-4be2-8cbc-4650f15c16d6.jpg?v=1746115566&width=500',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_26_open_1ba1375b-5724-4d2c-bfb6-db27196d0237.jpg?v=1746115566&width=750',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_26_isometric_front-icons_05856bf1-1223-4190-8f4b-646e2b00467b.jpg?v=1746115566&width=750',
+    'https://eu.heys.com/cdn/shop/products/SmartLuggage_features_2proximity_e405073e-14c7-471d-be77-c8764a0864d7.jpg?v=1746115566&width=750'
+  ],
+  'SP-42':[
+    'https://cdn.sanity.io/images/hf5b3axp/production/250e10d12e65d14cecb1a834b735b7b531329cb4-1500x1500.png?auto=format&fit=max&w=800',
+    'https://cdn.sanity.io/images/hf5b3axp/production/63476a1cd86fda14d7b8f01ec30dea0be9e3d891-1920x1920.png?auto=format&fit=max&w=800',
+    'https://cdn.sanity.io/images/hf5b3axp/production/ba93d21a74c18eaf8c0514d48d524e0a89d66a55-1500x1500.png?auto=format&fit=max&w=800',
+    'https://cdn.sanity.io/images/hf5b3axp/production/7b9f6d384c6dee65e2dd8f167f45334067c8ab7c-3840x1500.png?auto=format&fit=max&w=800',
+    'https://www.laptopsdirect.co.uk/Images/C27G4ZXE_1_Supersize.jpg?v=3'
+  ],
+  'SP-44':[
+    'https://assets.target.com.au/transform/f6c96a96-ea6e-461b-a267-a01baea60a2a/43114962-8?io=transform%3Afit%2Cwidth%3A1400%2Cheight%3A1600&output=webp&quality=90',
+    'https://cdn.mos.cms.futurecdn.net/whowhatwear/posts/278107/designer-luggage-sets-278107-1551672255228-product.png',
+    'https://urbantravellerco.id/cdn/shop/files/thecarryonpro-greychocolate.webp?v=1702287221&width=1445',
+    'https://brain-images-ssl.cdn.dixons.com/3/5/10146753/l_10146753_006.jpg',
+    'https://www.n-sport.net/UserFiles/products/big/05/06/zenska-torba-karl-lagerfeld-k-signature-shoulderbag-201W3100-783.jpg',
+    'https://www.cocoon.club/cdn/shop/products/GUCCI_GG-Marmont-Matelasse-Mini-Crossbody_Black_Leather_FRONT_grande.jpg?v=1621332282'
+  ],
+  'SP-52':[
+    'https://image01-eu.oneplus.net/shop/202104/27/1-M00-24-8B-rB8bwmCICVmAWJYwAAb0g1C5KSs370.png',
+    'https://static.wixstatic.com/media/c2b8f0_4036c43680524933b8d1a071d97da1ae~mv2.jpg/v1/fill/w_780%2Ch_480%2Cal_c%2Clg_1%2Cq_85/c2b8f0_4036c43680524933b8d1a071d97da1ae~mv2.jpg',
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=88',
+    'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=88',
+    'https://images.unsplash.com/photo-1546054454-aa26e2b734c7?auto=format&fit=crop&w=900&q=88'
+  ],
+  'SP-57':[
+    'https://urbantravellerco.id/cdn/shop/files/thecarryonpro-greychocolate.webp?v=1702287221&width=1445',
+    'https://www.cocoon.club/cdn/shop/products/GUCCI_GG-Marmont-Matelasse-Mini-Crossbody_Black_Leather_FRONT_grande.jpg?v=1621332282',
+    'https://www.n-sport.net/UserFiles/products/big/05/06/zenska-torba-karl-lagerfeld-k-signature-shoulderbag-201W3100-783.jpg',
+    'https://assets.target.com.au/transform/f6c96a96-ea6e-461b-a267-a01baea60a2a/43114962-8?io=transform%3Afit%2Cwidth%3A1400%2Cheight%3A1600&output=webp&quality=90',
+    'https://cdn.mos.cms.futurecdn.net/whowhatwear/posts/278107/designer-luggage-sets-278107-1551672255228-product.png',
+    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=88'
+  ]
+};
 function productImage(x){
   var s=(x[0]+' '+x[1]+' '+x[2]+' '+x[3]).toLowerCase();
   if(/camera|creator|streaming|photo/.test(s))return PRODUCT_IMAGES.camera;
@@ -88,5 +196,8 @@ function productImage(x){
   if(/home|kitchen|cook|air fryer|blender|vacuum/.test(s))return PRODUCT_IMAGES.home;
   return PRODUCT_IMAGES.tech;
 }
-window.AegisShopCatalog=rows.map(function(x){return{id:'SP-'+x[8],title:x[0],brand:x[1],category:x[2],subcategory:x[3],marketPrice:x[4],rating:x[5],badge:x[6],emoji:x[7],image:productImage(x)};});
+window.AegisShopCatalog=rows.map(function(x){
+  var id='SP-'+x[8],g=GALLERY_BY_ID[id]||[],ov=ACTIVE_PRODUCT_OVERRIDES[id]||{};
+  return{id:id,title:ov.title||x[0],brand:ov.brand||x[1],category:ov.category||x[2],subcategory:x[3],marketPrice:x[4],rating:x[5],badge:x[6],emoji:x[7],image:g[0]||productImage(x),gallery:g};
+});
 })();
