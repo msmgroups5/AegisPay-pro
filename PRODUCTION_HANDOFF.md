@@ -26,7 +26,7 @@
 - Supabase database changes are forward-only migrations under `database/migrations/`.
 - Supabase Edge Function source is under `supabase/functions/`.
 
-## Verified Supabase state on 2026-10-05
+## Verified Supabase state on 2026-10-08
 
 - Project status: ACTIVE_HEALTHY.
 - Two Auth users exist and both are email-confirmed.
