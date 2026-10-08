@@ -30,6 +30,7 @@ Deno.serve(async(req:Request)=>{
   const network=String(deposit.network||"").toUpperCase(), receiving=String(deposit.receiving_address||"").trim();
   const environment=String(prod.environment||"PRE_PRODUCTION").toUpperCase();
   const liveDeposits=system.live_deposits===true, realPayouts=system.real_payouts===true, goLive=system.production_go_live_approved===true;
+  const productionLiveDeposits=prod.live_deposits_enabled===true, productionRealPayouts=prod.real_payouts_enabled===true, productionGoLive=prod.go_live_approved===true;
   const payoutsLocked=prod.payouts_locked!==false, runtimeEnabled=runtimeRow?.value_json?.enabled===true;
   const configurationConsistent=liveDeposits===Boolean(prod.live_deposits_enabled)&&realPayouts===Boolean(prod.real_payouts_enabled)&&goLive===Boolean(prod.go_live_approved);
   const secrets={
@@ -38,15 +39,15 @@ Deno.serve(async(req:Request)=>{
    ai_review_endpoint:Boolean(AI_ENDPOINT),ai_review_api_key:Boolean(AI_KEY),ai_review_model:Boolean(AI_MODEL),telegram_bot_token:Boolean(TELEGRAM_TOKEN)
   };
   const mainnetBaseConfigOk=system.mode==="MAINNET"&&network==="TRON MAINNET"&&Boolean(receiving);
-  const mainnetMonitoringReady=mainnetBaseConfigOk&&liveDeposits&&secrets.trongrid_api&&secrets.cron_secret;
-  const mainnetPayoutGateOk=mainnetBaseConfigOk&&realPayouts&&goLive&&!payoutsLocked&&runtimeEnabled;
+  const mainnetMonitoringReady=mainnetBaseConfigOk&&liveDeposits&&productionLiveDeposits&&secrets.trongrid_api&&secrets.cron_secret;
+  const mainnetPayoutGateOk=mainnetBaseConfigOk&&realPayouts&&productionRealPayouts&&goLive&&productionGoLive&&!payoutsLocked&&runtimeEnabled;
   const mainnetPayoutOperational=mainnetPayoutGateOk&&secrets.trongrid_api&&secrets.mainnet_payout_key;
   const readiness={
    environment,system_mode:String(system.mode||"").toUpperCase(),system_status:String(system.status||""),network,
    receiving_address_configured:Boolean(receiving),live_deposits:liveDeposits,real_payouts:realPayouts,production_go_live_approved:goLive,payouts_locked:payoutsLocked,
    production_config_live_deposits:Boolean(prod.live_deposits_enabled),production_config_real_payouts:Boolean(prod.real_payouts_enabled),
    production_config_go_live_approved:Boolean(prod.go_live_approved),runtime_enabled:runtimeEnabled,configuration_consistent:configurationConsistent,
-   mainnet_base_config_ok:mainnetBaseConfigOk,mainnet_deposit_gate_ok:mainnetBaseConfigOk&&liveDeposits,mainnet_payout_gate_ok:mainnetPayoutGateOk,
+   mainnet_base_config_ok:mainnetBaseConfigOk,mainnet_deposit_gate_ok:mainnetBaseConfigOk&&liveDeposits&&productionLiveDeposits,mainnet_payout_gate_ok:mainnetPayoutGateOk,
    server_side_secrets_required:true,cron_secret_required_for_monitoring:true
   };
   return json({readiness,secrets,mainnet_monitoring_ready:mainnetMonitoringReady,mainnet_payout_operational:mainnetPayoutOperational,checked_at:new Date().toISOString()});
