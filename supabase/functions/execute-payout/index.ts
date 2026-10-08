@@ -82,8 +82,29 @@ let payoutMayHaveBeenBroadcast = false;
     const { data: networkRow } = await admin.from("platform_settings")
       .select("value_json").eq("key", "deposit_rules").maybeSingle();
     const network = String(networkRow?.value_json?.network || "").toUpperCase();
+
+    const { data: productionRow, error: productionError } = await admin.from("platform_settings")
+      .select("value_json").eq("key", "production_config").maybeSingle();
+    if (productionError) return json({ error: "Unable to confirm production payout gate." }, 503);
+    const productionConfig = productionRow?.value_json || {};
+    const productionGateOpen =
+      String(productionConfig.environment || "").toUpperCase() === "PRODUCTION" &&
+      productionConfig.go_live_approved === true &&
+      productionConfig.real_payouts_enabled === true &&
+      productionConfig.payouts_locked !== false;
+
     const testnet = systemMode.mode === "TESTNET_DEMO" && systemMode.testnet_payouts === true && network === "TRON TESTNET";
-    const mainnet = systemMode.mode === "MAINNET" && systemMode.real_payouts === true && network === "TRON MAINNET";
+    const mainnet = systemMode.mode === "MAINNET"
+      && systemMode.real_payouts === true
+      && network === "TRON MAINNET"
+      && productionConfig.go_live_approved === true
+      && productionConfig.real_payouts_enabled === true
+      && productionConfig.payouts_locked === false
+      && String(productionConfig.environment || "").toUpperCase() === "PRODUCTION";
+
+    if (systemMode.mode === "MAINNET" && network === "TRON MAINNET" && systemMode.real_payouts === true && !mainnet) {
+      return json({ error: "Production payout gate is locked. Complete the Phase 3 go-live checks before enabling real payouts." }, 403);
+    }
     if (!testnet && !mainnet) return json({ error: "The selected TRON network is not enabled for payouts." }, 403);
     const payoutKey = testnet ? TESTNET_PAYOUT_KEY : MAINNET_PAYOUT_KEY;
     if (!payoutKey) return json({ error: testnet ? "TRON_TESTNET_PAYOUT_PRIVATE_KEY is not configured." : "TRON_PAYOUT_PRIVATE_KEY is not configured." }, 503);
