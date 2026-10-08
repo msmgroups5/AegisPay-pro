@@ -67,16 +67,20 @@ Last aligned: 2026-10-08
 3. Keep real payouts disabled until operator configuration and final smoke tests pass.
 4. Enable live deposits/payouts only after explicit production go-live approval.
 
-### Phase 4 — Shop
-1. Finalize Shop integration experience inside AegisPay.
-2. Finish real-product image/catalog behavior and review UX.
-3. Verify cart, product details and checkout/task ticket behavior against the intended business model.
+### Phase 4 — Complete
+- Shop integration is wired through the dedicated Cloudflare `aegispay-shopping` Worker with task-aware return routing.
+- Client assigned Shop tasks use the canonical product catalog, real-product gallery URLs with fallback imagery, ratings and review previews.
+- Shop task purchase confirmation now returns to the canonical AegisPay client with task/product context.
+- Client records the purchase confirmation through the authenticated `record_shop_task_purchase` RPC before `complete_shop_task` can proceed.
+- Server-side task completion still enforces task ownership, assigned-product matching, available-balance checks and the final 18-hour settlement transition.
+- Cart, product details, task ticket and checkout/return behavior are aligned for the intended AegisPay Shop workflow.
 
-### Phase 5 — Android
-1. Sync canonical web/runtime assets.
-2. Validate client and admin Android flavors.
-3. Build and test APK/AAB.
-4. Finalize release configuration.
+### Phase 5 — Complete
+- Canonical Android client and Master Admin flavors remain aligned to the root AegisPay portal sources and shared runtime assets.
+- WebView authentication callbacks, file selection, QR scanning/location bridges and SHA-256 verified APK update flow are in the canonical Android runtime.
+- Android CI now builds and verifies both APK and AAB outputs for client and Master Admin, using signed release builds when release secrets are present and debug builds otherwise.
+- Android release workflow remains based on the canonical Client flavor and current baseline `versionCode 38 / versionName 2.5.9`.
+- Physical device installation/update verification remains part of the final Phase 6 QA gate and is not being falsely marked complete here.
 
 ### Phase 6 — Final production QA
 1. Mobile and desktop regression testing.
