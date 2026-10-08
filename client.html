@@ -553,7 +553,23 @@ function taskReviewList(product){
 function taskImageUrl(url){
   const raw=String(url||'').trim();
   if(!raw)return '';
+  if(/^data:image\//i.test(raw)||/^blob:/i.test(raw)||raw.startsWith(location.origin))return raw;
   return location.origin+'/product-image?url='+encodeURIComponent(raw);
+}
+function bindTaskImageFallback(root){
+  if(!root)return;
+  root.querySelectorAll('img[data-direct-src]').forEach(img=>{
+    if(img.dataset.imageFallbackBound)return;
+    img.dataset.imageFallbackBound='1';
+    img.addEventListener('error',function(){
+      const direct=this.dataset.directSrc||'';
+      if(direct && this.src!==direct){
+        this.src=direct;
+      }else{
+        this.style.opacity='.35';
+      }
+    });
+  });
 }
 function bindTaskDelegation(){
   if(window.__aegisTaskDelegationBound)return;
@@ -591,17 +607,18 @@ function openTaskProduct(taskId){
  }
  const modal=document.getElementById('taskProductModal'),box=document.getElementById('taskProductContent');if(!modal||!box)return;
  const rating=Number(product.rating||0),reviews=taskReviewList(product);
- const base=product.image||'',rawGallery=(Array.isArray(product.gallery)&&product.gallery.length?product.gallery:[base]).filter(Boolean).slice(0,7),gallery=rawGallery.map(taskImageUrl).filter(Boolean);
+ const base=product.image||'',rawGallery=(Array.isArray(product.gallery)&&product.gallery.length?product.gallery:[base]).filter(Boolean).slice(0,7),gallery=rawGallery;
  box.innerHTML='<div class="task-modal-head"><div><small class="mu">Assigned Shop Product</small><h2 style="font-size:19px;margin-top:2px">'+esc(product.title||task.title||'Product')+'</h2></div><button type="button" class="task-modal-close" data-close-task-product>×</button></div>'+
-   '<div class="task-gallery"><div class="task-gallery-main"><img id="taskGalleryMain" src="'+esc(gallery[0]||'')+'" alt="'+esc(product.title||'Product')+'"><span class="task-gallery-count" id="taskGalleryCount">1 / '+gallery.length+'</span></div><div class="task-gallery-thumbs">'+gallery.map((im,i)=>'<button type="button" style="padding:0;border:0;background:transparent" data-gallery-index="'+i+'"><img class="task-gallery-thumb '+(i===0?'on':'')+'" src="'+esc(im)+'" alt="Product image '+(i+1)+'"></button>').join('')+'</div></div>'+
+   '<div class="task-gallery"><div class="task-gallery-main"><img id="taskGalleryMain" src="'+esc(taskImageUrl(gallery[0]||''))+'" data-direct-src="'+esc(gallery[0]||'')+'" alt="'+esc(product.title||'Product')+'"><span class="task-gallery-count" id="taskGalleryCount">1 / '+gallery.length+'</span></div><div class="task-gallery-thumbs">'+gallery.map((im,i)=>'<button type="button" style="padding:0;border:0;background:transparent" data-gallery-index="'+i+'"><img class="task-gallery-thumb '+(i===0?'on':'')+'" src="'+esc(taskImageUrl(im))+'" data-direct-src="'+esc(im)+'" alt="Product image '+(i+1)+'"></button>').join('')+'</div></div>'+
    '<div style="margin-top:11px;font-size:12px;color:var(--mu)">'+esc(product.brand||offer.subtitle||'AegisPay Shop')+' · '+esc(product.category||'Shop Product')+'</div>'+
    '<div class="task-modal-rating"><span class="task-stars">'+taskStars(rating)+'</span><b>'+rating.toFixed(1)+'/5</b><span class="mu">Customer rating</span></div>'+
    '<div class="card" style="margin-top:13px;margin-bottom:0;padding:13px"><div class="sh" style="margin:0"><span>Task Purchase Value</span><b style="color:var(--t)">'+Number(task.task_value||0).toFixed(2)+' USDT</b></div><small class="mu">Review the assigned item first, purchase it through Shop, then return here and complete the task.</small></div>'+
    '<div class="sh" style="margin-top:16px"><span>Review Preview</span><span>'+rating.toFixed(1)+' / 5</span></div>'+
    reviews.map(r=>'<div class="task-review"><div class="who">'+esc(r.name)+' <span class="mu">· '+esc(r.d)+'</span></div><p>'+esc(r.text)+'</p></div>').join('')+
-   '<div class="task-modal-actions"><button type="button" class="btn o" data-close-task-product>Close</button><button type="button" class="btn" data-buy-task-product="'+esc(taskId)+'">Purchase / Open Shop '+ic('arrow')+'</button></div>'+
+   '<div class="task-modal-actions"><button type="button" class="btn o" data-close-task-product>Close</button><button type="button" class="btn" data-buy-task-product="'+esc(taskId)+'">Purchase '+ic('arrow')+'</button></div>'+
    '<div class="task-purchase-note">Product images are served from the assigned Shop catalog. Review Preview is illustrative; the marketplace contains the live listing information.</div>';
- modal.classList.add('show');
+ bindTaskImageFallback(box);
+modal.classList.add('show');
  const main=document.getElementById('taskGalleryMain'),count=document.getElementById('taskGalleryCount'),thumbs=box.querySelectorAll('[data-gallery-index]');let idx=0;
  const show=()=>{if(main)main.src=gallery[idx]||'';if(count)count.textContent=(idx+1)+' / '+gallery.length;thumbs.forEach((b,i)=>{const im=b.querySelector('img');if(im)im.classList.toggle('on',i===idx)})};
  thumbs.forEach(b=>b.onclick=()=>{idx=Number(b.getAttribute('data-gallery-index')||0);show()});
@@ -649,8 +666,8 @@ async function liveShop(){
   const offer=offerMap.get(String(x.offer_id||''))||null;
   const product=(window.AegisShopCatalog||[]).find(p=>String(p.id)===String(offer?.product_id||''))||null;
   taskProductData[String(x.id)]={task:x,offer,product};
-  const image=product?.image?taskImageUrl(product.image):'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0);
-  return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(image)+'" alt="'+esc(title)+'">':'<div class="task-product-img" style="display:grid;place-items:center;font-size:24px">🛍️</div>')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div>';
+  const imageRaw=product?.image?product.image:'',image=imageRaw?taskImageUrl(imageRaw):'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0);
+  return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(image)+'" data-direct-src="'+esc(imageRaw)+'" alt="'+esc(title)+'" loading="lazy">':'<div class="task-product-img" style="display:grid;place-items:center;font-size:24px">🛍️</div>')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div>';
 }).join(''):'<div class="mu" style="padding:16px 0;text-align:center">No assigned Shop tasks yet.</div>';
 
  let statusCard='';
@@ -666,6 +683,7 @@ async function liveShop(){
    statusCard='<div class="card"><div class="sh" style="margin-top:0">Active Shop Cycle <span>'+Number(cycle.cycle_base||0).toFixed(2)+' USDT</span></div><div class="two"><div><small class="mu">Tasks</small><h3>'+completedCount+'/'+rows.length+'</h3></div><div><small class="mu">Remaining Balance</small><h3>'+remaining.toFixed(2)+' USDT</h3></div></div><div class="warn" style="margin-top:12px"><span>Complete each assigned task individually. When the final task is completed, the 18-hour settlement starts automatically.</span></div></div>';
  }
  app.innerHTML=top('Shop & Tasks','home')+statusCard+'<div class="sh">Assigned Task Set <span>'+rows.length+' tasks</span></div><div class="card" style="padding:4px 16px">'+taskHtml+'</div><button class="btn o" style="margin-bottom:14px" onclick="location.href=\'https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&return=\'+encodeURIComponent(location.href)">Browse Shop Marketplace</button><div class="card"><div class="sh" style="margin-top:0">How the cycle works</div><div class="mu" style="font-size:11.5px;line-height:1.6">Open an assigned product to view its picture, rating and review previews. Purchase it through Shop, return here, then complete the task. After the final task, the 18-hour settlement timer starts automatically.</div></div><div id="taskProductModal" class="task-modal" aria-hidden="true"><div class="task-modal-box"><div id="taskProductContent"></div></div></div>'+nav('home');
+ bindTaskImageFallback(app);
  bindTaskDelegation();
 }
 
