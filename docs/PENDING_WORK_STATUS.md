@@ -31,7 +31,7 @@ Last aligned: 2026-10-08
 - Function-by-function review found the remaining 8 authenticated SECURITY DEFINER findings are intentionally used by client/admin workflows and have explicit role/authentication gates; no unauthenticated execution was retained for those reviewed functions.
 - RPC/RLS privilege smoke-check confirmed: anonymous users cannot select client users or execute protected RPCs; authenticated users cannot directly insert into deposit/KYC/withdrawal tables; client task/withdrawal/profile helper RPCs remain available only to authenticated users.
 - Read-only financial integrity audit confirmed zero unexplained balance for the two current profiles; the live financial tables are empty, so no state-transition E2E can truthfully be marked passed yet.
-- Shop checkout business-rule bug was fixed: the canonical client now requires the exact assigned task set, calculates totals from `task_value`, and uses a server-side `complete-cycle-checkout` endpoint; direct client execution of the legacy single-task completion RPC was retired.
+- Shop task completion is now consistent with the live UI: the browser completes each assigned task through the authenticated ownership-checked `complete_shop_task` RPC, each task debits its `task_value`, and the final task starts the 18-hour settlement. The separate `complete-cycle-checkout` endpoint remains hardened for exact full-cycle checkout.
 - Controlled Master Admin session check resolved the actor as MASTER ADMIN with admin-scoped row visibility. The operational queues are currently empty, so live KYC/deposit/withdrawal end-to-end state transitions still require TESTNET_DEMO fixture records or real test submissions before they can be marked passed.
 
 ## Pending sequence
