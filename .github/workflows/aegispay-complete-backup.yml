@@ -12,17 +12,17 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact repository state
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Create complete source snapshot
-        shell: bash
+
+      - name: Create backup ZIP
         run: |
-          set -euo pipefail
-          git archive --format=zip --output=AegisPay-complete-backup-2026-10-08.zip HEAD
+          set -e
+          zip -r AegisPay-complete-backup-2026-10-08.zip . -x ".git/*"
           sha256sum AegisPay-complete-backup-2026-10-08.zip > AegisPay-complete-backup-2026-10-08.sha256
-      - name: Upload complete backup
+          ls -lh AegisPay-complete-backup-2026-10-08.zip
+
+      - name: Upload backup
         uses: actions/upload-artifact@v4
         with:
           name: AegisPay-complete-backup-2026-10-08
