@@ -49,16 +49,16 @@ Deno.serve(async (req: Request) => {
       return json({ error: "The complete assigned task set is required." }, 400);
     }
 
-    const { data: cycle, error: cycleError } = await admin.from("cycle_runs")
+    const { data: cycleBefore, error: cycleError } = await admin.from("cycle_runs")
       .select("id,user_id,status,cycle_base,task_completed_at,ready_at")
       .eq("id", cycleId).eq("user_id", profile.id).maybeSingle();
-    if (cycleError || !cycle) return json({ error: "Shop cycle not found." }, 404);
-    if (cycle.status === "WAITING_18H") return json({ status: "WAITING_18H", cycle });
-    if (cycle.status !== "TASKS_OPEN") return json({ error: "This Shop cycle is not accepting checkout." }, 409);
+    if (cycleError || !cycleBefore) return json({ error: "Shop cycle not found." }, 404);
+    if (cycleBefore.status === "WAITING_18H") return json({ status: "WAITING_18H", cycle: cycleBefore });
+    if (cycleBefore.status !== "TASKS_OPEN") return json({ error: "This Shop cycle is not accepting checkout." }, 409);
 
     const { data: tasks, error: tasksError } = await admin.from("tasks")
       .select("id,cycle_id,user_id,status,task_value")
-      .eq("cycle_id", cycle.id).eq("user_id", profile.id)
+      .eq("cycle_id", cycleBefore.id).eq("user_id", profile.id)
       .order("id", { ascending: true });
     if (tasksError) return json({ error: "Unable to load assigned Shop tasks." }, 500);
     if (!tasks?.length) return json({ error: "This Shop cycle has no assigned tasks." }, 409);
@@ -73,43 +73,18 @@ Deno.serve(async (req: Request) => {
     }
 
     const taskTotal = tasks.reduce((sum, task) => sum + Number(task.task_value || 0), 0);
-    if (!Number.isFinite(taskTotal) || Math.abs(taskTotal - Number(cycle.cycle_base || 0)) > 0.01) {
+    if (!Number.isFinite(taskTotal) || Math.abs(taskTotal - Number(cycleBefore.cycle_base || 0)) > 0.01) {
       return json({ error: "Assigned Shop task values do not equal the full cycle balance." }, 409);
     }
 
-    const { error: taskUpdateError } = await admin.from("tasks").update({
-      status: "Completed", progress: 100, completion_date: new Date().toISOString().slice(0, 10)
-    }).eq("cycle_id", cycle.id).eq("user_id", profile.id).in("status", ["Pending","In Progress"]);
-    if (taskUpdateError) return json({ error: "Shop task completion could not be saved." }, 500);
+    const { data: closed, error: rpcError } = await admin.rpc("complete_shop_cycle_checkout", {
+      p_user_id: profile.id,
+      p_cycle_id: cycleBefore.id,
+      p_task_ids: tasks.map((task) => task.id),
+    });
 
-    const { data: closed, error: cycleUpdateError } = await admin.from("cycle_runs").update({
-      status: "WAITING_18H",
-      task_completed_at: new Date().toISOString(),
-      ready_at: new Date(Date.now() + 18 * 60 * 60 * 1000).toISOString()
-    }).eq("id", cycle.id).eq("user_id", profile.id).eq("status", "TASKS_OPEN")
-      .select("id,user_id,status,cycle_base,task_completed_at,ready_at,settled_at,profit_amount,created_at,source_deposit_id").maybeSingle();
-
-    if (cycleUpdateError || !closed) {
-      await admin.from("tasks").update({
-        status: "Pending", progress: 0, completion_date: null
-      }).eq("cycle_id", cycle.id).eq("user_id", profile.id).eq("status", "Completed");
-      return json({ error: "Shop cycle could not be advanced. Please try checkout again." }, 409);
-    }
-
-    await admin.from("notifications").insert([
-      {
-        user_id: profile.id, notification_type: "SHOP_CHECKOUT_COMPLETED",
-        title: "Shop task set completed",
-        body: "Your exact Shop task set has been completed and the 18-hour settlement timer has started.",
-        is_read: false,
-      },
-      {
-        user_id: profile.id, notification_type: "CYCLE_WAITING",
-        title: "18-hour settlement started",
-        body: "All assigned Shop tasks are complete. Your 18-hour settlement timer has started.",
-        is_read: false,
-      },
-    ]);
+    if (rpcError) return json({ error: String(rpcError.message || "Shop checkout failed.") }, 409);
+    if (!closed) return json({ error: "Shop cycle could not be completed." }, 409);
 
     return json({ status: "WAITING_18H", cycle: closed, completedTaskCount: tasks.length }, 200);
   } catch {
