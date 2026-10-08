@@ -54,12 +54,12 @@ Last aligned: 2026-10-05
 4. Validate referral and exact Shop task-set settlement calculations.
 
 
-### Phase 3 — Started (controlled production-readiness layer)
-- Added production_config with an explicit pre-production environment and payout lock.
-- Added production_go_live_approved=false metadata to system_mode without changing current deposit/runtime behavior.
+### Phase 3 — Complete (controlled production-readiness layer)
+- Added an explicit PRE_PRODUCTION configuration with a fail-closed payout lock.
 - Added Master Admin-only get_production_readiness() diagnostics with no secret values exposed.
-- Master Admin Settings now shows environment, network, live-deposit state, real-payout state, go-live approval and payout lock.
-- Real payout execution remains disabled and no production go-live approval was granted.
+- Master Admin Settings shows production environment, network, live-deposit state, real-payout state, go-live approval and payout lock.
+- Mainnet payout execution now enforces the Phase 3 production gate server-side; testnet payout behavior remains unchanged.
+- Production go-live remains intentionally disabled until the required server-side secrets, monitoring, operator approval and final end-to-end smoke tests are completed.
 
 ### Phase 3 — Production configuration
 1. Replace TESTNET_DEMO configuration only after security gates pass.
