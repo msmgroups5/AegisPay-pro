@@ -37,6 +37,9 @@ assert(client.includes("https://aegispay-web.aegispay.workers.dev/?reset=1"),'Pa
 assert(client.includes("db.rpc('link_withdrawal_wallet',{p_address:wallet,p_owner_name:profile.name})"),'Client wallet-link flow must use the owner-name protected RPC');
 assert(client.includes("complete-cycle-checkout"),'Client Shop checkout endpoint is not wired');
 assert(client.includes("db.rpc('complete_shop_task',{p_task_id:taskId})"),'Client per-task Shop completion RPC is missing');
+assert(client.includes("db.rpc('record_shop_task_purchase'"),'Client Shop purchase confirmation RPC is not wired');
+assert(client.includes("qs.get('shop_purchase')==='confirmed'"),'Client Shop purchase return callback is missing');
+assert(client.includes("&product=")||client.includes("'&product='"),'Shop task marketplace link must carry the assigned product ID');
 assert(client.includes("qs.get('reset')==='1'"),'Client password reset route is missing');
 assert(!client.includes("db.rpc('link_withdrawal_wallet',{p_wallet:wallet})"),'Legacy one-argument wallet RPC must not be called by the client');
 assert(!client.includes('aegispay-client1.netlify.app')&&!client.includes('aegispay-ali-archive.netlify.app'),'Legacy Netlify production redirect remains in client source');
@@ -71,6 +74,16 @@ assert(!gradle.includes('syncBlueprintRuntime')&&!gradle.includes('aegis-core.js
 const native=fs.readFileSync('android/app/src/main/java/com/aegispay/app/MainActivity.java','utf8');
 assert(!native.includes('aegispay-pro-web.aegispay.workers.dev')&&!native.includes('aegispay-client.netlify.app')&&!native.includes('__UNI__D835ED9'),'Android stale remote/legacy identity remains');
 assert(native.includes('aegispay-pro.pages.dev')&&native.includes('UPDATE_HOST'),'Android update endpoint must remain explicitly allowlisted for Cloudflare Pages');
+
+const androidWorkflow=fs.readFileSync('.github/workflows/android-apk.yml','utf8');
+for(const marker of [
+  ':app:assembleClientDebug',':app:assembleAdminDebug',':app:bundleClientDebug',':app:bundleAdminDebug',
+  ':app:assembleClientRelease',':app:assembleAdminRelease',':app:bundleClientRelease',':app:bundleAdminRelease'
+])assert(androidWorkflow.includes(marker),'Android Phase 5 build workflow missing: '+marker);
+assert(androidWorkflow.includes('outputs/bundle/clientDebug/app-client-debug.aab'),'Android client debug AAB verification is missing');
+assert(androidWorkflow.includes('outputs/bundle/adminDebug/app-admin-debug.aab'),'Android admin debug AAB verification is missing');
+assert(androidWorkflow.includes('outputs/bundle/clientRelease/app-client-release.aab'),'Android client release AAB verification is missing');
+assert(androidWorkflow.includes('outputs/bundle/adminRelease/app-admin-release.aab'),'Android admin release AAB verification is missing');
 
 const deploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
 assert(deploy.includes('cp client.html site/app/index.html'),'Deploy source of truth is not client.html');
