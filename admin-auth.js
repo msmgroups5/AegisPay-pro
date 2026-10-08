@@ -609,6 +609,12 @@ async function toggleAiBot(){
       updated_at:now
     },{onConflict:'key'});
     if(r.error)throw r.error;
+    const auditResult=await c.from('audit_events').insert({
+      actor_user_id:state.profile?.id||null,
+      event_type:'AI_BOT_TOGGLED',
+      description:'AI Approval Bot set to '+(enabled?'ON':'OFF')+' by Master Admin.'
+    });
+    if(auditResult.error)throw auditResult.error;
     await refreshData();
   });
 }
