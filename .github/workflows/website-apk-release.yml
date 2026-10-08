@@ -30,8 +30,11 @@ jobs:
           AAB="android/app/build/outputs/bundle/clientDebug/app-client-debug.aab"
           test -s "$APK"
           test -s "$AAB"
-          grep -q "versionCode 38" android/app/build.gradle
-          grep -q "versionName '2.5.9'" android/app/build.gradle
+          VERSION_CODE=$(sed -n "s/.*versionCode \\([0-9][0-9]*\\).*/\\1/p" android/app/build.gradle | head -1)
+          VERSION_NAME=$(sed -n "s/.*versionName '\\([^']*\\)'.*/\\1/p" android/app/build.gradle | head -1)
+          test -n "$VERSION_CODE"
+          test -n "$VERSION_NAME"
+          echo "Aurora version: $VERSION_NAME (code $VERSION_CODE)"
           sha256sum "$APK"
       - name: Publish Aurora Client APK
         env:
@@ -40,9 +43,11 @@ jobs:
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
-          TAG="aurora-apk-2.5.9-b38"
-          TITLE="AegisPay Aurora Client 2.5.9 (38)"
-          NOTES="Canonical Aurora Client UI APK. Includes username login, Secure & Verified footer, corrected CNIC/Passport file layout, automatic Shop task assignment while balance remains above 0, and the canonical Aurora UI guard."
+          VERSION_CODE=$(sed -n "s/.*versionCode \\([0-9][0-9]*\\).*/\\1/p" android/app/build.gradle | head -1)
+          VERSION_NAME=$(sed -n "s/.*versionName '\\([^']*\\)'.*/\\1/p" android/app/build.gradle | head -1)
+          TAG="aurora-apk-${VERSION_NAME}-b${VERSION_CODE}"
+          TITLE="AegisPay Aurora Client ${VERSION_NAME} (${VERSION_CODE})"
+          NOTES="Canonical Aurora Client UI APK. Includes username login, password recovery, Secure & Verified footer, corrected CNIC/Passport layout, automatic Shop task assignment, assigned-product marketplace flow, Shop purchase confirmation return flow, and the canonical Aurora UI guard."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
           else
