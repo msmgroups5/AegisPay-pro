@@ -609,18 +609,22 @@ function taskImageUrl(url){
 }
 function bindTaskImageFallback(root){
  if(!root)return;
- root.querySelectorAll('img[data-fallback-src]').forEach(img=>{
-  if(!img.dataset.imageFallbackBound){
-   img.dataset.imageFallbackBound='1';
-   img.addEventListener('error',function(){
-    const direct=this.dataset.directSrc||'';
-    const fallback=this.dataset.fallbackSrc||'';
-    if(direct && this.dataset.directTried!=='1' && this.src!==direct){this.dataset.directTried='1';this.src=direct;return;}
-    if(fallback && this.dataset.fallbackTried!=='1'){this.dataset.fallbackTried='1';this.src=fallback;return;}
-    this.style.opacity='.45';
-   });
-  }
-  if(img.complete && img.naturalWidth===0) setTimeout(()=>img.dispatchEvent(new Event('error')),0);
+ const probe=(img,url,mode)=>{
+  const target=String(url||'').trim();if(!target)return;
+  const p=new Image();
+  p.onload=()=>{img.src=target;img.dataset.imageState='remote';};
+  p.onerror=()=>{
+   if(mode==='remote'){
+    const direct=img.dataset.directSrc||'';
+    if(direct && img.dataset.directTried!=='1'){img.dataset.directTried='1';probe(img,direct,'direct');}
+   }
+  };
+  p.src=target;
+ };
+ root.querySelectorAll('img[data-remote-src]').forEach(img=>{
+  if(img.dataset.imageFallbackBound)return;
+  img.dataset.imageFallbackBound='1';
+  probe(img,img.dataset.remoteSrc,'remote');
  });
 }function bindTaskDelegation(){
   if(window.__aegisTaskDelegationBound)return;
@@ -660,7 +664,7 @@ function openTaskProduct(taskId){
  const rating=Number(product.rating||0),reviews=taskReviewList(product);
  const base=product.image||'',rawGallery=(Array.isArray(product.gallery)&&product.gallery.length?product.gallery:[base]).filter(Boolean).slice(0,7),gallery=rawGallery.map(taskImageUrl).filter(Boolean),galleryFallbacks=rawGallery.map((_,i)=>taskImageFallbackUrl(product.title||task.title||'Assigned Shop Product',i));
  box.innerHTML='<div class="task-modal-head"><div><small class="mu">Assigned Shop Product</small><h2 style="font-size:19px;margin-top:2px">'+esc(product.title||task.title||'Product')+'</h2></div><button type="button" class="task-modal-close" data-close-task-product>×</button></div>'+
-   '<div class="task-gallery"><div class="task-gallery-main"><img id="taskGalleryMain" src="'+esc(gallery[0]||'')+'" data-direct-src="'+esc(rawGallery[0]||'')+'" data-fallback-src="'+esc(galleryFallbacks[0]||'')+'" alt="'+esc(product.title||'Product')+'"><span class="task-gallery-count" id="taskGalleryCount">1 / '+gallery.length+'</span></div><div class="task-gallery-thumbs">'+gallery.map((im,i)=>'<button type="button" style="padding:0;border:0;background:transparent" data-gallery-index="'+i+'"><img class="task-gallery-thumb '+(i===0?'on':'')+'" src="'+esc(im)+'" data-direct-src="'+esc(rawGallery[i]||'')+'" data-fallback-src="'+esc(galleryFallbacks[i]||'')+'" alt="Product image '+(i+1)+'"></button>').join('')+'</div></div>'+
+   '<div class="task-gallery"><div class="task-gallery-main"><img id="taskGalleryMain" src="'+esc(galleryFallbacks[0]||'')+'" data-remote-src="'+esc(gallery[0]||'')+'" data-direct-src="'+esc(rawGallery[0]||'')+'" alt="'+esc(product.title||'Product')+'"><span class="task-gallery-count" id="taskGalleryCount">1 / '+gallery.length+'</span></div><div class="task-gallery-thumbs">'+gallery.map((im,i)=>'<button type="button" style="padding:0;border:0;background:transparent" data-gallery-index="'+i+'"><img class="task-gallery-thumb '+(i===0?'on':'')+'" src="'+esc(galleryFallbacks[i]||'')+'" data-remote-src="'+esc(im)+'" data-direct-src="'+esc(rawGallery[i]||'')+'" alt="Product image '+(i+1)+'"></button>').join('')+'</div></div>'+
    '<div style="margin-top:11px;font-size:12px;color:var(--mu)">'+esc(product.brand||offer.subtitle||'AegisPay Shop')+' · '+esc(product.category||'Shop Product')+'</div>'+
    '<div class="task-modal-rating"><span class="task-stars">'+taskStars(rating)+'</span><b>'+rating.toFixed(1)+'/5</b><span class="mu">Customer rating</span></div>'+
    '<div class="card" style="margin-top:13px;margin-bottom:0;padding:13px"><div class="sh" style="margin:0"><span>Task Purchase Value</span><b style="color:var(--t)">'+Number(task.task_value||0).toFixed(2)+' USDT</b></div><small class="mu">Review the assigned item first, purchase it through Shop, then return here and complete the task.</small></div>'+
@@ -671,7 +675,7 @@ function openTaskProduct(taskId){
  bindTaskImageFallback(box);
 modal.classList.add('show');
  const main=document.getElementById('taskGalleryMain'),count=document.getElementById('taskGalleryCount'),thumbs=box.querySelectorAll('[data-gallery-index]');let idx=0;
- const show=()=>{if(main){main.dataset.directSrc=rawGallery[idx]||'';main.dataset.fallbackSrc=galleryFallbacks[idx]||taskImageFallbackUrl(product.title||task.title||'Assigned Shop Product',idx);main.dataset.directTried='';main.dataset.fallbackTried='';main.src=gallery[idx]||'';}if(count)count.textContent=(idx+1)+' / '+gallery.length;thumbs.forEach((b,i)=>{const im=b.querySelector('img');if(im)im.classList.toggle('on',i===idx)});bindTaskImageFallback(box)};
+ const show=()=>{if(main){main.dataset.remoteSrc=gallery[idx]||'';main.dataset.directSrc=rawGallery[idx]||'';main.src=galleryFallbacks[idx]||taskImageFallbackUrl(product.title||task.title||'Assigned Shop Product',idx);main.dataset.directTried='';main.dataset.imageFallbackBound='';bindTaskImageFallback(main.parentElement);}if(count)count.textContent=(idx+1)+' / '+gallery.length;thumbs.forEach((b,i)=>{const im=b.querySelector('img');if(im)im.classList.toggle('on',i===idx)});};
  thumbs.forEach(b=>b.onclick=()=>{idx=Number(b.getAttribute('data-gallery-index')||0);show()});
  let sx=0;if(main){main.ontouchstart=e=>{sx=e.touches[0].clientX};main.ontouchend=e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>35){idx=(idx+(dx<0?1:-1)+gallery.length)%gallery.length;show()}};main.onclick=()=>{idx=(idx+1)%gallery.length;show()}};
  box.querySelectorAll('[data-close-task-product]').forEach(b=>b.onclick=closeTaskProduct);
@@ -718,7 +722,7 @@ async function liveShop(){
   const product=(window.AegisShopCatalog||[]).find(p=>String(p.id)===String(offer?.product_id||''))||null;
   taskProductData[String(x.id)]={task:x,offer,product};
   const imageRaw=product?.image?product.image:'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0),image=imageRaw?taskImageUrl(imageRaw):'',fallback=taskImageFallbackUrl(title,0);
-  return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(image)+'" data-direct-src="'+esc(imageRaw)+'" data-fallback-src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">':'<img class="task-product-img" src="'+esc(fallback)+'" data-fallback-src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div>';
+  return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(fallback)+'" data-remote-src="'+esc(image)+'" data-direct-src="'+esc(imageRaw)+'" alt="'+esc(title)+'" loading="lazy">':'<img class="task-product-img" src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div>';
 }).join(''):'<div class="mu" style="padding:16px 0;text-align:center">No assigned Shop tasks yet.</div>';
 
  let statusCard='';
