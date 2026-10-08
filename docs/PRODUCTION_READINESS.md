@@ -1,6 +1,6 @@
 # AegisPay Production Readiness
 
-## Verified deployment state — 2026-10-05
+## Verified deployment state — 2026-10-08
 
 - GitHub repository: `msmgroups5/AegisPay-pro`
 - Production source branch: `main`
@@ -29,7 +29,8 @@
 - `private-verification` Storage bucket is present, private, limited to 10 MB, and restricted to JPEG/PNG/WebP.
 - Storage access policies are owner-scoped and runtime-gated.
 - One active cycle-settlement cron runs every minute.
-- Current system mode is `TESTNET_DEMO`; real payouts and live deposit crediting are disabled.
+- Current system mode is `MAINNET / LIVE_DEPOSIT_TEST`.
+- Controlled live-deposit testing is enabled; real payouts remain disabled by the Phase 3 server-side payout gate.
 - No Supabase development branches exist.
 
 ## Security review
