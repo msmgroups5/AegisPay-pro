@@ -53,6 +53,14 @@ Last aligned: 2026-10-05
 3. Validate withdrawal request -> dual approval -> payout recovery flow in TESTNET_DEMO.
 4. Validate referral and exact Shop task-set settlement calculations.
 
+
+### Phase 3 — Started (controlled production-readiness layer)
+- Added production_config with an explicit pre-production environment and payout lock.
+- Added production_go_live_approved=false metadata to system_mode without changing current deposit/runtime behavior.
+- Added Master Admin-only get_production_readiness() diagnostics with no secret values exposed.
+- Master Admin Settings now shows environment, network, live-deposit state, real-payout state, go-live approval and payout lock.
+- Real payout execution remains disabled and no production go-live approval was granted.
+
 ### Phase 3 — Production configuration
 1. Replace TESTNET_DEMO configuration only after security gates pass.
 2. Configure production TRON/USDT receiving address and payout secrets server-side.
