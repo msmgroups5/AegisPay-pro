@@ -286,6 +286,7 @@ function settings(){
       field('setCycleHours','Cycle Hours',Number(cr.hours||18),'number')+
       field('setRef1','Level 1 Referral Reward',Number(rr.level_1||5),'number')+
       field('setRef2','Level 2 Referral Reward',Number(rr.level_2||2),'number')+
+      '<div class="aa-span-2 aa-ai-control"><div><strong>AI Approval Bot</strong><small>Controls AI precheck for KYC and deposit evidence. OFF means new submissions go to manual review; it never auto-approves.</small></div><button type="button" class="aa-system-toggle '+((s.ai_review||{}).enabled!==false?'on':'off')+'" data-action="ai-toggle">'+((s.ai_review||{}).enabled!==false?'AI BOT ON':'AI BOT OFF')+'</button></div>'+
       '<div class="aa-span-2"><button class="aa-primary" type="submit">Save Platform Rules</button></div>'+
     '</form></section>'+
     '<section class="aa-panel"><div class="aa-panel-head"><div><h2>Runtime</h2><p>Current backend mode.</p></div><span class="aa-badge aa-badge-amber">'+esc(sm.mode||'TESTNET_DEMO')+'</span></div>'+
@@ -546,6 +547,20 @@ async function createOffer(e){
     await refreshData();
   });
 }
+async function toggleAiBot(){
+  await setBusy(async function(){
+    const c=service.client(),now=new Date().toISOString();
+    const current=state.settings.ai_review||{};
+    const enabled=current.enabled===false;
+    const r=await c.from('platform_settings').upsert({
+      key:'ai_review',
+      value_json:{enabled:enabled,policy_version:'2026-10-08-v1',updated_by:state.profile?.id||null},
+      updated_at:now
+    },{onConflict:'key'});
+    if(r.error)throw r.error;
+    await refreshData();
+  });
+}
 async function saveSettings(e){
   e.preventDefault();
   await setBusy(async function(){
@@ -565,6 +580,7 @@ async function saveSettings(e){
       {key:'withdrawal_rules',value_json:wr,updated_at:now}
     ],{onConflict:'key'});
     if(r.error)throw r.error;
+    if(r.error)throw r.error;
     await refreshData();
   });
 }
@@ -581,6 +597,7 @@ root.addEventListener('click',function(e){
   if(action==='refresh'){setBusy(refreshData);return;}
   if(action==='logout'){service.signOut().finally(function(){state.profile=null;state.queues={deposits:[],kyc:[],withdrawals:[],kycHistory:[],depositHistory:[],stats:{}};render();});return;}
   if(action==='runtime'){runtime();return;}
+  if(action==='ai-toggle'){toggleAiBot();return;}
   if(action==='review'){review(el);return;}
   if(action==='payout'){payout(el);return;}
   if(action==='telegram-check'){telegramCheck();return;}
