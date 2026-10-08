@@ -628,13 +628,14 @@ async function saveProductionConfig(e){
       if(!window.confirm('You are changing a production payout control. Continue only after server-side payout secrets and operational smoke tests are verified.'))return;
     }
     if(payouts&&!window.confirm('FINAL CONFIRMATION: enable REAL PAYOUT execution?'))return;
-    const r=await c.rpc('set_production_config',{
-      p_environment:env,
-      p_live_deposits_enabled:live,
-      p_real_payouts_enabled:payouts,
-      p_go_live_approved:goLive,
-      p_payouts_locked:locked
-    });
+    const r=await service.invokeFunction('production-readiness',{body:{
+      action:'update',
+      environment:env,
+      liveDepositsEnabled:live,
+      realPayoutsEnabled:payouts,
+      goLiveApproved:goLive,
+      payoutsLocked:locked
+    }});
     if(r.error)throw r.error;
     await refreshData();
   });
