@@ -111,20 +111,17 @@ The private bucket `private-verification` stores deposit/KYC evidence.
 - Upload paths are scoped by Auth user ID.
 - Client read access is owner-scoped; Master Admin can review evidence.
 
-## TRON testnet
+## Controlled pre-production network state
 
-Current deposit configuration is explicitly testnet-only:
+The current platform is intentionally held in a controlled PRE_PRODUCTION / LIVE_DEPOSIT_TEST state:
 
-- Network: TRON TESTNET
-- Token: USDT
-- Standard: TRC20
-- Shasta USDT contract: `TG3XXyExBkPp9nzdajDZsozEu4BkaSJozs`
-- Receiving address: `THF68ipA3NK2V4mCxNBk8JWJGkU6a5cngg`
-- Live deposits: disabled
-- System mode: TESTNET_DEMO / TEST_MODE
+- System mode: MAINNET / LIVE_DEPOSIT_TEST
+- Controlled live-deposit testing: enabled
 - Real payouts: disabled
+- Phase 3 production payout gate: locked
+- Production go-live approval: not granted
 
-TRON Shasta monitoring uses `https://api.shasta.trongrid.io`.
+Network-specific deposit/payout secrets and wallet details remain server-side and are not exposed in this architecture document.
 
 ## Automation
 
