@@ -13,6 +13,7 @@ const must=[
   'database/migrations/20261008_phase3_production_gate_hardening.sql',
   'database/migrations/20261008_phase3_readiness_response_alignment.sql',
   'supabase/functions/production-readiness/index.ts',
+  'supabase/functions/submit-kyc/ai-review.ts','supabase/functions/submit-deposit/ai-review.ts',
   'site/index.html','site/site.css','android/app/build.gradle',
   'android/app/src/main/java/com/aegispay/app/MainActivity.java',
   '.github/workflows/ci.yml','.github/workflows/android-apk.yml',
@@ -35,6 +36,7 @@ assert(client.includes("setSession({access_token:accessToken,refresh_token:refre
 assert(client.includes("https://aegispay-web.aegispay.workers.dev/?reset=1"),'Password reset must target the canonical Worker');
 assert(client.includes("db.rpc('link_withdrawal_wallet',{p_address:wallet,p_owner_name:profile.name})"),'Client wallet-link flow must use the owner-name protected RPC');
 assert(client.includes("complete-cycle-checkout"),'Client Shop checkout endpoint is not wired');
+assert(client.includes("db.rpc('complete_shop_task',{p_task_id:taskId})"),'Client per-task Shop completion RPC is missing');
 assert(client.includes("qs.get('reset')==='1'"),'Client password reset route is missing');
 assert(!client.includes("db.rpc('link_withdrawal_wallet',{p_wallet:wallet})"),'Legacy one-argument wallet RPC must not be called by the client');
 assert(!client.includes('aegispay-client1.netlify.app')&&!client.includes('aegispay-ali-archive.netlify.app'),'Legacy Netlify production redirect remains in client source');
@@ -84,7 +86,7 @@ assert(fs.readFileSync('app-update.js','utf8').includes('/app-version.json'),'Up
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
 
 const functions=[
-  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','complete-cycle-checkout','complete-password-reset',
+  'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','production-readiness','complete-cycle-checkout','complete-password-reset',
   'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit'
 ];
 for(const f of functions)assert(exists('supabase/functions/'+f+'/index.ts'),'Missing Edge Function source: '+f);
