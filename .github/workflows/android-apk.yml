@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-debug-apks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       AEGIS_RELEASE_KEYSTORE_B64: ${{ secrets.AEGIS_RELEASE_KEYSTORE_B64 }}
       AEGIS_RELEASE_STORE_PASSWORD: ${{ secrets.AEGIS_RELEASE_STORE_PASSWORD }}
