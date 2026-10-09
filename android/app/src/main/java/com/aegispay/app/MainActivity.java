@@ -249,9 +249,17 @@ public class MainActivity extends AppCompatActivity {
         Uri updateUri = Uri.parse(url == null ? "" : url);
         String expectedHash = expectedSha256 == null ? "" : expectedSha256.trim().toLowerCase(Locale.US);
         boolean allowedPort = updateUri.getPort() == -1 || updateUri.getPort() == 443;
+        String updateAuthority = updateUri.getAuthority();
+        String updatePath = updateUri.getPath();
+        boolean safeAuthority = updateAuthority != null && updateAuthority.indexOf('@') < 0;
+        boolean allowedPath = updatePath != null
+                && updatePath.startsWith("/downloads/")
+                && updatePath.toLowerCase(Locale.US).endsWith(".apk");
         if (!"https".equalsIgnoreCase(updateUri.getScheme())
                 || !UPDATE_HOST.equalsIgnoreCase(updateUri.getHost())
                 || !allowedPort
+                || !safeAuthority
+                || !allowedPath
                 || !expectedHash.matches("^[a-f0-9]{64}$")) {
             Toast.makeText(this, "Invalid AegisPay update source or checksum.", Toast.LENGTH_LONG).show();
             notifyUpdateRetryAvailable();
