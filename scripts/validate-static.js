@@ -1,4 +1,5 @@
 const fs=require('node:fs');
+const vm=require('node:vm');
 const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 const exists=p=>fs.existsSync(p);
 
@@ -20,6 +21,23 @@ const must=[
   '.github/workflows/web-portal-deploy.yml','.github/workflows/website-apk-release.yml'
 ];
 for(const p of must)assert(exists(p),'Missing canonical source file: '+p);
+
+function assertInlineScriptsParse(file){
+  const html=fs.readFileSync(file,'utf8');
+  const re=/<script\\b([^>]*)>([\\s\\S]*?)<\\/script\\s*>/gi;
+  let match,index=0;
+  while((match=re.exec(html))){
+    const attrs=match[1]||'',source=match[2]||'';
+    if(/\\bsrc\\s*=/.test(attrs))continue;
+    if(/\\btype\\s*=\\s*["']?(?:application\\/json|application\\/ld\\+json|text\\/template|importmap)/i.test(attrs))continue;
+    index++;
+    try{new vm.Script(source,{filename:file+' inline script '+index});}
+    catch(error){throw new Error(file+' inline script '+index+' has a syntax error: '+error.message);}
+  }
+  assert(index>0,file+' has no inline scripts to validate');
+}
+assertInlineScriptsParse('client.html');
+assertInlineScriptsParse('master-admin.html');
 
 const client=fs.readFileSync('client.html','utf8');
 assert(client.includes('bootLive'),'Client inline runtime bootstrap is missing');
