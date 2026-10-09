@@ -120,7 +120,9 @@ assert(!rel.includes('netlify-cli deploy'),'Release workflow still has active Ne
 
 const updater=fs.readFileSync('app-update.js','utf8');
 assert(updater.includes('/app-version.json'),'Updater web manifest endpoint missing');
-assert(updater.includes('/assets/aegispay/app-version.json'),'Android updater must use the bundled asset manifest path');
+assert(updater.includes("https://aegispay-pro.pages.dev/app-version.json"),'Android updater must check the remote version manifest');
+assert(!updater.includes("!nativeReady()||isAdmin()||!remote"),'Master Admin Android updater must not be unconditionally disabled');
+assert(updater.includes('m.adminApkUrl')&&updater.includes('m.adminSha256'),'Android updater must support the Master Admin APK and SHA-256 manifest fields');
 const gradleSource=fs.readFileSync('android/app/build.gradle','utf8');
 assert(gradleSource.includes("include 'app-version.json'"),'Android client build must bundle app-version.json');
 assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readFileSync('_redirects','utf8').includes('/app/ /app/home.html 200'),'Canonical app redirect missing');
