@@ -88,6 +88,7 @@ Sensitive balance mutations, task completion, wallet linking and withdrawal requ
 ## Supabase Edge Functions
 
 - `public-signup`: controlled client test signup.
+- `username-login`: pre-auth username/password authentication; performs the credential check server-side and returns a session only after successful password verification. Requests are rate-limited; it does not return the registered email address.
 - `submit-deposit`: stores deposit evidence and runs deposit evidence review.
 - `verify-deposit`: verifies a submitted deposit against confirmed TRON transfers.
 - `monitor-deposits`: server-side automated deposit monitoring.
