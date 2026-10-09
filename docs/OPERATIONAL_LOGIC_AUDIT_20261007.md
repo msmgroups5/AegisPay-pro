@@ -28,8 +28,8 @@ The canonical GitHub repository, Supabase production project, Cloudflare Workers
 ### Login
 
 1. Client accepts either email or username.
-2. Username is resolved server-side through `resolve_login_email`.
-3. Supabase password login is performed only after a valid email is resolved.
+2. Username/password is submitted to the `username-login` Edge Function; the function resolves the profile internally and validates the password with Supabase Auth.
+3. The function returns session tokens only after successful credentials and only for an active, unfrozen client profile. A direct username-to-email RPC is not exposed to client roles.
 4. Confirmed-email and account-role gates remain enforced by the existing session/profile claim flow.
 
 ### Forgot Password / account recovery
