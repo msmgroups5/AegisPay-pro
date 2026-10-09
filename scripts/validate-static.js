@@ -24,12 +24,12 @@ for(const p of must)assert(exists(p),'Missing canonical source file: '+p);
 
 function assertInlineScriptsParse(file){
   const html=fs.readFileSync(file,'utf8');
-  const re=/<script\\b([^>]*)>([\\s\\S]*?)<\\/script\\s*>/gi;
+  const re=/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
   let match,index=0;
   while((match=re.exec(html))){
     const attrs=match[1]||'',source=match[2]||'';
-    if(/\\bsrc\\s*=/.test(attrs))continue;
-    if(/\\btype\\s*=\\s*["']?(?:application\\/json|application\\/ld\\+json|text\\/template|importmap)/i.test(attrs))continue;
+    if(/\bsrc\s*=/.test(attrs))continue;
+    if(/\btype\s*=\s*["']?(?:application\/json|application\/ld\+json|text\/template|importmap)/i.test(attrs))continue;
     index++;
     try{new vm.Script(source,{filename:file+' inline script '+index});}
     catch(error){throw new Error(file+' inline script '+index+' has a syntax error: '+error.message);}
