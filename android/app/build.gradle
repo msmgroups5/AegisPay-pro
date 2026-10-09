@@ -109,7 +109,8 @@ def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientU
         def html = new String(bytes, 'UTF-8')
         def requiredAuroraMarkers = [
             '<title>AegisPay – Aurora UI</title>',
-            'Choose Deposit Tier',
+            'Select a tier',
+            'Activate Selected Tier',
             'Submit Deposit',
             'link_withdrawal_wallet',
             'Identity Verification',
@@ -136,6 +137,7 @@ def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', 
         include 'client.html'
         include 'app-version.json'
         include 'app-update.js'
+        include 'supabase-sdk.js'
     }
     into(layout.projectDirectory.dir('src/client/assets/aegispay'))
 }
