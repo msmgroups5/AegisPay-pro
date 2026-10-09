@@ -36,7 +36,7 @@
 
 ## Security review
 
-Supabase Security Advisor currently reports 14 authenticated-callable SECURITY DEFINER functions plus 1 intentionally pre-auth anonymous username lookup (`resolve_login_email`). The reviewed authenticated functions enforce explicit identity, role, ownership and/or runtime checks; `get_production_readiness` and `set_production_config` are Master Admin-gated despite being callable by the authenticated role. The stale one-argument `link_withdrawal_wallet(text)` overload is no longer callable by client roles.
+The pre-auth `resolve_login_email` RPC was removed from anon/authenticated grants on 2026-10-09 because it returned registered emails from usernames. Username login now uses the `username-login` Edge Function: it performs a generic credential check server-side, rate-limits attempts and returns session tokens only after password verification. The reviewed authenticated SECURITY DEFINER RPCs still require function-by-function review; `get_production_readiness` and `set_production_config` are Master Admin-gated despite authenticated EXECUTE grants. The stale one-argument `link_withdrawal_wallet(text)` overload remains unavailable to client roles.
 
 Leaked Password Protection is still disabled and is a production prerequisite.
 
