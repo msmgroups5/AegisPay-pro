@@ -1,6 +1,6 @@
 # AegisPay Pending Work Status
 
-Last aligned: 2026-10-08
+Last aligned: 2026-10-09
 
 ## Current status
 
@@ -28,6 +28,11 @@ Last aligned: 2026-10-08
 - `admin_set_withdrawal_wallet(uuid,text)` EXECUTE was revoked from `authenticated`; direct client RPC access is now blocked.
 - Authenticated client smoke-check confirmed the current user resolves to app role `USER`, sees only the expected RLS-scoped user row, and can read the Shop catalog/runtime settings.
 - Leaked-password protection is deferred by operator decision because it is not available on the current plan; it is not being treated as an active Phase 1 task for now.
+- Deep cross-platform audit on 2026-10-09: GitHub canonical source, Cloudflare Worker embedded assets, and the 14 deployed Supabase Edge Function entrypoints (including KYC/deposit review helper files) were compared; all audited active Worker assets and Edge Function source files now match their current repository copies, except the intentionally enhanced active public-signup function was brought into GitHub source to remove source/runtime drift.
+- Fixed a missing brace in the client Shop purchase-return branch; extended static validation to syntax-parse inline scripts in client and Master Admin HTML.
+- Added and applied forward-only migrations `20261009_harden_shop_task_account_state` and `20261009_harden_shop_task_product_and_runtime`. Shop purchase confirmation/task completion now enforce active client role/status, temporary freeze and global runtime pause; purchase confirmation fails closed if the task's assigned product cannot be resolved; full-cycle checkout honors the global runtime pause.
+- Android source is configured for Build 39 / 2.6.0, but the public update manifest and last actually published APK are still Build 38 / 2.5.9 until a fresh APK is produced and its SHA-256 can be recorded. Do not advertise Build 39 before that artifact exists.
+- GitHub Actions runs for CI, web deployment and Android builds are still failing before steps start (`steps: []`, missing log blob) across Ubuntu and Windows runner labels. This is an unresolved GitHub hosted-runner/account-side blocker; an actual fresh APK is not yet verified.
 - Function-by-function review found the remaining 8 authenticated SECURITY DEFINER findings are intentionally used by client/admin workflows and have explicit role/authentication gates; no unauthenticated execution was retained for those reviewed functions.
 - RPC/RLS privilege smoke-check confirmed: anonymous users cannot select client users or execute protected RPCs; authenticated users cannot directly insert into deposit/KYC/withdrawal tables; client task/withdrawal/profile helper RPCs remain available only to authenticated users.
 - Read-only financial integrity audit confirmed zero unexplained balance for the two current profiles; the live financial tables are empty, so no state-transition E2E can truthfully be marked passed yet.
@@ -72,14 +77,14 @@ Last aligned: 2026-10-08
 - Client assigned Shop tasks use the canonical product catalog, real-product gallery URLs with fallback imagery, ratings and review previews.
 - Shop task purchase confirmation now returns to the canonical AegisPay client with task/product context.
 - Client records the purchase confirmation through the authenticated `record_shop_task_purchase` RPC before `complete_shop_task` can proceed.
-- Server-side task completion still enforces task ownership, assigned-product matching, available-balance checks and the final 18-hour settlement transition.
+- Server-side task completion enforces task ownership, assigned-product matching, available-balance checks and the final 18-hour settlement transition. Latest hardening additionally enforces active account status, temporary security freeze and global runtime pause at the mutation boundary.
 - Cart, product details, task ticket and checkout/return behavior are aligned for the intended AegisPay Shop workflow.
 
-### Phase 5 — Complete
+### Phase 5 — Source configuration complete; fresh artifact pending
 - Canonical Android client and Master Admin flavors remain aligned to the root AegisPay portal sources and shared runtime assets.
 - WebView authentication callbacks, file selection, QR scanning/location bridges and SHA-256 verified APK update flow are in the canonical Android runtime.
-- Android CI now builds and verifies both APK and AAB outputs for client and Master Admin, using signed release builds when release secrets are present and debug builds otherwise.
-- Android release workflow targets canonical Client flavor `versionCode 39 / versionName 2.6.0`; the Aurora release now builds and publishes both the APK and AAB from the same verified build.
+- Android CI is configured to build and verify both APK and AAB outputs for client and Master Admin, using signed release builds when release secrets are present and debug builds otherwise; current GitHub runner failures prevent verification of a fresh artifact.
+- Android source/release workflow targets canonical Client flavor `versionCode 39 / versionName 2.6.0` and is configured to publish both APK and AAB. Build 39 has not yet been generated or hash-verified.
 - Physical device installation/update verification remains part of the final Phase 6 QA gate and is not being falsely marked complete here.
 
 ### Phase 6 — Final production QA
