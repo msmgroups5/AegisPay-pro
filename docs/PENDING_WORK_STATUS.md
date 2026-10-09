@@ -79,7 +79,7 @@ Last aligned: 2026-10-08
 - Canonical Android client and Master Admin flavors remain aligned to the root AegisPay portal sources and shared runtime assets.
 - WebView authentication callbacks, file selection, QR scanning/location bridges and SHA-256 verified APK update flow are in the canonical Android runtime.
 - Android CI now builds and verifies both APK and AAB outputs for client and Master Admin, using signed release builds when release secrets are present and debug builds otherwise.
-- Android release workflow remains based on the canonical Client flavor and current baseline `versionCode 38 / versionName 2.5.9`.
+- Android release workflow targets canonical Client flavor `versionCode 39 / versionName 2.6.0`; the Aurora release now builds and publishes both the APK and AAB from the same verified build.
 - Physical device installation/update verification remains part of the final Phase 6 QA gate and is not being falsely marked complete here.
 
 ### Phase 6 — Final production QA
