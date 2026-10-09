@@ -777,9 +777,16 @@ function bindAuthForms(){
           if(stored.error)throw stored.error;
         }
         await initData();
-        if(profile.role!=='USER')throw Error('This account does not have client access.');
+        if(profile.role!=='USER'){
+          await db.auth.signOut();
+          profile=null;
+          authUser=null;
+          throw Error('This account does not have client access.');
+        }
         if(!['ACTIVE','NORMAL'].includes(String(profile.status||'').toUpperCase())){
           await db.auth.signOut();
+          profile=null;
+          authUser=null;
           throw Error('This account is not active.');
         }
         await liveHome();
