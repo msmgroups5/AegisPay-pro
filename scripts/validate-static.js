@@ -14,6 +14,7 @@ const must=[
   'database/migrations/20261008_phase3_production_gate_hardening.sql',
   'database/migrations/20261008_phase3_readiness_response_alignment.sql',
   'database/migrations/20261009_harden_shop_task_account_state.sql',
+  'database/migrations/20261009_harden_shop_task_product_and_runtime.sql',
   'supabase/functions/production-readiness/index.ts',
   'supabase/functions/submit-kyc/ai-review.ts','supabase/functions/submit-deposit/ai-review.ts',
   'site/index.html','site/site.css','android/app/build.gradle',
@@ -62,6 +63,9 @@ assert(shopHardening.includes("v_profile.frozen_until > now()"),'Shop task RPCs 
 assert(shopHardening.includes("NOT public.app_runtime_enabled()"),'Shop task RPCs must enforce the global runtime pause');
 assert((shopHardening.match(/v_profile.role <> 'USER'/g)||[]).length===2,'Both Shop mutation RPCs must validate client role');
 assert((shopHardening.match(/status.*NOT IN \('ACTIVE','NORMAL'\)/g)||[]).length===2,'Both Shop mutation RPCs must validate active account status');
+const shopProductHardening=fs.readFileSync('database/migrations/20261009_harden_shop_task_product_and_runtime.sql','utf8');
+assert(shopProductHardening.includes("The assigned Shop task does not have a resolvable product"),'Shop purchase confirmation must fail closed when its assigned product cannot be resolved');
+assert(shopProductHardening.includes("NOT public.app_runtime_enabled()"),'Cycle checkout must honor the global runtime pause');
 assert(client.includes("qs.get('shop_purchase')==='confirmed'"),'Client Shop purchase return callback is missing');
 assert(client.includes("&product=")||client.includes("'&product='"),'Shop task marketplace link must carry the assigned product ID');
 assert(client.includes("qs.get('reset')==='1'"),'Client password reset route is missing');
