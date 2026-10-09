@@ -80,19 +80,34 @@ window.AegisSupabaseService={
   var c=this.client();
   if(!c)throw new Error('Supabase client unavailable');
   var raw=String(identifier||'').trim();
-  var email=raw;
-  if(!raw.includes('@')){
-   var resolved=await c.rpc('resolve_login_email',{p_username:raw});
-   if(resolved.error)throw resolved.error;
-   email=resolved.data;
-   if(!email)throw new Error('Invalid login credentials.');
+  var secret=String(password||'');
+  if(raw.includes('@')){
+   var result=await c.auth.signInWithPassword({
+    email:raw.toLowerCase(),
+    password:secret
+   });
+   if(result.error)throw result.error;
+   var emailUser=result.data&&result.data.user;
+   if(!emailUser)throw new Error('Supabase Auth did not return a signed-in user.');
+   return emailUser;
   }
-  var result=await c.auth.signInWithPassword({
-   email:String(email||'').trim().toLowerCase(),
-   password:String(password||'')
+  var response=await this.invokeFunction('username-login',{body:{
+   username:raw.toLowerCase(),
+   password:secret
+  }});
+  var tokens=response&&response.data||{};
+  if(!tokens.access_token||!tokens.refresh_token)throw new Error('Invalid username or password.');
+  var stored=await c.auth.setSession({
+   access_token:tokens.access_token,
+   refresh_token:tokens.refresh_token
   });
-  if(result.error)throw result.error;
-  var user=result.data&&result.data.user;
+  if(stored.error)throw stored.error;
+  var user=stored.data&&stored.data.user;
+  if(!user){
+   var current=await c.auth.getUser();
+   if(current.error)throw current.error;
+   user=current.data&&current.data.user;
+  }
   if(!user)throw new Error('Supabase Auth did not return a signed-in user.');
   return user;
  },
