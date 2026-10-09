@@ -759,12 +759,22 @@ function bindAuthForms(){
       e.preventDefault();e.stopPropagation();
       try{
         const identifier=document.getElementById('le').value.trim();
-        const resolved=identifier.includes('@')?{data:identifier.toLowerCase(),error:null}:await db.rpc('resolve_login_email',{p_username:identifier.toLowerCase()});
-        if(resolved.error)throw resolved.error;
-        const loginEmail=identifier.includes('@')?identifier.toLowerCase():resolved.data;
-        if(!loginEmail)throw Error('Invalid login credentials.');
-        const r=await db.auth.signInWithPassword({email:loginEmail,password:document.getElementById('lp').value});
-        if(r.error)throw r.error;
+        const password=document.getElementById('lp').value;
+        if(identifier.includes('@')){
+          const r=await db.auth.signInWithPassword({email:identifier.toLowerCase(),password});
+          if(r.error)throw r.error;
+        }else{
+          const response=await db.functions.invoke('username-login',{body:{username:identifier.toLowerCase(),password}});
+          if(response.error){
+            let detail=null;
+            try{if(response.error.context&&typeof response.error.context.clone==='function')detail=await response.error.context.clone().json();}catch(_){}
+            throw Error((detail&&detail.error)||response.error.message||'Invalid username or password.');
+          }
+          const tokens=response.data||{};
+          if(!tokens.access_token||!tokens.refresh_token)throw Error('Invalid username or password.');
+          const stored=await db.auth.setSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token});
+          if(stored.error)throw stored.error;
+        }
         await initData();
         if(profile.role!=='USER')throw Error('This account does not have client access.');
         if(!['ACTIVE','NORMAL'].includes(String(profile.status||'').toUpperCase())){
