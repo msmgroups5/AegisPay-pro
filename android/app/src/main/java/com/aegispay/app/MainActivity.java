@@ -178,8 +178,9 @@ public class MainActivity extends AppCompatActivity {
         return uri != null
                 && getString(R.string.auth_scheme).equalsIgnoreCase(uri.getScheme())
                 && "auth".equalsIgnoreCase(uri.getHost())
-                && uri.getPath() != null
-                && uri.getPath().startsWith("/callback");
+                && "auth".equalsIgnoreCase(uri.getAuthority())
+                && uri.getPort() == -1
+                && "/callback".equals(uri.getPath());
     }
 
     private boolean handleWebNavigation(Uri uri, boolean isForMainFrame) {
@@ -262,6 +263,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        if (manager == null) {
+            Toast.makeText(this, "Android download service is unavailable.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
+            return;
+        }
         String flavor = getString(R.string.entry_html).contains("master-admin") ? "admin" : "client";
         String safeVersion = String.valueOf(versionName == null ? "latest" : versionName).replaceAll("[^A-Za-z0-9._-]", "_");
         String fileName = "aegispay-" + flavor + "-" + safeVersion + ".apk";
@@ -275,10 +281,22 @@ public class MainActivity extends AppCompatActivity {
         request.setAllowedOverRoaming(false);
         request.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, fileName);
 
-        registerUpdateReceiver();
-        activeUpdateSha256 = expectedHash;
-        activeUpdateDownloadId = manager.enqueue(request);
-        Toast.makeText(this, "AegisPay update download started.", Toast.LENGTH_SHORT).show();
+        try {
+            registerUpdateReceiver();
+            activeUpdateSha256 = expectedHash;
+            activeUpdateDownloadId = manager.enqueue(request);
+            if (activeUpdateDownloadId < 0L) throw new IllegalStateException("Update download was not queued.");
+            Toast.makeText(this, "AegisPay update download started.", Toast.LENGTH_SHORT).show();
+        } catch (Exception error) {
+            activeUpdateDownloadId = -1L;
+            activeUpdateSha256 = "";
+            if (updateDownloadReceiver != null) {
+                try { unregisterReceiver(updateDownloadReceiver); } catch (Exception ignored) { }
+                updateDownloadReceiver = null;
+            }
+            Toast.makeText(this, "AegisPay could not start the update download.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
+        }
     }
 
     private void registerUpdateReceiver() {
