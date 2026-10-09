@@ -43,6 +43,9 @@ jobs:
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/client/debug/app-client-debug.apk"
+          AAB="android/app/build/outputs/bundle/clientDebug/app-client-debug.aab"
+          test -s "$APK"
+          test -s "$AAB"
           VERSION_CODE=$(sed -n "s/.*versionCode \\([0-9][0-9]*\\).*/\\1/p" android/app/build.gradle | head -1)
           VERSION_NAME=$(sed -n "s/.*versionName '\\([^']*\\)'.*/\\1/p" android/app/build.gradle | head -1)
           TAG="aurora-apk-${VERSION_NAME}-b${VERSION_CODE}"
@@ -51,5 +54,5 @@ jobs:
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes "$NOTES" --prerelease --target "$GITHUB_SHA"
+            gh release create "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --title "$TITLE" --notes "$NOTES" --prerelease --target "$GITHUB_SHA"
           fi
