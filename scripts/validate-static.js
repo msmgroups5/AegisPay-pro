@@ -98,6 +98,9 @@ assert(service.includes('https://aegispay-web.aegispay.workers.dev/?reset=1'),'S
 
 const gradle=fs.readFileSync('android/app/build.gradle','utf8');
 assert(gradle.includes("include 'client.html'")&&!gradle.includes("include 'client-fresh.html'")&&gradle.includes("include 'master-admin.html'"),'Android canonical entries missing');
+assert(gradle.includes("include 'app-update.js'"),'Android Client build must bundle the updater helper');
+assert(client.includes('window.AEGIS_ANDROID_APP=!!window.AegisNative;'),'Canonical Client must identify the native Android runtime');
+assert(client.includes('<script src="./app-update.js"></script>'),'Canonical Client must load the remote update checker');
 assert(gradle.includes('ensureSupabaseSdk'),'Build must provision the pinned Supabase SDK for web packaging');
 assert(!gradle.includes("include 'styles.css'")&&!gradle.includes("include 'premium.css'"),'Retired CSS assets must not be bundled into the Android admin build');
 assert(!gradle.includes("include 'client-auth.js'")&&!gradle.includes("include 'client-home.css'"),'Retired client runtime assets must not be bundled into Android client builds');
