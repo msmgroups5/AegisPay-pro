@@ -9,7 +9,7 @@ Verified on 2026-10-03: ACTIVE/HEALTHY, region `ap-northeast-1`.
 RLS-enabled public application tables:
 `users`, `tasks`, `referrals`, `withdrawal_requests`, `activity_logs`, `notifications`, `platform_settings`, `vip_tiers`, `deposit_submissions`, `cycle_runs`, `account_ledger`, `admin_adjustments`, `shop_offers`, `audit_events`, `kyc_verifications`.
 
-Active Edge Functions align with the repository function directories: `public-signup`, `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `ai-support`, `verify-deposit`, `monitor-deposits`, `telegram-withdrawal`, `execute-payout`.
+Active Edge Functions align with the repository function directories: `public-signup`, `username-login`, `submit-deposit`, `submit-kyc`, `admin-queues`, `admin-review`, `ai-support`, `verify-deposit`, `monitor-deposits`, `telegram-withdrawal`, `execute-payout`, `admin-account-ops`, `complete-cycle-checkout`, `complete-password-reset`, `production-readiness`.
 
 ## Storage
 
