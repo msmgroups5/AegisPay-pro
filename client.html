@@ -967,6 +967,7 @@ if(qs.get('shop_purchase')==='confirmed'){
     setTimeout(()=>uiNotice(shopError.message||'Shop purchase confirmation could not be recorded.','error'),0);
   }
   return;
+}
 
 // Email verification does not need a persistent recovery session; it only confirms the address and returns the client to sign-in.
 if(qs.get('verified')==='1'){window.__emailVerified=true;history.replaceState({},document.title,location.pathname);await db.auth.signOut();window.go('login');return}
