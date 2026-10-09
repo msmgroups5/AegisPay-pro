@@ -13,6 +13,7 @@ const must=[
   'database/migrations/20261008_complete_phase3_production_controls.sql',
   'database/migrations/20261008_phase3_production_gate_hardening.sql',
   'database/migrations/20261008_phase3_readiness_response_alignment.sql',
+  'database/migrations/20261009_harden_shop_task_account_state.sql',
   'supabase/functions/production-readiness/index.ts',
   'supabase/functions/submit-kyc/ai-review.ts','supabase/functions/submit-deposit/ai-review.ts',
   'site/index.html','site/site.css','android/app/build.gradle',
@@ -56,6 +57,11 @@ assert(client.includes("db.rpc('link_withdrawal_wallet',{p_address:wallet,p_owne
 assert(client.includes("complete-cycle-checkout"),'Client Shop checkout endpoint is not wired');
 assert(client.includes("db.rpc('complete_shop_task',{p_task_id:taskId})"),'Client per-task Shop completion RPC is missing');
 assert(client.includes("db.rpc('record_shop_task_purchase'"),'Client Shop purchase confirmation RPC is not wired');
+const shopHardening=fs.readFileSync('database/migrations/20261009_harden_shop_task_account_state.sql','utf8');
+assert(shopHardening.includes("v_profile.frozen_until > now()"),'Shop task RPCs must enforce security freeze state');
+assert(shopHardening.includes("NOT public.app_runtime_enabled()"),'Shop task RPCs must enforce the global runtime pause');
+assert((shopHardening.match(/v_profile.role <> 'USER'/g)||[]).length===2,'Both Shop mutation RPCs must validate client role');
+assert((shopHardening.match(/status.*NOT IN \('ACTIVE','NORMAL'\)/g)||[]).length===2,'Both Shop mutation RPCs must validate active account status');
 assert(client.includes("qs.get('shop_purchase')==='confirmed'"),'Client Shop purchase return callback is missing');
 assert(client.includes("&product=")||client.includes("'&product='"),'Shop task marketplace link must carry the assigned product ID');
 assert(client.includes("qs.get('reset')==='1'"),'Client password reset route is missing');
