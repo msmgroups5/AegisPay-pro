@@ -41,7 +41,7 @@
 ## Security review
 
 Supabase Security Advisor currently reports:
-- 14 authenticated-callable SECURITY DEFINER RPCs plus 1 pre-auth anonymous `resolve_login_email` lookup remain visible to Security Advisor. The reviewed functions have explicit role/identity/ownership/runtime gates where required; these are function-by-function hardening candidates, not a blanket revoke target.
+- The pre-auth `resolve_login_email` RPC has been revoked from public client roles; username login now uses the rate-limited `username-login` Edge Function and does not return email addresses. The remaining authenticated SECURITY DEFINER functions still need function-by-function review; they must not be blindly revoked because several support required client/admin operations.
 - The stale one-argument `link_withdrawal_wallet(text)` overload is no longer executable by `authenticated`; the canonical two-argument wallet RPC is the authenticated client path.
 - Leaked Password Protection is disabled and remains a production security prerequisite.
 
