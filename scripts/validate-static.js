@@ -15,6 +15,7 @@ const must=[
   'database/migrations/20261008_phase3_readiness_response_alignment.sql',
   'database/migrations/20261009_harden_shop_task_account_state.sql',
   'database/migrations/20261009_harden_shop_task_product_and_runtime.sql',
+  'database/migrations/20261009_retire_public_username_email_lookup.sql',
   'supabase/functions/production-readiness/index.ts',
   'supabase/functions/submit-kyc/ai-review.ts','supabase/functions/submit-deposit/ai-review.ts',
   'site/index.html','site/site.css','android/app/build.gradle',
@@ -47,7 +48,8 @@ assert(client.includes('liveHome'),'Client Home runtime is missing');
 assert(client.includes('liveTopup'),'Client Top Up runtime is missing');
 assert(client.includes('liveWithdraw'),'Client Withdrawal runtime is missing');
 assert(client.includes('Username or Email'),'Canonical client login must accept username or email');
-assert(client.includes('resolve_login_email'),'Username login resolution is not wired');
+assert(client.includes("db.functions.invoke('username-login'"),'Username login must use the protected Edge Function');
+assert(!client.includes('resolve_login_email'),'Client must not call the public username-to-email RPC');
 assert(client.includes('public-signup'),'Canonical client signup function is not wired');
 assert(client.includes('resetPasswordForEmail'),'Client password reset request is not wired');
 assert(client.includes("reset=1"),'Client password reset redirect marker is missing');
@@ -86,6 +88,8 @@ const payout=fs.readFileSync('supabase/functions/execute-payout/index.ts','utf8'
 assert(payout.includes('production_config')&&payout.includes('Production payout gate is locked'),'Phase 3 payout gate is missing');
 
 const service=fs.readFileSync('supabase-service.js','utf8');
+assert(service.includes("'username-login'"),'Shared auth helper must use protected username login');
+assert(!service.includes("c.rpc('resolve_login_email'"),'Shared auth helper must not expose username-to-email lookup');
 for(const m of [
   'claim_aegispay_profile','public-signup','signInWithPassword','resetPasswordForEmail',
   'request_withdrawal','app_runtime_enabled','set_app_runtime_enabled'
@@ -139,7 +143,7 @@ assert(fs.readFileSync('_redirects','utf8').includes('/app /app/ 301')&&fs.readF
 
 const functions=[
   'admin-queues','admin-review','admin-account-ops','ai-support','execute-payout','monitor-deposits','production-readiness','complete-cycle-checkout','complete-password-reset',
-  'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit'
+  'public-signup','submit-deposit','submit-kyc','telegram-withdrawal','verify-deposit','username-login'
 ];
 for(const f of functions)assert(exists('supabase/functions/'+f+'/index.ts'),'Missing Edge Function source: '+f);
 
