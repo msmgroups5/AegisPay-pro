@@ -44,6 +44,10 @@ assertInlineScriptsParse('master-admin.html');
 
 const client=fs.readFileSync('client.html','utf8');
 assert(client.includes('bootLive'),'Client inline runtime bootstrap is missing');
+assert(client.includes('./supabase-sdk.js'),'Client must load the pinned local Supabase SDK');
+const androidBuild=fs.readFileSync('android/app/build.gradle','utf8');
+assert(androidBuild.includes("include 'supabase-sdk.js'"),'Client Android assets must include the pinned Supabase SDK');
+assert(androidBuild.includes("'Activate Selected Tier'"),'Android build guard must match the current tier UI');
 assert(client.includes('liveHome'),'Client Home runtime is missing');
 assert(client.includes('liveTopup'),'Client Top Up runtime is missing');
 assert(client.includes('liveWithdraw'),'Client Withdrawal runtime is missing');

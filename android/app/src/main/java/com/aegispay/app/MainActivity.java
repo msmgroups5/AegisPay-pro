@@ -23,6 +23,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceRequest;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -54,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver updateDownloadReceiver;
     private static final int UNKNOWN_SOURCE_REQUEST = 9842;
     private static final String UPDATE_HOST = "aegispay-pro.pages.dev";
+    private static final String LOCAL_ASSET_HOST = "appassets.androidplatform.net";
+    private static final String SHOP_HOST = "aegispay-shopping.aegispay.workers.dev";
+    private boolean nativeBridgeAttached;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
@@ -74,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webview);
         configureWebView(webView);
-        webView.addJavascriptInterface(new AegisBridge(), "AegisNative");
+        setNativeBridge(true);
         loadPortal();
         handleIncomingIntent(getIntent());
     }
@@ -100,6 +104,16 @@ public class MainActivity extends AppCompatActivity {
 
         view.setWebViewClient(new WebViewClientCompat() {
             @Override
+            public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest request) {
+                return handleWebNavigation(request.getUrl(), request.isForMainFrame());
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView v, String url) {
+                return handleWebNavigation(Uri.parse(url), true);
+            }
+
+            @Override
             public android.webkit.WebResourceResponse shouldInterceptRequest(WebView v, String url) {
                 return assetLoader.shouldInterceptRequest(Uri.parse(url));
             }
@@ -107,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView v, String url) {
                 super.onPageFinished(v, url);
-                webReady = true;
-                dispatchPendingAuthRedirect();
+                webReady = isTrustedLocalPortal(Uri.parse(url));
+                if (webReady) dispatchPendingAuthRedirect();
             }
         });
         view.setWebChromeClient(new WebChromeClient() {
@@ -132,6 +146,78 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    private void setNativeBridge(boolean enabled) {
+        if (webView == null || nativeBridgeAttached == enabled) return;
+        if (enabled) {
+            webView.addJavascriptInterface(new AegisBridge(), "AegisNative");
+        } else {
+            webView.removeJavascriptInterface("AegisNative");
+        }
+        nativeBridgeAttached = enabled;
+    }
+
+    private boolean isTrustedLocalPortal(Uri uri) {
+        return uri != null
+                && "https".equalsIgnoreCase(uri.getScheme())
+                && LOCAL_ASSET_HOST.equalsIgnoreCase(uri.getHost())
+                && LOCAL_ASSET_HOST.equalsIgnoreCase(uri.getAuthority())
+                && uri.getPath() != null
+                && uri.getPath().startsWith("/assets/aegispay/");
+    }
+
+    private boolean isTrustedShop(Uri uri) {
+        return uri != null
+                && "https".equalsIgnoreCase(uri.getScheme())
+                && SHOP_HOST.equalsIgnoreCase(uri.getHost())
+                && SHOP_HOST.equalsIgnoreCase(uri.getAuthority())
+                && ("/".equals(uri.getPath()) || uri.getPath().isEmpty());
+    }
+
+    private boolean isAuthCallback(Uri uri) {
+        return uri != null
+                && getString(R.string.auth_scheme).equalsIgnoreCase(uri.getScheme())
+                && "auth".equalsIgnoreCase(uri.getHost())
+                && "auth".equalsIgnoreCase(uri.getAuthority())
+                && uri.getPort() == -1
+                && "/callback".equals(uri.getPath());
+    }
+
+    private boolean handleWebNavigation(Uri uri, boolean isForMainFrame) {
+        if (isTrustedLocalPortal(uri)) {
+            setNativeBridge(true);
+            return false;
+        }
+        if (!isForMainFrame) return true;
+        if (isTrustedShop(uri)) {
+            webReady = false;
+            setNativeBridge(false);
+            return false;
+        }
+        if (isAuthCallback(uri)) {
+            handleIncomingIntent(new Intent(Intent.ACTION_VIEW, uri));
+            return true;
+        }
+
+        String scheme = uri == null ? null : uri.getScheme();
+        boolean webUrl = "https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme);
+        boolean safeWebAuthority = uri != null
+                && uri.getHost() != null
+                && uri.getAuthority() != null
+                && uri.getAuthority().indexOf('@') < 0;
+        boolean externalHandler = "mailto".equalsIgnoreCase(scheme)
+                || "tel".equalsIgnoreCase(scheme)
+                || "geo".equalsIgnoreCase(scheme);
+        if ((webUrl && safeWebAuthority) || externalHandler) openExternalUri(uri);
+        return true;
+    }
+
+    private void openExternalUri(Uri uri) {
+        if (uri == null) return;
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (Exception ignored) { }
+    }
 
     private void loadPortal() {
         localFallbackLoaded = false;
@@ -160,8 +246,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startApkDownload(String url, String versionName, String expectedSha256) {
-        if (url == null || !url.startsWith("https://") || !UPDATE_HOST.equals(Uri.parse(url).getHost())) {
-            Toast.makeText(this, "Invalid AegisPay update source.", Toast.LENGTH_LONG).show();
+        Uri updateUri = Uri.parse(url == null ? "" : url);
+        String expectedHash = expectedSha256 == null ? "" : expectedSha256.trim().toLowerCase(Locale.US);
+        boolean allowedPort = updateUri.getPort() == -1 || updateUri.getPort() == 443;
+        String updateAuthority = updateUri.getAuthority();
+        String updatePath = updateUri.getPath();
+        boolean safeAuthority = updateAuthority != null && updateAuthority.indexOf('@') < 0;
+        boolean allowedPath = updatePath != null
+                && updatePath.startsWith("/downloads/")
+                && updatePath.toLowerCase(Locale.US).endsWith(".apk");
+        if (!"https".equalsIgnoreCase(updateUri.getScheme())
+                || !UPDATE_HOST.equalsIgnoreCase(updateUri.getHost())
+                || !allowedPort
+                || !safeAuthority
+                || !allowedPath
+                || !expectedHash.matches("^[a-f0-9]{64}$")) {
+            Toast.makeText(this, "Invalid AegisPay update source or checksum.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
             return;
         }
         if (activeUpdateDownloadId != -1L) {
@@ -170,11 +271,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        if (manager == null) {
+            Toast.makeText(this, "Android download service is unavailable.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
+            return;
+        }
         String flavor = getString(R.string.entry_html).contains("master-admin") ? "admin" : "client";
         String safeVersion = String.valueOf(versionName == null ? "latest" : versionName).replaceAll("[^A-Za-z0-9._-]", "_");
         String fileName = "aegispay-" + flavor + "-" + safeVersion + ".apk";
 
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        DownloadManager.Request request = new DownloadManager.Request(updateUri);
         request.setTitle("AegisPay " + safeVersion);
         request.setDescription("Downloading secure application update");
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -183,10 +289,22 @@ public class MainActivity extends AppCompatActivity {
         request.setAllowedOverRoaming(false);
         request.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, fileName);
 
-        registerUpdateReceiver();
-        activeUpdateSha256 = expectedSha256 == null ? "" : expectedSha256.trim().toLowerCase(Locale.US);
-        activeUpdateDownloadId = manager.enqueue(request);
-        Toast.makeText(this, "AegisPay update download started.", Toast.LENGTH_SHORT).show();
+        try {
+            registerUpdateReceiver();
+            activeUpdateSha256 = expectedHash;
+            activeUpdateDownloadId = manager.enqueue(request);
+            if (activeUpdateDownloadId < 0L) throw new IllegalStateException("Update download was not queued.");
+            Toast.makeText(this, "AegisPay update download started.", Toast.LENGTH_SHORT).show();
+        } catch (Exception error) {
+            activeUpdateDownloadId = -1L;
+            activeUpdateSha256 = "";
+            if (updateDownloadReceiver != null) {
+                try { unregisterReceiver(updateDownloadReceiver); } catch (Exception ignored) { }
+                updateDownloadReceiver = null;
+            }
+            Toast.makeText(this, "AegisPay could not start the update download.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
+        }
     }
 
     private void registerUpdateReceiver() {
@@ -230,21 +348,28 @@ public class MainActivity extends AppCompatActivity {
 
         if (!success || apkUri == null) {
             Toast.makeText(this, "AegisPay update download failed.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
             return;
         }
 
         try {
-            if (!activeUpdateSha256.isEmpty() && !activeUpdateSha256.equalsIgnoreCase(sha256(apkUri))) {
+            if (!activeUpdateSha256.equalsIgnoreCase(sha256(apkUri))) {
                 Toast.makeText(this, "Update verification failed. The APK was not installed.", Toast.LENGTH_LONG).show();
+                notifyUpdateRetryAvailable();
                 return;
             }
         } catch (Exception error) {
             Toast.makeText(this, "Update verification could not be completed.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
             return;
         }
 
         pendingInstallUri = apkUri;
         installDownloadedApk();
+    }
+
+    private void notifyUpdateRetryAvailable() {
+        callJs("window.AegisUpdate && window.AegisUpdate.onNativeUpdateFailed && window.AegisUpdate.onNativeUpdateFailed()");
     }
 
     private void installDownloadedApk() {
@@ -268,20 +393,22 @@ public class MainActivity extends AppCompatActivity {
             startActivity(installIntent);
         } catch (Exception error) {
             Toast.makeText(this, "Android could not open the update installer.", Toast.LENGTH_LONG).show();
+            notifyUpdateRetryAvailable();
         }
     }
 
     private void handleIncomingIntent(Intent intent) {
         if (intent == null) return;
         Uri data = intent.getData();
-        if (data == null) return;
-        if (!getString(R.string.auth_scheme).equalsIgnoreCase(data.getScheme())) return;
+        if (!isAuthCallback(data)) return;
         pendingAuthRedirect = data.toString();
         dispatchPendingAuthRedirect();
     }
 
     private void dispatchPendingAuthRedirect() {
         if (!webReady || webView == null || pendingAuthRedirect == null) return;
+        String currentUrl = webView.getUrl();
+        if (currentUrl == null || !isTrustedLocalPortal(Uri.parse(currentUrl))) return;
         String redirect = pendingAuthRedirect;
         pendingAuthRedirect = null;
         String quoted = JSONObjectEscape.quote(redirect);
@@ -297,7 +424,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void callJs(String expression) {
         runOnUiThread(() -> {
-            if (webView != null) webView.evaluateJavascript(expression, null);
+            if (webView == null) return;
+            String currentUrl = webView.getUrl();
+            if (currentUrl == null || !isTrustedLocalPortal(Uri.parse(currentUrl))) return;
+            webView.evaluateJavascript(expression, null);
         });
     }
 
@@ -312,8 +442,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        boolean hasFine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean hasCoarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+        if (!hasFine && !hasCoarse) {
             ActivityCompat.requestPermissions(
                     this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -326,10 +459,19 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     private void readLastKnownLocation() {
+        boolean hasFine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean hasCoarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+        if (!hasFine && !hasCoarse) {
+            Toast.makeText(this, "Allow approximate or precise location to continue.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         Location best = null;
         try {
-            if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (hasFine && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 best = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
             if (best == null && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
@@ -359,9 +501,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_REQUEST && grantResults.length > 0
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            readLastKnownLocation();
+        if (requestCode == LOCATION_REQUEST && grantResults.length > 0) {
+            boolean granted = false;
+            for (int result : grantResults) {
+                if (result == PackageManager.PERMISSION_GRANTED) {
+                    granted = true;
+                    break;
+                }
+            }
+            if (granted) readLastKnownLocation();
+            else Toast.makeText(this, "Location permission was not granted.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -372,6 +521,7 @@ public class MainActivity extends AppCompatActivity {
                 installDownloadedApk();
             } else {
                 Toast.makeText(this, "Update installation was not authorized.", Toast.LENGTH_LONG).show();
+                notifyUpdateRetryAvailable();
             }
         }
 
