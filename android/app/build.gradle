@@ -15,8 +15,8 @@ android {
         applicationId 'com.aegispay.app'
         minSdk 23
         targetSdk 35
-        versionCode 39
-        versionName '2.6.0'
+        versionCode 41
+        versionName '2.6.2'
     }
 
     productFlavors {
@@ -134,6 +134,7 @@ def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', 
     }
     from(webRoot) {
         include 'client.html'
+        include 'supabase-sdk.js'
         include 'app-version.json'
         include 'app-update.js'
     }

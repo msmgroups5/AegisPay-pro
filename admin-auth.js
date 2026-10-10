@@ -283,7 +283,7 @@ function productionReadiness(){
   const payoutOn=Boolean(p.production_config_real_payouts);
   const locked=p.payouts_locked!==false;
   const approved=Boolean(p.production_config_go_live_approved);
-  const payoutReady=Boolean(p.mainnet_payout_gate_ok);
+  const payoutReady=Boolean(p.mainnet_payout_gate_ok&&d.mainnet_payout_operational);
   const secrets=d.secrets||{};
   const secretMark=function(v){return v?'READY':'MISSING';};
   return '<section class="aa-panel">'+
@@ -714,3 +714,4 @@ async function boot(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+
