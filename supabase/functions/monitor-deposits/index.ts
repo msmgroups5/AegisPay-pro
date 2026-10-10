@@ -69,18 +69,30 @@ Deno.serve(async (req: Request) => {
     const receiving = String(rules.receiving_address || "").trim();
     if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(receiving)) return json({ error: "Valid receiving address is not configured." }, 503);
 
+    const { data: pending, error } = await admin.from("deposit_submissions").select("*")
+      .eq("status", "PENDING_VERIFICATION")
+      .in("ai_review_status", ["APPROVED","MANUAL_APPROVED"])
+      .order("created_at", { ascending: true }).limit(100);
+    if (error) return json({ error: "Unable to load pending deposits." }, 500);
+
+    if (network === "TRON MAINNET") {
+      const { data: modeRow } = await admin.from("platform_settings").select("value_json").eq("key", "system_mode").maybeSingle();
+      const mode = modeRow?.value_json || {};
+      if (mode.mode !== "MAINNET" || mode.live_deposits !== true) {
+        return json({ error: "Mainnet deposit monitoring is disabled while live deposits are off." }, 403);
+      }
+      if (!TRONGRID_KEY) {
+        if (!pending?.length) return json({ monitorStatus: "AWAITING_PROVIDER_KEY", checked: 0, results: [] });
+        return json({ error: "TRONGRID_API_KEY is not configured; approved deposits cannot be checked automatically." }, 503);
+      }
+    }
+
     let baseUrl = "";
     let contract = "";
     if (network === "TRON TESTNET") {
       baseUrl = "https://api.shasta.trongrid.io";
       contract = String(rules.token_contract || SHASTA_TEST_USDT).trim();
     } else if (network === "TRON MAINNET") {
-      const { data: modeRow } = await admin.from("platform_settings").select("value_json").eq("key", "system_mode").maybeSingle();
-      const mode = modeRow?.value_json || {};
-      if (mode.mode !== "MAINNET" || mode.live_deposits !== true) {
-        return json({ error: "Mainnet deposit monitoring is disabled while live deposits are off." }, 403);
-      }
-      if (!TRONGRID_KEY) return json({ error: "TRONGRID_API_KEY is not configured." }, 503);
       baseUrl = "https://api.trongrid.io";
       contract = String(rules.token_contract || MAINNET_USDT).trim();
     } else {
@@ -88,11 +100,6 @@ Deno.serve(async (req: Request) => {
     }
     if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(contract)) return json({ error: "Valid TRC-20 contract is not configured." }, 503);
 
-    const { data: pending, error } = await admin.from("deposit_submissions").select("*")
-      .eq("status", "PENDING_VERIFICATION")
-      .in("ai_review_status", ["APPROVED","MANUAL_APPROVED"])
-      .order("created_at", { ascending: true }).limit(100);
-    if (error) return json({ error: "Unable to load pending deposits." }, 500);
     const results = [];
     for (const deposit of pending || []) {
       try {

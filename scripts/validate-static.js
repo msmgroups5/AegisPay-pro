@@ -97,7 +97,7 @@ const depositMonitor=fs.readFileSync('supabase/functions/monitor-deposits/index.
 assert(depositMonitor.includes('verify_deposit_monitor_cron_secret')&&depositMonitor.includes('x-aegis-cron-secret'),'Deposit monitor must authenticate scheduled calls using the server-side Vault token');
 const monitorMigration=fs.readFileSync('database/migrations/20261010110000_secure_mainnet_deposit_monitor_schedule.sql','utf8');
 assert(monitorMigration.includes('vault.create_secret')&&monitorMigration.includes("'aegispay-mainnet-deposit-monitor'")&&monitorMigration.includes("'* * * * *'")&&monitorMigration.includes('GRANT EXECUTE ON FUNCTION public.verify_deposit_monitor_cron_secret(text) TO service_role'),'Mainnet deposit monitoring must have a Vault-backed per-minute schedule and service-role-only secret validation');
-assert(client.includes('wallet===DEPOSIT_ADDRESS')&&client.includes('Approved submissions are checked automatically about once per minute')&&client.includes('Real withdrawals are currently locked'),'Client deposit flow must guard against stale QR destinations and disclose Mainnet risks and payout status');
+assert(client.includes('wallet===DEPOSIT_ADDRESS')&&client.includes('Automatic TRON checks are waiting for a provider API key')&&client.includes('Real withdrawals are currently locked'),'Client deposit flow must guard against stale QR destinations and disclose Mainnet risks and payout status');
 
 const webDeploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
 assert(webDeploy.includes('--branch="${GITHUB_REF_NAME}"')&&!webDeploy.includes('--branch=main'),'Manual Pages deployments must stay on the selected Git branch');

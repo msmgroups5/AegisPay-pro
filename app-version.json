@@ -8,6 +8,6 @@
   "notes": [
     "Clarifies real TRON Mainnet deposits and locked withdrawals.",
     "Checks the displayed deposit QR against the configured receiving address.",
-    "Deposit monitor is scheduled to verify approved submissions automatically."
+    "Automatic deposit checks need a production TronGrid API key; real withdrawals remain locked."
   ]
 }
