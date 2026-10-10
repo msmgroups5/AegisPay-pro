@@ -342,16 +342,17 @@ const U='https://wtcspnrmsoisroavojop.supabase.co',K='sb_publishable_pDg6Ef_P6fZ
 const db=supabase.createClient(U,K,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}});
 const oldGo=window.go; let profile=null,authUser=null,settings={},tiers=[],unreadNotifications=0;
 function uiNotice(message,type='error',duration=4200){
-  const root=document.getElementById('app');if(!root)return;
-  const old=root.querySelector('.app-notice');if(old)old.remove();
+  const host=document.body;if(!host)return;
+  const old=document.querySelector('.app-notice');if(old)old.remove();
   const el=document.createElement('div');el.className='app-notice '+(type==='success'?'success':type==='info'?'info':'error');
+  el.setAttribute('role',type==='error'?'alert':'status');el.setAttribute('aria-live',type==='error'?'assertive':'polite');
   el.innerHTML='<span style="font-size:15px;line-height:1">'+(type==='success'?'✓':type==='info'?'i':'!')+'</span><span style="flex:1">'+esc(String(message||''))+'</span><button class="x" type="button" aria-label="Close">×</button>';
-  el.querySelector('.x').onclick=()=>el.remove();root.prepend(el);
+  el.querySelector('.x').onclick=()=>el.remove();host.appendChild(el);
   if(duration>0)setTimeout(()=>{if(el.isConnected)el.remove()},duration);
 }
 let activityTickerTimer=null,activityTickerHideTimer=null,activityTickerIndex=0;
 const globalActivityFeed=[
- ['Olivia - UK','deposited','120.00'],['Hassan - UAE','withdrew','75.00'],['Sofia - Spain','deposited','250.00'],['Kenji - Japan','withdrew','95.00'],['Amara - Nigeria','deposited','180.00'],['Lucas - Brazil','withdrew','60.00'],['Aarav - India','deposited','210.00'],['Mia - USA','withdrew','85.00']
+ ['alishahid9181','deposited','55.00'],['sana_khan27','withdrew','32.00'],['mohsinali508','deposited','120.00'],['nora_rahman','withdrew','75.00'],['rayanmalik88','deposited','250.00'],['amira_hassan','withdrew','95.00'],['daniyal_q','deposited','180.00'],['zoya_malik','withdrew','60.00']
 ];
 function stopActivityTicker(){
  if(activityTickerTimer){clearInterval(activityTickerTimer);activityTickerTimer=null;}
@@ -363,9 +364,12 @@ function startActivityTicker(){
  if(!profile)return;
  const el=document.createElement('div');el.id='aegisActivityTicker';el.className='activity-ticker';el.setAttribute('aria-hidden','true');document.body.appendChild(el);
  const show=()=>{
-  const [name,action,amount]=globalActivityFeed[activityTickerIndex%globalActivityFeed.length];activityTickerIndex++;
+  const nextIndex=Math.floor(Math.random()*globalActivityFeed.length);
+  const randomIndex=globalActivityFeed.length>1&&nextIndex===activityTickerIndex?(nextIndex+1+Math.floor(Math.random()*(globalActivityFeed.length-1)))%globalActivityFeed.length:nextIndex;
+  activityTickerIndex=randomIndex;
+  const [name,action,amount]=globalActivityFeed[randomIndex];
   const verb=action==='deposited'?'deposited':'withdrew';
-  el.innerHTML='<span class="tag">ACTIVITY</span><span class="msg"><b>'+esc(name)+'</b> '+verb+' <span class="amount">'+esc(amount)+' USDT</span></span>';
+  el.innerHTML='<span class="tag">PREVIEW</span><span class="msg"><b>User '+esc(name)+'</b> '+verb+' <span class="amount">'+esc(amount)+' USDT</span> · Preview</span>';
   el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
   if(activityTickerHideTimer)clearTimeout(activityTickerHideTimer);
   activityTickerHideTimer=setTimeout(()=>el.classList.remove('show'),7000);
@@ -424,6 +428,9 @@ async function activateClientTier(tierId){
  try{
    const chosen=tiers.find(x=>String(x.id)===String(tierId));
    if(!chosen)throw Error('Please select a valid tier.');
+   const cycle=await db.from('cycle_runs').select('id').eq('user_id',profile.id).in('status',['TASKS_OPEN','WAITING_18H']).limit(1).maybeSingle();
+   if(cycle.error)throw cycle.error;
+   if(cycle.data)throw Error('Finish your current Shop cycle before selecting another tier.');
    const available=Math.max(0,Number(profile.current_platform_balance||0)-Number(profile.withdrawal_held||0));
    if(available<Number(chosen.deposit_amount||0))throw Error('Your available balance is below this tier requirement.');
    const r=await db.rpc('ai_activate_tier',{p_tier_id:String(tierId)});
@@ -444,7 +451,8 @@ async function completeShopTask(taskId){
    uiNotice('Task completed successfully.','success');
  }catch(e){
    if(btn){btn.disabled=false;btn.textContent='Complete';}
-   uiNotice(e.message||'Unable to complete task.','error');
+   const message=String(e.message||'');
+   uiNotice(/confirm the assigned shop purchase/i.test(message)?'Open Shop and confirm the assigned product purchase before completing this task.':(message||'Unable to complete task.'),'error');
  }
 }
 
@@ -453,15 +461,20 @@ async function liveTopup(){
  const wallet=String(d.trc20_wallet_address||d.deposit_wallet_address||d.deposit_address||d.wallet_address||d.receiving_address||'').trim();
  const available=Math.max(0,Number(profile.current_platform_balance||0)-Number(profile.withdrawal_held||0));
  const activeTier=tiers.find(t=>String(t.id)===String(profile.selected_tier_id||''));
+ const cycleRes=await db.from('cycle_runs').select('id,status').eq('user_id',profile.id).in('status',['TASKS_OPEN','WAITING_18H']).limit(1).maybeSingle();
+ if(cycleRes.error)throw cycleRes.error;
+ const hasActiveCycle=Boolean(cycleRes.data);
  const tierCards=tiers.map(t=>{
    const affordable=available>=Number(t.deposit_amount||0);
    const selected=String(profile.selected_tier_id||'')===String(t.id);
-   return '<button type="button" class="tier-card '+(selected?'selected ':'')+(!affordable?'locked':'')+'" data-tier-id="'+esc(t.id)+'" '+(!affordable?'disabled':'')+'><span class="tier-check">✓</span><div class="tier-name">'+esc(t.name)+'</div><div class="tier-amt">'+Number(t.deposit_amount||0).toFixed(0)+' USDT</div><small>Base profit '+Number(t.initial_profit||0).toFixed(2)+' USDT</small><small>'+ (affordable?'Eligible with current balance':'Requires '+Number(t.deposit_amount||0).toFixed(0)+' USDT available') +'</small></button>';
+   const locked=!affordable||hasActiveCycle;
+   const hint=hasActiveCycle?'Finish your current Shop cycle before selecting another tier':(affordable?'Eligible with current balance':'Requires '+Number(t.deposit_amount||0).toFixed(0)+' USDT available');
+   return '<button type="button" class="tier-card '+(selected?'selected ':'')+(locked?'locked':'')+'" data-tier-id="'+esc(t.id)+'" '+(locked?'disabled':'')+'><span class="tier-check">✓</span><div class="tier-name">'+esc(t.name)+'</div><div class="tier-amt">'+Number(t.deposit_amount||0).toFixed(0)+' USDT</div><small>Base profit '+Number(t.initial_profit||0).toFixed(2)+' USDT</small><small>'+hint+'</small></button>';
  }).join('');
  app.innerHTML=top('Top Up')+
  '<div class="card"><div class="sh">Deposit Amount <span style="color:var(--c);font-size:11px">Minimum 10 USDT</span></div><div class="amt" style="padding:18px 10px"><small>Enter any amount you want to deposit</small><div class="ap-field" style="margin-top:12px;margin-bottom:0"><input id="depAmount" type="number" min="10" step="0.01" inputmode="decimal" placeholder="10.00 USDT" autocomplete="off"></div></div></div>'+
  '<div class="card">'+(wallet?qr():'')+'<div class="sh">USDT (TRC20) Deposit Wallet Address</div><div class="in f">'+(wallet?esc(wallet):'Deposit wallet address is not configured')+'</div><div class="mu" style="font-size:11px;margin:-4px 0 12px">Send USDT only on the configured TRON network to this address.</div><div class="ap-field"><label>Transaction ID / TXID</label><input id="txid" type="text" autocomplete="off" placeholder="Enter transaction ID / TXID" required></div><label class="filepick">Choose File — Deposit Screenshot<input id="proof" type="file" accept="image/*"></label><button class="btn" style="margin-top:12px" id="submitDep">Submit Deposit '+ic('arrow')+'</button><div class="mu" style="font-size:11px;margin-top:10px">No deposit fee is charged by AegisPay. After verification, choose one of the six tiers below to activate Shop tasks.</div></div>'+
- '<div class="card"><div class="sh" style="margin-top:0">Choose Your Tier <span>'+Number(available).toFixed(2)+' USDT available</span></div><div class="mu" style="font-size:11px;line-height:1.55">A deposit can remain unactivated. Profit-bearing Shop tasks start only after you select a tier that your available balance can cover.</div><div class="tier-grid">'+tierCards+'</div>'+(activeTier?'<div class="mu" style="font-size:10.5px;margin-top:12px">Current tier: <b style="color:var(--t)">'+esc(activeTier.name)+'</b></div>':'')+'<button class="btn" style="margin-top:14px" id="activateTierBtn" disabled>Activate Selected Tier '+ic('arrow')+'</button></div>';
+ '<div class="card"><div class="sh" style="margin-top:0">Choose Your Tier <span>'+Number(available).toFixed(2)+' USDT available</span></div><div class="mu" style="font-size:11px;line-height:1.55">A deposit can remain unactivated. Profit-bearing Shop tasks start only after you select a tier that your available balance can cover.</div>'+(hasActiveCycle?'<div class="p2-status error" style="margin-top:10px"><span class="dot"></span><div><b>Current Shop cycle is active</b><small>Complete the assigned tasks and finish the cycle before changing tiers.</small></div></div>':'')+'<div class="tier-grid">'+tierCards+'</div>'+(activeTier?'<div class="mu" style="font-size:10.5px;margin-top:12px">Current tier: <b style="color:var(--t)">'+esc(activeTier.name)+'</b></div>':'')+'<button class="btn" style="margin-top:14px" id="activateTierBtn" disabled>Activate Selected Tier '+ic('arrow')+'</button></div>';
  document.querySelectorAll('[data-tier-id]').forEach(el=>el.onclick=()=>{
    document.querySelectorAll('[data-tier-id]').forEach(x=>x.classList.toggle('selected',x===el));
    const b=document.getElementById('activateTierBtn');if(b){b.disabled=false;b.dataset.tierId=el.getAttribute('data-tier-id');}
@@ -647,7 +660,8 @@ function openTaskMarketplace(taskId){
  if(!product){uiNotice('Product details are not available for this task yet.','error');return}
  const returnUrl=location.href;
  const shopQuery=String(offer?.title||product.title||'').trim();
- const u='https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&task='+encodeURIComponent(taskId)+'&product='+encodeURIComponent(product.id)+'&q='+encodeURIComponent(shopQuery)+'&return='+encodeURIComponent(returnUrl);
+ const shopPrice=Math.max(0,Number(x.task?.task_value||0));
+ const u='https://aegispay-shopping.aegispay.workers.dev/?from=aegispay&task='+encodeURIComponent(taskId)+'&product='+encodeURIComponent(product.id)+'&q='+encodeURIComponent(shopQuery)+'&price='+encodeURIComponent(shopPrice.toFixed(2))+'&return='+encodeURIComponent(returnUrl);
  location.href=u;
 }
 function openTaskProduct(taskId){
@@ -704,7 +718,7 @@ async function liveShop(){
  const p=profile;
  const [cr,tr,offersRes]=await Promise.all([
    db.from('cycle_runs').select('id,status,cycle_base,task_completed_at,ready_at,settled_at,profit_amount,created_at').eq('user_id',p.id).in('status',['TASKS_OPEN','WAITING_18H']).order('created_at',{ascending:false}).limit(1).maybeSingle(),
-   db.from('tasks').select('id,cycle_id,title,description,status,progress,reward,task_value,due_date,offer_id').eq('user_id',p.id).order('id',{ascending:false}).limit(100),
+   db.from('tasks').select('id,cycle_id,title,description,status,progress,reward,task_value,due_date,offer_id,shop_purchase_confirmed').eq('user_id',p.id).order('id',{ascending:false}).limit(100),
    db.from('shop_offers').select('id,title,subtitle,product_id,task_level').eq('status','ACTIVE')
  ]);
  if(cr.error)throw cr.error;if(tr.error)throw tr.error;if(offersRes.error)throw offersRes.error;
@@ -723,7 +737,7 @@ async function liveShop(){
   const product=(window.AegisShopCatalog||[]).find(p=>String(p.id)===String(offer?.product_id||''))||null;
   taskProductData[String(x.id)]={task:x,offer,product};
   const imageRaw=product?.image?product.image:'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0),image=imageRaw?taskImageUrl(imageRaw):'',fallback=taskImageFallbackUrl(title,0);
-  return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(fallback)+'" data-remote-src="'+esc(image)+'" data-direct-src="'+esc(imageRaw)+'" alt="'+esc(title)+'" loading="lazy">':'<img class="task-product-img" src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div>';
+  return '<div class="row" style="align-items:flex-start"><div style="padding-top:2px;min-width:0"><div class="task-product-row">'+(image?'<img class="task-product-img" src="'+esc(fallback)+'" data-remote-src="'+esc(image)+'" data-direct-src="'+esc(imageRaw)+'" alt="'+esc(title)+'" loading="lazy">':'<img class="task-product-img" src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?esc(rating.toFixed(1))+'/5':'Rating available in Shop')+' · Purchase value '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">View Pictures & Reviews</button></div></div><small style="display:block;margin-top:8px">'+esc(x.description||'')+' · '+esc(x.status)+' · Due '+esc(x.due_date||'—')+'</small></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Completed</div>':(x.shop_purchase_confirmed?'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>':'<button type="button" class="task-complete" data-buy-task-product="'+esc(x.id)+'">Buy in Shop</button>'))+'</div></div>';
 }).join(''):'<div class="mu" style="padding:16px 0;text-align:center">No assigned Shop tasks yet.</div>';
 
  let statusCard='';
@@ -1032,7 +1046,7 @@ const s=await db.auth.getSession();if(s.data.session){await initData();if(profil
 
 /* AEGISPAY PHASE 2 — PREMIUM CLIENT UX */
 (function(){
-  const css='.app-notice{position:static!important;display:flex;align-items:flex-start;gap:9px;width:100%;margin:0 0 14px;padding:12px 14px!important;border-radius:16px!important;box-shadow:none!important;backdrop-filter:blur(12px)!important;font-size:12px!important;line-height:1.5!important}.app-notice .x{display:none!important}.activity-ticker{display:none!important}'+
+  const css='.app-notice{position:fixed!important;top:auto!important;left:50%!important;right:auto!important;bottom:calc(88px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;display:flex;align-items:flex-start;gap:9px;width:min(398px,calc(100vw - 32px));max-width:398px;margin:0 auto;padding:12px 14px!important;border-radius:16px!important;box-shadow:0 18px 40px rgba(0,0,0,.38)!important;backdrop-filter:blur(12px)!important;font-size:12px!important;line-height:1.5!important;pointer-events:auto;z-index:210!important}.app-notice .x{display:block!important}.activity-ticker{display:flex!important;top:calc(8px + env(safe-area-inset-top))!important}'+
   '.p2-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:2px 2px 10px}.p2-head h2{font-size:16px;letter-spacing:-.2px}.p2-head span{font-size:10.5px;color:var(--mu)}'+
   '.p2-balance{padding:20px;border-radius:26px;background:radial-gradient(90% 130% at 100% 0,rgba(34,211,238,.30),transparent 58%),linear-gradient(135deg,#4b32d4,#17103f 72%);border:1px solid rgba(255,255,255,.14);box-shadow:0 24px 55px -28px rgba(124,92,255,.9);margin-bottom:14px}.p2-balance small{font-size:11px;color:rgba(255,255,255,.72)}.p2-balance h2{font-size:34px;letter-spacing:-1px;margin:4px 0 7px}.p2-balance h2 span{font-size:14px}.p2-balance .sub{font-size:10.5px;color:rgba(255,255,255,.72)}'+
   '.p2-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.p2-stat{padding:10px 8px;border-radius:14px;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.08)}.p2-stat small{display:block;font-size:9.5px}.p2-stat b{display:block;font-size:12px;margin-top:3px}'+
@@ -1048,13 +1062,6 @@ const s=await db.auth.getSession();if(s.data.session){await initData();if(profil
   '.p2-empty{text-align:center;padding:24px 14px;color:var(--mu);font-size:11.5px}.p2-empty b{display:block;color:var(--t);font-size:13px;margin-bottom:4px}@media(min-width:720px){#app{max-width:540px}}';
   const st=document.createElement('style');st.setAttribute('data-aegis-phase2','1');st.textContent=css;document.head.appendChild(st);
 
-  uiNotice=function(message,type){
-    const root=document.getElementById('app');if(!root)return;const old=root.querySelector('.app-notice');if(old)old.remove();
-    const el=document.createElement('div');el.className='app-notice '+(type==='success'?'success':type==='info'?'info':'error');
-    el.innerHTML='<span>'+(type==='success'?'✓':type==='info'?'i':'!')+'</span><span style="flex:1">'+esc(String(message||''))+'</span>';
-    root.prepend(el);setTimeout(function(){if(el.isConnected)el.remove();},6500);
-  };
-  startActivityTicker=function(){};
   top=function(t,b){return '<div class="tb" style="padding-top:18px"><b onclick="go(\''+(b||'home')+'\')" aria-label="Back">'+ic('back')+'</b><div style="flex:1;min-width:0"><small class="mu" style="font-size:9.5px;letter-spacing:.7px;text-transform:uppercase">AEGISPAY</small><h1 style="font-size:18px;margin-top:1px">'+esc(t)+'</h1></div><b class="dot" aria-label="Notifications">'+ic('bell')+'</b></div>'};
   nav=function(a){return '<nav>'+[['home','Home','home'],['wallet','Wallet','pie'],['earn','Earn','check'],['activity','Activity','clock'],['profile','Profile','user']].map(function(n){return '<a class="'+(n[0]===a?'on':'')+'" onclick="go(\''+n[0]+'\')">'+ic(n[2])+'<span>'+n[1]+'</span></a>';}).join('')+'</nav>'};
 
@@ -1099,11 +1106,11 @@ const s=await db.auth.getSession();if(s.data.session){await initData();if(profil
   };
 
   liveShop=async function(){
-    const p=profile,q=await Promise.all([db.from('cycle_runs').select('id,status,cycle_base,task_completed_at,ready_at,settled_at,profit_amount,created_at').eq('user_id',p.id).in('status',['TASKS_OPEN','WAITING_18H']).order('created_at',{ascending:false}).limit(1).maybeSingle(),db.from('tasks').select('id,cycle_id,title,description,status,progress,reward,task_value,due_date,offer_id').eq('user_id',p.id).order('id',{ascending:false}).limit(100),db.from('shop_offers').select('id,title,subtitle,product_id,task_level').eq('status','ACTIVE')]);
+    const p=profile,q=await Promise.all([db.from('cycle_runs').select('id,status,cycle_base,task_completed_at,ready_at,settled_at,profit_amount,created_at').eq('user_id',p.id).in('status',['TASKS_OPEN','WAITING_18H']).order('created_at',{ascending:false}).limit(1).maybeSingle(),db.from('tasks').select('id,cycle_id,title,description,status,progress,reward,task_value,due_date,offer_id,shop_purchase_confirmed').eq('user_id',p.id).order('id',{ascending:false}).limit(100),db.from('shop_offers').select('id,title,subtitle,product_id,task_level').eq('status','ACTIVE')]);
     if(q[0].error||q[1].error||q[2].error){uiNotice('Unable to load the earning cycle right now.','error');return;}
     const cycle=q[0].data||null,offerMap=new Map((q[2].data||[]).map(function(x){return[String(x.id),x];})),rows=(q[1].data||[]).filter(function(x){return !cycle||x.cycle_id===cycle.id;});taskProductData={};
     const done=rows.filter(function(x){return String(x.status)==='Completed';}).length,progress=rows.length?Math.round(done/rows.length*100):0,totalValue=rows.reduce(function(n,x){return n+Number(x.task_value||0);},0),waiting=cycle?.status==='WAITING_18H';
-    const taskHtml=rows.length?rows.map(function(x){const offer=offerMap.get(String(x.offer_id||''))||null,product=(window.AegisShopCatalog||[]).find(function(p){return String(p.id)===String(offer?.product_id||'');})||null;taskProductData[String(x.id)]={task:x,offer:offer,product:product};const raw=product?.image||'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0),prox=raw?taskImageUrl(raw):'',fallback=taskImageFallbackUrl(title,0);return '<div class="p2-card compact" style="margin-bottom:9px"><div class="task-product-row">'+(raw?'<img class="task-product-img" src="'+esc(fallback)+'" data-remote-src="'+esc(prox)+'" data-direct-src="'+esc(raw)+'" alt="'+esc(title)+'" loading="lazy">':'<img class="task-product-img" src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?rating.toFixed(1)+'/5':'Rating available')+' · Purchase '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">Pictures & Reviews</button></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Complete</div>':'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>')+'</div></div><small class="mu" style="display:block;margin-top:8px;font-size:10px">'+esc(x.description||'Assigned Shop task')+' · Due '+esc(x.due_date||'—')+'</small></div>';}).join(''):'<div class="p2-empty"><b>No assigned tasks</b>Active Shop tasks appear automatically after tier activation.</div>';
+    const taskHtml=rows.length?rows.map(function(x){const offer=offerMap.get(String(x.offer_id||''))||null,product=(window.AegisShopCatalog||[]).find(function(p){return String(p.id)===String(offer?.product_id||'');})||null;taskProductData[String(x.id)]={task:x,offer:offer,product:product};const raw=product?.image||'',title=product?.title||x.title||'Assigned Shop Product',brand=product?.brand||offer?.subtitle||'AegisPay Shop',rating=Number(product?.rating||0),prox=raw?taskImageUrl(raw):'',fallback=taskImageFallbackUrl(title,0);return '<div class="p2-card compact" style="margin-bottom:9px"><div class="task-product-row">'+(raw?'<img class="task-product-img" src="'+esc(fallback)+'" data-remote-src="'+esc(prox)+'" data-direct-src="'+esc(raw)+'" alt="'+esc(title)+'" loading="lazy">':'<img class="task-product-img" src="'+esc(fallback)+'" alt="'+esc(title)+'" loading="lazy">')+'<div class="task-product-info"><div class="task-product-title">'+esc(title)+'</div><div class="task-product-sub">'+esc(brand)+' · '+(rating?rating.toFixed(1)+'/5':'Rating available')+' · Purchase '+Number(x.task_value||0).toFixed(2)+' USDT</div><button type="button" class="task-view-product" data-open-task-product="'+esc(x.id)+'">Pictures & Reviews</button></div><div class="task-side"><div class="task-values">'+Number(x.task_value||0).toFixed(2)+'<small>Profit '+Number(x.reward||0).toFixed(2)+'</small></div>'+(String(x.status)==='Completed'?'<div class="task-done">✓ Complete</div>':(x.shop_purchase_confirmed?'<button type="button" class="task-complete" data-complete-task="'+esc(x.id)+'">Complete</button>':'<button type="button" class="task-complete" data-buy-task-product="'+esc(x.id)+'">Buy in Shop</button>'))+'</div></div><small class="mu" style="display:block;margin-top:8px;font-size:10px">'+esc(x.description||'Assigned Shop task')+' · Due '+esc(x.due_date||'—')+'</small></div>';}).join(''):'<div class="p2-empty"><b>No assigned tasks</b>Active Shop tasks appear automatically after tier activation.</div>';
     let status=!cycle?(profile.selected_tier_id?'<div class="p2-status"><span class="dot"></span><div><b>Preparing next cycle</b><small>Your active tier is selected.</small></div></div>':'<div class="p2-status"><span class="dot"></span><div><b>Shop is ready</b><small>Select a tier from Deposit to start automatic task assignment.</small></div></div>'):waiting?'<div class="p2-status green"><span class="dot"></span><div><b>18-hour settlement is running</b><small>All '+rows.length+' tasks are complete · '+esc(cycle.ready_at?new Date(cycle.ready_at).toLocaleString():'Automatic settlement')+'</small></div></div>':'<div class="p2-status"><span class="dot"></span><div><b>Active Shop cycle · '+Number(cycle.cycle_base||0).toFixed(2)+' USDT</b><small>'+done+'/'+rows.length+' tasks completed</small></div></div>';
     app.innerHTML=top('Earn')+status+'<div class="p2-card"><div class="p2-head"><h2>Cycle Progress</h2><span>'+progress+'%</span></div><div class="p2-progress"><i style="width:'+progress+'%"></i></div><div class="p2-mini-grid"><div class="p2-mini"><small>Tasks</small><b>'+done+'/'+rows.length+'</b></div><div class="p2-mini"><small>Task Value</small><b>'+totalValue.toFixed(2)+' USDT</b></div></div></div><div class="p2-card"><div class="p2-head"><h2>Workflow</h2><span>3 steps</span></div><div class="p2-step"><span class="n">1</span><div><b>Review the assigned product</b><small>Open Pictures & Reviews before purchasing.</small></div></div><div class="p2-step"><span class="n">2</span><div><b>Purchase in Shop</b><small>Use the assigned item, then return here.</small></div></div><div class="p2-step"><span class="n">3</span><div><b>Complete the task</b><small>The secured Shop workflow processes completion.</small></div></div></div><div class="p2-head"><h2>Assigned Tasks</h2><span>'+rows.length+' total</span></div>'+taskHtml+'<button class="btn" style="margin-bottom:10px" onclick="location.href=\'https://aegispay-shopping.aegispay.workers.dev/?from=aegis&return=\'+encodeURIComponent(location.href)">Open Shop Marketplace '+ic('arrow')+'</button><button class="btn o" style="margin-bottom:14px" onclick="go(\'referral\')">'+ic('gift')+' Referral Rewards</button><div id="taskProductModal" class="task-modal" aria-hidden="true"><div class="task-modal-box"><div id="taskProductContent"></div></div></div>'+nav('earn');
     bindTaskImageFallback(app);bindTaskDelegation();
