@@ -82,7 +82,13 @@ const admin=fs.readFileSync('master-admin.html','utf8');
 assert(admin.includes('./admin-auth.js')&&!admin.includes('aegis-core.js')&&!admin.includes('app.js'),'Admin entry wiring incomplete');
 
 const adminAuth=fs.readFileSync('admin-auth.js','utf8');
-assert(adminAuth.includes('Production Readiness')&&adminAuth.includes('aaProductionForm')&&adminAuth.includes('set_production_config')&&adminAuth.includes('get_production_readiness'),'Phase 3 Master Admin readiness controls are missing');
+assert(adminAuth.includes('Production Readiness')&&adminAuth.includes('aaProductionForm')&&adminAuth.includes("service.invokeFunction('production-readiness'")&&adminAuth.includes('get_production_readiness'),'Phase 3 Master Admin readiness controls are missing');
+
+const productionReadiness=fs.readFileSync('supabase/functions/production-readiness/index.ts','utf8');
+assert(productionReadiness.includes('set_production_config')&&productionReadiness.includes('mainnet_payout_operational')&&productionReadiness.includes('MASTER ADMIN'),'Production readiness must be enforced by the protected Edge Function');
+
+const productionGuardMigration=fs.readFileSync('database/migrations/20261010052037_normalize_production_environment_guard.sql','utf8');
+assert(productionGuardMigration.includes("upper(COALESCE(status,'')) IN ('ACTIVE','NORMAL')")&&productionGuardMigration.includes("IF v_env='PRE_PRODUCTION' AND p_real_payouts_enabled"),'Database role and production-environment guards must reject inactive admins and case variants');
 
 const payout=fs.readFileSync('supabase/functions/execute-payout/index.ts','utf8');
 assert(payout.includes('production_config')&&payout.includes('Production payout gate is locked'),'Phase 3 payout gate is missing');
@@ -155,3 +161,4 @@ for(const p of stale)assert(!exists(p),'Legacy path remains in canonical main: '
 
 console.log('AegisPay canonical architecture validation: PASS');
 assert(!fs.existsSync('netlify.toml'),'Obsolete Netlify production configuration must not return to canonical main');
+
