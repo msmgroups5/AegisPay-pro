@@ -85,4 +85,5 @@ jobs:
           python3 -c 'import json; assert json.load(open("/tmp/cf.json"))["success"] is True'
       - name: Deploy canonical site to Cloudflare Pages
         shell: bash
-        run: npx --yes wrangler@4 pages deploy site --project-name=aegispay-pro --branch=main --commit-hash="${GITHUB_SHA}" --commit-message="AegisPay canonical client UI" --commit-dirty=false
+        run: npx --yes wrangler@4 pages deploy site --project-name=aegispay-pro --branch="${GITHUB_REF_NAME}" --commit-hash="${GITHUB_SHA}" --commit-message="AegisPay canonical client UI" --commit-dirty=false
+

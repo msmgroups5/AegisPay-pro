@@ -90,6 +90,9 @@ assert(productionReadiness.includes('set_production_config')&&productionReadines
 const productionGuardMigration=fs.readFileSync('database/migrations/20261010052037_normalize_production_environment_guard.sql','utf8');
 assert(productionGuardMigration.includes("upper(COALESCE(status,'')) IN ('ACTIVE','NORMAL')")&&productionGuardMigration.includes("IF v_env='PRE_PRODUCTION' AND p_real_payouts_enabled"),'Database role and production-environment guards must reject inactive admins and case variants');
 
+const webDeploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
+assert(webDeploy.includes('--branch="${GITHUB_REF_NAME}"')&&!webDeploy.includes('--branch=main'),'Manual Pages deployments must stay on the selected Git branch');
+
 const payout=fs.readFileSync('supabase/functions/execute-payout/index.ts','utf8');
 assert(payout.includes('production_config')&&payout.includes('Production payout gate is locked'),'Phase 3 payout gate is missing');
 
