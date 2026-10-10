@@ -90,6 +90,15 @@ assert(productionReadiness.includes('set_production_config')&&productionReadines
 const productionGuardMigration=fs.readFileSync('database/migrations/20261010052037_normalize_production_environment_guard.sql','utf8');
 assert(productionGuardMigration.includes("upper(COALESCE(status,'')) IN ('ACTIVE','NORMAL')")&&productionGuardMigration.includes("IF v_env='PRE_PRODUCTION' AND p_real_payouts_enabled"),'Database role and production-environment guards must reject inactive admins and case variants');
 
+const publicSite=fs.readFileSync('site/index.html','utf8');
+assert(publicSite.includes('TRON MAINNET · REAL USDT DEPOSITS')&&publicSite.includes('blockchain transfers cannot be reversed')&&publicSite.includes('Real withdrawals are currently locked'),'Public site must disclose live Mainnet deposits, irreversible transfers, and locked payouts');
+assert(!publicSite.includes('NO REAL FUNDS')&&!publicSite.includes('TESTNET / DEMO ONLY'),'Public site must not describe the live deposit system as demo-only');
+const depositMonitor=fs.readFileSync('supabase/functions/monitor-deposits/index.ts','utf8');
+assert(depositMonitor.includes('verify_deposit_monitor_cron_secret')&&depositMonitor.includes('x-aegis-cron-secret'),'Deposit monitor must authenticate scheduled calls using the server-side Vault token');
+const monitorMigration=fs.readFileSync('database/migrations/20261010110000_secure_mainnet_deposit_monitor_schedule.sql','utf8');
+assert(monitorMigration.includes('vault.create_secret')&&monitorMigration.includes("'aegispay-mainnet-deposit-monitor'")&&monitorMigration.includes("'* * * * *'")&&monitorMigration.includes('GRANT EXECUTE ON FUNCTION public.verify_deposit_monitor_cron_secret(text) TO service_role'),'Mainnet deposit monitoring must have a Vault-backed per-minute schedule and service-role-only secret validation');
+assert(client.includes('wallet===DEPOSIT_ADDRESS')&&client.includes('Approved submissions are checked automatically about once per minute')&&client.includes('Real withdrawals are currently locked'),'Client deposit flow must guard against stale QR destinations and disclose Mainnet risks and payout status');
+
 const webDeploy=fs.readFileSync('.github/workflows/web-portal-deploy.yml','utf8');
 assert(webDeploy.includes('--branch="${GITHUB_REF_NAME}"')&&!webDeploy.includes('--branch=main'),'Manual Pages deployments must stay on the selected Git branch');
 

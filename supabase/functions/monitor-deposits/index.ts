@@ -49,11 +49,17 @@ async function verifyOne(admin: any, deposit: any, receiving: string, baseUrl: s
 
 Deno.serve(async (req: Request) => {
   if (req.method !== "POST" && req.method !== "GET") return json({ error: "Method not allowed." }, 405);
-  if (!CRON_SECRET || req.headers.get("x-aegis-cron-secret") !== CRON_SECRET) return json({ error: "Unauthorized." }, 401);
   if (!SUPABASE_URL || !SERVICE_KEY) return json({ error: "Deposit monitor is not configured." }, 503);
 
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
+    const suppliedSecret = req.headers.get("x-aegis-cron-secret");
+    const environmentSecretMatches = Boolean(CRON_SECRET && suppliedSecret && suppliedSecret === CRON_SECRET);
+    if (!environmentSecretMatches) {
+      if (!suppliedSecret) return json({ error: "Unauthorized." }, 401);
+      const { data: secretMatches, error: secretError } = await admin.rpc("verify_deposit_monitor_cron_secret", { p_token: suppliedSecret });
+      if (secretError || secretMatches !== true) return json({ error: "Unauthorized." }, 401);
+    }
     const { data: appEnabled, error: runtimeError } = await admin.rpc("app_runtime_enabled");
     if (runtimeError) return json({ error: "Unable to confirm AegisPay runtime status." }, 503);
     if (appEnabled !== true) return json({ appEnabled: false, checked: 0, results: [] });

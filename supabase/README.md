@@ -27,7 +27,7 @@ The canonical repository tracks this policy in `database/migrations/20261003_pri
 
 Current `platform_settings.system_mode` is `MAINNET / LIVE_DEPOSIT_TEST` with controlled live-deposit testing enabled and real payouts disabled behind the Phase 3 production gate.
 
-One active pg_cron job, `aegispay-cycle-settlement`, runs every minute.
+Two active pg_cron jobs run every minute: `aegispay-cycle-settlement` and `aegispay-mainnet-deposit-monitor`. The deposit monitor calls the custom-authenticated `monitor-deposits` Edge Function. Its caller token is generated and stored in Supabase Vault; approved deposit submissions are checked against the configured TRON network. This monitor does not enable payouts.
 
 ## Current review items
 

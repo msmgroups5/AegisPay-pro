@@ -1,13 +1,13 @@
 {
-  "versionCode": 40,
-  "versionName": "2.6.1",
+  "versionCode": 41,
+  "versionName": "2.6.2",
   "releaseChannel": "test",
   "releasedAt": "2026-10-09T23:58:58Z",
-  "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client-v2.6.1-b40.apk",
+  "clientApkUrl": "https://aegispay-pro.pages.dev/downloads/aegispay-client-v2.6.2-b41.apk",
   "clientSha256": "",
   "notes": [
-    "Canonical Aurora Client UI with restored Shop catalog and assigned-product flow.",
-    "Shop purchase confirmation, task completion, and back navigation are connected.",
-    "Activity notices are marked Preview and display every 30 seconds."
+    "Clarifies real TRON Mainnet deposits and locked withdrawals.",
+    "Checks the displayed deposit QR against the configured receiving address.",
+    "Deposit monitor is scheduled to verify approved submissions automatically."
   ]
 }
