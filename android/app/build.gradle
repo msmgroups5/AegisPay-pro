@@ -134,6 +134,7 @@ def syncClientAegisPayWebAssets = tasks.register('syncClientAegisPayWebAssets', 
     }
     from(webRoot) {
         include 'client.html'
+        include 'supabase-sdk.js'
         include 'app-version.json'
         include 'app-update.js'
     }
