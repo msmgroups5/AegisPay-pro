@@ -16,6 +16,7 @@ const must=[
   'database/migrations/20261009_harden_shop_task_account_state.sql',
   'database/migrations/20261009_harden_shop_task_product_and_runtime.sql',
   'database/migrations/20261009_retire_public_username_email_lookup.sql',
+  'database/migrations/20261014_phase1_validate_withdrawal_wallets.sql',
   'supabase/functions/production-readiness/index.ts',
   'supabase/functions/submit-kyc/ai-review.ts','supabase/functions/submit-deposit/ai-review.ts',
   'site/index.html','site/site.css','android/app/build.gradle',
