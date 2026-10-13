@@ -15,7 +15,8 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  IF NOT public.is_valid_tron_address(NEW.destination_address) THEN
+  -- NULL must fail closed too; PL/pgSQL IF treats a NULL condition as not true.
+  IF COALESCE(public.is_valid_tron_address(NEW.destination_address), false) IS NOT TRUE THEN
     RAISE EXCEPTION USING ERRCODE = '22023',
       MESSAGE = 'Enter a valid case-sensitive TRON Base58Check wallet address';
   END IF;
