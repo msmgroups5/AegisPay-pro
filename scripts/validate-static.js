@@ -43,6 +43,11 @@ assertInlineScriptsParse('client.html');
 assertInlineScriptsParse('master-admin.html');
 
 const client=fs.readFileSync('client.html','utf8');
+const withdrawalMigration=fs.readFileSync('database/migrations/20261007_password_reset_freeze_enforcement.sql','utf8');
+assert(withdrawalMigration.includes('public.is_valid_tron_address(p_address)'),'Wallet linking must verify TRON Base58Check checksum');
+assert(withdrawalMigration.includes('public.is_valid_tron_address(v_wallet)'),'Withdrawal submission must validate the saved wallet checksum');
+assert(!client.includes('withdrawWallet.value.trim().toUpperCase()'),'Client must not uppercase case-sensitive TRON addresses');
+
 assert(client.includes('bootLive'),'Client inline runtime bootstrap is missing');
 assert(client.includes('liveHome'),'Client Home runtime is missing');
 assert(client.includes('liveTopup'),'Client Top Up runtime is missing');
