@@ -45,7 +45,7 @@ assertInlineScriptsParse('master-admin.html');
 
 const client=fs.readFileSync('client.html','utf8');
 const withdrawalMigration=fs.readFileSync('database/migrations/20261014_phase1_validate_withdrawal_wallets.sql','utf8');
-assert(withdrawalMigration.includes('public.is_valid_tron_address(NEW.destination_address)'),'Database writes must verify TRON Base58Check checksum');
+assert(withdrawalMigration.includes('COALESCE(public.is_valid_tron_address(NEW.destination_address), false) IS NOT TRUE'),'Database writes must fail closed on invalid or NULL TRON addresses');
 assert(withdrawalMigration.includes('withdrawal_requests_validate_destination'),'New withdrawal destinations must be validated server-side');
 assert(!client.includes('withdrawWallet.value.trim().toUpperCase()'),'Client must not uppercase case-sensitive TRON addresses');
 
