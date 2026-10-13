@@ -109,7 +109,7 @@ def verifyCanonicalAuroraClientUi = tasks.register('verifyCanonicalAuroraClientU
         def html = new String(bytes, 'UTF-8')
         def requiredAuroraMarkers = [
             '<title>AegisPay – Aurora UI</title>',
-            'Choose Deposit Tier',
+            'Choose Your Tier',
             'Submit Deposit',
             'link_withdrawal_wallet',
             'Identity Verification',
