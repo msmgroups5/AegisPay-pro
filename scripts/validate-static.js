@@ -46,7 +46,12 @@ assertInlineScriptsParse('master-admin.html');
 const client=fs.readFileSync('client.html','utf8');
 const withdrawalMigration=fs.readFileSync('database/migrations/20261014_phase1_validate_withdrawal_wallets.sql','utf8');
 assert(withdrawalMigration.includes('COALESCE(public.is_valid_tron_address(NEW.destination_address), false) IS NOT TRUE'),'Database writes must fail closed on invalid or NULL TRON addresses');
-assert(withdrawalMigration.includes('withdrawal_requests_validate_destination'),'New withdrawal destinations must be validated server-side');
+assert(withdrawalMigration.includes('users_validate_withdrawal_destination'),'Saved user wallets must be validated server-side');
+assert(withdrawalMigration.includes('BEFORE INSERT OR UPDATE OF destination_address ON public.users'),'Saved-wallet validation must cover inserts and address changes');
+assert(withdrawalMigration.includes('BEFORE INSERT OR UPDATE OF destination_address ON public.withdrawal_requests'),'Withdrawal destination validation must cover inserts and address changes');
+assert(withdrawalMigration.includes("TG_TABLE_NAME = 'users'")&&withdrawalMigration.includes("COALESCE(trim(NEW.destination_address), '') = ''"),'A blank saved user wallet must remain allowed until a user sets one');
+assert(withdrawalMigration.includes('SET search_path TO \'\''),'Trigger function must use a locked-down search_path');
+assert(!client.includes('withdrawWallet.value.trim().toUpperCase()'),'Client must not uppercase case-sensitive TRON addresses');
 assert(!client.includes('withdrawWallet.value.trim().toUpperCase()'),'Client must not uppercase case-sensitive TRON addresses');
 
 assert(client.includes('bootLive'),'Client inline runtime bootstrap is missing');
@@ -92,6 +97,17 @@ assert(adminAuth.includes('Production Readiness')&&adminAuth.includes('aaProduct
 
 const payout=fs.readFileSync('supabase/functions/execute-payout/index.ts','utf8');
 assert(payout.includes('production_config')&&payout.includes('Production payout gate is locked'),'Phase 3 payout gate is missing');
+assert(payout.includes("if (profile.role !== \"MASTER ADMIN\")")&&payout.includes('Master Admin access required.'),'Only Master Admin may execute withdrawals');
+assert(!payout.includes('aiApprovedClientPayout')&&!payout.includes('Only your own currently AI-approved withdrawal'),'AI approval must not bypass Master Admin payout authority');
+const depositMonitor=fs.readFileSync('supabase/functions/monitor-deposits/index.ts','utf8');
+for(const marker of [
+  'verify_deposit_monitor_cron_secret','MAINNET_DEPOSITS_PAUSED','mode.live_deposits === true',
+  'mode.real_payouts === true','mode.production_go_live_approved === true',
+  'production.live_deposits_enabled === true','production.real_payouts_enabled === true',
+  'production.go_live_approved === true','production.payouts_locked === false',
+  'unresolvedPayouts','TRON_PAYOUT_PRIVATE_KEY'
+])assert(depositMonitor.includes(marker),'Deposit monitor production safety gate missing: '+marker);
+assert(depositMonitor.includes('if (!mainnetDepositsOpen)'),'Mainnet deposit monitor must fail closed until readiness gates pass');
 
 const service=fs.readFileSync('supabase-service.js','utf8');
 assert(service.includes("'username-login'"),'Shared auth helper must use protected username login');
