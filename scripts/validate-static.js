@@ -107,6 +107,7 @@ for(const marker of [
   'unresolvedPayouts','TRON_PAYOUT_PRIVATE_KEY'
 ])assert(depositMonitor.includes(marker),'Deposit monitor production safety gate missing: '+marker);
 assert(depositMonitor.includes('if (!mainnetDepositsOpen)'),'Mainnet deposit monitor must fail closed until readiness gates pass');
+assert(depositMonitor.includes('.split(/[\\s,]+/)'),'Telegram approver IDs must split on whitespace or commas');
 
 const service=fs.readFileSync('supabase-service.js','utf8');
 assert(service.includes("'username-login'"),'Shared auth helper must use protected username login');
