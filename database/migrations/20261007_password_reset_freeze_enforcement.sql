@@ -61,6 +61,10 @@ BEGIN
     RAISE EXCEPTION 'Link a withdrawal wallet before requesting a withdrawal';
   END IF;
 
+  IF NOT public.is_valid_tron_address(v_wallet) THEN
+    RAISE EXCEPTION 'The linked withdrawal wallet is invalid. Contact Master Admin to correct the exact case-sensitive address before requesting a payout';
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1 FROM public.kyc_verifications
     WHERE user_id=v_user_id AND status='VERIFIED'
@@ -140,8 +144,8 @@ BEGIN
     RAISE EXCEPTION 'Withdrawal wallet is already linked';
   END IF;
 
-  IF trim(COALESCE(p_address,'')) !~ '^T[1-9A-HJ-NP-Za-km-z]{33}$' THEN
-    RAISE EXCEPTION 'Enter a valid TRON wallet address';
+  IF NOT public.is_valid_tron_address(p_address) THEN
+    RAISE EXCEPTION 'Enter a valid case-sensitive TRON Base58Check wallet address';
   END IF;
 
   IF lower(trim(COALESCE(p_owner_name,''))) <> lower(trim(v_user.name)) THEN
