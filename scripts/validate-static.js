@@ -52,7 +52,6 @@ assert(withdrawalMigration.includes('BEFORE INSERT OR UPDATE OF destination_addr
 assert(withdrawalMigration.includes("TG_TABLE_NAME = 'users'")&&withdrawalMigration.includes("COALESCE(trim(NEW.destination_address), '') = ''"),'A blank saved user wallet must remain allowed until a user sets one');
 assert(withdrawalMigration.includes('SET search_path TO \'\''),'Trigger function must use a locked-down search_path');
 assert(!client.includes('withdrawWallet.value.trim().toUpperCase()'),'Client must not uppercase case-sensitive TRON addresses');
-assert(!client.includes('withdrawWallet.value.trim().toUpperCase()'),'Client must not uppercase case-sensitive TRON addresses');
 
 assert(client.includes('bootLive'),'Client inline runtime bootstrap is missing');
 assert(client.includes('liveHome'),'Client Home runtime is missing');
